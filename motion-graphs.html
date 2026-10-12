@@ -129,7 +129,7 @@ K.ctl=function(o){
 };
 K.wire=function(root,cb){
   root.querySelectorAll("input[type=range]").forEach(function(i){
-    const out=root.querySelector("#"+i.id+"-o");
+    const out=root.querySelector("#"+i.id+"-o");if(!out)return;
     const dec=String(i.step).indexOf(".")>=0?String(i.step).split(".")[1].length:0;
     const show=function(){out.textContent=(+i.value).toFixed(dec)+(i.dataset.unit?" "+i.dataset.unit:"")};
     show();i.addEventListener("input",function(){show();if(cb)cb(i.id,+i.value)});

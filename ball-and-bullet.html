@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ball and Bullet · Mr. D's Sims</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2f6; --surface:#ffffff; --stage:#f7fafc;
+  --ink:#142230; --muted:#566878; --line:#cbd6e0; --grid:#dde5ed;
+  --a:#0e7c86; --b:#cf7420; --accent:#2b4fd9; --good:#1c7d4a; --warn:#b3412e;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);padding-inline:16px;padding-block:18px 48px}
+.wrap{max-width:1080px;margin-inline:auto}
+header{display:flex;flex-direction:column;gap:.35rem;margin-bottom:18px}
+.back{font:600 .8rem var(--mono);color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent)}
+h1{font:800 clamp(1.8rem,5vw,2.6rem)/1.05 var(--display);letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,20rem);gap:20px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+.stagewrap{min-width:0;display:flex;flex-direction:column;gap:10px}
+canvas{display:block;width:100%;background:var(--stage);border:1px solid var(--line);border-radius:6px;touch-action:none}
+.readout{display:flex;flex-wrap:wrap;gap:4px 20px;font:400 .85rem var(--mono);color:var(--muted)}
+.readout b{color:var(--ink);font-weight:600}
+.side{min-width:0;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px 14px;margin:0;min-width:0}
+fieldset.card{margin:0}
+legend{font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-top:8px}
+.ctl:first-of-type{margin-top:2px}
+.ctl label{font-size:.92rem}
+.ctl output{font:600 .85rem var(--mono);text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:2px 0}
+.hint{font-size:.85rem;color:var(--muted);margin:.5rem 0 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn{font:600 .95rem var(--body);padding:9px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0e161e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0e161e}}
+.btn:disabled{opacity:.5;cursor:default}
+.chk{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.95rem}
+.choices{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}
+.choices label{display:flex;gap:6px;align-items:center;font-size:.95rem}
+select,input[type=number],input[type=text]{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:0}
+input[type=number]{width:7.5em}
+.q{margin:10px 0 0;font-weight:600;font-size:.95rem}
+.msg{margin:.6rem 0 0;font-size:.95rem}
+.msg.ok{color:var(--good)} .msg.bad{color:var(--warn)}
+.tag{display:inline-block;font:600 .75rem var(--mono);padding:1px 7px;border-radius:3px;margin-right:6px;background:var(--muted);color:var(--surface)}
+.tag.ok{background:var(--good);color:#fff}.tag.bad{background:var(--warn);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font:600 .72rem var(--mono);color:var(--muted);letter-spacing:.04em}
+.scroll{overflow-x:auto}
+.plots{display:flex;flex-direction:column;gap:8px}
+details{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+summary{cursor:pointer;font:600 1rem var(--body)}
+details p,details li{max-width:70ch}
+details code,.card code{font:400 .9em var(--mono)}
+footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<a class="back" href="index.html">&larr; All simulations</a>
+<h1>Ball and Bullet</h1>
+<p class="sub">A ball is dropped. A gun to the side fires a horizontal bullet at it. When should the gun fire so the bullet hits?</p>
+</header>
+
+<div class="layout">
+ <div class="stagewrap"><canvas id="cv" aria-label="A falling ball and a gun firing a horizontal bullet at it"></canvas><div class="readout" id="ro"></div><p class="msg" id="msg" aria-live="polite" style="margin-top:0"></p></div>
+ <div class="side">
+  <fieldset class="card"><legend>The problem</legend>
+   <p class="hint" style="margin-top:0">A heavy ball is dropped from rest. A gun fires a horizontal bullet at it from the side. How long after the ball is released should the gun fire for the bullet to hit it? (No air resistance.)</p>
+   <div id="sl"></div>
+  </fieldset>
+  <fieldset class="card"><legend>Step 1 · Predict</legend>
+   <label class="q" for="din" style="display:block;margin-top:0">Fire the gun after (s)</label>
+   <div class="row" style="margin-top:6px"><input type="number" id="din" step="0.01" placeholder="work it out first"><button class="btn primary" id="go">Release &amp; fire</button></div>
+   <div class="row"><button class="btn" id="rst">Reset</button><button class="btn" id="sol">Show solution</button></div>
+   <label class="chk"><span>Playback</span><input type="range" id="sp" min="0.1" max="1" step="0.05" value="0.4" aria-label="Playback speed"></label>
+  </fieldset>
+  <div class="card" id="solbox" hidden></div>
+ </div>
+</div>
+<details><summary>Instructions</summary><ol><li>Look at the setup: ball height, gun height, distance to the ball's path, and bullet speed. Change them if you like.</li>
+<li>Work out on paper when the gun must fire, measured from the moment the ball is released.</li>
+<li>Type your time and press <b>Release &amp; fire</b>. The ball drops at once and the gun fires at your time.</li>
+<li>A hit means your time is right. A miss tells you whether the bullet went above or below the ball, which tells you whether you fired too early or too late.</li>
+<li>Challenge: find a setup where there is no answer. What goes wrong?</li></ol></details>
+<details><summary>Theory</summary><p>Split the problem in two. The bullet moves sideways at constant speed, so the time it takes to reach the ball's path is <code>&tau; = d / v</code>. While it crosses, it falls freely, so it drops <code>&frac12;g&tau;&sup2;</code> below the gun's height.</p>
+<p>The bullet therefore meets the ball at height <code>h&prime; &minus; &frac12;g&tau;&sup2;</code>. The ball must have fallen from its starting height to that point, which takes <code>t = &radic;(2&Delta;h/g)</code> from release.</p>
+<p>That is the time from <em>release</em> to the meeting. The bullet spends the last <code>&tau;</code> of it in flight, so the gun must fire at <code>t &minus; &tau;</code> after release.</p>
+<p>If that is negative, the ball has already passed the meeting height before the bullet could even get there. Raise the bullet speed or move the gun closer.</p></details>
+<footer>Challenge problem from a collection of kinematics problems, reworded for this page. The numbers were checked by hand and by computer.</footer>
+</div>
+<script>
+const K={};
+K.$=(s,r)=>(r||document).querySelector(s);
+K.css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+K.rad=d=>d*Math.PI/180;K.deg=r=>r*180/Math.PI;
+K.f=(x,n)=>(+x).toFixed(n===undefined?1:n);
+K.G=9.81;
+K.fit=function(cv,ratio){
+  const w=cv.clientWidth||600,h=Math.round(w*ratio),d=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(w*d)||cv.height!==Math.round(h*d)){cv.width=Math.round(w*d);cv.height=Math.round(h*d);cv.style.height=h+"px"}
+  const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return {c:c,w:w,h:h};
+};
+K.ctl=function(o){
+  return '<div class="ctl"><label for="'+o.id+'">'+o.label+'</label><output id="'+o.id+'-o" for="'+o.id+'"></output>'+
+  '<input type="range" id="'+o.id+'" min="'+o.min+'" max="'+o.max+'" step="'+o.step+'" value="'+o.value+'" data-unit="'+(o.unit||"")+'"></div>';
+};
+K.wire=function(root,cb){
+  root.querySelectorAll("input[type=range]").forEach(function(i){
+    const out=root.querySelector("#"+i.id+"-o");if(!out)return;
+    const dec=String(i.step).indexOf(".")>=0?String(i.step).split(".")[1].length:0;
+    const show=function(){out.textContent=(+i.value).toFixed(dec)+(i.dataset.unit?" "+i.dataset.unit:"")};
+    show();i.addEventListener("input",function(){show();if(cb)cb(i.id,+i.value)});
+  });
+};
+K.arrow=function(c,x0,y0,x1,y1,col,lw,dash){
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=lw||2;if(dash)c.setLineDash(dash);
+  c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();c.setLineDash([]);
+  const a=Math.atan2(y1-y0,x1-x0),L=Math.hypot(x1-x0,y1-y0);
+  if(L>6){c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-9*Math.cos(a-.4),y1-9*Math.sin(a-.4));c.lineTo(x1-9*Math.cos(a+.4),y1-9*Math.sin(a+.4));c.closePath();c.fill()}
+  c.restore();
+};
+K.ticks=function(a,b,n){
+  const raw=(b-a)/n;if(!(raw>0))return [a];
+  const p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;
+  const s=(m<1.5?1:m<3?2:m<7?5:10)*p,out=[];
+  for(let v=Math.ceil(a/s-1e-9)*s;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));
+  return out;
+};
+/* K.plot(c, {x,y,w,h}, {xmin,xmax,ymin,ymax,title,xlabel,series:[{pts,color,width,dash,dots}],cursorX,vlines:[{x,color}],hlines:[{y,color,dash}]}) */
+K.plot=function(c,bx,o){
+  const X=function(v){return bx.x+(v-o.xmin)/(o.xmax-o.xmin)*bx.w};
+  const Y=function(v){return bx.y+bx.h-(v-o.ymin)/(o.ymax-o.ymin)*bx.h};
+  c.save();c.fillStyle=K.css("--surface");c.fillRect(bx.x,bx.y,bx.w,bx.h);
+  c.font="10px "+K.css("--mono");c.lineWidth=1;
+  const gx=K.ticks(o.xmin,o.xmax,Math.max(2,Math.round(bx.w/60))),gy=K.ticks(o.ymin,o.ymax,Math.max(2,Math.round(bx.h/32)));
+  c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");
+  c.textAlign="center";c.textBaseline="top";
+  gx.forEach(function(v){c.beginPath();c.moveTo(X(v),bx.y);c.lineTo(X(v),bx.y+bx.h);c.stroke();c.fillText(String(+v.toFixed(6)),X(v),bx.y+bx.h+3)});
+  c.textAlign="right";c.textBaseline="middle";
+  gy.forEach(function(v){c.beginPath();c.moveTo(bx.x,Y(v));c.lineTo(bx.x+bx.w,Y(v));c.stroke();c.fillText(String(+v.toFixed(6)),bx.x-4,Y(v))});
+  c.strokeStyle=K.css("--muted");
+  if(o.ymin<0&&o.ymax>0){c.beginPath();c.moveTo(bx.x,Y(0));c.lineTo(bx.x+bx.w,Y(0));c.stroke()}
+  if(o.xmin<0&&o.xmax>0){c.beginPath();c.moveTo(X(0),bx.y);c.lineTo(X(0),bx.y+bx.h);c.stroke()}
+  c.beginPath();c.rect(bx.x,bx.y,bx.w,bx.h);c.clip();
+  (o.hlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--muted");c.setLineDash(l.dash||[4,4]);c.beginPath();c.moveTo(bx.x,Y(l.y));c.lineTo(bx.x+bx.w,Y(l.y));c.stroke()});
+  (o.vlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--b");c.setLineDash(l.dash||[]);c.beginPath();c.moveTo(X(l.x),bx.y);c.lineTo(X(l.x),bx.y+bx.h);c.stroke()});
+  c.setLineDash([]);
+  (o.series||[]).forEach(function(s){
+    c.strokeStyle=K.css(s.color||"--accent");c.fillStyle=c.strokeStyle;c.lineWidth=s.width||2;c.setLineDash(s.dash||[]);
+    if(s.dots){s.pts.forEach(function(p){c.beginPath();c.arc(X(p[0]),Y(p[1]),s.r||3.5,0,7);c.fill()})}
+    else{c.beginPath();s.pts.forEach(function(p,i){i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1]))});c.stroke()}
+  });
+  c.setLineDash([]);
+  if(o.cursorX!==undefined&&o.cursorX!==null){c.strokeStyle=K.css("--ink");c.lineWidth=1;c.beginPath();c.moveTo(X(o.cursorX),bx.y);c.lineTo(X(o.cursorX),bx.y+bx.h);c.stroke()}
+  c.restore();
+  c.save();c.strokeStyle=K.css("--line");c.strokeRect(bx.x+.5,bx.y+.5,bx.w-1,bx.h-1);
+  c.fillStyle=K.css("--ink");c.font="600 11px "+K.css("--mono");c.textAlign="left";c.textBaseline="top";
+  if(o.title)c.fillText(o.title,bx.x+6,bx.y+4);
+  if(o.xlabel){c.fillStyle=K.css("--muted");c.textAlign="right";c.fillText(o.xlabel,bx.x+bx.w-6,bx.y+4)}
+  c.restore();
+  return {X:X,Y:Y};
+};
+K.loop=function(update,draw){
+  let last=performance.now();
+  function fr(now){const dt=Math.min((now-last)/1000,.1);last=now;update(dt);draw();requestAnimationFrame(fr)}
+  requestAnimationFrame(fr);
+};
+K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296}};
+
+(function(){
+"use strict";
+
+const $=K.$,cv=$("#cv"),g=9.81;
+$("#sl").innerHTML=K.ctl({id:"h",label:"Ball starts at",min:12,max:40,step:1,value:20,unit:"m"})+
+ K.ctl({id:"hp",label:"Gun height",min:2,max:30,step:1,value:10,unit:"m"})+
+ K.ctl({id:"d",label:"Distance to ball's path",min:20,max:80,step:1,value:50,unit:"m"})+
+ K.ctl({id:"v",label:"Bullet speed",min:40,max:200,step:5,value:100,unit:"m/s"});
+const S={h:20,hp:10,d:50,v:100};let st=null;
+const msg=(t,c)=>{const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")};
+K.wire(document,id=>{S.h=+$("#h").value;S.hp=+$("#hp").value;S.d=+$("#d").value;S.v=+$("#v").value;
+ if(S.hp>S.h-1){S.hp=S.h-1;$("#hp").value=S.hp;$("#hp-o").textContent=S.hp+" m"}st=null;msg("")});
+function ans(){const tau=S.d/S.v,yh=S.hp-.5*g*tau*tau,tb=yh>0.4?Math.sqrt(2*(S.h-yh)/g):NaN;return {tau:tau,yh:yh,tb:tb,delay:tb-tau}}
+$("#rst").onclick=()=>{st=null;msg("")};
+$("#go").onclick=()=>{
+ const d=parseFloat($("#din").value);if(!isFinite(d)||d<0){msg("Type a time of zero or more first.","bad");return}
+ st={t:0,delay:d,fired:false,bx:0,by:S.hp,bt:0,done:false,res:null,trail:[]};msg("")};
+$("#sol").onclick=()=>{
+ const b=$("#solbox"),a=ans();b.hidden=!b.hidden;if(b.hidden)return;
+ if(!(a.delay>=0)){b.innerHTML='<p class="q" style="margin-top:0">No answer for this setup</p><p class="hint">By the time the bullet could reach the ball\'s path, the ball has already fallen past the height where they would meet. Increase the bullet speed or reduce the distance.</p>';return}
+ b.innerHTML='<p class="q" style="margin-top:0">Solution</p><ol style="padding-left:1.2em;margin:.4em 0"><li>Bullet flight time: &tau; = d/v = '+S.d+'/'+S.v+' = <b>'+K.f(a.tau,2)+' s</b>.</li>'+
+ '<li>It falls &frac12;g&tau;&sup2; = '+K.f(.5*g*a.tau*a.tau,2)+' m, so it meets the ball at height '+S.hp+' &minus; '+K.f(.5*g*a.tau*a.tau,2)+' = <b>'+K.f(a.yh,2)+' m</b>.</li>'+
+ '<li>The ball has fallen '+S.h+' &minus; '+K.f(a.yh,2)+' = '+K.f(S.h-a.yh,2)+' m, which takes t = &radic;(2&middot;'+K.f(S.h-a.yh,2)+'/g) = <b>'+K.f(a.tb,2)+' s</b>.</li>'+
+ '<li>Fire <b>'+K.f(a.delay,2)+' s</b> after release: t &minus; &tau; = '+K.f(a.tb,2)+' &minus; '+K.f(a.tau,2)+'.</li></ol>';
+};
+function update(dt){
+ if(!st||st.done)return;dt*=+$("#sp").value;const n=Math.ceil(dt/.002),h=dt/n;
+ for(let i=0;i<n&&!st.done;i++){
+  st.t+=h;
+  if(!st.fired&&st.t>=st.delay){st.fired=true;st.bt=0;st.bx=0;st.by=S.hp}
+  if(st.fired){st.bt+=h;st.bx=S.v*st.bt;st.by=S.hp-.5*g*st.bt*st.bt;if(st.trail.length===0||st.bt-st.last>.01){st.trail.push([st.bx,st.by]);st.last=st.bt}
+   if(st.bx>=S.d){const yb=Math.max(.4,S.h-.5*g*st.t*st.t),dy=st.by-yb;st.done=true;st.dy=dy;st.by=yb+dy;
+    msg(Math.abs(dy)<=.45?"Hit! The bullet reached the ball "+K.f(st.t,2)+" s after release.":"Miss. The bullet passed "+K.f(Math.abs(dy),2)+" m "+(dy>0?"above":"below")+" the ball. You fired too "+(dy>0?"late (the ball had already fallen below the bullet)":"early (the ball had not yet fallen to the bullet\'s height)")+".",Math.abs(dy)<=.45?"ok":"bad");}}
+  if(st.t>8){st.done=true;msg("Time ran out.","bad")}
+ }
+}
+function draw(){
+ const {c,w,h}=K.fit(cv,.8),sc=Math.min((w-60)/(S.d+10),(h-40)/(S.h+4)),X=x=>30+x*sc,Y=y=>h-22-y*sc;
+ c.clearRect(0,0,w,h);c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.lineWidth=1;c.textAlign="right";
+ K.ticks(0,S.h+3,6).forEach(m=>{c.beginPath();c.moveTo(24,Y(m));c.lineTo(w,Y(m));c.stroke();c.fillText(m+" m",26,Y(m)+3)});
+ c.fillStyle=K.css("--line");c.fillRect(0,Y(0),w,h-Y(0));c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,Y(0));c.lineTo(w,Y(0));c.stroke();
+ c.lineWidth=3;c.beginPath();c.moveTo(X(0),Y(S.hp));c.lineTo(X(3),Y(S.hp));c.stroke();c.fillStyle=K.css("--ink");c.fillRect(X(-1.5),Y(S.hp)-3,X(1.5)-X(-1.5),6);c.fillRect(X(-1.2),Y(S.hp),6,Y(0)-Y(S.hp));
+ c.setLineDash([3,4]);c.strokeStyle=K.css("--muted");c.lineWidth=1;c.beginPath();c.moveTo(X(S.d),Y(0));c.lineTo(X(S.d),Y(S.h+3));c.stroke();c.setLineDash([]);
+ const a=ans(),t=st?st.t:0,yb=Math.max(.4,S.h-.5*g*t*t);
+ c.fillStyle=K.css("--b");c.beginPath();c.arc(X(S.d),Y(yb),.45*sc*1.2,0,7);c.fill();
+ if(st&&st.trail.length>1){c.strokeStyle=K.css("--a");c.lineWidth=2;c.beginPath();st.trail.forEach((p,i)=>i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1])));c.stroke()}
+ if(st&&st.fired){c.fillStyle=K.css("--a");c.beginPath();c.arc(X(st.bx),Y(st.by),4,0,7);c.fill()}
+ $("#ro").innerHTML="<span>t since release <b>"+K.f(t,2)+" s</b></span><span>bullet flight time <b>"+K.f(a.tau,2)+" s</b></span><span>ball height <b>"+K.f(yb,1)+" m</b></span>";
+}
+K.loop(update,draw);
+
+})();
+</script>
+</body>
+</html>

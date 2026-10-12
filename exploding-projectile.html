@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exploding Projectile · Mr. D's Sims</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2f6; --surface:#ffffff; --stage:#f7fafc;
+  --ink:#142230; --muted:#566878; --line:#cbd6e0; --grid:#dde5ed;
+  --a:#0e7c86; --b:#cf7420; --accent:#2b4fd9; --good:#1c7d4a; --warn:#b3412e;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);padding-inline:16px;padding-block:18px 48px}
+.wrap{max-width:1080px;margin-inline:auto}
+header{display:flex;flex-direction:column;gap:.35rem;margin-bottom:18px}
+.back{font:600 .8rem var(--mono);color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent)}
+h1{font:800 clamp(1.8rem,5vw,2.6rem)/1.05 var(--display);letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,20rem);gap:20px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+.stagewrap{min-width:0;display:flex;flex-direction:column;gap:10px}
+canvas{display:block;width:100%;background:var(--stage);border:1px solid var(--line);border-radius:6px;touch-action:none}
+.readout{display:flex;flex-wrap:wrap;gap:4px 20px;font:400 .85rem var(--mono);color:var(--muted)}
+.readout b{color:var(--ink);font-weight:600}
+.side{min-width:0;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px 14px;margin:0;min-width:0}
+fieldset.card{margin:0}
+legend{font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-top:8px}
+.ctl:first-of-type{margin-top:2px}
+.ctl label{font-size:.92rem}
+.ctl output{font:600 .85rem var(--mono);text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:2px 0}
+.hint{font-size:.85rem;color:var(--muted);margin:.5rem 0 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn{font:600 .95rem var(--body);padding:9px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0e161e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0e161e}}
+.btn:disabled{opacity:.5;cursor:default}
+.chk{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.95rem}
+.choices{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}
+.choices label{display:flex;gap:6px;align-items:center;font-size:.95rem}
+select,input[type=number],input[type=text]{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:0}
+input[type=number]{width:7.5em}
+.q{margin:10px 0 0;font-weight:600;font-size:.95rem}
+.msg{margin:.6rem 0 0;font-size:.95rem}
+.msg.ok{color:var(--good)} .msg.bad{color:var(--warn)}
+.tag{display:inline-block;font:600 .75rem var(--mono);padding:1px 7px;border-radius:3px;margin-right:6px;background:var(--muted);color:var(--surface)}
+.tag.ok{background:var(--good);color:#fff}.tag.bad{background:var(--warn);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font:600 .72rem var(--mono);color:var(--muted);letter-spacing:.04em}
+.scroll{overflow-x:auto}
+.plots{display:flex;flex-direction:column;gap:8px}
+details{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+summary{cursor:pointer;font:600 1rem var(--body)}
+details p,details li{max-width:70ch}
+details code,.card code{font:400 .9em var(--mono)}
+footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<a class="back" href="index.html">&larr; All simulations</a>
+<h1>Exploding Projectile</h1>
+<p class="sub">A shell bursts in mid-air and the two pieces land at the same moment. One piece lands back at the gun. How high was the burst?</p>
+</header>
+
+<div class="layout">
+ <div class="stagewrap"><canvas id="cv" aria-label="Path of a projectile that explodes into two pieces, with the centre of mass following the original arc"></canvas><div class="readout" id="ro"></div><p class="msg" id="msg" aria-live="polite" style="margin-top:0"></p></div>
+ <div class="side">
+  <fieldset class="card"><legend>The problem</legend>
+   <p class="hint" style="margin-top:0">A shell leaves the ground at 400 m/s, 30&deg; above the horizontal (take g = 10 m/s&sup2;, no air resistance). It explodes in flight into two pieces. Both reach the ground at the same instant. Piece A lands exactly where the shell was fired, hitting the ground at 250 m/s.</p>
+  </fieldset>
+  <fieldset class="card"><legend>Step 1 · Predict</legend>
+   <label class="q" for="hin" style="display:block;margin-top:0">Height of the explosion (m)</label>
+   <div class="row" style="margin-top:6px"><input type="number" id="hin" step="1" placeholder="work it out first"><button class="btn primary" id="test">Test it</button></div>
+   <p class="hint">Test it fires the shell and explodes it at your height on the way up. If you are right, piece A comes down on the gun.</p>
+  </fieldset>
+  <fieldset class="card"><legend>Explore</legend>
+   <div id="sl"></div>
+   <div class="row"><button class="btn" id="replay">Replay</button><button class="btn" id="sol">Show solution</button></div>
+  </fieldset>
+  <div class="card" id="solbox" hidden></div>
+ </div>
+</div>
+<details><summary>Instructions</summary><ol><li>Read the problem. Before touching the sim, work out the height of the explosion on paper.</li>
+<li>Type your height in Step 1 and press <b>Test it</b>. The shell flies, explodes at that height, and both pieces fall. Does piece A come down on the gun?</li>
+<li>If it misses, the message says by how far. Revise your answer and test again.</li>
+<li>Use <b>Explore</b> to move the explosion time, change how fast piece A is thrown backward, and change how the mass splits. Watch the grey dot, the centre of mass. What does it do?</li>
+<li>Press <b>Show solution</b> when you want to compare methods.</li></ol></details>
+<details><summary>Theory</summary><p>The explosion is caused by forces <em>inside</em> the shell. Internal forces cannot change the motion of the centre of mass. So the centre of mass keeps following the same parabola the whole shell would have followed, and it lands at the shell's original range.</p>
+<p>The explosion also does not change the vertical velocity of either piece in this problem, because both land at the same instant as the unbroken shell would. Only the horizontal velocities change, and they change in opposite directions so that the centre of mass is not disturbed.</p>
+<p>With these two facts, the pieces' horizontal motion after the burst is a balance: the centre of mass moves forward at <code>v cos&theta;</code> while piece A goes back at its own speed. The burst must happen when the horizontal ground covered forward by the centre of mass equals the ground piece A covers backward.</p>
+<p>Notice that the sim lets you change the mass split. It moves where piece B lands, but not where A lands. That is why the problem never needs the masses.</p></details>
+<footer>Challenge problem from a collection of kinematics problems, reworded for this page. The numbers were checked by two independent methods.</footer>
+</div>
+<script>
+const K={};
+K.$=(s,r)=>(r||document).querySelector(s);
+K.css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+K.rad=d=>d*Math.PI/180;K.deg=r=>r*180/Math.PI;
+K.f=(x,n)=>(+x).toFixed(n===undefined?1:n);
+K.G=9.81;
+K.fit=function(cv,ratio){
+  const w=cv.clientWidth||600,h=Math.round(w*ratio),d=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(w*d)||cv.height!==Math.round(h*d)){cv.width=Math.round(w*d);cv.height=Math.round(h*d);cv.style.height=h+"px"}
+  const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return {c:c,w:w,h:h};
+};
+K.ctl=function(o){
+  return '<div class="ctl"><label for="'+o.id+'">'+o.label+'</label><output id="'+o.id+'-o" for="'+o.id+'"></output>'+
+  '<input type="range" id="'+o.id+'" min="'+o.min+'" max="'+o.max+'" step="'+o.step+'" value="'+o.value+'" data-unit="'+(o.unit||"")+'"></div>';
+};
+K.wire=function(root,cb){
+  root.querySelectorAll("input[type=range]").forEach(function(i){
+    const out=root.querySelector("#"+i.id+"-o");if(!out)return;
+    const dec=String(i.step).indexOf(".")>=0?String(i.step).split(".")[1].length:0;
+    const show=function(){out.textContent=(+i.value).toFixed(dec)+(i.dataset.unit?" "+i.dataset.unit:"")};
+    show();i.addEventListener("input",function(){show();if(cb)cb(i.id,+i.value)});
+  });
+};
+K.arrow=function(c,x0,y0,x1,y1,col,lw,dash){
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=lw||2;if(dash)c.setLineDash(dash);
+  c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();c.setLineDash([]);
+  const a=Math.atan2(y1-y0,x1-x0),L=Math.hypot(x1-x0,y1-y0);
+  if(L>6){c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-9*Math.cos(a-.4),y1-9*Math.sin(a-.4));c.lineTo(x1-9*Math.cos(a+.4),y1-9*Math.sin(a+.4));c.closePath();c.fill()}
+  c.restore();
+};
+K.ticks=function(a,b,n){
+  const raw=(b-a)/n;if(!(raw>0))return [a];
+  const p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;
+  const s=(m<1.5?1:m<3?2:m<7?5:10)*p,out=[];
+  for(let v=Math.ceil(a/s-1e-9)*s;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));
+  return out;
+};
+/* K.plot(c, {x,y,w,h}, {xmin,xmax,ymin,ymax,title,xlabel,series:[{pts,color,width,dash,dots}],cursorX,vlines:[{x,color}],hlines:[{y,color,dash}]}) */
+K.plot=function(c,bx,o){
+  const X=function(v){return bx.x+(v-o.xmin)/(o.xmax-o.xmin)*bx.w};
+  const Y=function(v){return bx.y+bx.h-(v-o.ymin)/(o.ymax-o.ymin)*bx.h};
+  c.save();c.fillStyle=K.css("--surface");c.fillRect(bx.x,bx.y,bx.w,bx.h);
+  c.font="10px "+K.css("--mono");c.lineWidth=1;
+  const gx=K.ticks(o.xmin,o.xmax,Math.max(2,Math.round(bx.w/60))),gy=K.ticks(o.ymin,o.ymax,Math.max(2,Math.round(bx.h/32)));
+  c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");
+  c.textAlign="center";c.textBaseline="top";
+  gx.forEach(function(v){c.beginPath();c.moveTo(X(v),bx.y);c.lineTo(X(v),bx.y+bx.h);c.stroke();c.fillText(String(+v.toFixed(6)),X(v),bx.y+bx.h+3)});
+  c.textAlign="right";c.textBaseline="middle";
+  gy.forEach(function(v){c.beginPath();c.moveTo(bx.x,Y(v));c.lineTo(bx.x+bx.w,Y(v));c.stroke();c.fillText(String(+v.toFixed(6)),bx.x-4,Y(v))});
+  c.strokeStyle=K.css("--muted");
+  if(o.ymin<0&&o.ymax>0){c.beginPath();c.moveTo(bx.x,Y(0));c.lineTo(bx.x+bx.w,Y(0));c.stroke()}
+  if(o.xmin<0&&o.xmax>0){c.beginPath();c.moveTo(X(0),bx.y);c.lineTo(X(0),bx.y+bx.h);c.stroke()}
+  c.beginPath();c.rect(bx.x,bx.y,bx.w,bx.h);c.clip();
+  (o.hlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--muted");c.setLineDash(l.dash||[4,4]);c.beginPath();c.moveTo(bx.x,Y(l.y));c.lineTo(bx.x+bx.w,Y(l.y));c.stroke()});
+  (o.vlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--b");c.setLineDash(l.dash||[]);c.beginPath();c.moveTo(X(l.x),bx.y);c.lineTo(X(l.x),bx.y+bx.h);c.stroke()});
+  c.setLineDash([]);
+  (o.series||[]).forEach(function(s){
+    c.strokeStyle=K.css(s.color||"--accent");c.fillStyle=c.strokeStyle;c.lineWidth=s.width||2;c.setLineDash(s.dash||[]);
+    if(s.dots){s.pts.forEach(function(p){c.beginPath();c.arc(X(p[0]),Y(p[1]),s.r||3.5,0,7);c.fill()})}
+    else{c.beginPath();s.pts.forEach(function(p,i){i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1]))});c.stroke()}
+  });
+  c.setLineDash([]);
+  if(o.cursorX!==undefined&&o.cursorX!==null){c.strokeStyle=K.css("--ink");c.lineWidth=1;c.beginPath();c.moveTo(X(o.cursorX),bx.y);c.lineTo(X(o.cursorX),bx.y+bx.h);c.stroke()}
+  c.restore();
+  c.save();c.strokeStyle=K.css("--line");c.strokeRect(bx.x+.5,bx.y+.5,bx.w-1,bx.h-1);
+  c.fillStyle=K.css("--ink");c.font="600 11px "+K.css("--mono");c.textAlign="left";c.textBaseline="top";
+  if(o.title)c.fillText(o.title,bx.x+6,bx.y+4);
+  if(o.xlabel){c.fillStyle=K.css("--muted");c.textAlign="right";c.fillText(o.xlabel,bx.x+bx.w-6,bx.y+4)}
+  c.restore();
+  return {X:X,Y:Y};
+};
+K.loop=function(update,draw){
+  let last=performance.now();
+  function fr(now){const dt=Math.min((now-last)/1000,.1);last=now;update(dt);draw();requestAnimationFrame(fr)}
+  requestAnimationFrame(fr);
+};
+K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296}};
+
+(function(){
+"use strict";
+
+const $=K.$,cv=$("#cv"),G=10,V0=400,VX=V0*Math.cos(K.rad(30)),VY=V0*Math.sin(K.rad(30)),T=2*VY/G,XM=VX*T,YM=VY*VY/(2*G);
+$("#sl").innerHTML=K.ctl({id:"t1",label:"Explosion time",min:1,max:39,step:.1,value:12.1,unit:"s"})+
+ K.ctl({id:"ux",label:"Piece A horizontal velocity",min:-400,max:400,step:1,value:-150,unit:"m/s"})+
+ K.ctl({id:"fm",label:"Piece A share of the mass",min:.1,max:.9,step:.05,value:.5,unit:""})+
+ K.ctl({id:"sp",label:"Playback speed",min:1,max:10,step:1,value:4,unit:"&times;"});
+const S={t1:12.1,ux:-150,f:.5,sp:4};let st={t:T,run:false,test:false};
+const msg=(t,c)=>{const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")};
+K.wire(document,(id,v)=>{
+ if(id==="t1")S.t1=v;if(id==="ux")S.ux=v;if(id==="fm")S.f=v;if(id==="sp"){S.sp=v;return}
+ st={t:T,run:false,test:false};info()});
+const uxB=()=>(VX-S.f*S.ux)/(1-S.f),landA=()=>VX*S.t1+S.ux*(T-S.t1),landB=()=>VX*S.t1+uxB()*(T-S.t1);
+const hAt=t=>VY*t-.5*G*t*t;
+function setSlider(id,v){const e=$("#"+id);e.value=v;e.dispatchEvent(new Event("input"))}
+function info(){
+ msg("Piece A lands "+K.f(landA(),0)+" m from the gun, piece B "+K.f(landB(),0)+" m. Both land at t = "+K.f(T,0)+" s. Piece A's impact speed is "+K.f(Math.hypot(S.ux,VY),0)+" m/s.");
+}
+$("#replay").onclick=()=>{st={t:0,run:true,test:false}};
+$("#test").onclick=()=>{
+ const h=parseFloat($("#hin").value);
+ if(!isFinite(h)){msg("Type a height first.","bad");return}
+ if(h<0||h>YM){msg("The shell only reaches "+K.f(YM,0)+" m at its peak. Pick a height between 0 and "+K.f(YM,0)+" m.","bad");return}
+ const t1=(VY-Math.sqrt(VY*VY-2*G*h))/G;
+ S.ux=-150;S.t1=t1;setSlider("ux",-150);S.t1=t1;$("#t1").value=t1;$("#t1-o").textContent=K.f(t1,1)+" s";
+ st={t:0,run:true,test:true};
+};
+$("#sol").onclick=()=>{
+ const b=$("#solbox"),vxA=Math.sqrt(250*250-VY*VY),t1=vxA*T/(VX+vxA),h=hAt(t1);
+ b.hidden=!b.hidden;if(b.hidden)return;
+ b.innerHTML='<p class="q" style="margin-top:0">Solution</p><ol style="padding-left:1.2em;margin:.4em 0"><li>Vertical motion is untouched by the burst, so the pieces land at the same time as the whole shell: T = 2v<sub>y</sub>/g = 2(200)/10 = <b>40 s</b>. The vertical impact speed is 200 m/s.</li>'+
+ '<li>Piece A hits at 250 m/s, so its horizontal speed is &radic;(250&sup2; &minus; 200&sup2;) = <b>150 m/s</b>, directed backward.</li>'+
+ '<li>At the burst the shell is at x = 346.4 t<sub>1</sub>. Piece A then travels back 150(40 &minus; t<sub>1</sub>) and arrives at x = 0: 346.4 t<sub>1</sub> = 150(40 &minus; t<sub>1</sub>), so <b>t<sub>1</sub> = '+K.f(t1,2)+' s</b>.</li>'+
+ '<li>Height: h = 200(t<sub>1</sub>) &minus; 5t<sub>1</sub>&sup2; = <b>'+K.f(h,0)+' m</b>.</li></ol>'+
+ '<p class="hint">Another route: the centre of mass lands at 13 856 m, the shell\'s full range. Run the motion of A backward from its landing and it crosses the original arc exactly at the burst point.</p>';
+};
+function update(dt){
+ if(!st.run)return;st.t+=dt*S.sp;
+ if(st.t>=T){st.t=T;st.run=false;info();
+  if(st.test){const e=landA();msg(Math.abs(e)<60?"Piece A lands "+K.f(Math.abs(e),0)+" m from the gun. Your height works.":"Piece A lands "+K.f(e,0)+" m from the gun ("+(e>0?"past it, so the burst was too late, so go lower":"behind it")+"). Check your equation and test again.",Math.abs(e)<60?"ok":"bad")}}
+}
+function draw(){
+ const {c,w,h}=K.fit(cv,.46);c.clearRect(0,0,w,h);
+ const la=landA(),lb=landB(),lo=Math.min(0,la)-600,hi=Math.max(XM,lb)+600,X=x=>44+(x-lo)/(hi-lo)*(w-56),Y=y=>h-26-y/2300*(h-40);
+ c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.lineWidth=1;
+ c.textAlign="center";K.ticks(lo,hi,8).forEach(m=>{c.beginPath();c.moveTo(X(m),Y(0));c.lineTo(X(m),Y(2300));c.stroke();c.fillText(K.f(m/1000,m%1000?1:0)+" km",X(m),h-10)});
+ c.textAlign="right";[0,500,1000,1500,2000].forEach(m=>{c.beginPath();c.moveTo(44,Y(m));c.lineTo(w,Y(m));c.stroke();c.fillText(m+" m",40,Y(m)+3)});
+ c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,Y(0));c.lineTo(w,Y(0));c.stroke();
+ const par=(t0,t1,xf)=>{c.beginPath();for(let t=t0;t<=t1+.001;t+=.25){const x=xf(t),y=hAt(t);t===t0?c.moveTo(X(x),Y(y)):c.lineTo(X(x),Y(y))}c.stroke()};
+ c.setLineDash([5,5]);c.strokeStyle=K.css("--muted");c.lineWidth=1.5;par(0,T,t=>VX*t);c.setLineDash([]);
+ const t=st.t,t1=S.t1,xAt=(tt,u)=>VX*t1+u*(tt-t1);
+ c.lineWidth=3;c.strokeStyle=K.css("--ink");par(0,Math.min(t,t1),tt=>VX*tt);
+ if(t>t1){c.strokeStyle=K.css("--a");par(t1,t,tt=>xAt(tt,S.ux));c.strokeStyle=K.css("--b");par(t1,t,tt=>xAt(tt,uxB()))}
+ const ex=VX*t1,ey=hAt(t1);
+ c.strokeStyle=K.css("--warn");c.lineWidth=1.5;c.beginPath();c.arc(X(ex),Y(ey),7,0,7);c.stroke();
+ c.fillStyle=K.css("--warn");c.font="600 10px "+K.css("--mono");c.textAlign="left";c.fillText("burst: "+K.f(ey,0)+" m",X(ex)+10,Y(ey)-8);
+ const dot=(x,y,col,lab,r)=>{c.fillStyle=K.css(col);c.beginPath();c.arc(X(x),Y(y),r||5,0,7);c.fill();if(lab){c.fillStyle=K.css("--ink");c.textAlign="center";c.font="600 11px "+K.css("--mono");c.fillText(lab,X(x),Y(y)-10)}};
+ if(t<=t1)dot(VX*t,hAt(t),"--ink","");else{dot(xAt(t,S.ux),hAt(t),"--a","A");dot(xAt(t,uxB()),hAt(t),"--b","B")}
+ c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.arc(X(VX*t),Y(hAt(t)),7,0,7);c.stroke();
+ if(t>=T-.01){c.fillStyle=K.css("--a");c.fillRect(X(la)-1,Y(0)-8,3,16);c.fillStyle=K.css("--b");c.fillRect(X(lb)-1,Y(0)-8,3,16)}
+ $("#ro").innerHTML="<span>t <b>"+K.f(t,1)+" s</b></span><span>height <b>"+K.f(hAt(t),0)+" m</b></span><span>ring = centre of mass</span><span>vertical scale stretched</span>";
+}
+info();K.loop(update,draw);
+
+})();
+</script>
+</body>
+</html>

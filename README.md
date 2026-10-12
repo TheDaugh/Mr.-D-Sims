@@ -23,6 +23,8 @@ Instructions and theory text come from the originals wherever the executables co
 
 ## New
 
+`exploding-projectile.html`, `ball-and-bullet.html` and `rolling-disc.html` turn three challenge problems into predict-then-check sims. Students solve the problem on paper, enter the answer, and the sim tests it. Each has a worked solution.
+
 `predict-first.html` has three tabs (Two Carts, Hill Roll, Cut the String). Each asks students to commit to a prediction before the simulation runs, then checks it against the equation.
 
 ## Using them
