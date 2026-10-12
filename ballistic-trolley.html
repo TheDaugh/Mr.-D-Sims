@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ballistic Trolley · Mr. D's Sims</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2f6; --surface:#ffffff; --stage:#f7fafc;
+  --ink:#142230; --muted:#566878; --line:#cbd6e0; --grid:#dde5ed;
+  --a:#0e7c86; --b:#cf7420; --accent:#2b4fd9; --good:#1c7d4a; --warn:#b3412e;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);padding-inline:16px;padding-block:18px 48px}
+.wrap{max-width:1080px;margin-inline:auto}
+header{display:flex;flex-direction:column;gap:.35rem;margin-bottom:18px}
+.back{font:600 .8rem var(--mono);color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent)}
+h1{font:800 clamp(1.8rem,5vw,2.6rem)/1.05 var(--display);letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,20rem);gap:20px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+.stagewrap{min-width:0;display:flex;flex-direction:column;gap:10px}
+canvas{display:block;width:100%;background:var(--stage);border:1px solid var(--line);border-radius:6px;touch-action:none}
+.readout{display:flex;flex-wrap:wrap;gap:4px 20px;font:400 .85rem var(--mono);color:var(--muted)}
+.readout b{color:var(--ink);font-weight:600}
+.side{min-width:0;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px 14px;margin:0;min-width:0}
+fieldset.card{margin:0}
+legend{font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-top:8px}
+.ctl:first-of-type{margin-top:2px}
+.ctl label{font-size:.92rem}
+.ctl output{font:600 .85rem var(--mono);text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:2px 0}
+.hint{font-size:.85rem;color:var(--muted);margin:.5rem 0 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn{font:600 .95rem var(--body);padding:9px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0e161e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0e161e}}
+.btn:disabled{opacity:.5;cursor:default}
+.chk{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.95rem}
+.choices{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}
+.choices label{display:flex;gap:6px;align-items:center;font-size:.95rem}
+select,input[type=number],input[type=text]{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:0}
+input[type=number]{width:7.5em}
+.q{margin:10px 0 0;font-weight:600;font-size:.95rem}
+.msg{margin:.6rem 0 0;font-size:.95rem}
+.msg.ok{color:var(--good)} .msg.bad{color:var(--warn)}
+.tag{display:inline-block;font:600 .75rem var(--mono);padding:1px 7px;border-radius:3px;margin-right:6px;background:var(--muted);color:var(--surface)}
+.tag.ok{background:var(--good);color:#fff}.tag.bad{background:var(--warn);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font:600 .72rem var(--mono);color:var(--muted);letter-spacing:.04em}
+.scroll{overflow-x:auto}
+.plots{display:flex;flex-direction:column;gap:8px}
+details{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+summary{cursor:pointer;font:600 1rem var(--body)}
+details p,details li{max-width:70ch}
+details code,.card code{font:400 .9em var(--mono)}
+footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<a class="back" href="index.html">&larr; All simulations</a>
+<h1>Ballistic Trolley</h1>
+<p class="sub">A trolley fires a ball straight up as it rolls along. Where does the ball come down?</p>
+</header>
+
+<div class="layout">
+ <div class="stagewrap"><canvas id="cv" aria-label="A trolley with a cannon firing a ball upward while it moves along a track"></canvas><div class="readout" id="ro"></div></div>
+ <div class="side">
+  <fieldset class="card"><legend>Apparatus</legend>
+   <div id="sl"></div>
+   <div class="row" style="margin-top:8px"><label for="ball" style="align-self:center">Ball</label><select id="ball"><option value="solid">Heavy ball</option><option value="hollow">Hollow ball</option></select></div>
+   <label class="chk"><input type="checkbox" id="traj" checked> Show trajectory</label>
+   <div class="row" style="margin-top:4px"><label for="steps" style="align-self:center">Steps</label><select id="steps"><option value="h">Horizontal</option><option value="v">Vertical</option></select></div>
+   <div class="row"><button class="btn primary" id="go">Start trolley</button><button class="btn" id="fire" disabled>Fire ball</button><button class="btn" id="rst">Reset</button></div>
+   <p class="msg" id="msg" aria-live="polite"></p>
+  </fieldset>
+ </div>
+</div>
+<details><summary>Instructions</summary><ol><li>Set the trolley speed with the first slider, then press <b>Start trolley</b>. It stops by itself at the far end.</li>
+<li>Press <b>Fire ball</b> while it is moving. The ball goes up and lands back in the cannon.</li>
+<li>Set the ball's upward speed with the second slider.</li>
+<li><b>Show trajectory</b> plots the path. <b>Steps</b> switches the dots between equal horizontal steps and equal vertical steps.</li>
+<li>Fire the ball, then change the trolley speed before it lands. The ball misses.</li>
+<li><b>Challenge:</b> switch to the hollow ball, fire it, and slow the trolley down so the ball still lands in the cannon.</li></ol></details>
+<details><summary>Theory</summary><p>Projectile motion becomes much easier to understand if it is split into two separate motions.</p>
+<p>In the absence of air resistance the horizontal component of the velocity is constant. Here it equals the velocity of the trolley. The vertical velocity starts upward, is continually slowed by gravity until it stops and reverses, and the ball falls back down.</p>
+<p>A stationary observer sees the ball follow a parabola. An observer sitting on the trolley sees the ball simply go up and come down, as if the trolley were not moving. It is like a child playing with a ball inside a car travelling along the motorway.</p>
+<p>When air resistance becomes significant (at high speed, or when the ball is very light), drag reduces the horizontal velocity of the ball. Imagine throwing a ball straight up through the sun-roof of a fast car: it does not come back to your hands. In this case the ball does not fall back into the cannon.</p>
+<p><b>Challenge:</b> slow the trolley down after launching the hollow ball so you can still catch it.</p></details>
+<footer>Rebuilt in HTML from the LabVIEW simulation "Ballistic Trolley".</footer>
+</div>
+<script>
+const K={};
+K.$=(s,r)=>(r||document).querySelector(s);
+K.css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+K.rad=d=>d*Math.PI/180;K.deg=r=>r*180/Math.PI;
+K.f=(x,n)=>(+x).toFixed(n===undefined?1:n);
+K.G=9.81;
+K.fit=function(cv,ratio){
+  const w=cv.clientWidth||600,h=Math.round(w*ratio),d=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(w*d)||cv.height!==Math.round(h*d)){cv.width=Math.round(w*d);cv.height=Math.round(h*d);cv.style.height=h+"px"}
+  const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return {c:c,w:w,h:h};
+};
+K.ctl=function(o){
+  return '<div class="ctl"><label for="'+o.id+'">'+o.label+'</label><output id="'+o.id+'-o" for="'+o.id+'"></output>'+
+  '<input type="range" id="'+o.id+'" min="'+o.min+'" max="'+o.max+'" step="'+o.step+'" value="'+o.value+'" data-unit="'+(o.unit||"")+'"></div>';
+};
+K.wire=function(root,cb){
+  root.querySelectorAll("input[type=range]").forEach(function(i){
+    const out=root.querySelector("#"+i.id+"-o");
+    const dec=String(i.step).indexOf(".")>=0?String(i.step).split(".")[1].length:0;
+    const show=function(){out.textContent=(+i.value).toFixed(dec)+(i.dataset.unit?" "+i.dataset.unit:"")};
+    show();i.addEventListener("input",function(){show();if(cb)cb(i.id,+i.value)});
+  });
+};
+K.arrow=function(c,x0,y0,x1,y1,col,lw,dash){
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=lw||2;if(dash)c.setLineDash(dash);
+  c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();c.setLineDash([]);
+  const a=Math.atan2(y1-y0,x1-x0),L=Math.hypot(x1-x0,y1-y0);
+  if(L>6){c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-9*Math.cos(a-.4),y1-9*Math.sin(a-.4));c.lineTo(x1-9*Math.cos(a+.4),y1-9*Math.sin(a+.4));c.closePath();c.fill()}
+  c.restore();
+};
+K.ticks=function(a,b,n){
+  const raw=(b-a)/n;if(!(raw>0))return [a];
+  const p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;
+  const s=(m<1.5?1:m<3?2:m<7?5:10)*p,out=[];
+  for(let v=Math.ceil(a/s-1e-9)*s;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));
+  return out;
+};
+/* K.plot(c, {x,y,w,h}, {xmin,xmax,ymin,ymax,title,xlabel,series:[{pts,color,width,dash,dots}],cursorX,vlines:[{x,color}],hlines:[{y,color,dash}]}) */
+K.plot=function(c,bx,o){
+  const X=function(v){return bx.x+(v-o.xmin)/(o.xmax-o.xmin)*bx.w};
+  const Y=function(v){return bx.y+bx.h-(v-o.ymin)/(o.ymax-o.ymin)*bx.h};
+  c.save();c.fillStyle=K.css("--surface");c.fillRect(bx.x,bx.y,bx.w,bx.h);
+  c.font="10px "+K.css("--mono");c.lineWidth=1;
+  const gx=K.ticks(o.xmin,o.xmax,Math.max(2,Math.round(bx.w/60))),gy=K.ticks(o.ymin,o.ymax,Math.max(2,Math.round(bx.h/32)));
+  c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");
+  c.textAlign="center";c.textBaseline="top";
+  gx.forEach(function(v){c.beginPath();c.moveTo(X(v),bx.y);c.lineTo(X(v),bx.y+bx.h);c.stroke();c.fillText(String(+v.toFixed(6)),X(v),bx.y+bx.h+3)});
+  c.textAlign="right";c.textBaseline="middle";
+  gy.forEach(function(v){c.beginPath();c.moveTo(bx.x,Y(v));c.lineTo(bx.x+bx.w,Y(v));c.stroke();c.fillText(String(+v.toFixed(6)),bx.x-4,Y(v))});
+  c.strokeStyle=K.css("--muted");
+  if(o.ymin<0&&o.ymax>0){c.beginPath();c.moveTo(bx.x,Y(0));c.lineTo(bx.x+bx.w,Y(0));c.stroke()}
+  if(o.xmin<0&&o.xmax>0){c.beginPath();c.moveTo(X(0),bx.y);c.lineTo(X(0),bx.y+bx.h);c.stroke()}
+  c.beginPath();c.rect(bx.x,bx.y,bx.w,bx.h);c.clip();
+  (o.hlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--muted");c.setLineDash(l.dash||[4,4]);c.beginPath();c.moveTo(bx.x,Y(l.y));c.lineTo(bx.x+bx.w,Y(l.y));c.stroke()});
+  (o.vlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--b");c.setLineDash(l.dash||[]);c.beginPath();c.moveTo(X(l.x),bx.y);c.lineTo(X(l.x),bx.y+bx.h);c.stroke()});
+  c.setLineDash([]);
+  (o.series||[]).forEach(function(s){
+    c.strokeStyle=K.css(s.color||"--accent");c.fillStyle=c.strokeStyle;c.lineWidth=s.width||2;c.setLineDash(s.dash||[]);
+    if(s.dots){s.pts.forEach(function(p){c.beginPath();c.arc(X(p[0]),Y(p[1]),s.r||3.5,0,7);c.fill()})}
+    else{c.beginPath();s.pts.forEach(function(p,i){i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1]))});c.stroke()}
+  });
+  c.setLineDash([]);
+  if(o.cursorX!==undefined&&o.cursorX!==null){c.strokeStyle=K.css("--ink");c.lineWidth=1;c.beginPath();c.moveTo(X(o.cursorX),bx.y);c.lineTo(X(o.cursorX),bx.y+bx.h);c.stroke()}
+  c.restore();
+  c.save();c.strokeStyle=K.css("--line");c.strokeRect(bx.x+.5,bx.y+.5,bx.w-1,bx.h-1);
+  c.fillStyle=K.css("--ink");c.font="600 11px "+K.css("--mono");c.textAlign="left";c.textBaseline="top";
+  if(o.title)c.fillText(o.title,bx.x+6,bx.y+4);
+  if(o.xlabel){c.fillStyle=K.css("--muted");c.textAlign="right";c.fillText(o.xlabel,bx.x+bx.w-6,bx.y+4)}
+  c.restore();
+  return {X:X,Y:Y};
+};
+K.loop=function(update,draw){
+  let last=performance.now();
+  function fr(now){const dt=Math.min((now-last)/1000,.1);last=now;update(dt);draw();requestAnimationFrame(fr)}
+  requestAnimationFrame(fr);
+};
+K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296}};
+
+(function(){
+"use strict";
+
+const $=K.$,g=K.G,cv=$("#cv"),W=40;
+$("#sl").innerHTML=K.ctl({id:"vt",label:"Trolley speed",min:1,max:8,step:.5,value:4,unit:"m/s"})+
+ K.ctl({id:"vb",label:"Ball speed (upward)",min:5,max:20,step:1,value:12,unit:"m/s"});
+let vt=4,vb=12,hollow=false,st;
+K.wire(document,(id,v)=>{if(id==="vt")vt=v;if(id==="vb")vb=v});
+$("#ball").onchange=e=>{hollow=e.target.value==="hollow";reset()};
+function reset(){st={run:false,x:3,t:0,ball:null,hist:[],last:-1};$("#go").disabled=false;$("#fire").disabled=true;msg("")}
+function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
+$("#rst").onclick=reset;
+$("#go").onclick=()=>{reset();st.run=true;$("#go").disabled=true;$("#fire").disabled=false};
+$("#fire").onclick=()=>{if(st.ball||!st.run)return;st.ball={x:st.x,y:0,vx:vt,vy:vb,t:0,pts:[[st.x,0,0]],done:false,next:.25,strobe:[]};$("#fire").disabled=true};
+function update(dt){
+ if(!st.run)return;
+ const n=Math.ceil(dt/.004),h=dt/n;
+ for(let i=0;i<n;i++){
+  if(st.x<W-3)st.x=Math.min(W-3,st.x+vt*h);
+  st.t+=h;
+  const b=st.ball;
+  if(b&&!b.done){
+   const k=hollow?.02:0,sp=Math.hypot(b.vx,b.vy);
+   b.vx+=-k*sp*b.vx*h;b.vy+=(-g-k*sp*b.vy)*h;const py=b.y;b.x+=b.vx*h;b.y+=b.vy*h;b.t+=h;
+   if(b.t>=b.next){b.strobe.push([b.x,b.y,st.x]);b.next+=.25}
+   if(st.t-st.last>=.05){st.hist.push([st.t,b.x,st.x,b.vx,vt]);st.last=st.t}
+   b.pts.push([b.x,b.y,b.t]);
+   if(b.y<=0&&b.vy<0){b.done=true;b.y=0;const d=b.x-st.x;
+    if(Math.abs(d)<=.55)msg("Caught! The ball landed in the cannon.","ok");
+    else msg("Missed by "+K.f(Math.abs(d),1)+" m. The ball landed "+(d<0?"behind":"ahead of")+" the cannon.","bad")}
+  }
+ }
+}
+function draw(){
+ const {c,w,h}=K.fit(cv,.95);c.clearRect(0,0,w,h);
+ const sh=Math.round(h*.5),sx=(w-30)/W,gy=sh-26,X=x=>15+x*sx,Y=y=>gy-y*sx*1.0;
+ c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="center";c.lineWidth=1;
+ for(let m=0;m<=W;m+=5){c.beginPath();c.moveTo(X(m),0);c.lineTo(X(m),gy);c.stroke();c.fillText(m+" m",X(m),sh-8)}
+ c.fillStyle=K.css("--line");c.fillRect(0,gy,w,sh-gy);c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,gy);c.lineTo(w,gy);c.stroke();
+ const b=st.ball,tx=X(st.x);
+ c.fillStyle=K.css("--b");c.beginPath();c.roundRect(tx-1.5*sx,gy-12,3*sx,10,3);c.fill();c.fillStyle=K.css("--ink");c.beginPath();c.arc(tx-sx,gy-3,3.5,0,7);c.arc(tx+sx,gy-3,3.5,0,7);c.fill();
+ c.fillStyle=K.css("--ink");c.fillRect(tx-.5*sx,gy-22,.15*sx,10);c.fillRect(tx+.35*sx,gy-22,.15*sx,10);
+ if(b&&$("#traj").checked){
+  c.strokeStyle=K.css("--accent");c.lineWidth=2;c.beginPath();b.pts.forEach((p,i)=>i?c.lineTo(X(p[0]),Y(p[1])-22):c.moveTo(X(p[0]),Y(p[1])-22));c.stroke();
+  c.fillStyle=K.css("--accent");c.strokeStyle=K.css("--muted");c.lineWidth=1;c.setLineDash([2,3]);
+  b.strobe.forEach(s=>{c.beginPath();c.arc(X(s[0]),Y(s[1])-22,3,0,7);c.fill();
+   if($("#steps").value==="h"){c.beginPath();c.moveTo(X(s[0]),Y(s[1])-22);c.lineTo(X(s[0]),gy);c.stroke()}else{c.beginPath();c.moveTo(X(s[0]),Y(s[1])-22);c.lineTo(15,Y(s[1])-22);c.stroke()}});c.setLineDash([])}
+ if(b){c.fillStyle=K.css("--a");c.beginPath();c.arc(X(b.x),Y(b.y)-22,5,0,7);c.fill()}
+ else if(st.run===false||true){c.fillStyle=K.css("--a");c.beginPath();c.arc(tx,gy-26,4,0,7);c.fill()}
+ const gx=50,gw=w-gx-12,top=sh+14,gh=(h-top-58)/2,tm=Math.max(4,Math.ceil((st.t+.5)/2)*2);
+ const bx=st.hist.map(p=>[p[0],p[1]]),tr=st.hist.map(p=>[p[0],p[2]]),bv=st.hist.map(p=>[p[0],p[3]]),tv=st.hist.map(p=>[p[0],p[4]]);
+ K.plot(c,{x:gx,y:top,w:gw,h:gh},{xmin:0,xmax:tm,ymin:0,ymax:W,title:"horizontal position (m): ball orange, trolley blue",series:[{pts:tr,color:"--accent",width:3},{pts:bx,color:"--b",dash:[6,3]}]});
+ K.plot(c,{x:gx,y:top+gh+26,w:gw,h:gh},{xmin:0,xmax:tm,ymin:0,ymax:10,title:"horizontal speed (m/s)",xlabel:"time (s)",series:[{pts:tv,color:"--accent",width:3},{pts:bv,color:"--b",dash:[6,3]}]});
+ $("#ro").innerHTML="<span>t <b>"+K.f(st.t)+" s</b></span><span>trolley <b>"+K.f(vt)+" m/s</b></span>"+(b?"<span>ball height <b>"+K.f(b.y)+" m</b></span><span>ball horizontal <b>"+K.f(b.vx)+" m/s</b></span>":"");
+}
+reset();K.loop(update,draw);
+
+})();
+</script>
+</body>
+</html>

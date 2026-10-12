@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bounce Meter · Mr. D's Sims</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2f6; --surface:#ffffff; --stage:#f7fafc;
+  --ink:#142230; --muted:#566878; --line:#cbd6e0; --grid:#dde5ed;
+  --a:#0e7c86; --b:#cf7420; --accent:#2b4fd9; --good:#1c7d4a; --warn:#b3412e;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);padding-inline:16px;padding-block:18px 48px}
+.wrap{max-width:1080px;margin-inline:auto}
+header{display:flex;flex-direction:column;gap:.35rem;margin-bottom:18px}
+.back{font:600 .8rem var(--mono);color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent)}
+h1{font:800 clamp(1.8rem,5vw,2.6rem)/1.05 var(--display);letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,20rem);gap:20px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+.stagewrap{min-width:0;display:flex;flex-direction:column;gap:10px}
+canvas{display:block;width:100%;background:var(--stage);border:1px solid var(--line);border-radius:6px;touch-action:none}
+.readout{display:flex;flex-wrap:wrap;gap:4px 20px;font:400 .85rem var(--mono);color:var(--muted)}
+.readout b{color:var(--ink);font-weight:600}
+.side{min-width:0;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px 14px;margin:0;min-width:0}
+fieldset.card{margin:0}
+legend{font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-top:8px}
+.ctl:first-of-type{margin-top:2px}
+.ctl label{font-size:.92rem}
+.ctl output{font:600 .85rem var(--mono);text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:2px 0}
+.hint{font-size:.85rem;color:var(--muted);margin:.5rem 0 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn{font:600 .95rem var(--body);padding:9px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0e161e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0e161e}}
+.btn:disabled{opacity:.5;cursor:default}
+.chk{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.95rem}
+.choices{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}
+.choices label{display:flex;gap:6px;align-items:center;font-size:.95rem}
+select,input[type=number],input[type=text]{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:0}
+input[type=number]{width:7.5em}
+.q{margin:10px 0 0;font-weight:600;font-size:.95rem}
+.msg{margin:.6rem 0 0;font-size:.95rem}
+.msg.ok{color:var(--good)} .msg.bad{color:var(--warn)}
+.tag{display:inline-block;font:600 .75rem var(--mono);padding:1px 7px;border-radius:3px;margin-right:6px;background:var(--muted);color:var(--surface)}
+.tag.ok{background:var(--good);color:#fff}.tag.bad{background:var(--warn);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font:600 .72rem var(--mono);color:var(--muted);letter-spacing:.04em}
+.scroll{overflow-x:auto}
+.plots{display:flex;flex-direction:column;gap:8px}
+details{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+summary{cursor:pointer;font:600 1rem var(--body)}
+details p,details li{max-width:70ch}
+details code,.card code{font:400 .9em var(--mono)}
+footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<a class="back" href="index.html">&larr; All simulations</a>
+<h1>Bounce Meter</h1>
+<p class="sub">Listen to a bouncing ball and work out how high it was dropped from, using only the sound of its bounces.</p>
+</header>
+
+<div class="layout">
+ <div class="stagewrap"><canvas id="cv" aria-label="Sound envelope with detected bounces, and the reconstructed height of the ball"></canvas><div class="readout" id="ro">Record a bouncing ball, or use the simulated ball.</div></div>
+ <div class="side">
+  <fieldset class="card"><legend>Step 1 · Record</legend>
+   <div id="sl1"></div>
+   <div class="row"><button class="btn primary" id="rec">Record with microphone</button></div>
+   <div class="row"><button class="btn" id="sim">Use simulated ball</button></div>
+   <p class="msg" id="msg" aria-live="polite">Hold a ball above a hard floor and release it when recording starts.</p>
+  </fieldset>
+  <fieldset class="card"><legend>Step 2 · Find the bounces</legend>
+   <div id="sl2"></div>
+   <p class="hint">Adjust until a vertical line sits on each bounce and on no other bump.</p>
+  </fieldset>
+  <fieldset class="card"><legend>Step 3 · Estimate</legend>
+   <div id="sl3"></div>
+   <div class="card" style="margin-top:10px;background:var(--stage)"><div class="q" style="margin:0">Estimated original drop height</div><div id="ans" style="font:800 1.8rem var(--display);margin-top:2px">—</div><div class="hint" id="det"></div></div>
+  </fieldset>
+ </div>
+</div>
+<details><summary>Instructions</summary><ol><li>Press <b>Record with microphone</b>. Your browser will ask to use the microphone. A quiet room and a hard floor work best. No microphone? Use <b>Use simulated ball</b>.</li>
+<li>Set <b>Delay</b>, the seconds between pressing the button and releasing the ball, and <b>Record for</b>, how long to listen. A countdown shows how long is left before recording starts.</li>
+<li>Release the ball when the countdown ends. The top graph shows the sound track, rectified and smoothed. Vertical lines show where the program thinks each bounce happened.</li>
+<li>If it has missed a bounce or found one that is not there, adjust <b>Smoothing</b>, <b>Threshold</b> and <b>Minimum gap</b> until the lines sit on the bounces.</li>
+<li>The lower graph shows the motion the program reconstructs from the bounce times. It assumes g = 9.81 m s<sup>&minus;2</sup> and no air resistance.</li>
+<li>The last few bounces are often unreliable. Set <b>Use first N rebounds</b> to the number you trust. The estimate of the original drop height updates at once.</li></ol></details>
+<details><summary>Theory</summary><p>Without air resistance, the height an object reaches when thrown straight up depends only on how long it stays in the air. The time to fall from the top is <code>t = &radic;(2h/g)</code>, from <code>h = &frac12;gt&sup2;</code> with <code>u = 0</code>. Rising from the ground to the top takes just as long as falling back, so a full bounce between two impacts lasts <code>2t</code>.</p>
+<p>The computer records the time between impacts, <code>&Delta;t = 2t</code>. So the rebound height is <code>h = g&Delta;t&sup2; / 8</code>. Do this for every pair of impacts and you have the height of every rebound.</p>
+<p>The elasticity <code>e</code> is the ratio of one rebound height to the one before. A perfect rebound has <code>e = 1</code>. In the real world <code>e</code> is rarely better than 0.9, even for very bouncy balls. Averaging <code>e</code> over several bounces gives a good value.</p>
+<p>The first bounce is the one that happens before any timing starts, because the computer cannot hear the moment of release. Having found the height of the first rebound, <code>h&#8321;</code>, divide by <code>e</code> to work back to the original height: <code>H = h&#8321; / e</code>. The more rebounds you record, the better the estimate. It is a curiosity rather than a precision instrument.</p></details>
+<footer>Rebuilt in HTML from the LabVIEW simulation "Bounce Meter". Audio is processed on your device and is not uploaded or stored.</footer>
+</div>
+<script>
+const K={};
+K.$=(s,r)=>(r||document).querySelector(s);
+K.css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+K.rad=d=>d*Math.PI/180;K.deg=r=>r*180/Math.PI;
+K.f=(x,n)=>(+x).toFixed(n===undefined?1:n);
+K.G=9.81;
+K.fit=function(cv,ratio){
+  const w=cv.clientWidth||600,h=Math.round(w*ratio),d=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(w*d)||cv.height!==Math.round(h*d)){cv.width=Math.round(w*d);cv.height=Math.round(h*d);cv.style.height=h+"px"}
+  const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return {c:c,w:w,h:h};
+};
+K.ctl=function(o){
+  return '<div class="ctl"><label for="'+o.id+'">'+o.label+'</label><output id="'+o.id+'-o" for="'+o.id+'"></output>'+
+  '<input type="range" id="'+o.id+'" min="'+o.min+'" max="'+o.max+'" step="'+o.step+'" value="'+o.value+'" data-unit="'+(o.unit||"")+'"></div>';
+};
+K.wire=function(root,cb){
+  root.querySelectorAll("input[type=range]").forEach(function(i){
+    const out=root.querySelector("#"+i.id+"-o");
+    const dec=String(i.step).indexOf(".")>=0?String(i.step).split(".")[1].length:0;
+    const show=function(){out.textContent=(+i.value).toFixed(dec)+(i.dataset.unit?" "+i.dataset.unit:"")};
+    show();i.addEventListener("input",function(){show();if(cb)cb(i.id,+i.value)});
+  });
+};
+K.arrow=function(c,x0,y0,x1,y1,col,lw,dash){
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=lw||2;if(dash)c.setLineDash(dash);
+  c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();c.setLineDash([]);
+  const a=Math.atan2(y1-y0,x1-x0),L=Math.hypot(x1-x0,y1-y0);
+  if(L>6){c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-9*Math.cos(a-.4),y1-9*Math.sin(a-.4));c.lineTo(x1-9*Math.cos(a+.4),y1-9*Math.sin(a+.4));c.closePath();c.fill()}
+  c.restore();
+};
+K.ticks=function(a,b,n){
+  const raw=(b-a)/n;if(!(raw>0))return [a];
+  const p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;
+  const s=(m<1.5?1:m<3?2:m<7?5:10)*p,out=[];
+  for(let v=Math.ceil(a/s-1e-9)*s;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));
+  return out;
+};
+/* K.plot(c, {x,y,w,h}, {xmin,xmax,ymin,ymax,title,xlabel,series:[{pts,color,width,dash,dots}],cursorX,vlines:[{x,color}],hlines:[{y,color,dash}]}) */
+K.plot=function(c,bx,o){
+  const X=function(v){return bx.x+(v-o.xmin)/(o.xmax-o.xmin)*bx.w};
+  const Y=function(v){return bx.y+bx.h-(v-o.ymin)/(o.ymax-o.ymin)*bx.h};
+  c.save();c.fillStyle=K.css("--surface");c.fillRect(bx.x,bx.y,bx.w,bx.h);
+  c.font="10px "+K.css("--mono");c.lineWidth=1;
+  const gx=K.ticks(o.xmin,o.xmax,Math.max(2,Math.round(bx.w/60))),gy=K.ticks(o.ymin,o.ymax,Math.max(2,Math.round(bx.h/32)));
+  c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");
+  c.textAlign="center";c.textBaseline="top";
+  gx.forEach(function(v){c.beginPath();c.moveTo(X(v),bx.y);c.lineTo(X(v),bx.y+bx.h);c.stroke();c.fillText(String(+v.toFixed(6)),X(v),bx.y+bx.h+3)});
+  c.textAlign="right";c.textBaseline="middle";
+  gy.forEach(function(v){c.beginPath();c.moveTo(bx.x,Y(v));c.lineTo(bx.x+bx.w,Y(v));c.stroke();c.fillText(String(+v.toFixed(6)),bx.x-4,Y(v))});
+  c.strokeStyle=K.css("--muted");
+  if(o.ymin<0&&o.ymax>0){c.beginPath();c.moveTo(bx.x,Y(0));c.lineTo(bx.x+bx.w,Y(0));c.stroke()}
+  if(o.xmin<0&&o.xmax>0){c.beginPath();c.moveTo(X(0),bx.y);c.lineTo(X(0),bx.y+bx.h);c.stroke()}
+  c.beginPath();c.rect(bx.x,bx.y,bx.w,bx.h);c.clip();
+  (o.hlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--muted");c.setLineDash(l.dash||[4,4]);c.beginPath();c.moveTo(bx.x,Y(l.y));c.lineTo(bx.x+bx.w,Y(l.y));c.stroke()});
+  (o.vlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--b");c.setLineDash(l.dash||[]);c.beginPath();c.moveTo(X(l.x),bx.y);c.lineTo(X(l.x),bx.y+bx.h);c.stroke()});
+  c.setLineDash([]);
+  (o.series||[]).forEach(function(s){
+    c.strokeStyle=K.css(s.color||"--accent");c.fillStyle=c.strokeStyle;c.lineWidth=s.width||2;c.setLineDash(s.dash||[]);
+    if(s.dots){s.pts.forEach(function(p){c.beginPath();c.arc(X(p[0]),Y(p[1]),s.r||3.5,0,7);c.fill()})}
+    else{c.beginPath();s.pts.forEach(function(p,i){i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1]))});c.stroke()}
+  });
+  c.setLineDash([]);
+  if(o.cursorX!==undefined&&o.cursorX!==null){c.strokeStyle=K.css("--ink");c.lineWidth=1;c.beginPath();c.moveTo(X(o.cursorX),bx.y);c.lineTo(X(o.cursorX),bx.y+bx.h);c.stroke()}
+  c.restore();
+  c.save();c.strokeStyle=K.css("--line");c.strokeRect(bx.x+.5,bx.y+.5,bx.w-1,bx.h-1);
+  c.fillStyle=K.css("--ink");c.font="600 11px "+K.css("--mono");c.textAlign="left";c.textBaseline="top";
+  if(o.title)c.fillText(o.title,bx.x+6,bx.y+4);
+  if(o.xlabel){c.fillStyle=K.css("--muted");c.textAlign="right";c.fillText(o.xlabel,bx.x+bx.w-6,bx.y+4)}
+  c.restore();
+  return {X:X,Y:Y};
+};
+K.loop=function(update,draw){
+  let last=performance.now();
+  function fr(now){const dt=Math.min((now-last)/1000,.1);last=now;update(dt);draw();requestAnimationFrame(fr)}
+  requestAnimationFrame(fr);
+};
+K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296}};
+
+(function(){
+"use strict";
+
+const $=K.$,g=K.G,cv=$("#cv");
+$("#sl1").innerHTML=K.ctl({id:"dly",label:"Delay before recording",min:0,max:5,step:1,value:3,unit:"s"})+K.ctl({id:"dur",label:"Record for",min:3,max:12,step:1,value:8,unit:"s"});
+$("#sl2").innerHTML=K.ctl({id:"smo",label:"Smoothing",min:1,max:40,step:1,value:8,unit:"ms"})+K.ctl({id:"thr",label:"Threshold",min:3,max:80,step:1,value:20,unit:"%"})+K.ctl({id:"gap",label:"Minimum gap between bounces",min:15,max:300,step:5,value:60,unit:"ms"});
+$("#sl3").innerHTML=K.ctl({id:"nn",label:"Use first N rebounds",min:2,max:2,step:1,value:2,unit:""});
+let env=null,truth=null,res=null,state="idle",countdown=0;
+function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
+let freshN=true;
+K.wire(document,id=>{id==="nn"?estimate():analyse()});
+/* envelope at 1 kHz: block max of |x| */
+function toEnv(samples,sr){
+ const n=Math.floor(samples.length/sr*1000),e=new Float32Array(n),per=sr/1000;
+ for(let i=0;i<n;i++){let m=0;const a=Math.floor(i*per),b=Math.min(samples.length,Math.floor((i+1)*per));for(let j=a;j<b;j++){const v=Math.abs(samples[j]);if(v>m)m=v}e[i]=m}
+ return e;
+}
+function smooth(e,w){const out=new Float32Array(e.length);let s=0;for(let i=0;i<e.length;i++){s+=e[i];if(i>=w)s-=e[i-w];out[i]=s/Math.min(w,i+1)}return out}
+function analyse(){
+ if(!env){return}
+ const w=+$("#smo").value,fr=+$("#thr").value/100,gap=+$("#gap").value;
+ const sm=smooth(env,w);let mx=0;for(let i=0;i<sm.length;i++)if(sm[i]>mx)mx=sm[i];
+ const thr=mx*fr,peaks=[];
+ for(let i=0;i<sm.length;){
+  if(sm[i]>thr){let m=i;for(let j=i;j<Math.min(sm.length,i+gap);j++)if(sm[j]>sm[m])m=j;peaks.push(m/1000);i=m+gap}else i++;
+ }
+ const hs=[];for(let i=0;i+1<peaks.length;i++){const dt=peaks[i+1]-peaks[i];hs.push(g*dt*dt/8)}
+ const nmax=Math.max(2,hs.length),nn=$("#nn");nn.max=nmax;if(freshN){nn.value=Math.min(nmax,5);freshN=false}else if(+nn.value>nmax)nn.value=nmax;$("#nn-o").textContent=nn.value;
+ res={sm:sm,thr:thr,peaks:peaks,hs:hs};estimate();
+}
+function estimate(){
+ if(!res)return;const hs=res.hs;
+ if(hs.length<2){$("#ans").textContent="—";$("#det").textContent="Need at least two rebounds. Adjust the threshold or gap.";res.est=null;return}
+ const N=Math.min(hs.length,+$("#nn").value||2),es=[];for(let i=0;i+1<N;i++)es.push(hs[i+1]/hs[i]);
+ const e=es.reduce((a,b)=>a+b,0)/es.length,H=hs[0]/e;res.e=e;res.est=H;res.N=N;
+ $("#ans").textContent=K.f(H,2)+" m";
+ $("#det").textContent="First rebound "+K.f(hs[0],2)+" m, average e = "+K.f(e,2)+" from "+(N-1)+" ratio"+(N>2?"s":"")+". Original drop = "+K.f(hs[0],2)+" / "+K.f(e,2)+"."+(truth?" Simulated truth: "+K.f(truth.H,2)+" m, e = "+K.f(truth.e,2)+".":"");
+}
+/* synthetic recording */
+function synth(){
+ const sr=11025,H=.6+Math.random()*1.2,e=.6+Math.random()*.28,len=7,s=new Float32Array(sr*len);
+ const imp=[];let t=1.2+Math.sqrt(2*H/g),h=H;imp.push(t);
+ for(let i=0;i<14;i++){h*=e;const dt=2*Math.sqrt(2*h/g);if(dt<.045)break;t+=dt;if(t>len-.2)break;imp.push(t)}
+ imp.forEach((ti,i)=>{const amp=Math.pow(e,i/2)*.9,i0=Math.floor(ti*sr);for(let j=0;j<sr*.07;j++){const k=i0+j;if(k<s.length)s[k]+=amp*Math.exp(-j/(sr*.009))*(Math.random()*2-1)}});
+ for(let j=0;j<s.length;j++)s[j]+=(Math.random()*2-1)*.01;
+ return {samples:s,sr:sr,truth:{H:H,e:e}};
+}
+$("#sim").onclick=()=>{const d=synth();truth=d.truth;env=toEnv(d.samples,d.sr);freshN=true;msg("Simulated ball loaded. The original drop height is hidden in the estimate's detail line, for checking.","ok");analyse()};
+/* microphone */
+$("#rec").onclick=async()=>{
+ if(state!=="idle")return;
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){msg("This browser cannot reach a microphone here. Use the simulated ball, or open the page over https.","bad");return}
+ let stream;
+ try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})}
+ catch(err){msg("The microphone was not available ("+(err&&err.name?err.name:"error")+"). Allow access in your browser, or use the simulated ball.","bad");return}
+ const AC=window.AudioContext||window.webkitAudioContext,ctx=new AC(),src=ctx.createMediaStreamSource(stream),proc=ctx.createScriptProcessor(4096,1,1),chunks=[];
+ const dly=+$("#dly").value,dur=+$("#dur").value;state="wait";truth=null;$("#rec").disabled=true;
+ let t0=performance.now(),rec=false;
+ proc.onaudioprocess=ev=>{if(rec)chunks.push(new Float32Array(ev.inputBuffer.getChannelData(0)))};
+ src.connect(proc);proc.connect(ctx.destination);
+ const tick=setInterval(()=>{
+  const el=(performance.now()-t0)/1000;
+  if(!rec){countdown=dly-el;if(countdown>0){msg("Release in "+Math.ceil(countdown)+" …")}else{rec=true;t0=performance.now();msg("Recording… release the ball now.","ok")}}
+  else{const left=dur-el;if(left>0){msg("Recording… "+Math.ceil(left)+" s left","ok")}else{
+   clearInterval(tick);rec=false;proc.disconnect();src.disconnect();stream.getTracks().forEach(t=>t.stop());
+   const total=chunks.reduce((a,b)=>a+b.length,0),all=new Float32Array(total);let o=0;chunks.forEach(c=>{all.set(c,o);o+=c.length});
+   const sr=ctx.sampleRate;ctx.close();env=toEnv(all,sr);freshN=true;state="idle";$("#rec").disabled=false;msg("Recording done. Adjust the sliders until each bounce has a line.","ok");analyse()}}
+ },100);
+ if(dly===0){rec=true;t0=performance.now()}
+};
+function draw(){
+ const {c,w,h}=K.fit(cv,.85);c.clearRect(0,0,w,h);
+ if(!res){c.fillStyle=K.css("--muted");c.font="14px "+K.css("--body");c.textAlign="center";c.fillText("No recording yet.",w/2,h/2);return}
+ const tm=res.sm.length/1000,gx=50,gw=w-gx-12,gh=(h-84)/2;
+ const pts=[];for(let i=0;i<res.sm.length;i+=5)pts.push([i/1000,res.sm[i]]);
+ let mx=0;res.sm.forEach(v=>{if(v>mx)mx=v});mx=Math.max(mx*1.1,.001);
+ K.plot(c,{x:gx,y:16,w:gw,h:gh},{xmin:0,xmax:tm,ymin:0,ymax:mx,title:"sound level (rectified, smoothed)",series:[{pts:pts,color:"--accent",width:1.5}],hlines:[{y:res.thr,color:"--warn"}],vlines:res.peaks.map(x=>({x:x,color:"--b"}))});
+ const traj=[],P=res.peaks;
+ for(let i=0;i+1<P.length;i++){for(let k=0;k<=24;k++){const t=P[i]+(P[i+1]-P[i])*k/24;traj.push([t,g/2*(t-P[i])*(P[i+1]-t)])}}
+ const ser=[{pts:traj,color:"--a",width:2}];
+ let ymax=.05;traj.forEach(p=>{if(p[1]>ymax)ymax=p[1]});
+ if(res.est){const tf=Math.sqrt(2*res.est/g),tr=P[0]-tf,pre=[];for(let k=0;k<=24;k++){const t=tr+tf*k/24;pre.push([t,res.est-g/2*(t-tr)*(t-tr)])}ser.unshift({pts:pre,color:"--b",dash:[6,4],width:2});ymax=Math.max(ymax,res.est)}
+ K.plot(c,{x:gx,y:gh+52,w:gw,h:gh},{xmin:0,xmax:tm,ymin:0,ymax:ymax*1.1,title:"height (m): reconstructed, dashed = estimated drop",xlabel:"time (s)",series:ser});
+ $("#ro").innerHTML="<span>bounces found <b>"+P.length+"</b></span><span>rebounds <b>"+res.hs.length+"</b></span>"+(res.hs.length?"<span>first rebound <b>"+K.f(res.hs[0],2)+" m</b></span>":"");
+}
+K.loop(()=>{},draw);
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{margin:0}</style>
+<title>Predict First</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: graph-paper lab bench. Tab strip, then a stage (canvas) beside a three-step side column (setup, predict, check). */
+:root{
+  --bg:#eef2f6; --surface:#ffffff; --stage:#f7fafc;
+  --ink:#142230; --muted:#566878; --line:#cbd6e0; --grid:#dde5ed;
+  --a:#0e7c86; --b:#cf7420; --accent:#2b4fd9; --good:#1c7d4a; --warn:#b3412e;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:1080px;margin-inline:auto}
+h1{font:800 clamp(1.9rem,5vw,2.8rem)/1.05 var(--display);letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);margin:.4rem 0 0;max-width:60ch}
+header{display:flex;flex-direction:column;gap:.4rem;margin-bottom:20px}
+nav{display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px solid var(--line);margin-bottom:20px}
+nav button{font:600 1rem var(--body);color:var(--muted);background:none;border:0;padding:10px 14px;margin-bottom:-2px;border-bottom:3px solid transparent;cursor:pointer}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav button small{display:block;font:400 .75rem var(--mono);color:var(--muted)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,21rem);gap:20px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+.stagewrap{min-width:0;display:flex;flex-direction:column;gap:10px}
+canvas{display:block;width:100%;background:var(--stage);border:1px solid var(--line);border-radius:6px;touch-action:none}
+.readout{display:flex;flex-wrap:wrap;gap:6px 22px;font:400 .85rem var(--mono);color:var(--muted)}
+.readout b{color:var(--ink);font-weight:600}
+.side{min-width:0;display:flex;flex-direction:column;gap:12px}
+fieldset.card,.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px 14px;margin:0;min-width:0}
+legend{font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-top:8px}
+.ctl label{font-size:.92rem}
+.ctl output{font:600 .85rem var(--mono);text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:2px 0}
+.hint{font-size:.85rem;color:var(--muted);margin:.5rem 0 0}
+.choices{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}
+.choices label{display:flex;gap:6px;align-items:center;font-size:.95rem}
+.q{margin:10px 0 0;font-weight:600;font-size:.95rem}
+.actions{display:flex;gap:8px}
+.actions button{font:600 1rem var(--body);padding:10px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.actions .primary{flex:1;background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .actions .primary{color:#0e161e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .actions .primary{color:#0e161e}}
+.actions button:disabled{opacity:.5;cursor:default}
+.result h3{font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.result p{margin:.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font:600 .72rem var(--mono);color:var(--muted);letter-spacing:.04em}
+td.num{font-family:var(--mono)}
+.tag{display:inline-block;font:600 .75rem var(--mono);padding:1px 7px;border-radius:3px;margin-right:6px}
+.tag.ok{background:var(--good);color:#fff}
+.tag.miss{background:var(--warn);color:#fff}
+:root[data-theme="dark"] .tag{color:#0e161e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tag{color:#0e161e}}
+.bars{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;font:400 .8rem var(--mono);color:var(--muted)}
+.bars i{display:block;height:12px;border-radius:2px;background:var(--line);overflow:hidden}
+.bars i span{display:block;height:100%;width:0}
+.bars em{font-style:normal;color:var(--ink);min-width:5ch;text-align:right}
+details{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+summary{cursor:pointer;font:600 1rem var(--body)}
+details p,details li{max-width:68ch}
+details code,.result code{font:400 .9em var(--mono)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Predict First</h1>
+    <p class="sub">Each simulation asks for your answer before it shows you anything. Commit to a prediction, run it, then check it against the equation.</p>
+  </header>
+  <nav role="tablist" aria-label="Simulations">
+    <button role="tab" data-tab="collisions" aria-selected="true">Two Carts<small>momentum</small></button>
+    <button role="tab" data-tab="energy" aria-selected="false">Hill Roll<small>energy</small></button>
+    <button role="tab" data-tab="release" aria-selected="false">Cut the String<small>circular motion</small></button>
+  </nav>
+  <section id="collisions" role="tabpanel"></section>
+  <section id="energy" role="tabpanel" hidden></section>
+  <section id="release" role="tabpanel" hidden></section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r)=>(r||document).querySelector(s);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI;
+const f1=x=>(Math.round(x*10)/10).toFixed(1), f2=x=>(Math.round(x*100)/100).toFixed(2);
+const angDiff=(a,b)=>Math.abs(((a-b+540)%360)-180);
+const G=9.8;
+
+function fit(cv,ratio){
+  const w=cv.clientWidth||600,h=Math.round(w*ratio),d=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(w*d)||cv.height!==Math.round(h*d)){cv.width=Math.round(w*d);cv.height=Math.round(h*d);cv.style.height=h+"px"}
+  const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return {c,w,h};
+}
+function ctl(o){
+  return `<div class="ctl"><label for="${o.id}">${o.label}</label><output id="${o.id}-o" for="${o.id}"></output>
+  <input type="range" id="${o.id}" min="${o.min}" max="${o.max}" step="${o.step}" value="${o.value}" data-unit="${o.unit||""}"></div>`;
+}
+function wire(root,cb){
+  root.querySelectorAll("input[type=range]").forEach(i=>{
+    const out=root.querySelector("#"+i.id+"-o");
+    const show=()=>{out.textContent=(+i.value).toFixed(i.step.indexOf(".")>=0?i.step.split(".")[1].length:0)+" "+i.dataset.unit};
+    show();i.addEventListener("input",()=>{show();cb(i.id)});
+  });
+}
+function arrow(c,x0,y0,x1,y1,col,lw,dash){
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=lw||2;if(dash)c.setLineDash(dash);
+  c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();c.setLineDash([]);
+  const a=Math.atan2(y1-y0,x1-x0),L=Math.hypot(x1-x0,y1-y0);
+  if(L>6){c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-9*Math.cos(a-.4),y1-9*Math.sin(a-.4));c.lineTo(x1-9*Math.cos(a+.4),y1-9*Math.sin(a+.4));c.closePath();c.fill()}
+  c.restore();
+}
+function panel(root,o){
+  root.innerHTML=`
+  <div class="layout">
+    <div class="stagewrap"><canvas aria-label="${o.alt}"></canvas><div class="readout"></div>${o.under||""}</div>
+    <div class="side">
+      <fieldset class="card setup"><legend>Setup</legend>${o.setup}</fieldset>
+      <fieldset class="card predict"><legend>Step 1 · Predict</legend>${o.predict}</fieldset>
+      <div class="actions"><button class="primary run">Lock in &amp; run</button><button class="reset">Reset</button></div>
+      <div class="card result" hidden aria-live="polite"></div>
+    </div>
+  </div>
+  <details><summary>Theory</summary>${o.theory}</details>
+  <details><summary>Instructions for students</summary>${o.how}</details>`;
+  return {cv:$("canvas",root),ro:$(".readout",root),run:$(".run",root),reset:$(".reset",root),res:$(".result",root),root};
+}
+function showResult(p,html){p.res.hidden=false;p.res.innerHTML="<h3>Step 3 · Check</h3>"+html}
+function verdict(ok,txt){return `<p><span class="tag ${ok?"ok":"miss"}">${ok?"CLOSE":"OFF"}</span>${txt}</p>`}
+
+/* ---------------------------------------------------------------- TWO CARTS */
+const collisions=(function(){
+  const S={m1:1,v1:4,m2:3,v2:0,e:1};
+  const W=14,HALF=.6;
+  const p=panel($("#collisions"),{
+    alt:"Two carts on a frictionless track, A on the left, B on the right",
+    setup:ctl({id:"c-m1",label:"Cart A mass",min:.5,max:5,step:.5,value:1,unit:"kg"})+
+          ctl({id:"c-v1",label:"Cart A velocity",min:-2,max:6,step:.5,value:4,unit:"m/s"})+
+          ctl({id:"c-m2",label:"Cart B mass",min:.5,max:5,step:.5,value:3,unit:"kg"})+
+          ctl({id:"c-v2",label:"Cart B velocity",min:-4,max:4,step:.5,value:0,unit:"m/s"})+
+          ctl({id:"c-e",label:"Bounciness e",min:0,max:1,step:.1,value:1,unit:""})+
+          `<p class="hint">e = 1 is a perfect bounce. e = 0 is velcro: the carts stick together.</p>`,
+    predict:`<p class="hint" style="margin-top:0">Positive means moving right. What are the two velocities right after the carts touch?</p>`+
+          ctl({id:"c-pa",label:"Cart A after",min:-8,max:8,step:.5,value:0,unit:"m/s"})+
+          ctl({id:"c-pb",label:"Cart B after",min:-8,max:8,step:.5,value:0,unit:"m/s"}),
+    theory:`<p>Cart A's push on cart B and B's push on A are equal and opposite for exactly the same time. Equal and opposite impulses mean A loses as much momentum as B gains, so the total <code>p = m₁v₁ + m₂v₂</code> cannot change. This holds for every collision, bouncy or sticky.</p>
+    <p>Kinetic energy has no such guarantee. A bouncy collision hands it back; a sticky one turns some of it into heat and deformation. The bounciness <code>e</code> is the ratio of separation speed to approach speed: <code>e = (v₂′ − v₁′)/(v₁ − v₂)</code>.</p>
+    <p>Combining that with momentum conservation gives <code>v₁′ = [(m₁ − e·m₂)v₁ + (1+e)m₂v₂]/(m₁+m₂)</code>. A light cart that hits a heavy one comes back. A heavy cart that hits a light one plows on through.</p>`,
+    how:`<ol><li>Set the masses and velocities, or leave the starting values.</li><li>Move the two Step 1 sliders to where you think each cart will be moving after the hit. Say your reasoning aloud to a partner first.</li><li>Press Lock in &amp; run and watch.</li><li>Read Step 3. Which of your guesses broke a rule, and which rule?</li></ol>
+    <p>Try: equal masses, e = 1. Then A much heavier than B. Then e = 0.</p>`
+  });
+  const st={ph:"idle",xA:3,xB:10,vA:0,vB:0,t:0,hit:false,ht:0,pred:null};
+  function out(){
+    const {m1,v1,m2,v2,e}=S;
+    if(v1<=v2)return {hit:false,u1:v1,u2:v2};
+    const M=m1+m2;
+    return {hit:true,u1:((m1-e*m2)*v1+(1+e)*m2*v2)/M,u2:((m2-e*m1)*v2+(1+e)*m1*v1)/M};
+  }
+  function reset(){Object.assign(st,{ph:"idle",xA:3,xB:10,vA:S.v1,vB:S.v2,t:0,hit:false,ht:0});p.res.hidden=true;p.run.disabled=false;
+    ["c-pa","c-pb"].forEach(id=>$("#"+id).disabled=false)}
+  wire(p.root,id=>{
+    if(id==="c-pa"||id==="c-pb")return;
+    S.m1=+$("#c-m1").value;S.v1=+$("#c-v1").value;S.m2=+$("#c-m2").value;S.v2=+$("#c-v2").value;S.e=+$("#c-e").value;reset();
+  });
+  p.reset.onclick=reset;
+  p.run.onclick=()=>{reset();st.pred={a:+$("#c-pa").value,b:+$("#c-pb").value};st.ph="run";p.run.disabled=true;
+    ["c-pa","c-pb"].forEach(id=>$("#"+id).disabled=true)};
+  function finish(){
+    st.ph="done";p.run.disabled=false;["c-pa","c-pb"].forEach(id=>$("#"+id).disabled=false);
+    const {m1,v1,m2,v2,e}=S;
+    const pb=m1*v1+m2*v2,pa=m1*st.vA+m2*st.vB;
+    const kb=.5*m1*v1*v1+.5*m2*v2*v2,ka=.5*m1*st.vA*st.vA+.5*m2*st.vB*st.vB;
+    const eA=Math.abs(st.pred.a-st.vA),eB=Math.abs(st.pred.b-st.vB);
+    let h="";
+    if(!st.hit)h+=`<p>Cart A was never faster than cart B, so they never met. Nothing changed.</p>`;
+    h+=`<table><tr><th></th><th>You</th><th>Actual</th></tr>
+      <tr><td>Cart A after</td><td class="num">${f1(st.pred.a)}</td><td class="num">${f1(st.vA)} m/s</td></tr>
+      <tr><td>Cart B after</td><td class="num">${f1(st.pred.b)}</td><td class="num">${f1(st.vB)} m/s</td></tr></table>`;
+    h+=verdict(eA<=.5&&eB<=.5,eA<=.5&&eB<=.5?"Both within 0.5 m/s.":`Cart A off by ${f1(eA)} m/s, cart B off by ${f1(eB)} m/s.`);
+    h+=`<table><tr><th></th><th>Before</th><th>After</th></tr>
+      <tr><td>Momentum</td><td class="num">${f2(pb)}</td><td class="num">${f2(pa)} kg·m/s</td></tr>
+      <tr><td>Kinetic energy</td><td class="num">${f2(kb)}</td><td class="num">${f2(ka)} J</td></tr></table>`;
+    h+=`<p>Momentum is the same on both sides. Check your own pair of numbers: <code>${m1}(${f1(st.pred.a)}) + ${m2}(${f1(st.pred.b)}) = ${f2(m1*st.pred.a+m2*st.pred.b)}</code>. ${Math.abs(m1*st.pred.a+m2*st.pred.b-pb)<.05?"Yours conserves momentum.":"Yours does not equal "+f2(pb)+", so no real collision could produce it."}</p>`;
+    if(st.hit){
+      h+=e>=.99?`<p>With e = 1 the kinetic energy also survives, because nothing absorbed it.</p>`
+        :`<p>${f2(kb-ka)} J of kinetic energy went into heat and dents. ${e===0?"The carts moved off together at one velocity.":""}</p>`;
+      if(m1<m2&&st.vA<0&&v2<=0)h+=`<p>The lighter cart came back. It had to give up more velocity than it had.</p>`;
+      if(m1>m2&&st.vA>0&&e>0)h+=`<p>The heavier cart barely noticed. It kept going the same way.</p>`;
+    }
+    showResult(p,h);
+  }
+  function update(dt){
+    if(st.ph!=="run")return;
+    st.t+=dt;st.xA+=st.vA*dt;st.xB+=st.vB*dt;
+    if(!st.hit&&st.vA>st.vB&&st.xB-st.xA<=2*HALF){
+      const o=out(),mid=(st.xA+st.xB)/2;st.hit=o.hit;st.vA=o.u1;st.vB=o.u2;st.xA=mid-HALF;st.xB=mid+HALF;st.ht=st.t;
+    }
+    if((st.hit&&st.t-st.ht>2)||st.xA-HALF<0||st.xB+HALF>W||st.xA+HALF>W||st.xB-HALF<0||(!st.hit&&st.t>3)){finish()}
+  }
+  function draw(){
+    const {c,w,h}=fit(p.cv,.36);const sx=w/W,gy=h*.72;
+    c.clearRect(0,0,w,h);
+    c.strokeStyle=css("--grid");c.lineWidth=1;c.fillStyle=css("--muted");c.font="11px "+css("--mono");c.textAlign="center";
+    for(let m=0;m<=W;m++){c.beginPath();c.moveTo(m*sx,0);c.lineTo(m*sx,h);c.stroke();if(m%2===0)c.fillText(m+" m",m*sx,h-6)}
+    c.strokeStyle=css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,gy);c.lineTo(w,gy);c.stroke();
+    const cart=(x,m,col,lab,v)=>{
+      const cw=2*HALF*sx,ch=(.45+.13*m)*sx,cx=x*sx-cw/2;
+      c.fillStyle=col;c.beginPath();c.roundRect(cx,gy-ch-6,cw,ch,4);c.fill();
+      c.fillStyle="#fff";c.font="600 12px "+css("--mono");c.textAlign="center";c.fillText(lab,x*sx,gy-ch/2-2);
+      c.fillStyle=css("--ink");c.beginPath();c.arc(cx+cw*.22,gy-3,3.5,0,7);c.arc(cx+cw*.78,gy-3,3.5,0,7);c.fill();
+      if(Math.abs(v)>.01){const y=gy-ch-24;arrow(c,x*sx,y,x*sx+v*sx*.4,y,col,3);
+        c.fillStyle=css("--ink");c.font="12px "+css("--mono");c.fillText(f1(v)+" m/s",x*sx+v*sx*.2,y-8)}
+    };
+    cart(st.xA,S.m1,css("--a"),"A "+S.m1+"kg",st.vA);cart(st.xB,S.m2,css("--b"),"B "+S.m2+"kg",st.vB);
+    const ptot=S.m1*st.vA+S.m2*st.vB,k=.5*S.m1*st.vA**2+.5*S.m2*st.vB**2;
+    p.ro.innerHTML=`<span>t <b>${f2(st.t)} s</b></span><span>total p <b>${f2(ptot)} kg·m/s</b></span><span>total KE <b>${f2(k)} J</b></span>`;
+  }
+  reset();
+  return {update,draw,reset};
+})();
+
+/* ---------------------------------------------------------------- HILL ROLL */
+const energy=(function(){
+  const S={H:5,h2:3,f:0,m:2};
+  const W=28;
+  const ty=x=>x<6?S.H*(1-x/6)**2:(x>=14&&x<22?S.h2*(.5-.5*Math.cos(2*Math.PI*(x-14)/8)):0);
+  const ts=x=>x<6?-2*S.H/6*(1-x/6):(x>=14&&x<22?S.h2*.5*Math.sin(2*Math.PI*(x-14)/8)*2*Math.PI/8:0);
+  const p=panel($("#energy"),{
+    alt:"A ball released from the top of a ramp rolling toward a second hill",
+    under:`<div class="bars" id="e-bars">
+      <span>KE</span><i><span style="background:var(--b)"></span></i><em>0 J</em>
+      <span>PE</span><i><span style="background:var(--a)"></span></i><em>0 J</em>
+      <span>Heat</span><i><span style="background:var(--warn)"></span></i><em>0 J</em></div>`,
+    setup:ctl({id:"e-H",label:"Release height",min:2,max:8,step:.5,value:5,unit:"m"})+
+          ctl({id:"e-h2",label:"Second hill height",min:1,max:8,step:.5,value:3,unit:"m"})+
+          ctl({id:"e-m",label:"Ball mass",min:1,max:5,step:1,value:2,unit:"kg"})+
+          ctl({id:"e-f",label:"Friction (force per kg)",min:0,max:1,step:.1,value:0,unit:"N/kg"})+
+          `<p class="hint">The ball starts from rest at the top of the left ramp. Friction acts along the whole path.</p>`,
+    predict:ctl({id:"e-ps",label:"Speed on the flat",min:0,max:20,step:.5,value:5,unit:"m/s"})+
+      `<p class="q" id="e-q">Does it get over the second hill?</p>
+       <div class="choices"><label><input type="radio" name="e-clear" value="yes">Yes</label><label><input type="radio" name="e-clear" value="no">No</label></div>`,
+    theory:`<p>Gravity is the only force that does work on the ball while it rolls, and its work depends on height alone, never on the shape of the path. A ball that drops by <code>H</code> gains <code>mgH</code> of kinetic energy: <code>½mv² = mgH</code>.</p>
+    <p>The mass sits on both sides and cancels, so <code>v = √(2gH)</code> for any mass. A bowling ball and a marble reach the flat at the same speed.</p>
+    <p>Friction takes energy off the books at <code>f·m</code> per metre of path, turning it into heat. Then <code>v² = 2(gH − f·s)</code>, where <code>s</code> is the distance travelled. Without friction the ball clears the second hill when it started higher than that hill; with friction it needs more.</p>`,
+    how:`<ol><li>Pick a release height and leave friction at zero for the first run.</li><li>Set the speed slider to your guess for the flat section, and answer yes or no on the hill.</li><li>Press Lock in &amp; run. The bars show where the energy is at every moment.</li><li>Change only the mass and run again. Predict whether the speed changes first.</li></ol>`
+  });
+  const st={ph:"idle",x:0,v:0,t:0,s:0,vb:null,sb:0,maxX:0,turned:false,pred:null};
+  function reset(){Object.assign(st,{ph:"idle",x:0,v:0,t:0,s:0,vb:null,sb:0,maxX:0,turned:false});p.res.hidden=true;p.run.disabled=false;
+    $("#e-ps").disabled=false;p.root.querySelectorAll("[name=e-clear]").forEach(r=>r.disabled=false)}
+  wire(p.root,id=>{
+    if(id==="e-ps")return;
+    S.H=+$("#e-H").value;S.h2=+$("#e-h2").value;S.m=+$("#e-m").value;S.f=+$("#e-f").value;reset();
+  });
+  p.reset.onclick=reset;
+  p.run.onclick=()=>{const r=p.root.querySelector("[name=e-clear]:checked");reset();
+    st.pred={v:+$("#e-ps").value,clear:r?r.value:null};st.ph="run";p.run.disabled=true;
+    $("#e-ps").disabled=true;p.root.querySelectorAll("[name=e-clear]").forEach(q=>q.disabled=true)};
+  function finish(){
+    st.ph="done";p.run.disabled=false;$("#e-ps").disabled=false;p.root.querySelectorAll("[name=e-clear]").forEach(r=>r.disabled=false);
+    const cleared=st.maxX>=22,vth=Math.sqrt(2*G*S.H),vfr=Math.sqrt(Math.max(0,2*(G*S.H-S.f*st.sb)));
+    const err=Math.abs(st.pred.v-st.vb);
+    let h=`<table><tr><th></th><th>You</th><th>Actual</th></tr>
+      <tr><td>Speed on flat</td><td class="num">${f1(st.pred.v)}</td><td class="num">${f1(st.vb)} m/s</td></tr>
+      <tr><td>Clears hill</td><td class="num">${st.pred.clear||"—"}</td><td class="num">${cleared?"yes":"no"}</td></tr></table>`;
+    h+=verdict(err<=.7,err<=.7?"Speed within 0.7 m/s.":`Speed off by ${f1(err)} m/s ${st.pred.v>st.vb?"(too fast)":"(too slow)"}.`);
+    h+=`<p>Check: <code>v = √(2(g·H − f·s))</code> = √(2(${f1(G)}·${S.H} − ${S.f}·${f1(st.sb)})) = <b>${f1(vfr)} m/s</b>.${S.f===0?" With no friction this is just √(2gH).":" Frictionless it would have been "+f1(vth)+" m/s."}</p>`;
+    h+=`<p>${cleared?"It cleared the hill. Energy at the crest was enough to carry it over.":S.f===0&&S.H<=S.h2?"The ball can only climb as high as it started, so a hill this tall stops it. Equal heights is the edge case: it creeps up and never quite makes it.":"It ran out of kinetic energy on the climb and rolled back."}</p>`;
+    h+=`<p>Mass was ${S.m} kg and did not appear anywhere in the speed. Change it and run again.</p>`;
+    showResult(p,h);
+  }
+  function update(dt){
+    if(st.ph!=="run")return;
+    dt=Math.min(dt,.05);const n=Math.ceil(dt/.002),h=dt/n;
+    for(let i=0;i<n;i++){
+      const sl=ts(st.x),c=1/Math.sqrt(1+sl*sl),gt=-G*sl*c;
+      if(st.v===0&&Math.abs(gt)<=S.f){continue}
+      const fs=st.v>0?1:st.v<0?-1:Math.sign(gt);let a=gt-S.f*fs;
+      const v0=st.v;st.v+=a*h;
+      if(S.f>0&&v0!==0&&Math.sign(st.v)!==Math.sign(v0)&&Math.abs(gt)<=S.f)st.v=0;
+      st.x+=st.v*c*h;st.s+=Math.abs(st.v)*h;st.t+=h;
+      if(st.x<0){st.x=0;st.v=Math.max(st.v,0)}
+      st.maxX=Math.max(st.maxX,st.x);
+      if(st.vb===null&&st.x>=10){st.vb=st.v;st.sb=st.s}
+      if(st.x>=14.5&&st.v<0)st.turned=true;
+    }
+    const rest=st.v===0&&st.t>.5&&Math.abs(ts(st.x))<.001;
+    if(st.x>=27.5||(st.turned&&st.x<12)||st.t>40||rest){if(st.vb===null){st.vb=0;st.sb=st.s}finish()}
+  }
+  function draw(){
+    const {c,w,h}=fit(p.cv,.42);const sx=w/W,YMIN=-.8,YMAX=9.4,sy=h/(YMAX-YMIN);
+    const X=x=>x*sx,Y=y=>h-(y-YMIN)*sy;
+    c.clearRect(0,0,w,h);
+    c.strokeStyle=css("--grid");c.lineWidth=1;c.fillStyle=css("--muted");c.font="11px "+css("--mono");c.textAlign="left";
+    for(let y=0;y<=9;y++){c.beginPath();c.moveTo(0,Y(y));c.lineTo(w,Y(y));c.stroke();c.fillText(y+" m",4,Y(y)-3)}
+    c.setLineDash([5,4]);c.strokeStyle=css("--a");c.beginPath();c.moveTo(0,Y(S.H));c.lineTo(X(8),Y(S.H));c.stroke();
+    c.strokeStyle=css("--b");c.beginPath();c.moveTo(X(12),Y(S.h2));c.lineTo(X(24),Y(S.h2));c.stroke();c.setLineDash([]);
+    c.fillStyle=css("--ink");
+    c.beginPath();c.moveTo(X(0),Y(-.8));for(let x=0;x<=W;x+=.2)c.lineTo(X(x),Y(ty(x)));c.lineTo(X(W),Y(-.8));c.closePath();
+    c.fillStyle=css("--line");c.fill();
+    c.strokeStyle=css("--ink");c.lineWidth=2.5;c.beginPath();for(let x=0;x<=W;x+=.2){x?c.lineTo(X(x),Y(ty(x))):c.moveTo(X(x),Y(ty(x)))}c.stroke();
+    const sl=ts(st.x),k=1/Math.sqrt(1+sl*sl),r=.38,bx=st.x+r*(-sl)*k,by=ty(st.x)+r*k;
+    c.fillStyle=css("--accent");c.beginPath();c.arc(X(bx),Y(by),r*sx,0,7);c.fill();
+    const KE=.5*S.m*st.v*st.v,PE=S.m*G*ty(st.x),HT=S.m*S.f*st.s,E0=S.m*G*S.H;
+    const bars=$("#e-bars").children;
+    [[KE,1],[PE,4],[HT,7]].forEach(([val,i],j)=>{
+      const pc=Math.max(0,Math.min(100,val/E0*100));bars[i].firstElementChild.style.width=pc+"%";bars[i+1].textContent=Math.round(val)+" J";
+    });
+    p.ro.innerHTML=`<span>t <b>${f1(st.t)} s</b></span><span>speed <b>${f1(Math.abs(st.v))} m/s</b></span><span>height <b>${f1(ty(st.x))} m</b></span><span>total energy at start <b>${Math.round(E0)} J</b></span>`;
+  }
+  reset();
+  return {update,draw,reset};
+})();
+
+/* ---------------------------------------------------------------- CUT THE STRING */
+const release=(function(){
+  const S={R:1.5,v:5,th:120,m:.5};
+  const WX=8,WY=6;
+  const p=panel($("#release"),{
+    alt:"Top view of a ball whirling on a string, with a dashed arrow showing your predicted direction",
+    setup:ctl({id:"r-R",label:"String length",min:.5,max:3,step:.5,value:1.5,unit:"m"})+
+          ctl({id:"r-v",label:"Ball speed",min:2,max:8,step:.5,value:5,unit:"m/s"})+
+          ctl({id:"r-th",label:"Cut when the ball reaches angle",min:0,max:350,step:10,value:120,unit:"°"})+
+          `<p class="hint">Top view, no gravity. The ball circles counter-clockwise. Mass is 0.5 kg.</p>`,
+    predict:`<p class="hint" style="margin-top:0">Part A. Drag on the picture, or use the slider, to point an arrow in the direction the ball travels just after the cut.</p>`+
+          ctl({id:"r-pa",label:"Direction of travel",min:0,max:359,step:1,value:0,unit:"°"})+
+          `<p class="q">Part B. Double the speed at the same string length. The string tension becomes…</p>
+           <div class="choices"><label><input type="radio" name="r-t" value="1">×1</label><label><input type="radio" name="r-t" value="2">×2</label><label><input type="radio" name="r-t" value="4">×4</label><label><input type="radio" name="r-t" value="8">×8</label></div>`,
+    theory:`<p>While the string holds, it pulls the ball toward the center. That pull changes the direction of the velocity and nothing else; it gives the ball no push along its path. The needed pull is <code>T = mv²/R</code>.</p>
+    <p>Cut the string and no force acts on the ball. Newton's first law says it keeps the velocity it had that instant. That velocity pointed along the circle, tangent to it, so the ball leaves in a straight line at a right angle to the string.</p>
+    <p>Nothing flings the ball outward. The feeling of being thrown outward on a merry-go-round is your body trying to go straight while the seat pulls it sideways.</p>
+    <p>Because <code>T ∝ v²</code>, doubling the speed quadruples the tension. Doubling the string length at the same speed halves it.</p>`,
+    how:`<ol><li>Look at the setup and pick a cut angle.</li><li>Part A: aim the arrow where you think the ball goes after the cut. Sketch the ball's velocity at that instant before you aim.</li><li>Part B: choose how much the tension grows when the speed doubles.</li><li>Press Lock in &amp; run. The teal arrow during the spin is the string's pull.</li></ol>
+    <p>Run it at several cut angles. Does the rule change?</p>`
+  });
+  const st={ph:"idle",phi:0,tf:0,pos:null,trail:[],pred:null,tpred:null};
+  const P=()=>({x:S.R*Math.cos(rad(S.th)),y:S.R*Math.sin(rad(S.th))});
+  function reset(){Object.assign(st,{ph:"idle",phi:0,tf:0,pos:null,trail:[]});p.res.hidden=true;p.run.disabled=false;
+    $("#r-pa").disabled=false;p.root.querySelectorAll("[name=r-t]").forEach(r=>r.disabled=false)}
+  wire(p.root,id=>{
+    if(id==="r-pa")return;
+    S.R=+$("#r-R").value;S.v=+$("#r-v").value;S.th=+$("#r-th").value;reset();
+  });
+  p.reset.onclick=reset;
+  p.run.onclick=()=>{const r=p.root.querySelector("[name=r-t]:checked");reset();
+    st.pred=+$("#r-pa").value;st.tpred=r?+r.value:null;st.ph="spin";p.run.disabled=true;
+    $("#r-pa").disabled=true;p.root.querySelectorAll("[name=r-t]").forEach(q=>q.disabled=true)};
+  function aim(ev){
+    if(st.ph==="spin"||st.ph==="fly")return;
+    const rc=p.cv.getBoundingClientRect(),sx=rc.width/(2*WX);
+    const wx=((ev.clientX-rc.left)/sx)-WX,wy=WY-((ev.clientY-rc.top)/sx);
+    const q=P();let a=deg(Math.atan2(wy-q.y,wx-q.x));if(a<0)a+=360;
+    const sl=$("#r-pa");sl.value=Math.round(a)%360;sl.dispatchEvent(new Event("input"));
+  }
+  let drag=false;
+  p.cv.addEventListener("pointerdown",e=>{drag=true;p.cv.setPointerCapture(e.pointerId);aim(e)});
+  p.cv.addEventListener("pointermove",e=>{if(drag)aim(e)});
+  p.cv.addEventListener("pointerup",()=>{drag=false});
+  function finish(){
+    st.ph="done";p.run.disabled=false;$("#r-pa").disabled=false;p.root.querySelectorAll("[name=r-t]").forEach(r=>r.disabled=false);
+    const actual=(S.th+90)%360,err=angDiff(st.pred,actual),outward=angDiff(st.pred,S.th);
+    const T1=S.m*S.v*S.v/S.R,T2=S.m*(2*S.v)**2/S.R;
+    let h=`<table><tr><th></th><th>You</th><th>Actual</th></tr>
+      <tr><td>Direction</td><td class="num">${Math.round(st.pred)}°</td><td class="num">${actual}°</td></tr>
+      <tr><td>Tension ratio</td><td class="num">${st.tpred?"×"+st.tpred:"—"}</td><td class="num">×4</td></tr></table>`;
+    h+=verdict(err<=15,err<=15?`Direction within 15°.`:`Direction off by ${Math.round(err)}°.`);
+    h+=`<p>The ball leaves along the tangent, 90° ahead of the string's angle (${S.th}° + 90° = ${actual}°).</p>`;
+    if(err>15&&outward<=35)h+=`<p>You aimed it straight out along the string. That is the picture of the ball being flung outward, and no force does that. The velocity at the cut was already along the circle, and with no force left it keeps that velocity.</p>`;
+    h+=`<p>Tension: <code>T = mv²/R = ${S.m}(${S.v})²/${S.R} = ${f1(T1)} N</code>. At double speed, <code>${S.m}(${2*S.v})²/${S.R} = ${f1(T2)} N</code>, which is 4 times as much.</p>`;
+    if(st.tpred&&st.tpred!==4)h+=`<p>${st.tpred===2?"×2 would be right if tension went with speed. It goes with speed squared.":"The tension follows v², so 2² = 4."}</p>`;
+    showResult(p,h);
+  }
+  function update(dt){
+    if(st.ph==="spin"){
+      st.phi+=S.v/S.R*dt;
+      if(st.phi>=rad(S.th)){st.phi=rad(S.th);st.ph="fly";st.pos=P();st.trail=[{...st.pos}]}
+    }else if(st.ph==="fly"){
+      st.tf+=dt;const d=rad(S.th+90);
+      st.pos={x:P().x+S.v*Math.cos(d)*st.tf,y:P().y+S.v*Math.sin(d)*st.tf};st.trail.push({...st.pos});
+      if(Math.abs(st.pos.x)>WX-.3||Math.abs(st.pos.y)>WY-.3||st.tf>2.5){finish()}
+    }
+  }
+  function draw(){
+    const {c,w,h}=fit(p.cv,.75);const s=w/(2*WX),X=x=>w/2+x*s,Y=y=>h/2-y*s;
+    c.clearRect(0,0,w,h);
+    c.strokeStyle=css("--grid");c.lineWidth=1;c.fillStyle=css("--muted");c.font="11px "+css("--mono");c.textAlign="center";
+    for(let x=-WX;x<=WX;x++){c.beginPath();c.moveTo(X(x),0);c.lineTo(X(x),h);c.stroke()}
+    for(let y=-WY;y<=WY;y++){c.beginPath();c.moveTo(0,Y(y));c.lineTo(w,Y(y));c.stroke()}
+    c.fillText("1 m grid",w-34,h-6);
+    c.strokeStyle=css("--muted");c.setLineDash([4,5]);c.beginPath();c.arc(X(0),Y(0),S.R*s,0,7);c.stroke();c.setLineDash([]);
+    c.fillStyle=css("--ink");c.beginPath();c.arc(X(0),Y(0),4,0,7);c.fill();
+    const q=P();
+    c.fillStyle=css("--muted");c.beginPath();c.arc(X(q.x),Y(q.y),3,0,7);c.fill();
+    const show=st.ph==="idle"?+$("#r-pa").value:st.pred;
+    arrow(c,X(q.x),Y(q.y),X(q.x)+2.2*s*Math.cos(rad(show)),Y(q.y)-2.2*s*Math.sin(rad(show)),css("--accent"),3,[7,5]);
+    c.fillStyle=css("--accent");c.font="600 11px "+css("--mono");c.textAlign="left";
+    c.fillText("your prediction",X(q.x)+2.2*s*Math.cos(rad(show))+6,Y(q.y)-2.2*s*Math.sin(rad(show)));
+    let bx=0,by=0;
+    if(st.ph==="idle"){bx=S.R;by=0}
+    else if(st.ph==="spin"){bx=S.R*Math.cos(st.phi);by=S.R*Math.sin(st.phi)}
+    else {bx=st.pos.x;by=st.pos.y;
+      c.strokeStyle=css("--b");c.lineWidth=3;c.beginPath();st.trail.forEach((t,i)=>i?c.lineTo(X(t.x),Y(t.y)):c.moveTo(X(t.x),Y(t.y)));c.stroke()}
+    if(st.ph==="spin"||st.ph==="idle"){
+      c.strokeStyle=css("--ink");c.lineWidth=1.5;c.beginPath();c.moveTo(X(0),Y(0));c.lineTo(X(bx),Y(by));c.stroke();
+      if(st.ph==="spin"){const T=S.m*S.v*S.v/S.R,L=Math.min(T*.12,S.R*.9),u=Math.hypot(bx,by)||1;
+        arrow(c,X(bx),Y(by),X(bx-bx/u*L),Y(by-by/u*L),css("--a"),3.5)}
+    }
+    c.fillStyle=css("--b");c.beginPath();c.arc(X(bx),Y(by),.18*s,0,7);c.fill();
+    const T=S.m*S.v*S.v/S.R;
+    p.ro.innerHTML=`<span>speed <b>${f1(S.v)} m/s</b></span><span>tension while spinning <b>${f1(T)} N</b></span><span>${st.ph==="fly"||st.ph==="done"?"string cut":"string holding"}</span>`;
+  }
+  reset();
+  return {update,draw,reset};
+})();
+
+/* ---------------------------------------------------------------- shell */
+const sims={collisions,energy,release};
+let active="collisions",last=performance.now();
+function show(id){
+  if(!sims[id])id="collisions";active=id;
+  document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===id));
+  Object.keys(sims).forEach(k=>{document.getElementById(k).hidden=k!==id});
+  try{history.replaceState(null,"","#"+id)}catch(e){}
+}
+document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.tab)));
+window.addEventListener("hashchange",()=>show(location.hash.slice(1)));
+show(location.hash.slice(1)||"collisions");
+function frame(now){
+  const dt=Math.min((now-last)/1000,.1);last=now;
+  const s=sims[active];s.update(dt);s.draw();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

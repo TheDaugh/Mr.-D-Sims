@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reading Motion Graphs · Mr. D's Sims</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2f6; --surface:#ffffff; --stage:#f7fafc;
+  --ink:#142230; --muted:#566878; --line:#cbd6e0; --grid:#dde5ed;
+  --a:#0e7c86; --b:#cf7420; --accent:#2b4fd9; --good:#1c7d4a; --warn:#b3412e;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);padding-inline:16px;padding-block:18px 48px}
+.wrap{max-width:1080px;margin-inline:auto}
+header{display:flex;flex-direction:column;gap:.35rem;margin-bottom:18px}
+.back{font:600 .8rem var(--mono);color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent)}
+h1{font:800 clamp(1.8rem,5vw,2.6rem)/1.05 var(--display);letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,20rem);gap:20px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+.stagewrap{min-width:0;display:flex;flex-direction:column;gap:10px}
+canvas{display:block;width:100%;background:var(--stage);border:1px solid var(--line);border-radius:6px;touch-action:none}
+.readout{display:flex;flex-wrap:wrap;gap:4px 20px;font:400 .85rem var(--mono);color:var(--muted)}
+.readout b{color:var(--ink);font-weight:600}
+.side{min-width:0;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px 14px;margin:0;min-width:0}
+fieldset.card{margin:0}
+legend{font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-top:8px}
+.ctl:first-of-type{margin-top:2px}
+.ctl label{font-size:.92rem}
+.ctl output{font:600 .85rem var(--mono);text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:2px 0}
+.hint{font-size:.85rem;color:var(--muted);margin:.5rem 0 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn{font:600 .95rem var(--body);padding:9px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0e161e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0e161e}}
+.btn:disabled{opacity:.5;cursor:default}
+.chk{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.95rem}
+.choices{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}
+.choices label{display:flex;gap:6px;align-items:center;font-size:.95rem}
+select,input[type=number],input[type=text]{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:0}
+input[type=number]{width:7.5em}
+.q{margin:10px 0 0;font-weight:600;font-size:.95rem}
+.msg{margin:.6rem 0 0;font-size:.95rem}
+.msg.ok{color:var(--good)} .msg.bad{color:var(--warn)}
+.tag{display:inline-block;font:600 .75rem var(--mono);padding:1px 7px;border-radius:3px;margin-right:6px;background:var(--muted);color:var(--surface)}
+.tag.ok{background:var(--good);color:#fff}.tag.bad{background:var(--warn);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font:600 .72rem var(--mono);color:var(--muted);letter-spacing:.04em}
+.scroll{overflow-x:auto}
+.plots{display:flex;flex-direction:column;gap:8px}
+details{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+summary{cursor:pointer;font:600 1rem var(--body)}
+details p,details li{max-width:70ch}
+details code,.card code{font:400 .9em var(--mono)}
+footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<a class="back" href="index.html">&larr; All simulations</a>
+<h1>Reading Motion Graphs</h1>
+<p class="sub">A car moves along a track. Read its velocity–time or displacement–time graph to find velocity, acceleration and distance.</p>
+</header>
+
+<div class="layout">
+ <div class="stagewrap"><canvas id="cv" aria-label="A car on a track above a motion graph"></canvas>
+  <div class="row" style="margin-top:0"><button class="btn" id="play">Play</button><input type="range" id="tc" min="0" max="10" step="0.05" value="0" aria-label="Time" style="flex:1;min-width:8rem;accent-color:var(--accent)"></div>
+  <div class="readout" id="ro"></div></div>
+ <div class="side">
+  <fieldset class="card"><legend>Graph</legend>
+   <div class="row" style="margin-top:0"><label for="mode" style="align-self:center">Show</label><select id="mode"><option value="v">Velocity–time</option><option value="x">Displacement–time</option></select><button class="btn" id="new">New problem</button></div>
+   <p class="hint">Every problem is different. Play the car, then read the graph.</p>
+  </fieldset>
+  <fieldset class="card"><legend>Question</legend>
+   <p class="q" id="qt" style="margin-top:0"></p>
+   <div class="row"><input type="number" id="ans" step="0.1" aria-label="Your answer"><span id="unit" style="align-self:center;font:600 .85rem var(--mono)"></span><button class="btn primary" id="chk">Check</button></div>
+   <p class="msg" id="msg" aria-live="polite"></p>
+  </fieldset>
+ </div>
+</div>
+<details><summary>Instructions</summary><ol><li>Choose which graph you want to read, then press <b>New problem</b> for a fresh motion.</li>
+<li>Press <b>Play</b> to watch the car, or drag the time slider. A black line on the graph follows the time.</li>
+<li>Read the question, work out the answer from the graph, and type it in. Press <b>Check</b>.</li>
+<li>After you check, the graph marks the part you needed: a shaded area, a highlighted slope, or a read-off point.</li></ol></details>
+<details><summary>Theory</summary><p>Learning to interpret motion graphs is an important skill in physics. The most important step is to read the vertical axis carefully. Is it a velocity graph or a displacement graph?</p>
+<p><b>If it is a displacement graph:</b></p>
+<ul><li>The vertical value is how far the object is from the start.</li><li>The slope represents the velocity. A steeper line is a faster object, and a downward slope is motion backwards.</li></ul>
+<p><b>If it is a velocity graph:</b></p>
+<ul><li>The velocity can be read directly from the vertical axis.</li><li>The slope represents the acceleration.</li><li>The area under the graph represents the distance travelled. Area below the axis counts as negative, because the car is going backwards.</li></ul></details>
+<footer>Rebuilt in HTML from the LabVIEW simulation "Graphs".</footer>
+</div>
+<script>
+const K={};
+K.$=(s,r)=>(r||document).querySelector(s);
+K.css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+K.rad=d=>d*Math.PI/180;K.deg=r=>r*180/Math.PI;
+K.f=(x,n)=>(+x).toFixed(n===undefined?1:n);
+K.G=9.81;
+K.fit=function(cv,ratio){
+  const w=cv.clientWidth||600,h=Math.round(w*ratio),d=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(w*d)||cv.height!==Math.round(h*d)){cv.width=Math.round(w*d);cv.height=Math.round(h*d);cv.style.height=h+"px"}
+  const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return {c:c,w:w,h:h};
+};
+K.ctl=function(o){
+  return '<div class="ctl"><label for="'+o.id+'">'+o.label+'</label><output id="'+o.id+'-o" for="'+o.id+'"></output>'+
+  '<input type="range" id="'+o.id+'" min="'+o.min+'" max="'+o.max+'" step="'+o.step+'" value="'+o.value+'" data-unit="'+(o.unit||"")+'"></div>';
+};
+K.wire=function(root,cb){
+  root.querySelectorAll("input[type=range]").forEach(function(i){
+    const out=root.querySelector("#"+i.id+"-o");
+    const dec=String(i.step).indexOf(".")>=0?String(i.step).split(".")[1].length:0;
+    const show=function(){out.textContent=(+i.value).toFixed(dec)+(i.dataset.unit?" "+i.dataset.unit:"")};
+    show();i.addEventListener("input",function(){show();if(cb)cb(i.id,+i.value)});
+  });
+};
+K.arrow=function(c,x0,y0,x1,y1,col,lw,dash){
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=lw||2;if(dash)c.setLineDash(dash);
+  c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();c.setLineDash([]);
+  const a=Math.atan2(y1-y0,x1-x0),L=Math.hypot(x1-x0,y1-y0);
+  if(L>6){c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-9*Math.cos(a-.4),y1-9*Math.sin(a-.4));c.lineTo(x1-9*Math.cos(a+.4),y1-9*Math.sin(a+.4));c.closePath();c.fill()}
+  c.restore();
+};
+K.ticks=function(a,b,n){
+  const raw=(b-a)/n;if(!(raw>0))return [a];
+  const p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;
+  const s=(m<1.5?1:m<3?2:m<7?5:10)*p,out=[];
+  for(let v=Math.ceil(a/s-1e-9)*s;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));
+  return out;
+};
+/* K.plot(c, {x,y,w,h}, {xmin,xmax,ymin,ymax,title,xlabel,series:[{pts,color,width,dash,dots}],cursorX,vlines:[{x,color}],hlines:[{y,color,dash}]}) */
+K.plot=function(c,bx,o){
+  const X=function(v){return bx.x+(v-o.xmin)/(o.xmax-o.xmin)*bx.w};
+  const Y=function(v){return bx.y+bx.h-(v-o.ymin)/(o.ymax-o.ymin)*bx.h};
+  c.save();c.fillStyle=K.css("--surface");c.fillRect(bx.x,bx.y,bx.w,bx.h);
+  c.font="10px "+K.css("--mono");c.lineWidth=1;
+  const gx=K.ticks(o.xmin,o.xmax,Math.max(2,Math.round(bx.w/60))),gy=K.ticks(o.ymin,o.ymax,Math.max(2,Math.round(bx.h/32)));
+  c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");
+  c.textAlign="center";c.textBaseline="top";
+  gx.forEach(function(v){c.beginPath();c.moveTo(X(v),bx.y);c.lineTo(X(v),bx.y+bx.h);c.stroke();c.fillText(String(+v.toFixed(6)),X(v),bx.y+bx.h+3)});
+  c.textAlign="right";c.textBaseline="middle";
+  gy.forEach(function(v){c.beginPath();c.moveTo(bx.x,Y(v));c.lineTo(bx.x+bx.w,Y(v));c.stroke();c.fillText(String(+v.toFixed(6)),bx.x-4,Y(v))});
+  c.strokeStyle=K.css("--muted");
+  if(o.ymin<0&&o.ymax>0){c.beginPath();c.moveTo(bx.x,Y(0));c.lineTo(bx.x+bx.w,Y(0));c.stroke()}
+  if(o.xmin<0&&o.xmax>0){c.beginPath();c.moveTo(X(0),bx.y);c.lineTo(X(0),bx.y+bx.h);c.stroke()}
+  c.beginPath();c.rect(bx.x,bx.y,bx.w,bx.h);c.clip();
+  (o.hlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--muted");c.setLineDash(l.dash||[4,4]);c.beginPath();c.moveTo(bx.x,Y(l.y));c.lineTo(bx.x+bx.w,Y(l.y));c.stroke()});
+  (o.vlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--b");c.setLineDash(l.dash||[]);c.beginPath();c.moveTo(X(l.x),bx.y);c.lineTo(X(l.x),bx.y+bx.h);c.stroke()});
+  c.setLineDash([]);
+  (o.series||[]).forEach(function(s){
+    c.strokeStyle=K.css(s.color||"--accent");c.fillStyle=c.strokeStyle;c.lineWidth=s.width||2;c.setLineDash(s.dash||[]);
+    if(s.dots){s.pts.forEach(function(p){c.beginPath();c.arc(X(p[0]),Y(p[1]),s.r||3.5,0,7);c.fill()})}
+    else{c.beginPath();s.pts.forEach(function(p,i){i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1]))});c.stroke()}
+  });
+  c.setLineDash([]);
+  if(o.cursorX!==undefined&&o.cursorX!==null){c.strokeStyle=K.css("--ink");c.lineWidth=1;c.beginPath();c.moveTo(X(o.cursorX),bx.y);c.lineTo(X(o.cursorX),bx.y+bx.h);c.stroke()}
+  c.restore();
+  c.save();c.strokeStyle=K.css("--line");c.strokeRect(bx.x+.5,bx.y+.5,bx.w-1,bx.h-1);
+  c.fillStyle=K.css("--ink");c.font="600 11px "+K.css("--mono");c.textAlign="left";c.textBaseline="top";
+  if(o.title)c.fillText(o.title,bx.x+6,bx.y+4);
+  if(o.xlabel){c.fillStyle=K.css("--muted");c.textAlign="right";c.fillText(o.xlabel,bx.x+bx.w-6,bx.y+4)}
+  c.restore();
+  return {X:X,Y:Y};
+};
+K.loop=function(update,draw){
+  let last=performance.now();
+  function fr(now){const dt=Math.min((now-last)/1000,.1);last=now;update(dt);draw();requestAnimationFrame(fr)}
+  requestAnimationFrame(fr);
+};
+K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296}};
+
+(function(){
+"use strict";
+
+const $=K.$,cv=$("#cv");
+let rnd=K.rand(Date.now()%100000),prob,tc=0,play=false,done=false;
+function make(){
+ const T=[0,2,4,6,8,10],V=[];let v=Math.round(rnd()*4);V.push(v);
+ for(let i=1;i<T.length;i++){if(rnd()<.35){}else{v=Math.round(-5+rnd()*13)}V.push(v)}
+ const X=[0];for(let i=1;i<T.length;i++)X.push(X[i-1]+(V[i-1]+V[i])/2*(T[i]-T[i-1]));
+ return {T:T,V:V,X:X};
+}
+const vAt=(p,t)=>{let i=Math.min(4,Math.floor(t/2));const f=(t-p.T[i])/2;return p.V[i]+(p.V[i+1]-p.V[i])*f};
+const xAt=(p,t)=>{let i=Math.min(4,Math.floor(t/2));const s=t-p.T[i],a=(p.V[i+1]-p.V[i])/2;return p.X[i]+p.V[i]*s+.5*a*s*s};
+function question(){
+ const m=$("#mode").value,r=rnd,i=Math.floor(r()*5),j=Math.min(5,i+1+Math.floor(r()*2));
+ let q;
+ if(m==="v"){
+  const k=Math.floor(r()*3);
+  if(k===0){const t=+(r()*9+.5).toFixed(1);q={kind:"read",t:t,ans:vAt(prob,t),tol:.35,txt:"What is the velocity at t = "+t+" s?",unit:"m/s"}}
+  else if(k===1){q={kind:"area",a:prob.T[i],b:prob.T[j],ans:prob.X[j]-prob.X[i],tol:.8,txt:"What is the displacement from t = "+prob.T[i]+" s to t = "+prob.T[j]+" s?",unit:"m"}}
+  else{q={kind:"slope",a:prob.T[i],b:prob.T[i+1],ans:(prob.V[i+1]-prob.V[i])/2,tol:.2,txt:"What is the acceleration between t = "+prob.T[i]+" s and t = "+prob.T[i+1]+" s?",unit:"m/s²"}}
+ }else{
+  const k=Math.floor(r()*2);
+  if(k===0){const t=+(r()*9+.5).toFixed(1);q={kind:"read",t:t,ans:xAt(prob,t),tol:.9,txt:"What is the displacement at t = "+t+" s?",unit:"m"}}
+  else{q={kind:"avg",a:prob.T[i],b:prob.T[j],ans:(prob.X[j]-prob.X[i])/(prob.T[j]-prob.T[i]),tol:.35,txt:"What is the average velocity from t = "+prob.T[i]+" s to t = "+prob.T[j]+" s?",unit:"m/s"}}
+ }
+ return q;
+}
+function fresh(){prob=make();prob.q=question();tc=0;play=false;done=false;$("#tc").value=0;$("#play").textContent="Play";$("#qt").textContent=prob.q.txt;$("#unit").textContent=prob.q.unit;$("#ans").value="";msg("")}
+function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
+$("#new").onclick=fresh;$("#mode").onchange=()=>{prob.q=question();done=false;$("#qt").textContent=prob.q.txt;$("#unit").textContent=prob.q.unit;$("#ans").value="";msg("")};
+$("#play").onclick=()=>{if(tc>=10)tc=0;play=!play;$("#play").textContent=play?"Pause":"Play"};
+$("#tc").oninput=e=>{tc=+e.target.value;play=false;$("#play").textContent="Play"};
+$("#chk").onclick=()=>{
+ const v=parseFloat($("#ans").value);if(!isFinite(v)){msg("Type an answer first.","bad");return}
+ done=true;const q=prob.q,ok=Math.abs(v-q.ans)<=q.tol;
+ const how={read:"Read it straight off the graph.",area:"It is the area between the line and the axis. Below the axis counts as negative.",slope:"It is the slope of the line: rise over run.",avg:"It is the slope between the two points: change in displacement over change in time."}[q.kind];
+ msg(ok?"Correct: "+K.f(q.ans,1)+" "+q.unit+". "+how:"Not quite. The answer is "+K.f(q.ans,1)+" "+q.unit+". "+how,ok?"ok":"bad");
+};
+function update(dt){if(play){tc+=dt;if(tc>=10){tc=10;play=false;$("#play").textContent="Play"}$("#tc").value=tc}}
+function draw(){
+ const {c,w,h}=K.fit(cv,.7);c.clearRect(0,0,w,h);const m=$("#mode").value,p=prob;
+ const trackH=62,xs=p.X,xmin=Math.min.apply(null,xs.concat([0]))-1,xmax=Math.max.apply(null,xs)+1;
+ const tx=x=>30+(x-xmin)/(xmax-xmin)*(w-60);
+ c.fillStyle=K.css("--stage");c.fillRect(0,0,w,trackH);c.strokeStyle=K.css("--muted");c.lineWidth=2;c.beginPath();c.moveTo(24,trackH-18);c.lineTo(w-24,trackH-18);c.stroke();
+ c.lineWidth=1;c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="center";
+ K.ticks(xmin,xmax,8).forEach(v=>{c.beginPath();c.moveTo(tx(v),trackH-18);c.lineTo(tx(v),trackH-12);c.stroke();c.fillText(v+" m",tx(v),trackH-2)});
+ const cx=tx(xAt(p,tc));c.fillStyle=K.css("--a");c.beginPath();c.roundRect(cx-16,trackH-38,32,16,3);c.fill();c.fillStyle=K.css("--ink");c.beginPath();c.arc(cx-8,trackH-21,4,0,7);c.arc(cx+8,trackH-21,4,0,7);c.fill();
+ c.fillStyle=K.css("--b");c.beginPath();c.arc(tx(0),trackH-24,3,0,7);c.fill();
+ const ser=[],pts=[];
+ for(let t=0;t<=10.001;t+=.1)pts.push([t,m==="v"?vAt(p,t):xAt(p,t)]);
+ const vals=pts.map(q=>q[1]),lo=Math.floor(Math.min.apply(null,vals.concat([0]))-1),hi=Math.ceil(Math.max.apply(null,vals.concat([0]))+1);
+ const bx={x:46,y:trackH+16,w:w-62,h:h-trackH-48};
+ const ov=K.plot(c,bx,{xmin:0,xmax:10,ymin:lo,ymax:hi,title:m==="v"?"velocity (m/s)":"displacement (m)",xlabel:"time (s)",series:[{pts:pts,color:"--accent"}],cursorX:tc});
+ if(done){const q=p.q;c.save();
+  if(q.kind==="area"&&m==="v"){c.fillStyle=K.css("--b");c.globalAlpha=.3;c.beginPath();c.moveTo(ov.X(q.a),ov.Y(0));for(let t=q.a;t<=q.b+.001;t+=.1)c.lineTo(ov.X(t),ov.Y(vAt(p,t)));c.lineTo(ov.X(q.b),ov.Y(0));c.closePath();c.fill()}
+  else if(q.kind==="read"){const y=m==="v"?vAt(p,q.t):xAt(p,q.t);c.fillStyle=K.css("--warn");c.beginPath();c.arc(ov.X(q.t),ov.Y(y),5,0,7);c.fill();c.strokeStyle=K.css("--warn");c.setLineDash([4,3]);c.beginPath();c.moveTo(ov.X(q.t),ov.Y(0));c.lineTo(ov.X(q.t),ov.Y(y));c.lineTo(ov.X(0),ov.Y(y));c.stroke()}
+  else if(q.kind==="slope"||q.kind==="avg"){const f=m==="v"?vAt:xAt;c.strokeStyle=K.css("--warn");c.lineWidth=4;c.beginPath();c.moveTo(ov.X(q.a),ov.Y(f(p,q.a)));c.lineTo(ov.X(q.b),ov.Y(f(p,q.b)));c.stroke();
+   c.lineWidth=1.5;c.setLineDash([4,3]);c.beginPath();c.moveTo(ov.X(q.a),ov.Y(f(p,q.a)));c.lineTo(ov.X(q.b),ov.Y(f(p,q.a)));c.lineTo(ov.X(q.b),ov.Y(f(p,q.b)));c.stroke()}
+  c.restore()}
+ $("#ro").innerHTML="<span>t <b>"+K.f(tc,1)+" s</b></span><span>position <b>"+K.f(xAt(p,tc))+" m</b></span><span>velocity <b>"+K.f(vAt(p,tc))+" m/s</b></span>";
+}
+fresh();K.loop(update,draw);
+
+})();
+</script>
+</body>
+</html>
