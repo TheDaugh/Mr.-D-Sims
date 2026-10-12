@@ -2,7 +2,7 @@
 
 Classroom simulations. Each one is a single HTML file that runs in any modern browser, so there is nothing to install and they work on Chromebooks and phones.
 
-Open `index.html` for the front page. It links to `physics/` and `chemistry/`, and each has its own hub.
+Open `index.html` for the front page. It links to `physics/`, `chemistry/` and `calculus/`, and each has its own hub.
 
 ## Physics
 
@@ -38,3 +38,13 @@ The `chemistry/` folder holds virtual labs, with a hub page at `chemistry/index.
 | 2 · Properties of Matter | `specific-heat.html` (calorimetry with a mystery metal) |
 
 To add a lab, put the page in its unit folder and add one entry to `chemistry/labs.js`. Chemistry pages share `chemistry/shared/lab.css`, so keep the `../shared/lab.css` link when copying one.
+
+## Calculus
+
+The `calculus/` folder holds AP Calculus AB sims, with a hub at `calculus/index.html` that lists them by unit. The list lives in `calculus/sims.js`; add one entry there to add a card.
+
+| Unit | Page |
+|---|---|
+| 6 · Integration and Accumulation of Change | `accumulation-lab.html` (two tabs: the accumulation machine, where g(x) = ∫f builds up as you drag x, and Riemann sums with left, right, midpoint and trapezoid rules and an error-vs-n plot) |
+
+Each page is one self-contained file, so the same rules as the physics sims apply: constants and function lists sit at the top of the `<script>` block.

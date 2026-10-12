@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accumulation Lab</title>
+<meta name="description" content="Drag x to watch g(x) = integral of f build up, and compare left, right, midpoint and trapezoid sums.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+.top{display:flex;gap:12px;align-items:baseline;max-width:1120px;margin:0 auto 10px}
+.top a{font:600 .8rem var(--mono);color:var(--muted);text-decoration:none}
+.top a:hover{color:var(--f)}
+/* Layout: two-tab lab. Stacked plots (f above g, shared x-axis) beside a readout panel; stacks to one column on phones. */
+:root{
+  --bg:#F2F5F8; --panel:#FFFFFF; --fg:#121C26; --muted:#566676; --line:#D5DEE6; --grid:#E4EAF0; --axis:#8796A4;
+  --f:#1B5FD1; --g:#C95A00; --neg:#C23B6B; --ok:#0E7F57; --chip:#E8EEF4;
+  --m-left:#1B5FD1; --m-right:#7A4FD6; --m-mid:#0F8A5F; --m-trap:#C95A00;
+  --display:'Bricolage Grotesque','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --body:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1620; --panel:#142030; --fg:#E6EDF4; --muted:#92A3B4; --line:#243445; --grid:#1C2B3B; --axis:#5A7388;
+    --f:#5CA5FF; --g:#FFB454; --neg:#FF7FA3; --ok:#4CD6A2; --chip:#1B2A3B;
+    --m-left:#5CA5FF; --m-right:#B79BFF; --m-mid:#4CD6A2; --m-trap:#FFB454;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1620; --panel:#142030; --fg:#E6EDF4; --muted:#92A3B4; --line:#243445; --grid:#1C2B3B; --axis:#5A7388;
+  --f:#5CA5FF; --g:#FFB454; --neg:#FF7FA3; --ok:#4CD6A2; --chip:#1B2A3B;
+  --m-left:#5CA5FF; --m-right:#B79BFF; --m-mid:#4CD6A2; --m-trap:#FFB454;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;padding-inline:16px;padding-block:20px 40px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,4vw,36px);line-height:1.05;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{margin:4px 0 0;color:var(--muted);font-size:14px}
+.tabs{display:flex;gap:4px;background:var(--chip);padding:4px;border-radius:10px}
+.tabs button{font:inherit;font-weight:500;color:var(--muted);background:transparent;border:0;border-radius:7px;padding:8px 14px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+button:focus-visible,select:focus-visible,input:focus-visible,canvas:focus-visible{outline:2px solid var(--f);outline-offset:2px}
+.lab{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px;align-items:start}
+.plots{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 12px 14px;display:flex;flex-direction:column;gap:6px}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;font-size:13px;color:var(--muted);padding-left:8px}
+.head b{font-family:var(--mono);font-weight:500;font-size:13px}
+.head .f{color:var(--f)} .head .g{color:var(--g)}
+canvas{display:block;width:100%;touch-action:pan-y;cursor:ew-resize}
+#accF{aspect-ratio:16/6} #accG{aspect-ratio:16/6.4} #rieMain{aspect-ratio:16/7} #rieErr{aspect-ratio:16/6;cursor:default} #tub{aspect-ratio:7/5;cursor:default}
+.xrow{display:flex;align-items:center;gap:12px;padding:4px 8px 0}
+.xrow label{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
+input[type=range]{flex:1;min-width:0;accent-color:var(--f)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.field{display:flex;flex-direction:column;gap:6px}
+.field>label,.lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+.eq{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0;overflow-wrap:anywhere}
+dl.ro{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:baseline}
+dl.ro dt{color:var(--muted);font-size:13px}
+dl.ro dd{margin:0;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:14px}
+dd.f{color:var(--f)} dd.g{color:var(--g)}
+.note{margin:0;font-size:14px;padding:10px 12px;background:var(--chip);border-radius:8px}
+.note.ok{color:var(--ok)}
+.checks{display:flex;flex-direction:column;gap:8px}
+.checks label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+.checks input{accent-color:var(--f);width:16px;height:16px}
+.btn{font:inherit;font-weight:600;color:var(--bg);background:var(--fg);border:0;border-radius:8px;padding:9px 14px;cursor:pointer}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.seg button{font:inherit;font-size:14px;font-weight:500;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.seg button i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.seg button[aria-pressed="true"]{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
+.terms{font-family:var(--mono);font-size:12px;line-height:1.7;margin:0;color:var(--fg);overflow-x:auto;white-space:pre}
+.rule p{margin:0 0 8px;font-size:14px}
+.rule p:last-child{margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;padding-left:8px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:18px;height:0;border-top:3px solid}
+.legend i.dash{border-top-style:dashed}
+@media (max-width:860px){
+  .lab{grid-template-columns:minmax(0,1fr)}
+  #accF{aspect-ratio:4/2.6} #accG{aspect-ratio:4/2.8} #rieMain{aspect-ratio:4/2.9} #rieErr{aspect-ratio:4/2.6}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="top"><a href="../">&larr; Calculus hub</a><span style="font:400 .8rem var(--mono);color:var(--muted)">Mr. D's Sims</span></div>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Accumulation Lab</h1>
+      <p class="sub">AP Calculus AB · Unit 6 · Integration and accumulation of change</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Simulation">
+      <button role="tab" id="tabAcc" aria-selected="true" aria-controls="secAcc">Accumulation machine</button>
+      <button role="tab" id="tabRie" aria-selected="false" aria-controls="secRie">Riemann sums</button>
+    </div>
+  </header>
+
+  <section id="secAcc" role="tabpanel" aria-labelledby="tabAcc">
+    <div class="lab">
+      <div class="plots">
+        <div class="head"><b class="f">f(t)</b><span>the rate. Shaded area from 0 to x. Below the axis counts negative.</span></div>
+        <canvas id="accF" tabindex="0" role="img" aria-label="Graph of f with area shaded from 0 to x. Drag to move x."></canvas>
+        <div class="head"><b class="g">g(x) = ∫₀ˣ f(t) dt</b><span>the accumulated amount. The blue triangle has run 1 and rise f(x).</span></div>
+        <canvas id="accG" tabindex="0" role="img" aria-label="Graph of g, the accumulated area, with a slope triangle at x."></canvas>
+        <div class="xrow"><label for="accX">x = <span id="accXv">2.50</span></label><input type="range" id="accX" min="0" max="8" step="0.01" value="2.5"></div>
+      </div>
+      <aside class="panel">
+        <div class="field">
+          <label for="accFn">Rate function</label>
+          <select id="accFn"></select>
+          <p class="eq" id="accEq"></p>
+        </div>
+        <dl class="ro">
+          <dt>f(x), height of f</dt><dd class="f" id="accOutF"></dd>
+          <dt>g(x), area so far</dt><dd class="g" id="accOutG"></dd>
+          <dt>slope of g at x</dt><dd id="accOutS"></dd>
+        </dl>
+        <p class="note" id="accStatus"></p>
+        <div class="checks">
+          <label><input type="checkbox" id="accSlope" checked> Show slope triangle on g</label>
+          <label><input type="checkbox" id="accZeros" checked> Mark where f = 0</label>
+          <label><input type="checkbox" id="accTub"> Bathtub view</label>
+        </div>
+        <div class="field" id="tubBox" hidden>
+          <canvas id="tub" role="img" aria-label="Bathtub whose water level is the starting amount plus g(x)"></canvas>
+          <div class="xrow" style="padding:0"><label for="accA0">start A(0) = <span id="accA0v">5</span></label><input type="range" id="accA0" min="0" max="12" step="1" value="5"></div>
+          <p class="eq">Level A(x) = A(0) + ∫₀ˣ f(t) dt. The faucet runs when f is positive, the drain when f is negative.</p>
+        </div>
+        <button class="btn" id="accPlay" type="button">Play sweep</button>
+      </aside>
+    </div>
+  </section>
+
+  <section id="secRie" role="tabpanel" aria-labelledby="tabRie" hidden>
+    <div class="lab">
+      <div class="plots">
+        <div class="head"><b id="rieTitle">Left sum</b><span>on [0, 8] with n subintervals</span></div>
+        <canvas id="rieMain" role="img" aria-label="Graph of f with the chosen Riemann sum shapes"></canvas>
+        <div class="head"><b>Error vs n</b><span>|sum − exact|, both axes log scale. Dot marks the current n.</span></div>
+        <div class="legend" id="rieLegend"></div>
+        <canvas id="rieErr" role="img" aria-label="Log-log plot of error against n for left, right, midpoint and trapezoid sums"></canvas>
+      </div>
+      <aside class="panel">
+        <div class="field">
+          <label for="rieFn">Function</label>
+          <select id="rieFn"></select>
+          <p class="eq" id="rieEq"></p>
+        </div>
+        <div class="field">
+          <span class="lbl">Sum</span>
+          <div class="seg" id="rieSeg">
+            <button type="button" data-m="left" aria-pressed="true"><i style="background:var(--m-left)"></i>Left</button>
+            <button type="button" data-m="right" aria-pressed="false"><i style="background:var(--m-right)"></i>Right</button>
+            <button type="button" data-m="mid" aria-pressed="false"><i style="background:var(--m-mid)"></i>Midpoint</button>
+            <button type="button" data-m="trap" aria-pressed="false"><i style="background:var(--m-trap)"></i>Trapezoid</button>
+          </div>
+        </div>
+        <div class="field">
+          <div class="xrow" style="padding:0"><label for="rieN">n = <span id="rieNv">6</span></label><input type="range" id="rieN" min="1" max="100" step="1" value="6"></div>
+        </div>
+        <dl class="ro">
+          <dt>sum</dt><dd id="rieSum"></dd>
+          <dt>exact ∫₀⁸ f</dt><dd id="rieExact"></dd>
+          <dt>sum − exact</dt><dd id="rieErrV"></dd>
+        </dl>
+        <div class="rule note" id="rieRule"><p id="rieR1"></p><p id="rieR2"></p><p id="rieR3"></p></div>
+        <div class="field"><span class="lbl">Terms, as you would write them</span><pre class="terms" id="rieTerms"></pre></div>
+      </aside>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+'use strict';
+var A=0,B=8,N=2000,H=(B-A)/N;
+function $(id){return document.getElementById(id);}
+var pts=[[0,0],[1,2],[3,2],[4,-1],[6,-1],[7,1.5],[8,0]];
+function pw(t){for(var i=1;i<pts.length;i++){if(t<=pts[i][0]){var a=pts[i-1],b=pts[i];return a[1]+(b[1]-a[1])*(t-a[0])/(b[0]-a[0]);}}return 0;}
+var FUNS={
+  wave:{label:'Wave',tex:'f(t) = 2 sin(0.9t) + 0.3',f:function(t){return 2*Math.sin(0.9*t)+0.3;},y:[-3,3]},
+  graph:{label:'Line-segment graph',tex:'f is a graph made of line segments, like many AP stems',f:pw,y:[-2,3]},
+  cubic:{label:'Cubic',tex:'f(t) = (t − 1)(t − 4)(t − 6) / 10',f:function(t){return (t-1)*(t-4)*(t-6)/10;},y:[-3,6]},
+  decay:{label:'Decay',tex:'f(t) = 5e^(−t/3) − 1',f:function(t){return 5*Math.exp(-t/3)-1;},y:[-2,5]},
+  rise:{label:'Rising parabola',tex:'f(t) = 1 + t² / 8',f:function(t){return 1+t*t/8;},y:[-1,10]}
+};
+var KEYS=Object.keys(FUNS);
+KEYS.forEach(function(k){
+  var F=FUNS[k];F.key=k;F.g=new Float64Array(N+1);
+  var s=0,prev=F.f(A),mn=0,mx=0,i;
+  for(i=1;i<=N;i++){var cur=F.f(A+i*H);s+=(prev+cur)/2*H;F.g[i]=s;prev=cur;if(s<mn)mn=s;if(s>mx)mx=s;}
+  F.gmin=mn;F.gmax=mx;F.zeros=[];
+  for(i=1;i<N-1;i++){
+    var a=F.f(A+i*H),b=F.f(A+(i+1)*H);
+    if(a>0&&b<=0)F.zeros.push({x:A+i*H+H*a/(a-b),t:'max'});
+    else if(a<0&&b>=0)F.zeros.push({x:A+i*H+H*a/(a-b),t:'min'});
+  }
+  var inc=true,dec=true;
+  for(i=0;i<N;i++){var d=F.f(A+(i+1)*H)-F.f(A+i*H);if(d<-1e-9)inc=false;if(d>1e-9)dec=false;}
+  var up=true,dn=true,hh=5*H;
+  for(var x=A+hh;x<=B-hh+1e-9;x+=hh){var s2=F.f(x+hh)-2*F.f(x)+F.f(x-hh);if(s2<-1e-7)up=false;if(s2>1e-7)dn=false;}
+  F.props={'increasing':inc,'decreasing':dec,'concave up':up,'concave down':dn};
+});
+function gAt(F,x){x=Math.min(B,Math.max(A,x));var u=(x-A)/H,i=Math.min(N-1,Math.floor(u)),fr=u-i;return F.g[i]*(1-fr)+F.g[i+1]*fr;}
+
+var METHODS=['left','right','mid','trap'];
+var MNAME={left:'Left',right:'Right',mid:'Midpoint',trap:'Trapezoid'};
+function rsum(F,m,n){var w=(B-A)/n,s=0;for(var i=0;i<n;i++){var l=A+i*w,r=l+w;s+=m==='left'?F.f(l):m==='right'?F.f(r):m==='mid'?F.f((l+r)/2):(F.f(l)+F.f(r))/2;}return s*w;}
+function errs(F){
+  if(F.err)return F.err;
+  var ex=F.g[N];F.err={};
+  METHODS.forEach(function(m){var a=[];for(var n=1;n<=100;n++)a.push(Math.abs(rsum(F,m,n)-ex));F.err[m]=a;});
+  return F.err;
+}
+
+/* ---------- drawing helpers ---------- */
+var pad={l:44,r:18,t:14,b:26};
+function colors(){
+  var cs=getComputedStyle(document.documentElement);
+  function g(n){return cs.getPropertyValue(n).trim();}
+  return{fg:g('--fg'),muted:g('--muted'),grid:g('--grid'),axis:g('--axis'),f:g('--f'),g:g('--g'),neg:g('--neg'),ok:g('--ok'),panel:g('--panel'),mono:g('--mono'),
+    m:{left:g('--m-left'),right:g('--m-right'),mid:g('--m-mid'),trap:g('--m-trap')}};
+}
+function setup(c){
+  var dpr=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;
+  if(!w||!h)return null;
+  var W=Math.round(w*dpr),Hh=Math.round(h*dpr);
+  if(c.width!==W||c.height!==Hh){c.width=W;c.height=Hh;}
+  var ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  return{ctx:ctx,w:w,h:h};
+}
+function mk(w,h,x0,x1,y0,y1){
+  var L=pad.l,R=w-pad.r,T=pad.t,Bm=h-pad.b;
+  return{L:L,R:R,T:T,B:Bm,x0:x0,x1:x1,y0:y0,y1:y1,
+    px:function(x){return L+(x-x0)/(x1-x0)*(R-L);},
+    py:function(y){return Bm-(y-y0)/(y1-y0)*(Bm-T);}};
+}
+function niceStep(r,t){var raw=r/t,p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;return(m<1.5?1:m<3.5?2:m<7.5?5:10)*p;}
+function fmtTick(v){return String(Math.round(v*1000)/1000);}
+function axes(ctx,P,C){
+  ctx.save();ctx.font='11px '+C.mono;ctx.lineWidth=1;
+  ctx.textAlign='center';ctx.textBaseline='top';
+  for(var x=Math.ceil(P.x0);x<=P.x1;x++){var X=P.px(x);ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(X,P.T);ctx.lineTo(X,P.B);ctx.stroke();ctx.fillStyle=C.muted;ctx.fillText(String(x),X,P.B+6);}
+  var step=niceStep(P.y1-P.y0,5);ctx.textAlign='right';ctx.textBaseline='middle';
+  var k0=Math.ceil(P.y0/step-1e-9);
+  for(var k=k0;k*step<=P.y1+1e-9;k++){var y=k*step,Y=P.py(y);ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(P.L,Y);ctx.lineTo(P.R,Y);ctx.stroke();ctx.fillStyle=C.muted;ctx.fillText(fmtTick(y),P.L-6,Y);}
+  var ay=(P.y0<0&&P.y1>0)?P.py(0):P.B;
+  ctx.strokeStyle=C.axis;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(P.L,ay);ctx.lineTo(P.R,ay);ctx.stroke();
+  ctx.restore();
+}
+function curve(ctx,P,fn,xa,xb,steps){ctx.beginPath();for(var i=0;i<=steps;i++){var x=xa+(xb-xa)*i/steps,X=P.px(x),Y=P.py(fn(x));if(i)ctx.lineTo(X,Y);else ctx.moveTo(X,Y);}}
+function clipBox(ctx,P){ctx.beginPath();ctx.rect(P.L,P.T,P.R-P.L,P.B-P.T);ctx.clip();}
+function dot(ctx,X,Y,r,fill,ring){ctx.beginPath();ctx.arc(X,Y,r,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=ring;ctx.stroke();}
+function label(ctx,t,X,Y,C,color,align){ctx.save();ctx.font='12px '+C.mono;ctx.fillStyle=color;ctx.textAlign=align||'left';ctx.textBaseline='middle';ctx.fillText(t,X,Y);ctx.restore();}
+
+/* ---------- accumulation machine ---------- */
+var S={fn:'wave',x:2.5,slope:true,zeros:true,tub:false,a0:5,playing:false,raf:0,last:0};
+function drawAccF(C,F){
+  var s=setup($('accF'));if(!s)return;var ctx=s.ctx,P=mk(s.w,s.h,A,B,F.y[0],F.y[1]);
+  axes(ctx,P,C);var x=S.x,fx=F.f(x),y0=P.py(0),X=P.px(x);
+  ctx.save();clipBox(ctx,P);
+  if(x>A+1e-6){
+    var steps=Math.max(2,Math.ceil((x-A)*60));
+    var poly=function(){ctx.beginPath();ctx.moveTo(P.px(A),y0);for(var i=0;i<=steps;i++){var xx=A+(x-A)*i/steps;ctx.lineTo(P.px(xx),P.py(F.f(xx)));}ctx.lineTo(X,y0);ctx.closePath();};
+    ctx.save();ctx.beginPath();ctx.rect(P.L,P.T,P.R-P.L,y0-P.T);ctx.clip();poly();ctx.fillStyle=C.f;ctx.globalAlpha=0.3;ctx.fill();ctx.restore();
+    ctx.save();ctx.beginPath();ctx.rect(P.L,y0,P.R-P.L,P.B-y0);ctx.clip();poly();ctx.fillStyle=C.neg;ctx.globalAlpha=0.3;ctx.fill();ctx.restore();
+  }
+  if(S.zeros){ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle=C.axis;ctx.lineWidth=1;F.zeros.forEach(function(z){var zx=P.px(z.x);ctx.beginPath();ctx.moveTo(zx,P.T);ctx.lineTo(zx,P.B);ctx.stroke();});ctx.restore();}
+  curve(ctx,P,F.f,A,B,300);ctx.strokeStyle=C.fg;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+  ctx.beginPath();ctx.moveTo(X,y0);ctx.lineTo(X,P.py(fx));ctx.strokeStyle=C.f;ctx.lineWidth=4;ctx.lineCap='round';ctx.stroke();
+  ctx.restore();
+  dot(ctx,X,P.py(fx),5,C.f,C.panel);
+  var right=X<P.R-90;label(ctx,'f(x)',right?X+10:X-10,P.py(fx)+(fx>=0?-12:12),C,C.f,right?'left':'right');
+}
+function drawAccG(C,F){
+  var s=setup($('accG'));if(!s)return;var ctx=s.ctx;
+  var lo=Math.min(0,F.gmin),hi=Math.max(0,F.gmax),span=(hi-lo)||1;lo-=span*0.12;hi+=span*0.12;
+  var P=mk(s.w,s.h,A,B,lo,hi);axes(ctx,P,C);
+  var x=S.x,fx=F.f(x),gx=gAt(F,x),X=P.px(x),Y=P.py(gx);
+  ctx.save();clipBox(ctx,P);
+  if(S.zeros){ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle=C.axis;ctx.lineWidth=1;F.zeros.forEach(function(z){var zx=P.px(z.x);ctx.beginPath();ctx.moveTo(zx,P.T);ctx.lineTo(zx,P.B);ctx.stroke();});ctx.restore();}
+  var gf=function(t){return gAt(F,t);};
+  curve(ctx,P,gf,A,B,300);ctx.strokeStyle=C.g;ctx.globalAlpha=0.3;ctx.lineWidth=2.5;ctx.stroke();ctx.globalAlpha=1;
+  if(x>A){curve(ctx,P,gf,A,x,Math.max(2,Math.ceil((x-A)*40)));ctx.strokeStyle=C.g;ctx.lineWidth=3;ctx.lineJoin='round';ctx.stroke();}
+  if(S.slope){
+    var dx=x+1<=B?1:-1,rise=fx*dx;
+    ctx.beginPath();ctx.moveTo(P.px(x-1),P.py(gx-fx));ctx.lineTo(P.px(x+1),P.py(gx+fx));ctx.strokeStyle=C.f;ctx.globalAlpha=0.45;ctx.lineWidth=1.5;ctx.stroke();ctx.globalAlpha=1;
+    ctx.beginPath();ctx.moveTo(X,Y);ctx.lineTo(P.px(x+dx),Y);ctx.lineTo(P.px(x+dx),P.py(gx+rise));
+    ctx.strokeStyle=C.f;ctx.lineWidth=3;ctx.lineJoin='round';ctx.stroke();
+  }
+  ctx.restore();
+  if(S.zeros){F.zeros.forEach(function(z){var zx=P.px(z.x),zy=P.py(gAt(F,z.x));dot(ctx,zx,zy,4,C.panel,C.fg);label(ctx,'relative '+z.t,zx+8,zy+(z.t==='max'?-12:12),C,C.fg,'left');});}
+  dot(ctx,X,Y,5.5,C.g,C.panel);
+  if(S.slope){var dx2=x+1<=B?1:-1;label(ctx,'1',P.px(x+dx2/2),Y+(fx>=0?12:-12),C,C.f,'center');label(ctx,'f(x)',P.px(x+dx2)+(dx2>0?8:-8),P.py(gx+fx*dx2/2),C,C.f,dx2>0?'left':'right');}
+}
+function drawTub(C,F){
+  var s=setup($('tub'));if(!s)return;var ctx=s.ctx,w=s.w,h=s.h;
+  var lvl=S.a0+gAt(F,S.x),fx=F.f(S.x),cap=Math.max(10,(S.a0+F.gmax)*1.15);
+  var L=w*0.2,R=w*0.8,T=h*0.3,Bm=h-26;
+  var frac=Math.max(0,Math.min(1,lvl/cap));
+  ctx.save();
+  ctx.fillStyle=C.g;ctx.globalAlpha=0.4;ctx.fillRect(L,Bm-(Bm-T)*frac,R-L,(Bm-T)*frac);ctx.globalAlpha=1;
+  ctx.strokeStyle=C.fg;ctx.lineWidth=3;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,Bm);ctx.lineTo(R,Bm);ctx.lineTo(R,T);ctx.stroke();
+  ctx.strokeStyle=C.axis;ctx.lineWidth=1;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(R,T);ctx.stroke();ctx.setLineDash([]);
+  ctx.restore();
+  label(ctx,'A = '+(lvl<0?'below empty':lvl.toFixed(1)),w/2,Math.min(Bm-10,Bm-(Bm-T)*frac-12),C,lvl<0?C.neg:C.fg,'center');
+  if(fx>0.005){
+    ctx.fillStyle=C.f;ctx.fillRect(L+14,6,10,T-10);
+    ctx.beginPath();ctx.moveTo(L+8,T-6);ctx.lineTo(L+30,T-6);ctx.lineTo(L+19,T+6);ctx.closePath();ctx.fill();
+    label(ctx,'in '+fx.toFixed(2),L+36,16,C,C.f,'left');
+  }else if(fx<-0.005){
+    var cx=w/2;ctx.fillStyle=C.neg;ctx.fillRect(cx-5,Bm+1,10,8);
+    ctx.beginPath();ctx.moveTo(cx-11,Bm+9);ctx.lineTo(cx+11,Bm+9);ctx.lineTo(cx,Bm+20);ctx.closePath();ctx.fill();
+    label(ctx,'out '+(-fx).toFixed(2),cx+18,Bm+14,C,C.neg,'left');
+  }else label(ctx,'steady',L+36,16,C,C.muted,'left');
+}
+function renderAcc(){
+  var C=colors(),F=FUNS[S.fn],x=S.x,fx=F.f(x),gx=gAt(F,x);
+  var xa=Math.max(A,x-0.02),xb=Math.min(B,x+0.02),sl=(gAt(F,xb)-gAt(F,xa))/(xb-xa);
+  $('accXv').textContent=x.toFixed(2);$('accX').value=x;
+  $('accEq').textContent=F.tex;
+  $('accOutF').textContent=fx.toFixed(3);$('accOutG').textContent=gx.toFixed(3);$('accOutS').textContent=sl.toFixed(3);
+  $('accStatus').textContent=fx>0.005?'f is above the axis, so g is increasing. The slope of g equals the height of f.':fx<-0.005?'f is below the axis, so g is decreasing. The slope of g equals the height of f, which is negative.':'f(x) = 0, so g has a horizontal tangent here.';
+  drawAccF(C,F);drawAccG(C,F);
+  $('tubBox').hidden=!S.tub;
+  if(S.tub){$('accA0v').textContent=S.a0;drawTub(C,F);}
+}
+
+/* ---------- Riemann sums ---------- */
+var R_={fn:'decay',m:'left',n:6};
+var RULES={
+  left:{over:'decreasing',under:'increasing'},
+  right:{over:'increasing',under:'decreasing'},
+  trap:{over:'concave up',under:'concave down'},
+  mid:{over:'concave down',under:'concave up'}
+};
+function drawRie(C,F){
+  var s=setup($('rieMain'));if(!s)return;var ctx=s.ctx;
+  var P=mk(s.w,s.h,A,B,Math.min(F.y[0],0),F.y[1]);axes(ctx,P,C);
+  var n=R_.n,wd=(B-A)/n,col=C.m[R_.m],y0=P.py(0);
+  ctx.save();clipBox(ctx,P);ctx.lineWidth=n>30?0.8:1.6;ctx.lineJoin='round';
+  for(var i=0;i<n;i++){
+    var xl=A+i*wd,xr=xl+wd;ctx.beginPath();
+    if(R_.m==='trap'){ctx.moveTo(P.px(xl),y0);ctx.lineTo(P.px(xl),P.py(F.f(xl)));ctx.lineTo(P.px(xr),P.py(F.f(xr)));ctx.lineTo(P.px(xr),y0);ctx.closePath();}
+    else{var xs=R_.m==='left'?xl:R_.m==='right'?xr:(xl+xr)/2,yy=P.py(F.f(xs));ctx.rect(P.px(xl),Math.min(y0,yy),P.px(xr)-P.px(xl),Math.abs(yy-y0));}
+    ctx.fillStyle=col;ctx.globalAlpha=0.28;ctx.fill();ctx.globalAlpha=0.9;ctx.strokeStyle=col;ctx.stroke();ctx.globalAlpha=1;
+  }
+  if(n<=24){
+    for(var j=0;j<=n;j++){
+      var xj=A+j*wd;
+      if(R_.m==='trap')dot(ctx,P.px(xj),P.py(F.f(xj)),3.5,col,C.panel);
+      else if(j<n){var xq=R_.m==='left'?xj:R_.m==='right'?xj+wd:xj+wd/2;dot(ctx,P.px(xq),P.py(F.f(xq)),3.5,col,C.panel);}
+    }
+  }
+  curve(ctx,P,F.f,A,B,400);ctx.strokeStyle=C.fg;ctx.lineWidth=2.5;ctx.stroke();
+  ctx.restore();
+}
+function drawErr(C,F){
+  var s=setup($('rieErr'));if(!s)return;var ctx=s.ctx,E=errs(F),FLOOR=1e-8,mn=Infinity,mx=0;
+  METHODS.forEach(function(m){E[m].forEach(function(v){v=Math.max(v,FLOOR);if(v<mn)mn=v;if(v>mx)mx=v;});});
+  var y0=Math.floor(Math.log10(mn)),y1=Math.ceil(Math.log10(mx));if(y1<=y0)y1=y0+1;
+  var P=mk(s.w,s.h,0,2,y0,y1);
+  ctx.save();ctx.font='11px '+C.mono;ctx.lineWidth=1;
+  [1,2,5,10,20,50,100].forEach(function(n){var X=P.px(Math.log10(n));ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(X,P.T);ctx.lineTo(X,P.B);ctx.stroke();ctx.fillStyle=C.muted;ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(String(n),X,P.B+6);});
+  var every=Math.max(1,Math.ceil((y1-y0)/6));
+  for(var k=y0;k<=y1;k+=every){var Y=P.py(k);ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(P.L,Y);ctx.lineTo(P.R,Y);ctx.stroke();ctx.fillStyle=C.muted;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText('1e'+k,P.L-6,Y);}
+  ctx.strokeStyle=C.axis;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(P.L,P.B);ctx.lineTo(P.R,P.B);ctx.stroke();
+  ctx.restore();
+  ctx.save();clipBox(ctx,P);ctx.lineJoin='round';
+  METHODS.forEach(function(m){
+    var act=m===R_.m;ctx.beginPath();
+    E[m].forEach(function(v,i){var X=P.px(Math.log10(i+1)),Y=P.py(Math.log10(Math.max(v,FLOOR)));if(i)ctx.lineTo(X,Y);else ctx.moveTo(X,Y);});
+    ctx.setLineDash(m==='right'?[6,4]:[]);ctx.strokeStyle=C.m[m];ctx.lineWidth=act?3:1.6;ctx.globalAlpha=act?1:0.55;ctx.stroke();
+  });
+  ctx.restore();
+  var cur=Math.max(E[R_.m][R_.n-1],FLOOR);dot(ctx,P.px(Math.log10(R_.n)),P.py(Math.log10(cur)),5,C.m[R_.m],C.panel);
+  label(ctx,'n',P.R,P.B+14,C,C.muted,'right');
+}
+function cf(v){return(v<0?'−':'')+Math.abs(v).toFixed(3);}
+function renderRie(){
+  var C=colors(),F=FUNS[R_.fn],m=R_.m,n=R_.n,w=(B-A)/n;
+  $('rieNv').textContent=n;$('rieEq').textContent=F.tex;$('rieTitle').textContent=MNAME[m]+' sum';
+  var sum=rsum(F,m,n),ex=F.g[N],er=sum-ex;
+  $('rieSum').textContent=cf(sum);$('rieExact').textContent=cf(ex);
+  $('rieErrV').textContent=(er>=0?'+':'−')+Math.abs(er).toFixed(3);
+  var rule=RULES[m],kind=(m==='left'||m==='right')?'mono':'conc';
+  var article=m==='left'?'A left sum':m==='right'?'A right sum':m==='mid'?'A midpoint sum':'A trapezoid sum';
+  $('rieR1').textContent=article+' is an overestimate when f is '+rule.over+' and an underestimate when f is '+rule.under+', on the whole interval [0, 8].';
+  var names=kind==='mono'?['increasing','decreasing']:['concave up','concave down'],have=names.filter(function(p){return F.props[p];});
+  $('rieR2').textContent='On [0, 8], f is '+(have.length?have[0]:(kind==='mono'?'not monotonic':'neither concave up nor concave down'))+'.';
+  var verdict=F.props[rule.over]?'overestimate':F.props[rule.under]?'underestimate':null,actual=er>=0?'over':'under';
+  $('rieR3').textContent=verdict?('So the '+MNAME[m].toLowerCase()+' sum is an '+verdict+'. Here it is '+actual+' by '+Math.abs(er).toFixed(3)+'.'):('So the rule cannot decide this one. The sum happens to be '+actual+' by '+Math.abs(er).toFixed(3)+', but that is not a justification.');
+  var terms=[],fm=function(v){return v.toFixed(3);},wd=w.toFixed(3);
+  for(var i=0;i<n;i++){
+    var l=A+i*w,r=l+w,t;
+    if(m==='trap')t='½ × '+wd+' × ('+fm(F.f(l))+' + '+fm(F.f(r))+')';
+    else{var xs=m==='left'?l:m==='right'?r:(l+r)/2;t=wd+' × '+fm(F.f(xs));}
+    terms.push(t);
+  }
+  $('rieTerms').textContent=(n>6?terms.slice(0,3).concat(['⋮  ('+n+' terms in all)'],terms.slice(-1)):terms).join('\n');
+  drawRie(C,F);drawErr(C,F);
+}
+
+/* ---------- wiring ---------- */
+var tab='acc';
+function render(){if(tab==='acc')renderAcc();else renderRie();}
+function showTab(t){
+  tab=t;
+  $('secAcc').hidden=t!=='acc';$('secRie').hidden=t!=='rie';
+  $('tabAcc').setAttribute('aria-selected',String(t==='acc'));$('tabRie').setAttribute('aria-selected',String(t==='rie'));
+  try{history.replaceState(null,'','#'+(t==='acc'?'accumulation':'riemann'));}catch(e){}
+  if(t!=='acc')stop();
+  render();
+}
+KEYS.forEach(function(k){['accFn','rieFn'].forEach(function(id){var o=document.createElement('option');o.value=k;o.textContent=FUNS[k].label;$(id).appendChild(o);});});
+$('accFn').value=S.fn;$('rieFn').value=R_.fn;
+$('accFn').addEventListener('change',function(e){S.fn=e.target.value;render();});
+$('rieFn').addEventListener('change',function(e){R_.fn=e.target.value;render();});
+$('accX').addEventListener('input',function(e){stop();S.x=+e.target.value;render();});
+$('accA0').addEventListener('input',function(e){S.a0=+e.target.value;render();});
+$('accSlope').addEventListener('change',function(e){S.slope=e.target.checked;render();});
+$('accZeros').addEventListener('change',function(e){S.zeros=e.target.checked;render();});
+$('accTub').addEventListener('change',function(e){S.tub=e.target.checked;render();});
+$('rieN').addEventListener('input',function(e){R_.n=+e.target.value;render();});
+$('rieSeg').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;R_.m=b.getAttribute('data-m');
+  Array.prototype.forEach.call($('rieSeg').children,function(c){c.setAttribute('aria-pressed',String(c===b));});render();
+});
+$('tabAcc').addEventListener('click',function(){showTab('acc');});
+$('tabRie').addEventListener('click',function(){showTab('rie');});
+
+function xFromPointer(c,ev){var r=c.getBoundingClientRect(),L=pad.l,Rr=r.width-pad.r;return Math.max(A,Math.min(B,A+((ev.clientX-r.left)-L)/(Rr-L)*(B-A)));}
+['accF','accG'].forEach(function(id){
+  var c=$(id),down=false;
+  c.addEventListener('pointerdown',function(ev){down=true;try{c.setPointerCapture(ev.pointerId);}catch(e){}stop();S.x=xFromPointer(c,ev);renderAcc();});
+  c.addEventListener('pointermove',function(ev){if(!down)return;S.x=xFromPointer(c,ev);renderAcc();});
+  c.addEventListener('pointerup',function(){down=false;});
+  c.addEventListener('pointercancel',function(){down=false;});
+  c.addEventListener('keydown',function(ev){
+    var d=ev.key==='ArrowRight'?0.1:ev.key==='ArrowLeft'?-0.1:0;if(!d)return;
+    ev.preventDefault();stop();S.x=Math.max(A,Math.min(B,S.x+d));renderAcc();
+  });
+});
+function stop(){S.playing=false;if(S.raf)cancelAnimationFrame(S.raf);S.raf=0;$('accPlay').textContent='Play sweep';}
+function step(ts){
+  if(!S.playing)return;
+  var dt=Math.min(0.05,(ts-S.last)/1000);S.last=ts;S.x=Math.min(B,S.x+dt*0.9);renderAcc();
+  if(S.x>=B){stop();return;}
+  S.raf=requestAnimationFrame(step);
+}
+$('accPlay').addEventListener('click',function(){
+  if(S.playing){stop();return;}
+  if(S.x>=B-0.01)S.x=A;
+  S.playing=true;$('accPlay').textContent='Pause';S.last=performance.now();S.raf=requestAnimationFrame(step);
+});
+
+var lg=$('rieLegend');
+METHODS.forEach(function(m){var sp=document.createElement('span'),i=document.createElement('i');i.style.borderTopColor='var(--m-'+m+')';if(m==='right')i.className='dash';sp.appendChild(i);sp.appendChild(document.createTextNode(MNAME[m]));lg.appendChild(sp);});
+
+if(window.ResizeObserver){var ro=new ResizeObserver(function(){render();});document.querySelectorAll('.plots').forEach(function(el){ro.observe(el);});}
+else window.addEventListener('resize',render);
+var mq=window.matchMedia('(prefers-color-scheme: dark)');
+if(mq.addEventListener)mq.addEventListener('change',render);
+new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);
+showTab(location.hash==='#riemann'?'rie':'acc');
+})();
+</script>
+</body>
+</html>
