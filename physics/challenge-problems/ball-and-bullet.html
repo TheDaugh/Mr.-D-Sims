@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ticker Timer · Mr. D's Sims</title>
+<title>Ball and Bullet · Mr. D's Sims</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -83,41 +83,37 @@ footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
 <body>
 <div class="wrap">
 <header>
-<a class="back" href="index.html">&larr; All simulations</a>
-<h1>Ticker Timer</h1>
-<p class="sub">A trolley pulls a paper tape through a timer that taps a dot every 0.02 s. Read the spacing of the dots to work out how the trolley moved.</p>
+<a class="back" href="../index.html">&larr; Physics sims</a>
+<h1>Ball and Bullet</h1>
+<p class="sub">A ball is dropped. A gun to the side fires a horizontal bullet at it. When should the gun fire so the bullet hits?</p>
 </header>
 
 <div class="layout">
- <div class="stagewrap"><canvas id="cv" aria-label="A paper tape with dots, above a chart of strip lengths"></canvas><div class="readout" id="ro">Hover over the tape to measure the gap between two dots.</div></div>
+ <div class="stagewrap"><canvas id="cv" aria-label="A falling ball and a gun firing a horizontal bullet at it"></canvas><div class="readout" id="ro"></div><p class="msg" id="msg" aria-live="polite" style="margin-top:0"></p></div>
  <div class="side">
-  <fieldset class="card"><legend>Experiment</legend>
-   <div class="row" style="margin-top:0"><label for="kind" style="align-self:center">Trolley</label><select id="kind">
-    <option value="0">Constant speed</option><option value="1">Speeding up steadily</option><option value="2">Speeding up from a push</option><option value="3">Slowing down steadily</option><option value="4">Speeds up, then constant</option><option value="m">Mystery tape</option></select></div>
-   <div class="row"><button class="btn primary" id="run">Run the trolley</button><button class="btn" id="cut" disabled>Cut into strips</button></div>
-   <p class="hint">Every dot is 0.02 s after the last. A strip of five gaps is 0.1 s long.</p>
+  <fieldset class="card"><legend>The problem</legend>
+   <p class="hint" style="margin-top:0">A heavy ball is dropped from rest. A gun fires a horizontal bullet at it from the side. How long after the ball is released should the gun fire for the bullet to hit it? (No air resistance.)</p>
+   <div id="sl"></div>
   </fieldset>
-  <fieldset class="card"><legend>Analyse</legend>
-   <label class="q" for="desc" style="display:block;margin-top:0">How did the trolley move?</label>
-   <div class="row" style="margin-top:6px"><select id="desc"><option value="">Choose…</option><option value="0">Constant speed</option><option value="1">Speeding up steadily</option><option value="3">Slowing down steadily</option><option value="4">Speeding up, then constant speed</option></select><button class="btn" id="c1">Check</button></div>
-   <p class="msg" id="m1" aria-live="polite"></p>
-   <label class="q" for="acc" style="display:block">Acceleration (cm/s²)</label>
-   <div class="row" style="margin-top:6px"><input type="number" id="acc" step="1"><button class="btn" id="c2">Check</button></div>
-   <p class="msg" id="m2" aria-live="polite"></p>
+  <fieldset class="card"><legend>Step 1 · Predict</legend>
+   <label class="q" for="din" style="display:block;margin-top:0">Fire the gun after (s)</label>
+   <div class="row" style="margin-top:6px"><input type="number" id="din" step="0.01" placeholder="work it out first"><button class="btn primary" id="go">Release &amp; fire</button></div>
+   <div class="row"><button class="btn" id="rst">Reset</button><button class="btn" id="sol">Show solution</button></div>
+   <label class="chk"><span>Playback</span><input type="range" id="sp" min="0.1" max="1" step="0.05" value="0.4" aria-label="Playback speed"></label>
   </fieldset>
+  <div class="card" id="solbox" hidden></div>
  </div>
 </div>
-<details><summary>Instructions</summary><ol><li>Pick a trolley motion and press <b>Run the trolley</b>. The tape appears with its dots.</li>
-<li>Look at the spacing. Far-apart dots mean the trolley moved fast between taps. Close dots mean slow.</li>
-<li>Hover over the tape to measure the gap between two neighbouring dots. Divide by 0.02 s to get the speed at that moment.</li>
-<li>Press <b>Cut into strips</b>. Each strip of five gaps covers 0.1 s. The chart stacks the strips side by side, and the line through their tops is a velocity–time graph.</li>
-<li>Say how the trolley moved, then work out the acceleration from how fast the strips grow.</li>
-<li>Try <b>Mystery tape</b> for a motion you do not know in advance.</li></ol></details>
-<details><summary>Theory</summary><p>A ticker timer taps a paper tape at a steady rate, here 50 times a second. The tape is fixed to a trolley and pulled through, so each tap leaves a dot. The dots are always <b>0.02 s</b> apart in time. How far apart they are on the tape depends on how fast the trolley was going.</p>
-<p>Wide spacing means high speed and tight spacing means low speed. Equal spacing means constant velocity. Spacing that grows steadily means constant acceleration.</p>
-<p>The average velocity across any gap is <code>v = distance / 0.02 s</code>. Cutting the tape every five gaps gives strips that each cover 0.1 s. Their lengths are proportional to the average velocity over that 0.1 s. Standing the strips side by side builds a velocity–time bar chart.</p>
-<p>If the strip lengths grow by the same amount each time, the acceleration is constant: <code>a = &Delta;v / &Delta;t = (&Delta;strip length / 0.1 s) / 0.1 s</code>.</p></details>
-<footer>Rebuilt in HTML from the LabVIEW simulation "Ticker Timer".</footer>
+<details><summary>Instructions</summary><ol><li>Look at the setup: ball height, gun height, distance to the ball's path, and bullet speed. Change them if you like.</li>
+<li>Work out on paper when the gun must fire, measured from the moment the ball is released.</li>
+<li>Type your time and press <b>Release &amp; fire</b>. The ball drops at once and the gun fires at your time.</li>
+<li>A hit means your time is right. A miss tells you whether the bullet went above or below the ball, which tells you whether you fired too early or too late.</li>
+<li>Challenge: find a setup where there is no answer. What goes wrong?</li></ol></details>
+<details><summary>Theory</summary><p>Split the problem in two. The bullet moves sideways at constant speed, so the time it takes to reach the ball's path is <code>&tau; = d / v</code>. While it crosses, it falls freely, so it drops <code>&frac12;g&tau;&sup2;</code> below the gun's height.</p>
+<p>The bullet therefore meets the ball at height <code>h&prime; &minus; &frac12;g&tau;&sup2;</code>. The ball must have fallen from its starting height to that point, which takes <code>t = &radic;(2&Delta;h/g)</code> from release.</p>
+<p>That is the time from <em>release</em> to the meeting. The bullet spends the last <code>&tau;</code> of it in flight, so the gun must fire at <code>t &minus; &tau;</code> after release.</p>
+<p>If that is negative, the ball has already passed the meeting height before the bullet could even get there. Raise the bullet speed or move the gun closer.</p></details>
+<footer>Challenge problem from a collection of kinematics problems, reworded for this page. The numbers were checked by hand and by computer.</footer>
 </div>
 <script>
 const K={};
@@ -201,70 +197,53 @@ K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+101390422
 (function(){
 "use strict";
 
-const $=K.$,cv=$("#cv"),DT=.02,NT=70,rnd=K.rand(Date.now()%99991);
-const KINDS=[
- {n:"Constant speed",u:40,a:0},
- {n:"Speeding up steadily",u:0,a:60},
- {n:"Speeding up from a push",u:25,a:45},
- {n:"Slowing down steadily",u:110,a:-65},
- {n:"Speeds up, then constant",u:0,a:80,tc:.8}
-];
-let cur=null,dots=[],cut=false,hover=-1;
-function pos(k,t){const u=k.u,a=k.a;if(k.tc!==undefined&&t>k.tc){const v1=u+a*k.tc;return u*k.tc+.5*a*k.tc*k.tc+v1*(t-k.tc)}return u*t+.5*a*t*t}
-$("#run").onclick=()=>{
- let v=$("#kind").value;
- if(v==="m"){const opts=[0,1,2,3,4];v=opts[Math.floor(rnd()*5)];cur={idx:v,mystery:true}}else{cur={idx:+v,mystery:false}}
- cur.k=KINDS[cur.idx];
- dots=[];for(let j=0;j<=NT;j++)dots.push(pos(cur.k,j*DT));
- cut=false;hover=-1;$("#cut").disabled=false;$("#m1").textContent="";$("#m2").textContent="";$("#acc").value="";$("#desc").value="";
- $("#ro").textContent="Hover over the tape to measure the gap between two dots.";
+const $=K.$,cv=$("#cv"),g=9.81;
+$("#sl").innerHTML=K.ctl({id:"h",label:"Ball starts at",min:12,max:40,step:1,value:20,unit:"m"})+
+ K.ctl({id:"hp",label:"Gun height",min:2,max:30,step:1,value:10,unit:"m"})+
+ K.ctl({id:"d",label:"Distance to ball's path",min:20,max:80,step:1,value:50,unit:"m"})+
+ K.ctl({id:"v",label:"Bullet speed",min:40,max:200,step:5,value:100,unit:"m/s"});
+const S={h:20,hp:10,d:50,v:100};let st=null;
+const msg=(t,c)=>{const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")};
+K.wire(document,id=>{S.h=+$("#h").value;S.hp=+$("#hp").value;S.d=+$("#d").value;S.v=+$("#v").value;
+ if(S.hp>S.h-1){S.hp=S.h-1;$("#hp").value=S.hp;$("#hp-o").textContent=S.hp+" m"}st=null;msg("")});
+function ans(){const tau=S.d/S.v,yh=S.hp-.5*g*tau*tau,tb=yh>0.4?Math.sqrt(2*(S.h-yh)/g):NaN;return {tau:tau,yh:yh,tb:tb,delay:tb-tau}}
+$("#rst").onclick=()=>{st=null;msg("")};
+$("#go").onclick=()=>{
+ const d=parseFloat($("#din").value);if(!isFinite(d)||d<0){msg("Type a time of zero or more first.","bad");return}
+ st={t:0,delay:d,fired:false,bx:0,by:S.hp,bt:0,done:false,res:null,trail:[]};msg("")};
+$("#sol").onclick=()=>{
+ const b=$("#solbox"),a=ans();b.hidden=!b.hidden;if(b.hidden)return;
+ if(!(a.delay>=0)){b.innerHTML='<p class="q" style="margin-top:0">No answer for this setup</p><p class="hint">By the time the bullet could reach the ball\'s path, the ball has already fallen past the height where they would meet. Increase the bullet speed or reduce the distance.</p>';return}
+ b.innerHTML='<p class="q" style="margin-top:0">Solution</p><ol style="padding-left:1.2em;margin:.4em 0"><li>Bullet flight time: &tau; = d/v = '+S.d+'/'+S.v+' = <b>'+K.f(a.tau,2)+' s</b>.</li>'+
+ '<li>It falls &frac12;g&tau;&sup2; = '+K.f(.5*g*a.tau*a.tau,2)+' m, so it meets the ball at height '+S.hp+' &minus; '+K.f(.5*g*a.tau*a.tau,2)+' = <b>'+K.f(a.yh,2)+' m</b>.</li>'+
+ '<li>The ball has fallen '+S.h+' &minus; '+K.f(a.yh,2)+' = '+K.f(S.h-a.yh,2)+' m, which takes t = &radic;(2&middot;'+K.f(S.h-a.yh,2)+'/g) = <b>'+K.f(a.tb,2)+' s</b>.</li>'+
+ '<li>Fire <b>'+K.f(a.delay,2)+' s</b> after release: t &minus; &tau; = '+K.f(a.tb,2)+' &minus; '+K.f(a.tau,2)+'.</li></ol>';
 };
-$("#cut").onclick=()=>{if(cur){cut=true;$("#cut").disabled=true}};
-function strips(){const s=[];for(let i=0;i*5+5<=NT;i++)s.push(dots[i*5+5]-dots[i*5]);return s}
-function msg(id,t,c){const m=$(id);m.textContent=t;m.className="msg "+(c||"")}
-$("#c1").onclick=()=>{
- if(!cur){msg("#m1","Run the trolley first.","bad");return}
- const d=$("#desc").value;if(d===""){msg("#m1","Choose an answer first.","bad");return}
- const ok=+d===cur.idx;
- msg("#m1",ok?"Yes: "+cur.k.n.toLowerCase()+".":"Not quite. Compare the gaps at the start and the end of the tape. The tape shows: "+cur.k.n.toLowerCase()+".",ok?"ok":"bad");
-};
-$("#c2").onclick=()=>{
- if(!cur){msg("#m2","Run the trolley first.","bad");return}
- const v=parseFloat($("#acc").value);if(!isFinite(v)){msg("#m2","Type a value first.","bad");return}
- const a=cur.k.a,ok=Math.abs(v-a)<=Math.max(8,Math.abs(a)*.15);
- msg("#m2",ok?"Close enough. The trolley accelerated at "+a+" cm/s².":"Not quite. The actual acceleration was "+a+" cm/s². Take two strips, subtract their lengths, then divide by 0.1 s twice.",ok?"ok":"bad");
-};
-cv.addEventListener("pointermove",e=>{
- if(!cur)return;const r=cv.getBoundingClientRect(),px=e.clientX-r.left,s=tape.s;
- let best=-1,bd=1e9;for(let j=0;j<NT;j++){const m=(tape.x0+(dots[j]+dots[j+1])/2*s);const d=Math.abs(px-m);if(d<bd){bd=d;best=j}}
- hover=bd<30?best:-1;
- if(hover>=0){const g=dots[hover+1]-dots[hover];$("#ro").innerHTML="Gap between dots "+hover+" and "+(hover+1)+": <b>"+K.f(g,2)+" cm</b> in 0.02 s, so v = <b>"+K.f(g/DT,0)+" cm/s</b>"}
-});
-cv.addEventListener("pointerleave",()=>{hover=-1});
-const tape={x0:24,s:1};
-function draw(){
- const {c,w,h}=K.fit(cv,.8);c.clearRect(0,0,w,h);
- const th=Math.round(h*.24);
- c.fillStyle=K.css("--surface");c.fillRect(0,0,w,th+30);c.strokeStyle=K.css("--line");c.strokeRect(.5,.5,w-1,th+29);
- if(!cur){c.fillStyle=K.css("--muted");c.font="14px "+K.css("--body");c.textAlign="center";c.fillText("Choose a trolley and press Run to make a tape.",w/2,th/2+16);return}
- const L=dots[NT],s=(w-tape.x0*2)/L;tape.s=s;
- c.fillStyle=K.css("--stage");c.fillRect(tape.x0-10,18,L*s+20,th-6);
- c.strokeStyle=K.css("--line");c.strokeRect(tape.x0-10+.5,18.5,L*s+20,th-6);
- const ym=18+(th-6)/2;
- for(let j=0;j<=NT;j++){c.fillStyle=(j%5===0)?K.css("--b"):K.css("--ink");c.beginPath();c.arc(tape.x0+dots[j]*s,ym,j%5===0?3.4:2.4,0,7);c.fill()}
- if(hover>=0){c.strokeStyle=K.css("--accent");c.lineWidth=3;c.beginPath();c.moveTo(tape.x0+dots[hover]*s,ym+12);c.lineTo(tape.x0+dots[hover+1]*s,ym+12);c.stroke();c.lineWidth=1}
- if(cut){for(let j=0;j<=NT;j+=5){c.strokeStyle=K.css("--warn");c.setLineDash([3,3]);c.beginPath();c.moveTo(tape.x0+dots[j]*s,14);c.lineTo(tape.x0+dots[j]*s,th+4);c.stroke();c.setLineDash([])}}
- c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="left";c.fillText("tape (time runs left to right, scale "+K.f(s*10/1,0)+" px per 10 cm)",tape.x0,12);
- const by=th+44,bh=h-by-30,st=strips(),mx=Math.ceil(Math.max.apply(null,st)*1.1);
- if(!cut){c.fillStyle=K.css("--muted");c.font="13px "+K.css("--body");c.textAlign="center";c.fillText("Press Cut into strips to build the velocity–time chart.",w/2,by+bh/2);return}
- const ov=K.plot(c,{x:50,y:by,w:w-66,h:bh},{xmin:0,xmax:st.length,ymin:0,ymax:mx,title:"strip length (cm) per 0.1 s",xlabel:"strip number (each 0.1 s)",series:[]});
- st.forEach((l,i)=>{c.fillStyle=K.css("--a");c.globalAlpha=.8;c.fillRect(ov.X(i)+3,ov.Y(l),ov.X(1)-ov.X(0)-6,ov.Y(0)-ov.Y(l));c.globalAlpha=1;
-  c.strokeStyle=K.css("--ink");c.strokeRect(ov.X(i)+3.5,ov.Y(l)+.5,ov.X(1)-ov.X(0)-7,ov.Y(0)-ov.Y(l))});
- c.fillStyle=K.css("--muted");c.textAlign="center";c.font="10px "+K.css("--mono");
- const d=(st[st.length-1]-st[0])/(st.length-1);
- $("#ro").innerHTML="Strips: "+st.map(x=>K.f(x,1)).join(", ")+" cm. They change by about <b>"+K.f(d,2)+" cm</b> per strip.";
+function update(dt){
+ if(!st||st.done)return;dt*=+$("#sp").value;const n=Math.ceil(dt/.002),h=dt/n;
+ for(let i=0;i<n&&!st.done;i++){
+  st.t+=h;
+  if(!st.fired&&st.t>=st.delay){st.fired=true;st.bt=0;st.bx=0;st.by=S.hp}
+  if(st.fired){st.bt+=h;st.bx=S.v*st.bt;st.by=S.hp-.5*g*st.bt*st.bt;if(st.trail.length===0||st.bt-st.last>.01){st.trail.push([st.bx,st.by]);st.last=st.bt}
+   if(st.bx>=S.d){const yb=Math.max(.4,S.h-.5*g*st.t*st.t),dy=st.by-yb;st.done=true;st.dy=dy;st.by=yb+dy;
+    msg(Math.abs(dy)<=.45?"Hit! The bullet reached the ball "+K.f(st.t,2)+" s after release.":"Miss. The bullet passed "+K.f(Math.abs(dy),2)+" m "+(dy>0?"above":"below")+" the ball. You fired too "+(dy>0?"late (the ball had already fallen below the bullet)":"early (the ball had not yet fallen to the bullet\'s height)")+".",Math.abs(dy)<=.45?"ok":"bad");}}
+  if(st.t>8){st.done=true;msg("Time ran out.","bad")}
+ }
 }
-K.loop(()=>{},draw);
+function draw(){
+ const {c,w,h}=K.fit(cv,.8),sc=Math.min((w-60)/(S.d+10),(h-40)/(S.h+4)),X=x=>30+x*sc,Y=y=>h-22-y*sc;
+ c.clearRect(0,0,w,h);c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.lineWidth=1;c.textAlign="right";
+ K.ticks(0,S.h+3,6).forEach(m=>{c.beginPath();c.moveTo(24,Y(m));c.lineTo(w,Y(m));c.stroke();c.fillText(m+" m",26,Y(m)+3)});
+ c.fillStyle=K.css("--line");c.fillRect(0,Y(0),w,h-Y(0));c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,Y(0));c.lineTo(w,Y(0));c.stroke();
+ c.lineWidth=3;c.beginPath();c.moveTo(X(0),Y(S.hp));c.lineTo(X(3),Y(S.hp));c.stroke();c.fillStyle=K.css("--ink");c.fillRect(X(-1.5),Y(S.hp)-3,X(1.5)-X(-1.5),6);c.fillRect(X(-1.2),Y(S.hp),6,Y(0)-Y(S.hp));
+ c.setLineDash([3,4]);c.strokeStyle=K.css("--muted");c.lineWidth=1;c.beginPath();c.moveTo(X(S.d),Y(0));c.lineTo(X(S.d),Y(S.h+3));c.stroke();c.setLineDash([]);
+ const a=ans(),t=st?st.t:0,yb=Math.max(.4,S.h-.5*g*t*t);
+ c.fillStyle=K.css("--b");c.beginPath();c.arc(X(S.d),Y(yb),.45*sc*1.2,0,7);c.fill();
+ if(st&&st.trail.length>1){c.strokeStyle=K.css("--a");c.lineWidth=2;c.beginPath();st.trail.forEach((p,i)=>i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1])));c.stroke()}
+ if(st&&st.fired){c.fillStyle=K.css("--a");c.beginPath();c.arc(X(st.bx),Y(st.by),4,0,7);c.fill()}
+ $("#ro").innerHTML="<span>t since release <b>"+K.f(t,2)+" s</b></span><span>bullet flight time <b>"+K.f(a.tau,2)+" s</b></span><span>ball height <b>"+K.f(yb,1)+" m</b></span>";
+}
+K.loop(update,draw);
 
 })();
 </script>

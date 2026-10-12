@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Rolling Disc · Mr. D's Sims</title>
+<title>Ticker Timer · Mr. D's Sims</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -83,42 +83,41 @@ footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
 <body>
 <div class="wrap">
 <header>
-<a class="back" href="index.html">&larr; All simulations</a>
-<h1>Rolling Disc</h1>
-<p class="sub">A disc rolls without slipping. Two points on it have speeds that change as it turns. When are they equal?</p>
+<a class="back" href="../index.html">&larr; Physics sims</a>
+<h1>Ticker Timer</h1>
+<p class="sub">A trolley pulls a paper tape through a timer that taps a dot every 0.02 s. Read the spacing of the dots to work out how the trolley moved.</p>
 </header>
 
 <div class="layout">
- <div class="stagewrap"><canvas id="cv" aria-label="A rolling disc with two marked points, their paths, and a graph of their speeds"></canvas><div class="readout" id="ro"></div></div>
+ <div class="stagewrap"><canvas id="cv" aria-label="A paper tape with dots, above a chart of strip lengths"></canvas><div class="readout" id="ro">Hover over the tape to measure the gap between two dots.</div></div>
  <div class="side">
-  <fieldset class="card"><legend>The problem</legend>
-   <p class="hint" style="margin-top:0">A disc rolls without slipping. Point A starts at the top of the rim. Point B starts halfway between the centre and A. Find when A's speed first matches B's, using the rule chosen below.</p>
-   <div class="row"><button class="btn" id="p7">Problem 7 numbers</button><button class="btn" id="p8">Problem 8 numbers</button></div>
-   <div class="row" style="margin-top:8px"><label for="mode" style="align-self:center">Compare A with</label></div>
-   <select id="mode" style="width:100%;margin-top:4px"><option value="init">B&rsquo;s starting speed (fixed number)</option><option value="live">B&rsquo;s speed at the same moment</option></select>
-   <div id="sl"></div>
+  <fieldset class="card"><legend>Experiment</legend>
+   <div class="row" style="margin-top:0"><label for="kind" style="align-self:center">Trolley</label><select id="kind">
+    <option value="0">Constant speed</option><option value="1">Speeding up steadily</option><option value="2">Speeding up from a push</option><option value="3">Slowing down steadily</option><option value="4">Speeds up, then constant</option><option value="m">Mystery tape</option></select></div>
+   <div class="row"><button class="btn primary" id="run">Run the trolley</button><button class="btn" id="cut" disabled>Cut into strips</button></div>
+   <p class="hint">Every dot is 0.02 s after the last. A strip of five gaps is 0.1 s long.</p>
   </fieldset>
-  <fieldset class="card"><legend>Step 1 · Predict</legend>
-   <div class="ctl" style="margin-top:2px"><label for="ta">Time until first equal (s)</label><span></span><input type="number" id="ta" step="any" style="grid-column:1/-1;width:100%"></div>
-   <div class="ctl"><label for="sa">That common speed (m/s)</label><span></span><input type="number" id="sa" step="any" style="grid-column:1/-1;width:100%"></div>
-   <div class="ctl"><label for="da">Distance the centre has moved (m)</label><span></span><input type="number" id="da" step="any" style="grid-column:1/-1;width:100%"></div>
-   <div class="row"><button class="btn primary" id="run">Roll &amp; check</button><button class="btn" id="rst">Reset</button></div>
-   <p class="msg" id="msg" aria-live="polite"></p>
-   <label class="chk"><span>Playback</span><input type="range" id="sp" min="0.25" max="3" step="0.25" value="1" aria-label="Playback speed"></label>
+  <fieldset class="card"><legend>Analyse</legend>
+   <label class="q" for="desc" style="display:block;margin-top:0">How did the trolley move?</label>
+   <div class="row" style="margin-top:6px"><select id="desc"><option value="">Choose…</option><option value="0">Constant speed</option><option value="1">Speeding up steadily</option><option value="3">Slowing down steadily</option><option value="4">Speeding up, then constant speed</option></select><button class="btn" id="c1">Check</button></div>
+   <p class="msg" id="m1" aria-live="polite"></p>
+   <label class="q" for="acc" style="display:block">Acceleration (cm/s²)</label>
+   <div class="row" style="margin-top:6px"><input type="number" id="acc" step="1"><button class="btn" id="c2">Check</button></div>
+   <p class="msg" id="m2" aria-live="polite"></p>
   </fieldset>
-  <div class="row" style="margin-top:0"><button class="btn" id="sol">Show solution</button></div>
-  <div class="card" id="solbox" hidden></div>
  </div>
 </div>
-<details><summary>Instructions</summary><ol><li>Choose <b>Problem 7 numbers</b> or <b>Problem 8 numbers</b>, or set your own radius and speed. The comparison rule is chosen for you with the buttons.</li>
-<li>Work out the time, the speed at that moment and the distance on paper. Enter all three.</li>
-<li>Press <b>Roll &amp; check</b>. The disc rolls through one turn. The two traced curves are the paths of A and B. The vertical line on the graph marks the first time the speeds match.</li>
-<li>Look at the dashed lines from the contact point to each marked point. A point's speed is its distance from the contact point multiplied by the angular speed.</li></ol></details>
-<details><summary>Theory</summary><p>A rolling disc without slipping can be seen two ways. In the first, the centre moves forward at <code>v</code> while the disc spins about the centre at <code>&omega; = v/R</code>. A point on the disc has the centre's velocity plus its spin velocity. At the top, the two add and the speed is <code>2v</code>. At the bottom they cancel and the speed is zero.</p>
-<p>In the second, the whole disc is turning about the point touching the ground, the <b>instantaneous axis</b>. Every point's speed is then <code>&omega;</code> times its distance from the contact point. This makes each speed easy to write.</p>
-<p>A point at distance <code>&rho;</code> from the centre and turned <code>&phi;</code> from the top has a speed <code>v&radic;(1 + (&rho;/R)&sup2; + 2(&rho;/R)cos&phi;)</code>. For a rim point this simplifies to <code>2v cos(&phi;/2)</code>. The turn angle is tied to the distance moved: <code>&phi; = (distance)/R</code>.</p>
-<p>Setting A's speed equal to B's gives a single equation for <code>&phi;</code>, and then <code>t = &phi;R/v</code>.</p></details>
-<footer>Challenge problems from a collection of kinematics problems, reworded for this page. The numbers were checked analytically and numerically.</footer>
+<details><summary>Instructions</summary><ol><li>Pick a trolley motion and press <b>Run the trolley</b>. The tape appears with its dots.</li>
+<li>Look at the spacing. Far-apart dots mean the trolley moved fast between taps. Close dots mean slow.</li>
+<li>Hover over the tape to measure the gap between two neighbouring dots. Divide by 0.02 s to get the speed at that moment.</li>
+<li>Press <b>Cut into strips</b>. Each strip of five gaps covers 0.1 s. The chart stacks the strips side by side, and the line through their tops is a velocity–time graph.</li>
+<li>Say how the trolley moved, then work out the acceleration from how fast the strips grow.</li>
+<li>Try <b>Mystery tape</b> for a motion you do not know in advance.</li></ol></details>
+<details><summary>Theory</summary><p>A ticker timer taps a paper tape at a steady rate, here 50 times a second. The tape is fixed to a trolley and pulled through, so each tap leaves a dot. The dots are always <b>0.02 s</b> apart in time. How far apart they are on the tape depends on how fast the trolley was going.</p>
+<p>Wide spacing means high speed and tight spacing means low speed. Equal spacing means constant velocity. Spacing that grows steadily means constant acceleration.</p>
+<p>The average velocity across any gap is <code>v = distance / 0.02 s</code>. Cutting the tape every five gaps gives strips that each cover 0.1 s. Their lengths are proportional to the average velocity over that 0.1 s. Standing the strips side by side builds a velocity–time bar chart.</p>
+<p>If the strip lengths grow by the same amount each time, the acceleration is constant: <code>a = &Delta;v / &Delta;t = (&Delta;strip length / 0.1 s) / 0.1 s</code>.</p></details>
+<footer>Rebuilt in HTML from the LabVIEW simulation "Ticker Timer".</footer>
 </div>
 <script>
 const K={};
@@ -202,66 +201,70 @@ K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+101390422
 (function(){
 "use strict";
 
-const $=K.$,cv=$("#cv");
-$("#sl").innerHTML=K.ctl({id:"R",label:"Disc radius",min:.05,max:1.5,step:.05,value:1,unit:"m"})+
- K.ctl({id:"v",label:"Speed of centre",min:.1,max:6,step:.1,value:.5,unit:"m/s"})+
- K.ctl({id:"k",label:"B's distance from centre (fraction of radius)",min:.1,max:.9,step:.05,value:.5,unit:""});
-const S={R:1,v:.5,k:.5,mode:"live"};let st={phi:0,run:false,done:false,hit:null};
-K.wire(document,id=>{S.R=+$("#R").value;S.v=+$("#v").value;S.k=+$("#k").value;reset()});
-$("#mode").onchange=e=>{S.mode=e.target.value;reset()};
-function preset(R,v,m){$("#R").value=R;$("#v").value=v;$("#k").value=.5;$("#mode").value=m;S.mode=m;["R","v","k"].forEach(i=>$("#"+i).dispatchEvent(new Event("input")))}
-$("#p7").onclick=()=>preset(.1,4,"init");$("#p8").onclick=()=>preset(1,.5,"live");
-const spA=phi=>S.v*Math.sqrt(Math.max(0,2+2*Math.cos(phi))),spB=phi=>S.v*Math.sqrt(1+S.k*S.k+2*S.k*Math.cos(phi));
-const target=phi=>S.mode==="init"?S.v*(1+S.k):spB(phi);
-function exact(){
- const phi=S.mode==="init"?2*Math.acos((1+S.k)/2):Math.acos(-(1+S.k)/2);
- return {phi:phi,t:phi*S.R/S.v,speed:spA(phi),dist:S.R*phi};
-}
-function reset(){st={phi:0,run:false,done:false,hit:null};$("#msg").textContent="";$("#msg").className="msg"}
-$("#rst").onclick=reset;
+const $=K.$,cv=$("#cv"),DT=.02,NT=70,rnd=K.rand(Date.now()%99991);
+const KINDS=[
+ {n:"Constant speed",u:40,a:0},
+ {n:"Speeding up steadily",u:0,a:60},
+ {n:"Speeding up from a push",u:25,a:45},
+ {n:"Slowing down steadily",u:110,a:-65},
+ {n:"Speeds up, then constant",u:0,a:80,tc:.8}
+];
+let cur=null,dots=[],cut=false,hover=-1;
+function pos(k,t){const u=k.u,a=k.a;if(k.tc!==undefined&&t>k.tc){const v1=u+a*k.tc;return u*k.tc+.5*a*k.tc*k.tc+v1*(t-k.tc)}return u*t+.5*a*t*t}
 $("#run").onclick=()=>{
- const E=exact(),ta=parseFloat($("#ta").value),sa=parseFloat($("#sa").value),da=parseFloat($("#da").value),m=$("#msg"),ok=(a,b)=>isFinite(a)&&Math.abs(a-b)<=Math.max(.02*Math.abs(b),1e-9+0.005*Math.abs(b));
- st={phi:0,run:true,done:false,hit:E.phi};
- const parts=[["time",ta,E.t,"s"],["speed",sa,E.speed,"m/s"],["distance",da,E.dist,"m"]],good=parts.filter(p=>ok(p[1],p[2]));
- m.innerHTML=parts.map(p=>(isFinite(p[1])?(ok(p[1],p[2])?"<b>"+p[0]+": correct.</b> ":"<b>"+p[0]+":</b> not quite, the answer is "+K.f(p[2],p[2]<.1?4:3)+" "+p[3]+". "):"<b>"+p[0]+":</b> not entered, it is "+K.f(p[2],p[2]<.1?4:3)+" "+p[3]+". ")).join("<br>");
- m.className="msg "+(good.length===3?"ok":"bad");
+ let v=$("#kind").value;
+ if(v==="m"){const opts=[0,1,2,3,4];v=opts[Math.floor(rnd()*5)];cur={idx:v,mystery:true}}else{cur={idx:+v,mystery:false}}
+ cur.k=KINDS[cur.idx];
+ dots=[];for(let j=0;j<=NT;j++)dots.push(pos(cur.k,j*DT));
+ cut=false;hover=-1;$("#cut").disabled=false;$("#m1").textContent="";$("#m2").textContent="";$("#acc").value="";$("#desc").value="";
+ $("#ro").textContent="Hover over the tape to measure the gap between two dots.";
 };
-$("#sol").onclick=()=>{
- const b=$("#solbox"),E=exact();b.hidden=!b.hidden;if(b.hidden)return;
- const k=S.k;
- b.innerHTML='<p class="q" style="margin-top:0">Solution</p><ol style="padding-left:1.2em;margin:.4em 0">'+
- '<li>Rolling without slipping: &omega; = v/R. A rim point has speed 2v cos(&phi;/2); B (at '+k+'R) has speed v&radic;(1 + '+K.f(k*k,2)+' + '+K.f(2*k,1)+' cos&phi;).</li>'+
- (S.mode==="init"?'<li>B\'s starting speed is v(1 + '+k+') = '+K.f(S.v*(1+k),2)+' m/s. Set 2v cos(&phi;/2) equal to it: cos(&phi;/2) = '+K.f((1+k)/2,3)+', so &phi; = '+K.f(E.phi,4)+' rad.</li>':
- '<li>Equal speeds: 2 + 2cos&phi; = 1 + '+K.f(k*k,2)+' + '+K.f(2*k,1)+' cos&phi;, which gives cos&phi; = &minus;'+K.f((1+k)/2,3)+', so &phi; = '+K.f(E.phi,4)+' rad ('+K.f(E.phi*180/Math.PI,1)+'&deg;).</li>')+
- '<li>Time: t = &phi;R/v = <b>'+K.f(E.t,E.t<.1?4:3)+' s</b>.</li><li>Speed: 2v cos(&phi;/2) = <b>'+K.f(E.speed,3)+' m/s</b>.</li><li>Distance moved by the centre: vt = R&phi; = <b>'+K.f(E.dist,3)+' m</b>.</li></ol>';
+$("#cut").onclick=()=>{if(cur){cut=true;$("#cut").disabled=true}};
+function strips(){const s=[];for(let i=0;i*5+5<=NT;i++)s.push(dots[i*5+5]-dots[i*5]);return s}
+function msg(id,t,c){const m=$(id);m.textContent=t;m.className="msg "+(c||"")}
+$("#c1").onclick=()=>{
+ if(!cur){msg("#m1","Run the trolley first.","bad");return}
+ const d=$("#desc").value;if(d===""){msg("#m1","Choose an answer first.","bad");return}
+ const ok=+d===cur.idx;
+ msg("#m1",ok?"Yes: "+cur.k.n.toLowerCase()+".":"Not quite. Compare the gaps at the start and the end of the tape. The tape shows: "+cur.k.n.toLowerCase()+".",ok?"ok":"bad");
 };
-function update(dt){if(st.run){st.phi+=dt*S_sp();if(st.phi>=2*Math.PI){st.phi=2*Math.PI;st.run=false;st.done=true}}}
-const S_sp=()=>+$("#sp").value;
+$("#c2").onclick=()=>{
+ if(!cur){msg("#m2","Run the trolley first.","bad");return}
+ const v=parseFloat($("#acc").value);if(!isFinite(v)){msg("#m2","Type a value first.","bad");return}
+ const a=cur.k.a,ok=Math.abs(v-a)<=Math.max(8,Math.abs(a)*.15);
+ msg("#m2",ok?"Close enough. The trolley accelerated at "+a+" cm/s².":"Not quite. The actual acceleration was "+a+" cm/s². Take two strips, subtract their lengths, then divide by 0.1 s twice.",ok?"ok":"bad");
+};
+cv.addEventListener("pointermove",e=>{
+ if(!cur)return;const r=cv.getBoundingClientRect(),px=e.clientX-r.left,s=tape.s;
+ let best=-1,bd=1e9;for(let j=0;j<NT;j++){const m=(tape.x0+(dots[j]+dots[j+1])/2*s);const d=Math.abs(px-m);if(d<bd){bd=d;best=j}}
+ hover=bd<30?best:-1;
+ if(hover>=0){const g=dots[hover+1]-dots[hover];$("#ro").innerHTML="Gap between dots "+hover+" and "+(hover+1)+": <b>"+K.f(g,2)+" cm</b> in 0.02 s, so v = <b>"+K.f(g/DT,0)+" cm/s</b>"}
+});
+cv.addEventListener("pointerleave",()=>{hover=-1});
+const tape={x0:24,s:1};
 function draw(){
- const {c,w,h}=K.fit(cv,.95);c.clearRect(0,0,w,h);
- const sh=Math.round(h*.45),L=2*Math.PI*S.R+2.2*S.R,sc=(w-30)/L,gy=sh-18,R=S.R*sc,cx=15+S.R*sc+S.R*st.phi*sc,cy=gy-R;
- c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,gy);c.lineTo(w,gy);c.stroke();
- const pt=(rho,th,phi0)=>{const a=phi0+th;return [15+S.R*sc+S.R*phi0*sc+rho*Math.sin(a)*R/S.R*S.R,0]};
- const pos=(rho,phi)=>[15+S.R*sc+S.R*phi*sc+rho*R*Math.sin(phi),gy-R-rho*R*Math.cos(phi)];
- [[1,"--a"],[S.k,"--b"]].forEach(p=>{c.strokeStyle=K.css(p[1]);c.lineWidth=1.5;c.globalAlpha=.6;c.beginPath();for(let f=0;f<=Math.min(st.phi,2*Math.PI)+.001;f+=.05){const q=pos(p[0],f);f===0?c.moveTo(q[0],q[1]):c.lineTo(q[0],q[1])}c.stroke();c.globalAlpha=1});
- const disc=(phi,alpha)=>{const x=15+S.R*sc+S.R*phi*sc;c.globalAlpha=alpha;c.fillStyle=K.css("--surface");c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.arc(x,gy-R,R,0,7);c.fill();c.stroke();
-  c.lineWidth=1;c.strokeStyle=K.css("--line");c.beginPath();c.moveTo(x,gy-R);c.lineTo(x+R*Math.sin(phi+2),gy-R-R*Math.cos(phi+2));c.moveTo(x,gy-R);c.lineTo(x+R*Math.sin(phi+4.2),gy-R-R*Math.cos(phi+4.2));c.stroke();c.globalAlpha=1};
- if(st.hit!==null&&st.phi>st.hit)disc(st.hit,.3);
- disc(st.phi,1);
- const A=pos(1,st.phi),B=pos(S.k,st.phi),P=[cx,gy];
- c.setLineDash([4,4]);c.strokeStyle=K.css("--muted");c.lineWidth=1;[A,B].forEach(q=>{c.beginPath();c.moveTo(P[0],P[1]);c.lineTo(q[0],q[1]);c.stroke()});c.setLineDash([]);
- const vel=(rho)=>[S.v+S.v*rho*Math.cos(st.phi),-S.v*rho*Math.sin(st.phi)],ak=R*.5/S.v;
- [[A,1,"--a"],[B,S.k,"--b"]].forEach(p=>{const u=vel(p[1]);K.arrow(c,p[0][0],p[0][1],p[0][0]+u[0]*ak,p[0][1]+u[1]*ak,K.css(p[2]),2.5);c.fillStyle=K.css(p[2]);c.beginPath();c.arc(p[0][0],p[0][1],4.5,0,7);c.fill()});
- c.fillStyle=K.css("--ink");c.beginPath();c.arc(P[0],P[1],3,0,7);c.fill();c.font="600 11px "+K.css("--mono");c.textAlign="center";c.fillText("A",A[0],A[1]-9);c.fillText("B",B[0],B[1]-9);
- const pts=(f)=>{const o=[];for(let q=0;q<=2*Math.PI+.001;q+=.03)o.push([q*S.R/S.v,f(q)]);return o};
- const tmax=2*Math.PI*S.R/S.v,vm=2*S.v*1.08,E=exact(),tn=st.phi*S.R/S.v;
- const ser=[{pts:pts(spA),color:"--a",width:2.5},{pts:pts(spB),color:"--b",width:2.5}];
- const hl=S.mode==="init"?[{y:S.v*(1+S.k),color:"--b",dash:[4,3]}]:[];
- K.plot(c,{x:48,y:sh+18,w:w-64,h:h-sh-48},{xmin:0,xmax:tmax,ymin:0,ymax:vm,title:"speed (m/s): A teal, B orange",xlabel:"time (s)",series:ser,hlines:hl,vlines:(st.hit!==null?[{x:E.t,color:"--warn"}]:[]),cursorX:tn});
- $("#ro").innerHTML="<span>t <b>"+K.f(tn,tn<.1?3:2)+" s</b></span><span>speed A <b>"+K.f(spA(st.phi),2)+" m/s</b></span><span>speed B <b>"+K.f(spB(st.phi),2)+" m/s</b></span><span>turned <b>"+K.f(st.phi*180/Math.PI,0)+"&deg;</b></span>";
+ const {c,w,h}=K.fit(cv,.8);c.clearRect(0,0,w,h);
+ const th=Math.round(h*.24);
+ c.fillStyle=K.css("--surface");c.fillRect(0,0,w,th+30);c.strokeStyle=K.css("--line");c.strokeRect(.5,.5,w-1,th+29);
+ if(!cur){c.fillStyle=K.css("--muted");c.font="14px "+K.css("--body");c.textAlign="center";c.fillText("Choose a trolley and press Run to make a tape.",w/2,th/2+16);return}
+ const L=dots[NT],s=(w-tape.x0*2)/L;tape.s=s;
+ c.fillStyle=K.css("--stage");c.fillRect(tape.x0-10,18,L*s+20,th-6);
+ c.strokeStyle=K.css("--line");c.strokeRect(tape.x0-10+.5,18.5,L*s+20,th-6);
+ const ym=18+(th-6)/2;
+ for(let j=0;j<=NT;j++){c.fillStyle=(j%5===0)?K.css("--b"):K.css("--ink");c.beginPath();c.arc(tape.x0+dots[j]*s,ym,j%5===0?3.4:2.4,0,7);c.fill()}
+ if(hover>=0){c.strokeStyle=K.css("--accent");c.lineWidth=3;c.beginPath();c.moveTo(tape.x0+dots[hover]*s,ym+12);c.lineTo(tape.x0+dots[hover+1]*s,ym+12);c.stroke();c.lineWidth=1}
+ if(cut){for(let j=0;j<=NT;j+=5){c.strokeStyle=K.css("--warn");c.setLineDash([3,3]);c.beginPath();c.moveTo(tape.x0+dots[j]*s,14);c.lineTo(tape.x0+dots[j]*s,th+4);c.stroke();c.setLineDash([])}}
+ c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="left";c.fillText("tape (time runs left to right, scale "+K.f(s*10/1,0)+" px per 10 cm)",tape.x0,12);
+ const by=th+44,bh=h-by-30,st=strips(),mx=Math.ceil(Math.max.apply(null,st)*1.1);
+ if(!cut){c.fillStyle=K.css("--muted");c.font="13px "+K.css("--body");c.textAlign="center";c.fillText("Press Cut into strips to build the velocity–time chart.",w/2,by+bh/2);return}
+ const ov=K.plot(c,{x:50,y:by,w:w-66,h:bh},{xmin:0,xmax:st.length,ymin:0,ymax:mx,title:"strip length (cm) per 0.1 s",xlabel:"strip number (each 0.1 s)",series:[]});
+ st.forEach((l,i)=>{c.fillStyle=K.css("--a");c.globalAlpha=.8;c.fillRect(ov.X(i)+3,ov.Y(l),ov.X(1)-ov.X(0)-6,ov.Y(0)-ov.Y(l));c.globalAlpha=1;
+  c.strokeStyle=K.css("--ink");c.strokeRect(ov.X(i)+3.5,ov.Y(l)+.5,ov.X(1)-ov.X(0)-7,ov.Y(0)-ov.Y(l))});
+ c.fillStyle=K.css("--muted");c.textAlign="center";c.font="10px "+K.css("--mono");
+ const d=(st[st.length-1]-st[0])/(st.length-1);
+ $("#ro").innerHTML="Strips: "+st.map(x=>K.f(x,1)).join(", ")+" cm. They change by about <b>"+K.f(d,2)+" cm</b> per strip.";
 }
-K.loop(update,draw);
-preset(1,.5,"live");
+K.loop(()=>{},draw);
 
 })();
 </script>

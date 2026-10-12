@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ball and Bullet · Mr. D's Sims</title>
+<title>Falling Target · Mr. D's Sims</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -83,37 +83,35 @@ footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
 <body>
 <div class="wrap">
 <header>
-<a class="back" href="index.html">&larr; All simulations</a>
-<h1>Ball and Bullet</h1>
-<p class="sub">A ball is dropped. A gun to the side fires a horizontal bullet at it. When should the gun fire so the bullet hits?</p>
+<a class="back" href="../index.html">&larr; Physics sims</a>
+<h1>Falling Target</h1>
+<p class="sub">A rifle fires at a target that lets go the instant the shot leaves the barrel. Where should you aim?</p>
 </header>
 
 <div class="layout">
- <div class="stagewrap"><canvas id="cv" aria-label="A falling ball and a gun firing a horizontal bullet at it"></canvas><div class="readout" id="ro"></div><p class="msg" id="msg" aria-live="polite" style="margin-top:0"></p></div>
+ <div class="stagewrap"><canvas id="cv" aria-label="Rifle on the left aimed at a target hanging in the air on the right"></canvas><div class="readout" id="ro"></div></div>
  <div class="side">
-  <fieldset class="card"><legend>The problem</legend>
-   <p class="hint" style="margin-top:0">A heavy ball is dropped from rest. A gun fires a horizontal bullet at it from the side. How long after the ball is released should the gun fire for the bullet to hit it? (No air resistance.)</p>
+  <fieldset class="card"><legend>Setup</legend>
    <div id="sl"></div>
+   <label class="chk"><input type="checkbox" id="laser" checked> Show laser pointer</label>
+   <label class="chk"><input type="checkbox" id="grav" checked> Gravity on</label>
   </fieldset>
-  <fieldset class="card"><legend>Step 1 · Predict</legend>
-   <label class="q" for="din" style="display:block;margin-top:0">Fire the gun after (s)</label>
-   <div class="row" style="margin-top:6px"><input type="number" id="din" step="0.01" placeholder="work it out first"><button class="btn primary" id="go">Release &amp; fire</button></div>
-   <div class="row"><button class="btn" id="rst">Reset</button><button class="btn" id="sol">Show solution</button></div>
-   <label class="chk"><span>Playback</span><input type="range" id="sp" min="0.1" max="1" step="0.05" value="0.4" aria-label="Playback speed"></label>
-  </fieldset>
-  <div class="card" id="solbox" hidden></div>
+  <div class="card">
+   <div class="row"><button class="btn primary" id="fire">Fire</button><button class="btn" id="aim">Aim at target</button><button class="btn" id="reset">Pick target up</button></div>
+   <p class="msg" id="msg" aria-live="polite"></p>
+  </div>
  </div>
 </div>
-<details><summary>Instructions</summary><ol><li>Look at the setup: ball height, gun height, distance to the ball's path, and bullet speed. Change them if you like.</li>
-<li>Work out on paper when the gun must fire, measured from the moment the ball is released.</li>
-<li>Type your time and press <b>Release &amp; fire</b>. The ball drops at once and the gun fires at your time.</li>
-<li>A hit means your time is right. A miss tells you whether the bullet went above or below the ball, which tells you whether you fired too early or too late.</li>
-<li>Challenge: find a setup where there is no answer. What goes wrong?</li></ol></details>
-<details><summary>Theory</summary><p>Split the problem in two. The bullet moves sideways at constant speed, so the time it takes to reach the ball's path is <code>&tau; = d / v</code>. While it crosses, it falls freely, so it drops <code>&frac12;g&tau;&sup2;</code> below the gun's height.</p>
-<p>The bullet therefore meets the ball at height <code>h&prime; &minus; &frac12;g&tau;&sup2;</code>. The ball must have fallen from its starting height to that point, which takes <code>t = &radic;(2&Delta;h/g)</code> from release.</p>
-<p>That is the time from <em>release</em> to the meeting. The bullet spends the last <code>&tau;</code> of it in flight, so the gun must fire at <code>t &minus; &tau;</code> after release.</p>
-<p>If that is negative, the ball has already passed the meeting height before the bullet could even get there. Raise the bullet speed or move the gun closer.</p></details>
-<footer>Challenge problem from a collection of kinematics problems, reworded for this page. The numbers were checked by hand and by computer.</footer>
+<details><summary>Instructions</summary><ol><li>Press <b>Fire</b> to see what happens. The target is released at the moment the bullet leaves the rifle.</li>
+<li>Press <b>Pick target up</b>, then change the target's height or distance with the sliders.</li>
+<li>Use <b>Angle</b> to tilt the rifle up or down, or press <b>Aim at target</b> to point the laser straight at it.</li>
+<li>Change the bullet speed. Does a faster bullet change where you should aim?</li>
+<li>Turn gravity off and fire again. What is different, and what stays the same?</li></ol></details>
+<details><summary>Theory</summary><p>It feels as if you should aim a little below the target, because the target is falling. Gravity pulls on the bullet too, so the net effect is that no correction is needed. The rifle points straight at the target's starting position and the bullet still hits.</p>
+<p>The simplest case has the target level with the rifle. The bullet's horizontal velocity is constant if air resistance is ignored. Its vertical motion is a free fall, <code>&frac12;gt&sup2;</code>. The target falls <code>&frac12;gt&sup2;</code> in the same time. At every instant the two are at the same height, so the bullet still hits.</p>
+<p>When the target is above or below the rifle the argument takes one more step. Write the bullet's position as its straight aim line plus a drop of <code>&frac12;gt&sup2;</code>. Write the target's position as its starting point plus the same drop. A bullet that meets the target at the start point on the aim line meets it wherever the drop has carried both.</p>
+<p>It fails only if the target reaches the ground before the bullet reaches it. Raise the bullet speed until it works.</p></details>
+<footer>Rebuilt in HTML from the LabVIEW simulation "Falling Target".</footer>
 </div>
 <script>
 const K={};
@@ -197,52 +195,77 @@ K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+101390422
 (function(){
 "use strict";
 
-const $=K.$,cv=$("#cv"),g=9.81;
-$("#sl").innerHTML=K.ctl({id:"h",label:"Ball starts at",min:12,max:40,step:1,value:20,unit:"m"})+
- K.ctl({id:"hp",label:"Gun height",min:2,max:30,step:1,value:10,unit:"m"})+
- K.ctl({id:"d",label:"Distance to ball's path",min:20,max:80,step:1,value:50,unit:"m"})+
- K.ctl({id:"v",label:"Bullet speed",min:40,max:200,step:5,value:100,unit:"m/s"});
-const S={h:20,hp:10,d:50,v:100};let st=null;
-const msg=(t,c)=>{const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")};
-K.wire(document,id=>{S.h=+$("#h").value;S.hp=+$("#hp").value;S.d=+$("#d").value;S.v=+$("#v").value;
- if(S.hp>S.h-1){S.hp=S.h-1;$("#hp").value=S.hp;$("#hp-o").textContent=S.hp+" m"}st=null;msg("")});
-function ans(){const tau=S.d/S.v,yh=S.hp-.5*g*tau*tau,tb=yh>0.4?Math.sqrt(2*(S.h-yh)/g):NaN;return {tau:tau,yh:yh,tb:tb,delay:tb-tau}}
-$("#rst").onclick=()=>{st=null;msg("")};
-$("#go").onclick=()=>{
- const d=parseFloat($("#din").value);if(!isFinite(d)||d<0){msg("Type a time of zero or more first.","bad");return}
- st={t:0,delay:d,fired:false,bx:0,by:S.hp,bt:0,done:false,res:null,trail:[]};msg("")};
-$("#sol").onclick=()=>{
- const b=$("#solbox"),a=ans();b.hidden=!b.hidden;if(b.hidden)return;
- if(!(a.delay>=0)){b.innerHTML='<p class="q" style="margin-top:0">No answer for this setup</p><p class="hint">By the time the bullet could reach the ball\'s path, the ball has already fallen past the height where they would meet. Increase the bullet speed or reduce the distance.</p>';return}
- b.innerHTML='<p class="q" style="margin-top:0">Solution</p><ol style="padding-left:1.2em;margin:.4em 0"><li>Bullet flight time: &tau; = d/v = '+S.d+'/'+S.v+' = <b>'+K.f(a.tau,2)+' s</b>.</li>'+
- '<li>It falls &frac12;g&tau;&sup2; = '+K.f(.5*g*a.tau*a.tau,2)+' m, so it meets the ball at height '+S.hp+' &minus; '+K.f(.5*g*a.tau*a.tau,2)+' = <b>'+K.f(a.yh,2)+' m</b>.</li>'+
- '<li>The ball has fallen '+S.h+' &minus; '+K.f(a.yh,2)+' = '+K.f(S.h-a.yh,2)+' m, which takes t = &radic;(2&middot;'+K.f(S.h-a.yh,2)+'/g) = <b>'+K.f(a.tb,2)+' s</b>.</li>'+
- '<li>Fire <b>'+K.f(a.delay,2)+' s</b> after release: t &minus; &tau; = '+K.f(a.tb,2)+' &minus; '+K.f(a.tau,2)+'.</li></ol>';
-};
-function update(dt){
- if(!st||st.done)return;dt*=+$("#sp").value;const n=Math.ceil(dt/.002),h=dt/n;
- for(let i=0;i<n&&!st.done;i++){
-  st.t+=h;
-  if(!st.fired&&st.t>=st.delay){st.fired=true;st.bt=0;st.bx=0;st.by=S.hp}
-  if(st.fired){st.bt+=h;st.bx=S.v*st.bt;st.by=S.hp-.5*g*st.bt*st.bt;if(st.trail.length===0||st.bt-st.last>.01){st.trail.push([st.bx,st.by]);st.last=st.bt}
-   if(st.bx>=S.d){const yb=Math.max(.4,S.h-.5*g*st.t*st.t),dy=st.by-yb;st.done=true;st.dy=dy;st.by=yb+dy;
-    msg(Math.abs(dy)<=.45?"Hit! The bullet reached the ball "+K.f(st.t,2)+" s after release.":"Miss. The bullet passed "+K.f(Math.abs(dy),2)+" m "+(dy>0?"above":"below")+" the ball. You fired too "+(dy>0?"late (the ball had already fallen below the bullet)":"early (the ball had not yet fallen to the bullet\'s height)")+".",Math.abs(dy)<=.45?"ok":"bad");}}
-  if(st.t>8){st.done=true;msg("Time ran out.","bad")}
+const $=K.$,g=K.G,WD=50,HH=25,P0={x:2,y:1.5};
+let st=null;
+const S={D:35,H:10,v:35,ang:0,grav:true,laser:true};
+$("#sl").innerHTML=K.ctl({id:"s-d",label:"Target distance",min:15,max:46,step:1,value:35,unit:"m"})+
+ K.ctl({id:"s-h",label:"Target height",min:3,max:22,step:1,value:10,unit:"m"})+
+ K.ctl({id:"s-v",label:"Bullet speed",min:15,max:70,step:1,value:35,unit:"m/s"})+
+ K.ctl({id:"s-a",label:"Rifle angle",min:-5,max:60,step:0.01,value:14,unit:"&deg;"});
+const aimA=()=>K.deg(Math.atan2(S.H-P0.y,S.D-P0.x));
+function setAngle(a){S.ang=a;const el=$("#s-a");el.value=a;el.dispatchEvent(new Event("input"))}
+K.wire(document,id=>{
+ if(id==="s-d")S.D=+$("#s-d").value; if(id==="s-h")S.H=+$("#s-h").value; if(id==="s-v")S.v=+$("#s-v").value;
+ if(id==="s-a")S.ang=+$("#s-a").value; st=null;$("#fire").disabled=false;msg("");
+});
+S.D=35;S.H=10;S.v=35;setAngle(aimA());
+$("#laser").onchange=e=>S.laser=e.target.checked;
+$("#grav").onchange=e=>{S.grav=e.target.checked;st=null;$("#fire").disabled=false;msg("")};
+$("#aim").onclick=()=>{st=null;$("#fire").disabled=false;msg("");setAngle(aimA())};
+$("#reset").onclick=()=>{st=null;$("#fire").disabled=false;msg("")};
+function msg(t,cls){const m=$("#msg");m.textContent=t;m.className="msg "+(cls||"")}
+const tY=t=>Math.max(.4,S.H-(S.grav?.5*g*t*t:0));
+$("#fire").onclick=()=>{const a=K.rad(S.ang);
+ st={t:0,x:P0.x,y:P0.y,vx:S.v*Math.cos(a),vy:S.v*Math.sin(a),trail:[[P0.x,P0.y]],strobe:[],nextS:.15,done:false,hit:false};
+ $("#fire").disabled=true;msg("")};
+function finish(){
+ $("#fire").disabled=false;
+ const off=Math.abs(S.ang-aimA());
+ if(st.hit){
+  const d=.5*g*st.t*st.t;
+  msg(S.grav?"Hit after "+K.f(st.t,2)+" s. In that time gravity pulled the bullet "+K.f(d,1)+" m below its aim line and the target "+K.f(d,1)+" m below where it started. Equal drops, so the aim line needed no correction.":
+   "Hit after "+K.f(st.t,2)+" s. Gravity is off, so nothing falls and a straight shot lands.","ok");
+ }else if(off>.6){
+  msg("Miss. The rifle points "+K.f(S.ang,1)+"° and the target started at "+K.f(aimA(),1)+"°. Press Aim at target and fire again.","bad");
+ }else{
+  const tf=(S.D-P0.x)/(S.v*Math.cos(K.rad(S.ang))),tg=Math.sqrt(2*(S.H-.4)/g);
+  msg("Miss, although the aim was right. The bullet needs "+K.f(tf,2)+" s to get there and the target reaches the ground in "+K.f(tg,2)+" s. Raise the bullet speed.","bad");
  }
 }
-function draw(){
- const {c,w,h}=K.fit(cv,.8),sc=Math.min((w-60)/(S.d+10),(h-40)/(S.h+4)),X=x=>30+x*sc,Y=y=>h-22-y*sc;
- c.clearRect(0,0,w,h);c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.lineWidth=1;c.textAlign="right";
- K.ticks(0,S.h+3,6).forEach(m=>{c.beginPath();c.moveTo(24,Y(m));c.lineTo(w,Y(m));c.stroke();c.fillText(m+" m",26,Y(m)+3)});
- c.fillStyle=K.css("--line");c.fillRect(0,Y(0),w,h-Y(0));c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,Y(0));c.lineTo(w,Y(0));c.stroke();
- c.lineWidth=3;c.beginPath();c.moveTo(X(0),Y(S.hp));c.lineTo(X(3),Y(S.hp));c.stroke();c.fillStyle=K.css("--ink");c.fillRect(X(-1.5),Y(S.hp)-3,X(1.5)-X(-1.5),6);c.fillRect(X(-1.2),Y(S.hp),6,Y(0)-Y(S.hp));
- c.setLineDash([3,4]);c.strokeStyle=K.css("--muted");c.lineWidth=1;c.beginPath();c.moveTo(X(S.d),Y(0));c.lineTo(X(S.d),Y(S.h+3));c.stroke();c.setLineDash([]);
- const a=ans(),t=st?st.t:0,yb=Math.max(.4,S.h-.5*g*t*t);
- c.fillStyle=K.css("--b");c.beginPath();c.arc(X(S.d),Y(yb),.45*sc*1.2,0,7);c.fill();
- if(st&&st.trail.length>1){c.strokeStyle=K.css("--a");c.lineWidth=2;c.beginPath();st.trail.forEach((p,i)=>i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1])));c.stroke()}
- if(st&&st.fired){c.fillStyle=K.css("--a");c.beginPath();c.arc(X(st.bx),Y(st.by),4,0,7);c.fill()}
- $("#ro").innerHTML="<span>t since release <b>"+K.f(t,2)+" s</b></span><span>bullet flight time <b>"+K.f(a.tau,2)+" s</b></span><span>ball height <b>"+K.f(yb,1)+" m</b></span>";
+function update(dt){
+ if(!st||st.done)return;
+ const n=Math.ceil(dt/.002),h=dt/n;
+ for(let i=0;i<n&&!st.done;i++){
+  st.t+=h;st.vy-=(S.grav?g:0)*h;st.x+=st.vx*h;st.y+=st.vy*h;
+  if(Math.hypot(st.x-S.D,st.y-tY(st.t))<.6){st.done=true;st.hit=true}
+  if(st.x>WD+1||st.y<0||st.x>S.D+3)st.done=true;
+  if(st.t>=st.nextS){st.strobe.push({x:st.x,y:st.y,ty:tY(st.t)});st.nextS+=.15}
+ }
+ st.trail.push([st.x,st.y]);
+ if(st.done)finish();
 }
+function draw(){
+ const {c,w,h}=K.fit(cv,.5),s=w/WD,X=x=>x*s,Y=y=>h-y*s;
+ c.clearRect(0,0,w,h);
+ c.strokeStyle=K.css("--grid");c.lineWidth=1;c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="left";
+ for(let y=5;y<HH;y+=5){c.beginPath();c.moveTo(0,Y(y));c.lineTo(w,Y(y));c.stroke();c.fillText(y+" m",4,Y(y)-3)}
+ c.fillStyle=K.css("--line");c.fillRect(0,Y(0),w,h-Y(0));
+ const t=st?st.t:0,ty=tY(t),a=K.rad(S.ang);
+ if(S.laser){c.strokeStyle=K.css("--warn");c.setLineDash([6,5]);c.lineWidth=1.5;c.beginPath();c.moveTo(X(P0.x),Y(P0.y));c.lineTo(X(P0.x+90*Math.cos(a)),Y(P0.y+90*Math.sin(a)));c.stroke();c.setLineDash([])}
+ if(st){
+  c.strokeStyle=K.css("--muted");c.lineWidth=1;c.setLineDash([2,3]);
+  st.strobe.forEach(p=>{c.beginPath();c.moveTo(X(p.x),Y(p.y));c.lineTo(X(S.D),Y(p.ty));c.stroke()});c.setLineDash([]);
+  st.strobe.forEach(p=>{c.fillStyle=K.css("--a");c.beginPath();c.arc(X(p.x),Y(p.y),3,0,7);c.fill();c.fillStyle=K.css("--b");c.beginPath();c.arc(X(S.D),Y(p.ty),3,0,7);c.fill()});
+ }
+ if(!st||st.t===0){c.strokeStyle=K.css("--ink");c.lineWidth=3;c.beginPath();c.moveTo(X(S.D),Y(S.H+.5));c.lineTo(X(S.D),Y(S.H+3));c.stroke();c.beginPath();c.moveTo(X(S.D-1.2),Y(S.H+3));c.lineTo(X(S.D+1.2),Y(S.H+3));c.stroke()}
+ [[1.2,K.css("--b")],[.8,K.css("--surface")],[.4,K.css("--b")]].forEach(p=>{c.fillStyle=p[1];c.beginPath();c.arc(X(S.D),Y(ty),p[0]*s*.6,0,7);c.fill()});
+ c.strokeStyle=K.css("--ink");c.lineWidth=5;c.lineCap="round";c.beginPath();c.moveTo(X(P0.x-2.2*Math.cos(a)),Y(P0.y-2.2*Math.sin(a)));c.lineTo(X(P0.x),Y(P0.y));c.stroke();c.lineCap="butt";
+ c.fillStyle=K.css("--ink");c.beginPath();c.arc(X(P0.x-1),Y(.5),.6*s,0,7);c.fill();
+ if(st){c.fillStyle=K.css("--a");c.beginPath();c.arc(X(st.x),Y(st.y),4,0,7);c.fill()}
+ const tf=(S.D-P0.x)/(S.v*Math.cos(a)),tg=Math.sqrt(2*(S.H-.4)/g);
+ $("#ro").innerHTML="<span>t <b>"+K.f(t,2)+" s</b></span><span>aim line to target <b>"+K.f(aimA(),1)+"&deg;</b></span><span>flight time <b>"+K.f(tf,2)+" s</b></span><span>fall time <b>"+(S.grav?K.f(tg,2)+" s":"never")+"</b></span>";
+}
+const cv=$("#cv");
 K.loop(update,draw);
 
 })();

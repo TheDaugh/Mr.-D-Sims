@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ballistic Trolley · Mr. D's Sims</title>
+<title>Exploding Projectile · Mr. D's Sims</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -83,36 +83,39 @@ footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
 <body>
 <div class="wrap">
 <header>
-<a class="back" href="index.html">&larr; All simulations</a>
-<h1>Ballistic Trolley</h1>
-<p class="sub">A trolley fires a ball straight up as it rolls along. Where does the ball come down?</p>
+<a class="back" href="../index.html">&larr; Physics sims</a>
+<h1>Exploding Projectile</h1>
+<p class="sub">A shell bursts in mid-air and the two pieces land at the same moment. One piece lands back at the gun. How high was the burst?</p>
 </header>
 
 <div class="layout">
- <div class="stagewrap"><canvas id="cv" aria-label="A trolley with a cannon firing a ball upward while it moves along a track"></canvas><div class="readout" id="ro"></div></div>
+ <div class="stagewrap"><canvas id="cv" aria-label="Path of a projectile that explodes into two pieces, with the centre of mass following the original arc"></canvas><div class="readout" id="ro"></div><p class="msg" id="msg" aria-live="polite" style="margin-top:0"></p></div>
  <div class="side">
-  <fieldset class="card"><legend>Apparatus</legend>
-   <div id="sl"></div>
-   <div class="row" style="margin-top:8px"><label for="ball" style="align-self:center">Ball</label><select id="ball"><option value="solid">Heavy ball</option><option value="hollow">Hollow ball</option></select></div>
-   <label class="chk"><input type="checkbox" id="traj" checked> Show trajectory</label>
-   <div class="row" style="margin-top:4px"><label for="steps" style="align-self:center">Steps</label><select id="steps"><option value="h">Horizontal</option><option value="v">Vertical</option></select></div>
-   <div class="row"><button class="btn primary" id="go">Start trolley</button><button class="btn" id="fire" disabled>Fire ball</button><button class="btn" id="rst">Reset</button></div>
-   <p class="msg" id="msg" aria-live="polite"></p>
+  <fieldset class="card"><legend>The problem</legend>
+   <p class="hint" style="margin-top:0">A shell leaves the ground at 400 m/s, 30&deg; above the horizontal (take g = 10 m/s&sup2;, no air resistance). It explodes in flight into two pieces. Both reach the ground at the same instant. Piece A lands exactly where the shell was fired, hitting the ground at 250 m/s.</p>
   </fieldset>
+  <fieldset class="card"><legend>Step 1 · Predict</legend>
+   <label class="q" for="hin" style="display:block;margin-top:0">Height of the explosion (m)</label>
+   <div class="row" style="margin-top:6px"><input type="number" id="hin" step="1" placeholder="work it out first"><button class="btn primary" id="test">Test it</button></div>
+   <p class="hint">Test it fires the shell and explodes it at your height on the way up. If you are right, piece A comes down on the gun.</p>
+  </fieldset>
+  <fieldset class="card"><legend>Explore</legend>
+   <div id="sl"></div>
+   <div class="row"><button class="btn" id="replay">Replay</button><button class="btn" id="sol">Show solution</button></div>
+  </fieldset>
+  <div class="card" id="solbox" hidden></div>
  </div>
 </div>
-<details><summary>Instructions</summary><ol><li>Set the trolley speed with the first slider, then press <b>Start trolley</b>. It stops by itself at the far end.</li>
-<li>Press <b>Fire ball</b> while it is moving. The ball goes up and lands back in the cannon.</li>
-<li>Set the ball's upward speed with the second slider.</li>
-<li><b>Show trajectory</b> plots the path. <b>Steps</b> switches the dots between equal horizontal steps and equal vertical steps.</li>
-<li>Fire the ball, then change the trolley speed before it lands. The ball misses.</li>
-<li><b>Challenge:</b> switch to the hollow ball, fire it, and slow the trolley down so the ball still lands in the cannon.</li></ol></details>
-<details><summary>Theory</summary><p>Projectile motion becomes much easier to understand if it is split into two separate motions.</p>
-<p>In the absence of air resistance the horizontal component of the velocity is constant. Here it equals the velocity of the trolley. The vertical velocity starts upward, is continually slowed by gravity until it stops and reverses, and the ball falls back down.</p>
-<p>A stationary observer sees the ball follow a parabola. An observer sitting on the trolley sees the ball simply go up and come down, as if the trolley were not moving. It is like a child playing with a ball inside a car travelling along the motorway.</p>
-<p>When air resistance becomes significant (at high speed, or when the ball is very light), drag reduces the horizontal velocity of the ball. Imagine throwing a ball straight up through the sun-roof of a fast car: it does not come back to your hands. In this case the ball does not fall back into the cannon.</p>
-<p><b>Challenge:</b> slow the trolley down after launching the hollow ball so you can still catch it.</p></details>
-<footer>Rebuilt in HTML from the LabVIEW simulation "Ballistic Trolley".</footer>
+<details><summary>Instructions</summary><ol><li>Read the problem. Before touching the sim, work out the height of the explosion on paper.</li>
+<li>Type your height in Step 1 and press <b>Test it</b>. The shell flies, explodes at that height, and both pieces fall. Does piece A come down on the gun?</li>
+<li>If it misses, the message says by how far. Revise your answer and test again.</li>
+<li>Use <b>Explore</b> to move the explosion time, change how fast piece A is thrown backward, and change how the mass splits. Watch the grey dot, the centre of mass. What does it do?</li>
+<li>Press <b>Show solution</b> when you want to compare methods.</li></ol></details>
+<details><summary>Theory</summary><p>The explosion is caused by forces <em>inside</em> the shell. Internal forces cannot change the motion of the centre of mass. So the centre of mass keeps following the same parabola the whole shell would have followed, and it lands at the shell's original range.</p>
+<p>The explosion also does not change the vertical velocity of either piece in this problem, because both land at the same instant as the unbroken shell would. Only the horizontal velocities change, and they change in opposite directions so that the centre of mass is not disturbed.</p>
+<p>With these two facts, the pieces' horizontal motion after the burst is a balance: the centre of mass moves forward at <code>v cos&theta;</code> while piece A goes back at its own speed. The burst must happen when the horizontal ground covered forward by the centre of mass equals the ground piece A covers backward.</p>
+<p>Notice that the sim lets you change the mass split. It moves where piece B lands, but not where A lands. That is why the problem never needs the masses.</p></details>
+<footer>Challenge problem from a collection of kinematics problems, reworded for this page. The numbers were checked by two independent methods.</footer>
 </div>
 <script>
 const K={};
@@ -196,59 +199,67 @@ K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+101390422
 (function(){
 "use strict";
 
-const $=K.$,g=K.G,cv=$("#cv"),W=40;
-$("#sl").innerHTML=K.ctl({id:"vt",label:"Trolley speed",min:1,max:8,step:.5,value:4,unit:"m/s"})+
- K.ctl({id:"vb",label:"Ball speed (upward)",min:5,max:20,step:1,value:12,unit:"m/s"});
-let vt=4,vb=12,hollow=false,st;
-K.wire(document,(id,v)=>{if(id==="vt")vt=v;if(id==="vb")vb=v});
-$("#ball").onchange=e=>{hollow=e.target.value==="hollow";reset()};
-function reset(){st={run:false,x:3,t:0,ball:null,hist:[],last:-1};$("#go").disabled=false;$("#fire").disabled=true;msg("")}
-function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
-$("#rst").onclick=reset;
-$("#go").onclick=()=>{reset();st.run=true;$("#go").disabled=true;$("#fire").disabled=false};
-$("#fire").onclick=()=>{if(st.ball||!st.run)return;st.ball={x:st.x,y:0,vx:vt,vy:vb,t:0,pts:[[st.x,0,0]],done:false,next:.25,strobe:[]};$("#fire").disabled=true};
+const $=K.$,cv=$("#cv"),G=10,V0=400,VX=V0*Math.cos(K.rad(30)),VY=V0*Math.sin(K.rad(30)),T=2*VY/G,XM=VX*T,YM=VY*VY/(2*G);
+$("#sl").innerHTML=K.ctl({id:"t1",label:"Explosion time",min:1,max:39,step:.1,value:12.1,unit:"s"})+
+ K.ctl({id:"ux",label:"Piece A horizontal velocity",min:-400,max:400,step:1,value:-150,unit:"m/s"})+
+ K.ctl({id:"fm",label:"Piece A share of the mass",min:.1,max:.9,step:.05,value:.5,unit:""})+
+ K.ctl({id:"sp",label:"Playback speed",min:1,max:10,step:1,value:4,unit:"&times;"});
+const S={t1:12.1,ux:-150,f:.5,sp:4};let st={t:T,run:false,test:false};
+const msg=(t,c)=>{const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")};
+K.wire(document,(id,v)=>{
+ if(id==="t1")S.t1=v;if(id==="ux")S.ux=v;if(id==="fm")S.f=v;if(id==="sp"){S.sp=v;return}
+ st={t:T,run:false,test:false};info()});
+const uxB=()=>(VX-S.f*S.ux)/(1-S.f),landA=()=>VX*S.t1+S.ux*(T-S.t1),landB=()=>VX*S.t1+uxB()*(T-S.t1);
+const hAt=t=>VY*t-.5*G*t*t;
+function setSlider(id,v){const e=$("#"+id);e.value=v;e.dispatchEvent(new Event("input"))}
+function info(){
+ msg("Piece A lands "+K.f(landA(),0)+" m from the gun, piece B "+K.f(landB(),0)+" m. Both land at t = "+K.f(T,0)+" s. Piece A's impact speed is "+K.f(Math.hypot(S.ux,VY),0)+" m/s.");
+}
+$("#replay").onclick=()=>{st={t:0,run:true,test:false}};
+$("#test").onclick=()=>{
+ const h=parseFloat($("#hin").value);
+ if(!isFinite(h)){msg("Type a height first.","bad");return}
+ if(h<0||h>YM){msg("The shell only reaches "+K.f(YM,0)+" m at its peak. Pick a height between 0 and "+K.f(YM,0)+" m.","bad");return}
+ const t1=(VY-Math.sqrt(VY*VY-2*G*h))/G;
+ S.ux=-150;S.t1=t1;setSlider("ux",-150);S.t1=t1;$("#t1").value=t1;$("#t1-o").textContent=K.f(t1,1)+" s";
+ st={t:0,run:true,test:true};
+};
+$("#sol").onclick=()=>{
+ const b=$("#solbox"),vxA=Math.sqrt(250*250-VY*VY),t1=vxA*T/(VX+vxA),h=hAt(t1);
+ b.hidden=!b.hidden;if(b.hidden)return;
+ b.innerHTML='<p class="q" style="margin-top:0">Solution</p><ol style="padding-left:1.2em;margin:.4em 0"><li>Vertical motion is untouched by the burst, so the pieces land at the same time as the whole shell: T = 2v<sub>y</sub>/g = 2(200)/10 = <b>40 s</b>. The vertical impact speed is 200 m/s.</li>'+
+ '<li>Piece A hits at 250 m/s, so its horizontal speed is &radic;(250&sup2; &minus; 200&sup2;) = <b>150 m/s</b>, directed backward.</li>'+
+ '<li>At the burst the shell is at x = 346.4 t<sub>1</sub>. Piece A then travels back 150(40 &minus; t<sub>1</sub>) and arrives at x = 0: 346.4 t<sub>1</sub> = 150(40 &minus; t<sub>1</sub>), so <b>t<sub>1</sub> = '+K.f(t1,2)+' s</b>.</li>'+
+ '<li>Height: h = 200(t<sub>1</sub>) &minus; 5t<sub>1</sub>&sup2; = <b>'+K.f(h,0)+' m</b>.</li></ol>'+
+ '<p class="hint">Another route: the centre of mass lands at 13 856 m, the shell\'s full range. Run the motion of A backward from its landing and it crosses the original arc exactly at the burst point.</p>';
+};
 function update(dt){
- if(!st.run)return;
- const n=Math.ceil(dt/.004),h=dt/n;
- for(let i=0;i<n;i++){
-  if(st.x<W-3)st.x=Math.min(W-3,st.x+vt*h);
-  st.t+=h;
-  const b=st.ball;
-  if(b&&!b.done){
-   const k=hollow?.02:0,sp=Math.hypot(b.vx,b.vy);
-   b.vx+=-k*sp*b.vx*h;b.vy+=(-g-k*sp*b.vy)*h;const py=b.y;b.x+=b.vx*h;b.y+=b.vy*h;b.t+=h;
-   if(b.t>=b.next){b.strobe.push([b.x,b.y,st.x]);b.next+=.25}
-   if(st.t-st.last>=.05){st.hist.push([st.t,b.x,st.x,b.vx,vt]);st.last=st.t}
-   b.pts.push([b.x,b.y,b.t]);
-   if(b.y<=0&&b.vy<0){b.done=true;b.y=0;const d=b.x-st.x;
-    if(Math.abs(d)<=.55)msg("Caught! The ball landed in the cannon.","ok");
-    else msg("Missed by "+K.f(Math.abs(d),1)+" m. The ball landed "+(d<0?"behind":"ahead of")+" the cannon.","bad")}
-  }
- }
+ if(!st.run)return;st.t+=dt*S.sp;
+ if(st.t>=T){st.t=T;st.run=false;info();
+  if(st.test){const e=landA();msg(Math.abs(e)<60?"Piece A lands "+K.f(Math.abs(e),0)+" m from the gun. Your height works.":"Piece A lands "+K.f(e,0)+" m from the gun ("+(e>0?"past it, so the burst was too late, so go lower":"behind it")+"). Check your equation and test again.",Math.abs(e)<60?"ok":"bad")}}
 }
 function draw(){
- const {c,w,h}=K.fit(cv,.95);c.clearRect(0,0,w,h);
- const sh=Math.round(h*.5),sx=(w-30)/W,gy=sh-26,X=x=>15+x*sx,Y=y=>gy-y*sx*1.0;
- c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="center";c.lineWidth=1;
- for(let m=0;m<=W;m+=5){c.beginPath();c.moveTo(X(m),0);c.lineTo(X(m),gy);c.stroke();c.fillText(m+" m",X(m),sh-8)}
- c.fillStyle=K.css("--line");c.fillRect(0,gy,w,sh-gy);c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,gy);c.lineTo(w,gy);c.stroke();
- const b=st.ball,tx=X(st.x);
- c.fillStyle=K.css("--b");c.beginPath();c.roundRect(tx-1.5*sx,gy-12,3*sx,10,3);c.fill();c.fillStyle=K.css("--ink");c.beginPath();c.arc(tx-sx,gy-3,3.5,0,7);c.arc(tx+sx,gy-3,3.5,0,7);c.fill();
- c.fillStyle=K.css("--ink");c.fillRect(tx-.5*sx,gy-22,.15*sx,10);c.fillRect(tx+.35*sx,gy-22,.15*sx,10);
- if(b&&$("#traj").checked){
-  c.strokeStyle=K.css("--accent");c.lineWidth=2;c.beginPath();b.pts.forEach((p,i)=>i?c.lineTo(X(p[0]),Y(p[1])-22):c.moveTo(X(p[0]),Y(p[1])-22));c.stroke();
-  c.fillStyle=K.css("--accent");c.strokeStyle=K.css("--muted");c.lineWidth=1;c.setLineDash([2,3]);
-  b.strobe.forEach(s=>{c.beginPath();c.arc(X(s[0]),Y(s[1])-22,3,0,7);c.fill();
-   if($("#steps").value==="h"){c.beginPath();c.moveTo(X(s[0]),Y(s[1])-22);c.lineTo(X(s[0]),gy);c.stroke()}else{c.beginPath();c.moveTo(X(s[0]),Y(s[1])-22);c.lineTo(15,Y(s[1])-22);c.stroke()}});c.setLineDash([])}
- if(b){c.fillStyle=K.css("--a");c.beginPath();c.arc(X(b.x),Y(b.y)-22,5,0,7);c.fill()}
- else if(st.run===false||true){c.fillStyle=K.css("--a");c.beginPath();c.arc(tx,gy-26,4,0,7);c.fill()}
- const gx=50,gw=w-gx-12,top=sh+14,gh=(h-top-58)/2,tm=Math.max(4,Math.ceil((st.t+.5)/2)*2);
- const bx=st.hist.map(p=>[p[0],p[1]]),tr=st.hist.map(p=>[p[0],p[2]]),bv=st.hist.map(p=>[p[0],p[3]]),tv=st.hist.map(p=>[p[0],p[4]]);
- K.plot(c,{x:gx,y:top,w:gw,h:gh},{xmin:0,xmax:tm,ymin:0,ymax:W,title:"horizontal position (m): ball orange, trolley blue",series:[{pts:tr,color:"--accent",width:3},{pts:bx,color:"--b",dash:[6,3]}]});
- K.plot(c,{x:gx,y:top+gh+26,w:gw,h:gh},{xmin:0,xmax:tm,ymin:0,ymax:10,title:"horizontal speed (m/s)",xlabel:"time (s)",series:[{pts:tv,color:"--accent",width:3},{pts:bv,color:"--b",dash:[6,3]}]});
- $("#ro").innerHTML="<span>t <b>"+K.f(st.t)+" s</b></span><span>trolley <b>"+K.f(vt)+" m/s</b></span>"+(b?"<span>ball height <b>"+K.f(b.y)+" m</b></span><span>ball horizontal <b>"+K.f(b.vx)+" m/s</b></span>":"");
+ const {c,w,h}=K.fit(cv,.46);c.clearRect(0,0,w,h);
+ const la=landA(),lb=landB(),lo=Math.min(0,la)-600,hi=Math.max(XM,lb)+600,X=x=>44+(x-lo)/(hi-lo)*(w-56),Y=y=>h-26-y/2300*(h-40);
+ c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.lineWidth=1;
+ c.textAlign="center";K.ticks(lo,hi,8).forEach(m=>{c.beginPath();c.moveTo(X(m),Y(0));c.lineTo(X(m),Y(2300));c.stroke();c.fillText(K.f(m/1000,m%1000?1:0)+" km",X(m),h-10)});
+ c.textAlign="right";[0,500,1000,1500,2000].forEach(m=>{c.beginPath();c.moveTo(44,Y(m));c.lineTo(w,Y(m));c.stroke();c.fillText(m+" m",40,Y(m)+3)});
+ c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,Y(0));c.lineTo(w,Y(0));c.stroke();
+ const par=(t0,t1,xf)=>{c.beginPath();for(let t=t0;t<=t1+.001;t+=.25){const x=xf(t),y=hAt(t);t===t0?c.moveTo(X(x),Y(y)):c.lineTo(X(x),Y(y))}c.stroke()};
+ c.setLineDash([5,5]);c.strokeStyle=K.css("--muted");c.lineWidth=1.5;par(0,T,t=>VX*t);c.setLineDash([]);
+ const t=st.t,t1=S.t1,xAt=(tt,u)=>VX*t1+u*(tt-t1);
+ c.lineWidth=3;c.strokeStyle=K.css("--ink");par(0,Math.min(t,t1),tt=>VX*tt);
+ if(t>t1){c.strokeStyle=K.css("--a");par(t1,t,tt=>xAt(tt,S.ux));c.strokeStyle=K.css("--b");par(t1,t,tt=>xAt(tt,uxB()))}
+ const ex=VX*t1,ey=hAt(t1);
+ c.strokeStyle=K.css("--warn");c.lineWidth=1.5;c.beginPath();c.arc(X(ex),Y(ey),7,0,7);c.stroke();
+ c.fillStyle=K.css("--warn");c.font="600 10px "+K.css("--mono");c.textAlign="left";c.fillText("burst: "+K.f(ey,0)+" m",X(ex)+10,Y(ey)-8);
+ const dot=(x,y,col,lab,r)=>{c.fillStyle=K.css(col);c.beginPath();c.arc(X(x),Y(y),r||5,0,7);c.fill();if(lab){c.fillStyle=K.css("--ink");c.textAlign="center";c.font="600 11px "+K.css("--mono");c.fillText(lab,X(x),Y(y)-10)}};
+ if(t<=t1)dot(VX*t,hAt(t),"--ink","");else{dot(xAt(t,S.ux),hAt(t),"--a","A");dot(xAt(t,uxB()),hAt(t),"--b","B")}
+ c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.arc(X(VX*t),Y(hAt(t)),7,0,7);c.stroke();
+ if(t>=T-.01){c.fillStyle=K.css("--a");c.fillRect(X(la)-1,Y(0)-8,3,16);c.fillStyle=K.css("--b");c.fillRect(X(lb)-1,Y(0)-8,3,16)}
+ $("#ro").innerHTML="<span>t <b>"+K.f(t,1)+" s</b></span><span>height <b>"+K.f(hAt(t),0)+" m</b></span><span>ring = centre of mass</span><span>vertical scale stretched</span>";
 }
-reset();K.loop(update,draw);
+info();K.loop(update,draw);
 
 })();
 </script>

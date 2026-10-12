@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Exploding Projectile · Mr. D's Sims</title>
+<title>Reading Motion Graphs · Mr. D's Sims</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -83,39 +83,37 @@ footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
 <body>
 <div class="wrap">
 <header>
-<a class="back" href="index.html">&larr; All simulations</a>
-<h1>Exploding Projectile</h1>
-<p class="sub">A shell bursts in mid-air and the two pieces land at the same moment. One piece lands back at the gun. How high was the burst?</p>
+<a class="back" href="../index.html">&larr; Physics sims</a>
+<h1>Reading Motion Graphs</h1>
+<p class="sub">A car moves along a track. Read its velocity–time or displacement–time graph to find velocity, acceleration and distance.</p>
 </header>
 
 <div class="layout">
- <div class="stagewrap"><canvas id="cv" aria-label="Path of a projectile that explodes into two pieces, with the centre of mass following the original arc"></canvas><div class="readout" id="ro"></div><p class="msg" id="msg" aria-live="polite" style="margin-top:0"></p></div>
+ <div class="stagewrap"><canvas id="cv" aria-label="A car on a track above a motion graph"></canvas>
+  <div class="row" style="margin-top:0"><button class="btn" id="play">Play</button><input type="range" id="tc" min="0" max="10" step="0.05" value="0" aria-label="Time" style="flex:1;min-width:8rem;accent-color:var(--accent)"></div>
+  <div class="readout" id="ro"></div></div>
  <div class="side">
-  <fieldset class="card"><legend>The problem</legend>
-   <p class="hint" style="margin-top:0">A shell leaves the ground at 400 m/s, 30&deg; above the horizontal (take g = 10 m/s&sup2;, no air resistance). It explodes in flight into two pieces. Both reach the ground at the same instant. Piece A lands exactly where the shell was fired, hitting the ground at 250 m/s.</p>
+  <fieldset class="card"><legend>Graph</legend>
+   <div class="row" style="margin-top:0"><label for="mode" style="align-self:center">Show</label><select id="mode"><option value="v">Velocity–time</option><option value="x">Displacement–time</option></select><button class="btn" id="new">New problem</button></div>
+   <p class="hint">Every problem is different. Play the car, then read the graph.</p>
   </fieldset>
-  <fieldset class="card"><legend>Step 1 · Predict</legend>
-   <label class="q" for="hin" style="display:block;margin-top:0">Height of the explosion (m)</label>
-   <div class="row" style="margin-top:6px"><input type="number" id="hin" step="1" placeholder="work it out first"><button class="btn primary" id="test">Test it</button></div>
-   <p class="hint">Test it fires the shell and explodes it at your height on the way up. If you are right, piece A comes down on the gun.</p>
+  <fieldset class="card"><legend>Question</legend>
+   <p class="q" id="qt" style="margin-top:0"></p>
+   <div class="row"><input type="number" id="ans" step="0.1" aria-label="Your answer"><span id="unit" style="align-self:center;font:600 .85rem var(--mono)"></span><button class="btn primary" id="chk">Check</button></div>
+   <p class="msg" id="msg" aria-live="polite"></p>
   </fieldset>
-  <fieldset class="card"><legend>Explore</legend>
-   <div id="sl"></div>
-   <div class="row"><button class="btn" id="replay">Replay</button><button class="btn" id="sol">Show solution</button></div>
-  </fieldset>
-  <div class="card" id="solbox" hidden></div>
  </div>
 </div>
-<details><summary>Instructions</summary><ol><li>Read the problem. Before touching the sim, work out the height of the explosion on paper.</li>
-<li>Type your height in Step 1 and press <b>Test it</b>. The shell flies, explodes at that height, and both pieces fall. Does piece A come down on the gun?</li>
-<li>If it misses, the message says by how far. Revise your answer and test again.</li>
-<li>Use <b>Explore</b> to move the explosion time, change how fast piece A is thrown backward, and change how the mass splits. Watch the grey dot, the centre of mass. What does it do?</li>
-<li>Press <b>Show solution</b> when you want to compare methods.</li></ol></details>
-<details><summary>Theory</summary><p>The explosion is caused by forces <em>inside</em> the shell. Internal forces cannot change the motion of the centre of mass. So the centre of mass keeps following the same parabola the whole shell would have followed, and it lands at the shell's original range.</p>
-<p>The explosion also does not change the vertical velocity of either piece in this problem, because both land at the same instant as the unbroken shell would. Only the horizontal velocities change, and they change in opposite directions so that the centre of mass is not disturbed.</p>
-<p>With these two facts, the pieces' horizontal motion after the burst is a balance: the centre of mass moves forward at <code>v cos&theta;</code> while piece A goes back at its own speed. The burst must happen when the horizontal ground covered forward by the centre of mass equals the ground piece A covers backward.</p>
-<p>Notice that the sim lets you change the mass split. It moves where piece B lands, but not where A lands. That is why the problem never needs the masses.</p></details>
-<footer>Challenge problem from a collection of kinematics problems, reworded for this page. The numbers were checked by two independent methods.</footer>
+<details><summary>Instructions</summary><ol><li>Choose which graph you want to read, then press <b>New problem</b> for a fresh motion.</li>
+<li>Press <b>Play</b> to watch the car, or drag the time slider. A black line on the graph follows the time.</li>
+<li>Read the question, work out the answer from the graph, and type it in. Press <b>Check</b>.</li>
+<li>After you check, the graph marks the part you needed: a shaded area, a highlighted slope, or a read-off point.</li></ol></details>
+<details><summary>Theory</summary><p>Learning to interpret motion graphs is an important skill in physics. The most important step is to read the vertical axis carefully. Is it a velocity graph or a displacement graph?</p>
+<p><b>If it is a displacement graph:</b></p>
+<ul><li>The vertical value is how far the object is from the start.</li><li>The slope represents the velocity. A steeper line is a faster object, and a downward slope is motion backwards.</li></ul>
+<p><b>If it is a velocity graph:</b></p>
+<ul><li>The velocity can be read directly from the vertical axis.</li><li>The slope represents the acceleration.</li><li>The area under the graph represents the distance travelled. Area below the axis counts as negative, because the car is going backwards.</li></ul></details>
+<footer>Rebuilt in HTML from the LabVIEW simulation "Graphs".</footer>
 </div>
 <script>
 const K={};
@@ -199,67 +197,66 @@ K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+101390422
 (function(){
 "use strict";
 
-const $=K.$,cv=$("#cv"),G=10,V0=400,VX=V0*Math.cos(K.rad(30)),VY=V0*Math.sin(K.rad(30)),T=2*VY/G,XM=VX*T,YM=VY*VY/(2*G);
-$("#sl").innerHTML=K.ctl({id:"t1",label:"Explosion time",min:1,max:39,step:.1,value:12.1,unit:"s"})+
- K.ctl({id:"ux",label:"Piece A horizontal velocity",min:-400,max:400,step:1,value:-150,unit:"m/s"})+
- K.ctl({id:"fm",label:"Piece A share of the mass",min:.1,max:.9,step:.05,value:.5,unit:""})+
- K.ctl({id:"sp",label:"Playback speed",min:1,max:10,step:1,value:4,unit:"&times;"});
-const S={t1:12.1,ux:-150,f:.5,sp:4};let st={t:T,run:false,test:false};
-const msg=(t,c)=>{const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")};
-K.wire(document,(id,v)=>{
- if(id==="t1")S.t1=v;if(id==="ux")S.ux=v;if(id==="fm")S.f=v;if(id==="sp"){S.sp=v;return}
- st={t:T,run:false,test:false};info()});
-const uxB=()=>(VX-S.f*S.ux)/(1-S.f),landA=()=>VX*S.t1+S.ux*(T-S.t1),landB=()=>VX*S.t1+uxB()*(T-S.t1);
-const hAt=t=>VY*t-.5*G*t*t;
-function setSlider(id,v){const e=$("#"+id);e.value=v;e.dispatchEvent(new Event("input"))}
-function info(){
- msg("Piece A lands "+K.f(landA(),0)+" m from the gun, piece B "+K.f(landB(),0)+" m. Both land at t = "+K.f(T,0)+" s. Piece A's impact speed is "+K.f(Math.hypot(S.ux,VY),0)+" m/s.");
+const $=K.$,cv=$("#cv");
+let rnd=K.rand(Date.now()%100000),prob,tc=0,play=false,done=false;
+function make(){
+ const T=[0,2,4,6,8,10],V=[];let v=Math.round(rnd()*4);V.push(v);
+ for(let i=1;i<T.length;i++){if(rnd()<.35){}else{v=Math.round(-5+rnd()*13)}V.push(v)}
+ const X=[0];for(let i=1;i<T.length;i++)X.push(X[i-1]+(V[i-1]+V[i])/2*(T[i]-T[i-1]));
+ return {T:T,V:V,X:X};
 }
-$("#replay").onclick=()=>{st={t:0,run:true,test:false}};
-$("#test").onclick=()=>{
- const h=parseFloat($("#hin").value);
- if(!isFinite(h)){msg("Type a height first.","bad");return}
- if(h<0||h>YM){msg("The shell only reaches "+K.f(YM,0)+" m at its peak. Pick a height between 0 and "+K.f(YM,0)+" m.","bad");return}
- const t1=(VY-Math.sqrt(VY*VY-2*G*h))/G;
- S.ux=-150;S.t1=t1;setSlider("ux",-150);S.t1=t1;$("#t1").value=t1;$("#t1-o").textContent=K.f(t1,1)+" s";
- st={t:0,run:true,test:true};
-};
-$("#sol").onclick=()=>{
- const b=$("#solbox"),vxA=Math.sqrt(250*250-VY*VY),t1=vxA*T/(VX+vxA),h=hAt(t1);
- b.hidden=!b.hidden;if(b.hidden)return;
- b.innerHTML='<p class="q" style="margin-top:0">Solution</p><ol style="padding-left:1.2em;margin:.4em 0"><li>Vertical motion is untouched by the burst, so the pieces land at the same time as the whole shell: T = 2v<sub>y</sub>/g = 2(200)/10 = <b>40 s</b>. The vertical impact speed is 200 m/s.</li>'+
- '<li>Piece A hits at 250 m/s, so its horizontal speed is &radic;(250&sup2; &minus; 200&sup2;) = <b>150 m/s</b>, directed backward.</li>'+
- '<li>At the burst the shell is at x = 346.4 t<sub>1</sub>. Piece A then travels back 150(40 &minus; t<sub>1</sub>) and arrives at x = 0: 346.4 t<sub>1</sub> = 150(40 &minus; t<sub>1</sub>), so <b>t<sub>1</sub> = '+K.f(t1,2)+' s</b>.</li>'+
- '<li>Height: h = 200(t<sub>1</sub>) &minus; 5t<sub>1</sub>&sup2; = <b>'+K.f(h,0)+' m</b>.</li></ol>'+
- '<p class="hint">Another route: the centre of mass lands at 13 856 m, the shell\'s full range. Run the motion of A backward from its landing and it crosses the original arc exactly at the burst point.</p>';
-};
-function update(dt){
- if(!st.run)return;st.t+=dt*S.sp;
- if(st.t>=T){st.t=T;st.run=false;info();
-  if(st.test){const e=landA();msg(Math.abs(e)<60?"Piece A lands "+K.f(Math.abs(e),0)+" m from the gun. Your height works.":"Piece A lands "+K.f(e,0)+" m from the gun ("+(e>0?"past it, so the burst was too late, so go lower":"behind it")+"). Check your equation and test again.",Math.abs(e)<60?"ok":"bad")}}
+const vAt=(p,t)=>{let i=Math.min(4,Math.floor(t/2));const f=(t-p.T[i])/2;return p.V[i]+(p.V[i+1]-p.V[i])*f};
+const xAt=(p,t)=>{let i=Math.min(4,Math.floor(t/2));const s=t-p.T[i],a=(p.V[i+1]-p.V[i])/2;return p.X[i]+p.V[i]*s+.5*a*s*s};
+function question(){
+ const m=$("#mode").value,r=rnd,i=Math.floor(r()*5),j=Math.min(5,i+1+Math.floor(r()*2));
+ let q;
+ if(m==="v"){
+  const k=Math.floor(r()*3);
+  if(k===0){const t=+(r()*9+.5).toFixed(1);q={kind:"read",t:t,ans:vAt(prob,t),tol:.35,txt:"What is the velocity at t = "+t+" s?",unit:"m/s"}}
+  else if(k===1){q={kind:"area",a:prob.T[i],b:prob.T[j],ans:prob.X[j]-prob.X[i],tol:.8,txt:"What is the displacement from t = "+prob.T[i]+" s to t = "+prob.T[j]+" s?",unit:"m"}}
+  else{q={kind:"slope",a:prob.T[i],b:prob.T[i+1],ans:(prob.V[i+1]-prob.V[i])/2,tol:.2,txt:"What is the acceleration between t = "+prob.T[i]+" s and t = "+prob.T[i+1]+" s?",unit:"m/s²"}}
+ }else{
+  const k=Math.floor(r()*2);
+  if(k===0){const t=+(r()*9+.5).toFixed(1);q={kind:"read",t:t,ans:xAt(prob,t),tol:.9,txt:"What is the displacement at t = "+t+" s?",unit:"m"}}
+  else{q={kind:"avg",a:prob.T[i],b:prob.T[j],ans:(prob.X[j]-prob.X[i])/(prob.T[j]-prob.T[i]),tol:.35,txt:"What is the average velocity from t = "+prob.T[i]+" s to t = "+prob.T[j]+" s?",unit:"m/s"}}
+ }
+ return q;
 }
+function fresh(){prob=make();prob.q=question();tc=0;play=false;done=false;$("#tc").value=0;$("#play").textContent="Play";$("#qt").textContent=prob.q.txt;$("#unit").textContent=prob.q.unit;$("#ans").value="";msg("")}
+function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
+$("#new").onclick=fresh;$("#mode").onchange=()=>{prob.q=question();done=false;$("#qt").textContent=prob.q.txt;$("#unit").textContent=prob.q.unit;$("#ans").value="";msg("")};
+$("#play").onclick=()=>{if(tc>=10)tc=0;play=!play;$("#play").textContent=play?"Pause":"Play"};
+$("#tc").oninput=e=>{tc=+e.target.value;play=false;$("#play").textContent="Play"};
+$("#chk").onclick=()=>{
+ const v=parseFloat($("#ans").value);if(!isFinite(v)){msg("Type an answer first.","bad");return}
+ done=true;const q=prob.q,ok=Math.abs(v-q.ans)<=q.tol;
+ const how={read:"Read it straight off the graph.",area:"It is the area between the line and the axis. Below the axis counts as negative.",slope:"It is the slope of the line: rise over run.",avg:"It is the slope between the two points: change in displacement over change in time."}[q.kind];
+ msg(ok?"Correct: "+K.f(q.ans,1)+" "+q.unit+". "+how:"Not quite. The answer is "+K.f(q.ans,1)+" "+q.unit+". "+how,ok?"ok":"bad");
+};
+function update(dt){if(play){tc+=dt;if(tc>=10){tc=10;play=false;$("#play").textContent="Play"}$("#tc").value=tc}}
 function draw(){
- const {c,w,h}=K.fit(cv,.46);c.clearRect(0,0,w,h);
- const la=landA(),lb=landB(),lo=Math.min(0,la)-600,hi=Math.max(XM,lb)+600,X=x=>44+(x-lo)/(hi-lo)*(w-56),Y=y=>h-26-y/2300*(h-40);
- c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.lineWidth=1;
- c.textAlign="center";K.ticks(lo,hi,8).forEach(m=>{c.beginPath();c.moveTo(X(m),Y(0));c.lineTo(X(m),Y(2300));c.stroke();c.fillText(K.f(m/1000,m%1000?1:0)+" km",X(m),h-10)});
- c.textAlign="right";[0,500,1000,1500,2000].forEach(m=>{c.beginPath();c.moveTo(44,Y(m));c.lineTo(w,Y(m));c.stroke();c.fillText(m+" m",40,Y(m)+3)});
- c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,Y(0));c.lineTo(w,Y(0));c.stroke();
- const par=(t0,t1,xf)=>{c.beginPath();for(let t=t0;t<=t1+.001;t+=.25){const x=xf(t),y=hAt(t);t===t0?c.moveTo(X(x),Y(y)):c.lineTo(X(x),Y(y))}c.stroke()};
- c.setLineDash([5,5]);c.strokeStyle=K.css("--muted");c.lineWidth=1.5;par(0,T,t=>VX*t);c.setLineDash([]);
- const t=st.t,t1=S.t1,xAt=(tt,u)=>VX*t1+u*(tt-t1);
- c.lineWidth=3;c.strokeStyle=K.css("--ink");par(0,Math.min(t,t1),tt=>VX*tt);
- if(t>t1){c.strokeStyle=K.css("--a");par(t1,t,tt=>xAt(tt,S.ux));c.strokeStyle=K.css("--b");par(t1,t,tt=>xAt(tt,uxB()))}
- const ex=VX*t1,ey=hAt(t1);
- c.strokeStyle=K.css("--warn");c.lineWidth=1.5;c.beginPath();c.arc(X(ex),Y(ey),7,0,7);c.stroke();
- c.fillStyle=K.css("--warn");c.font="600 10px "+K.css("--mono");c.textAlign="left";c.fillText("burst: "+K.f(ey,0)+" m",X(ex)+10,Y(ey)-8);
- const dot=(x,y,col,lab,r)=>{c.fillStyle=K.css(col);c.beginPath();c.arc(X(x),Y(y),r||5,0,7);c.fill();if(lab){c.fillStyle=K.css("--ink");c.textAlign="center";c.font="600 11px "+K.css("--mono");c.fillText(lab,X(x),Y(y)-10)}};
- if(t<=t1)dot(VX*t,hAt(t),"--ink","");else{dot(xAt(t,S.ux),hAt(t),"--a","A");dot(xAt(t,uxB()),hAt(t),"--b","B")}
- c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.arc(X(VX*t),Y(hAt(t)),7,0,7);c.stroke();
- if(t>=T-.01){c.fillStyle=K.css("--a");c.fillRect(X(la)-1,Y(0)-8,3,16);c.fillStyle=K.css("--b");c.fillRect(X(lb)-1,Y(0)-8,3,16)}
- $("#ro").innerHTML="<span>t <b>"+K.f(t,1)+" s</b></span><span>height <b>"+K.f(hAt(t),0)+" m</b></span><span>ring = centre of mass</span><span>vertical scale stretched</span>";
+ const {c,w,h}=K.fit(cv,.7);c.clearRect(0,0,w,h);const m=$("#mode").value,p=prob;
+ const trackH=62,xs=p.X,xmin=Math.min.apply(null,xs.concat([0]))-1,xmax=Math.max.apply(null,xs)+1;
+ const tx=x=>30+(x-xmin)/(xmax-xmin)*(w-60);
+ c.fillStyle=K.css("--stage");c.fillRect(0,0,w,trackH);c.strokeStyle=K.css("--muted");c.lineWidth=2;c.beginPath();c.moveTo(24,trackH-18);c.lineTo(w-24,trackH-18);c.stroke();
+ c.lineWidth=1;c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="center";
+ K.ticks(xmin,xmax,8).forEach(v=>{c.beginPath();c.moveTo(tx(v),trackH-18);c.lineTo(tx(v),trackH-12);c.stroke();c.fillText(v+" m",tx(v),trackH-2)});
+ const cx=tx(xAt(p,tc));c.fillStyle=K.css("--a");c.beginPath();c.roundRect(cx-16,trackH-38,32,16,3);c.fill();c.fillStyle=K.css("--ink");c.beginPath();c.arc(cx-8,trackH-21,4,0,7);c.arc(cx+8,trackH-21,4,0,7);c.fill();
+ c.fillStyle=K.css("--b");c.beginPath();c.arc(tx(0),trackH-24,3,0,7);c.fill();
+ const ser=[],pts=[];
+ for(let t=0;t<=10.001;t+=.1)pts.push([t,m==="v"?vAt(p,t):xAt(p,t)]);
+ const vals=pts.map(q=>q[1]),lo=Math.floor(Math.min.apply(null,vals.concat([0]))-1),hi=Math.ceil(Math.max.apply(null,vals.concat([0]))+1);
+ const bx={x:46,y:trackH+16,w:w-62,h:h-trackH-48};
+ const ov=K.plot(c,bx,{xmin:0,xmax:10,ymin:lo,ymax:hi,title:m==="v"?"velocity (m/s)":"displacement (m)",xlabel:"time (s)",series:[{pts:pts,color:"--accent"}],cursorX:tc});
+ if(done){const q=p.q;c.save();
+  if(q.kind==="area"&&m==="v"){c.fillStyle=K.css("--b");c.globalAlpha=.3;c.beginPath();c.moveTo(ov.X(q.a),ov.Y(0));for(let t=q.a;t<=q.b+.001;t+=.1)c.lineTo(ov.X(t),ov.Y(vAt(p,t)));c.lineTo(ov.X(q.b),ov.Y(0));c.closePath();c.fill()}
+  else if(q.kind==="read"){const y=m==="v"?vAt(p,q.t):xAt(p,q.t);c.fillStyle=K.css("--warn");c.beginPath();c.arc(ov.X(q.t),ov.Y(y),5,0,7);c.fill();c.strokeStyle=K.css("--warn");c.setLineDash([4,3]);c.beginPath();c.moveTo(ov.X(q.t),ov.Y(0));c.lineTo(ov.X(q.t),ov.Y(y));c.lineTo(ov.X(0),ov.Y(y));c.stroke()}
+  else if(q.kind==="slope"||q.kind==="avg"){const f=m==="v"?vAt:xAt;c.strokeStyle=K.css("--warn");c.lineWidth=4;c.beginPath();c.moveTo(ov.X(q.a),ov.Y(f(p,q.a)));c.lineTo(ov.X(q.b),ov.Y(f(p,q.b)));c.stroke();
+   c.lineWidth=1.5;c.setLineDash([4,3]);c.beginPath();c.moveTo(ov.X(q.a),ov.Y(f(p,q.a)));c.lineTo(ov.X(q.b),ov.Y(f(p,q.a)));c.lineTo(ov.X(q.b),ov.Y(f(p,q.b)));c.stroke()}
+  c.restore()}
+ $("#ro").innerHTML="<span>t <b>"+K.f(tc,1)+" s</b></span><span>position <b>"+K.f(xAt(p,tc))+" m</b></span><span>velocity <b>"+K.f(vAt(p,tc))+" m/s</b></span>";
 }
-info();K.loop(update,draw);
+fresh();K.loop(update,draw);
 
 })();
 </script>

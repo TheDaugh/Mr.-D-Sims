@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Terminal Velocity · Mr. D's Sims</title>
+<title>Projectiles · Mr. D's Sims</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -83,35 +83,36 @@ footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
 <body>
 <div class="wrap">
 <header>
-<a class="back" href="index.html">&larr; All simulations</a>
-<h1>Terminal Velocity</h1>
-<p class="sub">Drop a parcel from a helicopter, open the parachute when you choose, and watch the velocity and acceleration graphs.</p>
+<a class="back" href="../index.html">&larr; Physics sims</a>
+<h1>Projectiles</h1>
+<p class="sub">Launch a ball at any speed, angle and height. Predict where it lands, then try to hit the target.</p>
 </header>
 
 <div class="layout">
- <div class="stagewrap"><canvas id="cv" aria-label="Altitude view of a parcel falling, with velocity and acceleration graphs"></canvas><div class="readout" id="ro"></div></div>
+ <div class="stagewrap"><canvas id="cv" aria-label="A projectile path from a launcher with a flag target on the ground"></canvas><div class="readout" id="ro"></div></div>
  <div class="side">
-  <fieldset class="card"><legend>Setup</legend>
-   <div id="sl"></div>
+  <fieldset class="card"><legend>Launcher</legend><div id="sl"></div>
+   <label class="chk"><input type="checkbox" id="air"> Air resistance</label>
+   <label class="chk"><input type="checkbox" id="comp" checked> Show velocity components</label>
+   <div class="row"><button class="btn primary" id="fire">Fire</button><button class="btn" id="clr">Clear paths</button></div>
   </fieldset>
-  <div class="card">
-   <div class="row"><button class="btn primary" id="drop">Drop</button><button class="btn" id="chute" disabled>Deploy parachute</button><button class="btn" id="clear">Clear &amp; reset</button></div>
+  <fieldset class="card"><legend>Target</legend>
+   <div class="row" style="margin-top:0"><button class="btn" id="tgt">New target</button><button class="btn" id="notgt">No target</button></div>
    <p class="msg" id="msg" aria-live="polite"></p>
-  </div>
+  </fieldset>
  </div>
 </div>
-<details><summary>Instructions</summary><ol><li>Press <b>Drop</b> to release the parcel from the helicopter.</li>
-<li>Watch the velocity and acceleration graphs. What is happening to the velocity? To the acceleration?</li>
-<li>Press <b>Deploy parachute</b> when you want to open it.</li>
-<li>Look at both graphs again. How do they compare with before the parachute opened?</li>
-<li>Change the <b>Parachute size</b> and drop again. How does it change the rate of descent?</li>
-<li>Press <b>Clear &amp; reset</b> to drop a new parcel.</li></ol></details>
-<details><summary>Theory</summary><p>On the Moon, how fast objects fall does not depend on their size or density, because there is no air. Objects keep accelerating until they hit the surface, which is why the Moon is covered in craters.</p>
-<p>On Earth the air resists motion. The resistance grows with the size of the object and with its speed. As a falling object speeds up, the retarding force eventually matches the weight pulling it down. The net force is then zero, the acceleration is zero, and the object falls at constant velocity. That is <b>terminal velocity</b>.</p>
-<p>Terminal velocity changes with size. A parachute adds area, so the drag force is bigger at any given speed. When it opens, the parcel slows until the drag has dropped to equal the weight again, at a much lower speed. A bigger parachute means a lower terminal velocity.</p>
-<p>The same thing happens on a bicycle freewheeling down a long hill. Crouch down and your terminal velocity rises. Sit upright with your coat open and it falls. Keep your hands on the handlebars.</p>
-<p>The model here is <code>ma = mg &minus; kv&sup2;</code>, where <code>k</code> grows with the area. At terminal velocity <code>v = &radic;(mg/k)</code>.</p></details>
-<footer>Rebuilt in HTML from the LabVIEW simulation "Terminal Velocity". Parcel mass 20 kg.</footer>
+<details><summary>Instructions</summary><ol><li>Set the speed, angle and launch height, then press <b>Fire</b>. The dashed line previews the path before you fire.</li>
+<li>The green arrow is the horizontal velocity and the orange arrow is the vertical velocity. Watch how each one changes.</li>
+<li>Press <b>New target</b> and try to land the ball on the flag. Predict the angle you need before you fire.</li>
+<li>Find the angle that gives the longest range from the ground. Then repeat from the top of a 15 m tower.</li>
+<li>Turn on <b>air resistance</b> and fire again. Which angle gives the longest range now?</li></ol></details>
+<details><summary>Theory</summary><p>A projectile is easiest to understand as two separate motions that happen at once.</p>
+<p><b>Horizontal:</b> with no air resistance nothing pushes the ball sideways, so the horizontal velocity <code>v cos&theta;</code> is constant.</p>
+<p><b>Vertical:</b> gravity pulls down, so the vertical velocity starts at <code>v sin&theta;</code> and falls by 9.81 m/s every second. The ball slows on the way up, stops at the top, and speeds up on the way down.</p>
+<p>The path is a parabola. From the ground with no air, the range is <code>v&sup2; sin 2&theta; / g</code>, which is largest at 45&deg;. Two angles that add up to 90&deg; give the same range. Launch from higher up and the best angle drops below 45&deg;.</p>
+<p>Air resistance slows the ball in both directions. The range falls and the path is no longer symmetrical: the descent is steeper than the climb.</p></details>
+<footer>Rebuilt in HTML from the LabVIEW simulation "Projectiles". The original file held little text, so this follows its title.</footer>
 </div>
 <script>
 const K={};
@@ -195,58 +196,60 @@ K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+101390422
 (function(){
 "use strict";
 
-const $=K.$,g=K.G,M=20,KB=.2,ALT=800;
-$("#sl").innerHTML=K.ctl({id:"p-a",label:"Parachute size (area)",min:1,max:8,step:.5,value:3,unit:"m&sup2;"})+
- K.ctl({id:"p-s",label:"Animation speed",min:1,max:6,step:1,value:3,unit:"&times;"});
-let area=3,spd=3;
-K.wire(document,id=>{if(id==="p-a")area=+$("#p-a").value;if(id==="p-s")spd=+$("#p-s").value});
-const cv=$("#cv");
-let st;
-function reset(){st={on:false,t:0,y:ALT,v:0,a:g,chuteT:null,pts:[],landed:false};$("#drop").disabled=false;$("#chute").disabled=true;msg("")}
-function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
-$("#clear").onclick=reset;
-$("#drop").onclick=()=>{st.on=true;$("#drop").disabled=true;$("#chute").disabled=false};
-$("#chute").onclick=()=>{if(st.chuteT===null){st.chuteT=st.t;$("#chute").disabled=true;st.chutes=(st.chutes||[]);st.chutes.push(st.t)}};
-function kNow(){
- if(st.chuteT===null)return KB;
- const f=Math.min(1,(st.t-st.chuteT)/2);
- return KB+.9*area*f;
-}
-function update(dt){
- if(!st.on||st.landed)return;
- dt*=spd;const n=Math.ceil(dt/.005),h=dt/n;
- for(let i=0;i<n&&!st.landed;i++){
-  const k=kNow();st.a=g-k*st.v*st.v/M;st.v+=st.a*h;st.y-=st.v*h;st.t+=h;
-  if(st.t-(st.last||0)>=.1){st.pts.push([st.t,st.v,st.a]);st.last=st.t}
-  if(st.y<=0){st.y=0;st.landed=true;st.pts.push([st.t,st.v,st.a]);
-   msg("Landed after "+K.f(st.t,1)+" s at "+K.f(st.v,1)+" m/s.",st.v<8?"ok":"bad");$("#chute").disabled=true}
+const $=K.$,g=K.G,cv=$("#cv");
+$("#sl").innerHTML=K.ctl({id:"v",label:"Launch speed",min:5,max:40,step:1,value:20,unit:"m/s"})+
+ K.ctl({id:"a",label:"Launch angle",min:5,max:85,step:1,value:45,unit:"&deg;"})+
+ K.ctl({id:"h",label:"Launch height",min:0,max:30,step:1,value:0,unit:"m"});
+const S={v:20,a:45,h:0,air:false,comp:true};
+let paths=[],cur=null,target=null,view=60;
+function traj(v,a,h,air){
+ const pts=[],dt=.01;let x=0,y=h,vx=v*Math.cos(K.rad(a)),vy=v*Math.sin(K.rad(a)),t=0,k=air?.012:0;
+ pts.push({t:0,x:x,y:y,vx:vx,vy:vy});
+ while(t<60){
+  const sp=Math.hypot(vx,vy),ax=-k*sp*vx,ay=-g-k*sp*vy;vx+=ax*dt;vy+=ay*dt;
+  const py=y;x+=vx*dt;y+=vy*dt;t+=dt;
+  if(y<=0&&vy<0){const f=py/(py-y);x-=vx*dt*(1-f);y=0;pts.push({t:t,x:x,y:0,vx:vx,vy:vy});break}
+  pts.push({t:t,x:x,y:y,vx:vx,vy:vy});
  }
+ return pts;
 }
+K.wire(document,id=>{S.v=+$("#v").value;S.a=+$("#a").value;S.h=+$("#h").value});
+$("#air").onchange=e=>S.air=e.target.checked;$("#comp").onchange=e=>S.comp=e.target.checked;
+$("#fire").onclick=()=>{const p=traj(S.v,S.a,S.h,S.air);cur={pts:p,t:0,air:S.air,v:S.v,a:S.a,h:S.h,done:false};msg("")};
+$("#clr").onclick=()=>{paths=[];cur=null;msg("")};
+$("#tgt").onclick=()=>{const m=Math.max(25,rangeMax());target=+(12+Math.random()*(Math.min(m,140)-12)).toFixed(0);paths=[];cur=null;msg("Hit the flag at "+target+" m.")};
+$("#notgt").onclick=()=>{target=null;msg("")};
+function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
+function rangeMax(){const p=traj(S.v,45,S.h,S.air);return p[p.length-1].x}
+function update(dt){
+ if(!cur||cur.done)return;cur.t+=dt;const last=cur.pts[cur.pts.length-1];
+ if(cur.t>=last.t){cur.t=last.t;cur.done=true;paths.push(cur);if(paths.length>6)paths.shift();
+  if(target!==null){const d=last.x-target;msg(Math.abs(d)<=1.5?"Hit! Landed "+K.f(last.x,1)+" m away.":"Missed by "+K.f(Math.abs(d),1)+" m ("+(d>0?"too far":"too short")+"). Landed at "+K.f(last.x,1)+" m.",Math.abs(d)<=1.5?"ok":"bad")}}
+}
+function at(p,t){let i=0;while(i<p.length-2&&p[i+1].t<t)i++;const A=p[i],B=p[Math.min(i+1,p.length-1)],f=B.t>A.t?(t-A.t)/(B.t-A.t):0;
+ return {x:A.x+(B.x-A.x)*f,y:A.y+(B.y-A.y)*f,vx:A.vx+(B.vx-A.vx)*f,vy:A.vy+(B.vy-A.vy)*f}}
 function draw(){
- const {c,w,h}=K.fit(cv,.72);c.clearRect(0,0,w,h);
- const lw=Math.min(150,w*.3),top=14,bot=h-22;
- c.fillStyle=K.css("--stage");c.fillRect(0,0,lw,h);
- c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="left";
- const Y=a=>bot-(a/ALT)*(bot-top);
- for(let a=0;a<=ALT;a+=200){c.beginPath();c.moveTo(0,Y(a));c.lineTo(lw,Y(a));c.stroke();c.fillText(a+" m",4,Y(a)-3)}
- c.fillStyle=K.css("--line");c.fillRect(0,bot,lw,h-bot);
- const px=lw*.62,py=Y(st.y)-10;
- c.fillStyle=K.css("--ink");c.fillRect(lw*.15,top-6,lw*.34,8);c.fillRect(lw*.15+lw*.17-1,top-12,2,6);
- if(st.chuteT!==null){const f=Math.min(1,(st.t-st.chuteT)/2),r=(10+Math.sqrt(area)*9)*f+3;
-  c.fillStyle=K.css("--b");c.beginPath();c.arc(px,py-22*f-6,r,Math.PI,0);c.fill();
-  c.strokeStyle=K.css("--ink");c.lineWidth=1;c.beginPath();c.moveTo(px-r,py-22*f-6);c.lineTo(px,py);c.lineTo(px+r,py-22*f-6);c.stroke()}
- c.fillStyle=K.css("--a");c.fillRect(px-6,py,12,12);
- const gx=lw+38,gw=w-gx-12,gh=(h-60)/2,tmax=Math.max(10,Math.ceil((st.t+1)/5)*5);
- const vs=st.pts.map(p=>[p[0],p[1]]),as=st.pts.map(p=>[p[0],p[2]]);
- const vmax=Math.max(40,Math.ceil(Math.max.apply(null,vs.map(p=>p[1]).concat([0]))/10)*10);
- const amin=Math.min(-4,Math.floor(Math.min.apply(null,as.map(p=>p[1]).concat([0]))/10)*10);
- const vl=(st.chutes||[]).map(t=>({x:t,color:"--b",dash:[4,3]}));
- K.plot(c,{x:gx,y:18,w:gw,h:gh},{xmin:0,xmax:tmax,ymin:0,ymax:vmax,title:"velocity (m/s, down)",series:[{pts:vs,color:"--a"}],vlines:vl});
- K.plot(c,{x:gx,y:gh+42,w:gw,h:gh},{xmin:0,xmax:tmax,ymin:amin,ymax:12,title:"acceleration (m/s², down +)",xlabel:"time (s)",series:[{pts:as,color:"--accent"}],vlines:vl,hlines:[{y:0}]});
- const kk=kNow(),vt=Math.sqrt(M*g/kk);
- $("#ro").innerHTML="<span>t <b>"+K.f(st.t)+" s</b></span><span>speed <b>"+K.f(st.v)+" m/s</b></span><span>accel <b>"+K.f(st.a)+" m/s&sup2;</b></span><span>terminal velocity now <b>"+K.f(vt)+" m/s</b></span>";
+ const {c,w,h}=K.fit(cv,.55),pre=traj(S.v,S.a,S.h,S.air);
+ let need=Math.max(pre[pre.length-1].x,target||0);paths.forEach(p=>{need=Math.max(need,p.pts[p.pts.length-1].x)});
+ let ymax=S.h;[pre].concat(paths.map(p=>p.pts)).forEach(p=>p.forEach(q=>{ymax=Math.max(ymax,q.y)}));
+ const wx=Math.max(30,Math.ceil(need*1.12/10)*10),sc=Math.min((w-60)/wx,(h-40)/Math.max(10,ymax*1.15)),X=x=>30+x*sc,Y=y=>h-24-y*sc;
+ c.clearRect(0,0,w,h);c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="center";c.lineWidth=1;
+ K.ticks(0,wx,Math.round(w/70)).forEach(v=>{c.beginPath();c.moveTo(X(v),0);c.lineTo(X(v),h-24);c.stroke();c.fillText(v+" m",X(v),h-8)});
+ K.ticks(0,(h-40)/sc,5).forEach(v=>{c.beginPath();c.moveTo(30,Y(v));c.lineTo(w,Y(v));c.stroke()});
+ c.fillStyle=K.css("--line");c.fillRect(0,h-24,w,24);c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,h-24);c.lineTo(w,h-24);c.stroke();
+ if(S.h>0){c.fillStyle=K.css("--line");c.fillRect(X(0)-30,Y(S.h),30,S.h*sc);c.strokeStyle=K.css("--ink");c.strokeRect(X(0)-30,Y(S.h),30,S.h*sc)}
+ const path=(p,col,dash,lw)=>{c.strokeStyle=K.css(col);c.setLineDash(dash||[]);c.lineWidth=lw||2;c.beginPath();p.forEach((q,i)=>i?c.lineTo(X(q.x),Y(q.y)):c.moveTo(X(q.x),Y(q.y)));c.stroke();c.setLineDash([])};
+ paths.forEach((p,i)=>{c.globalAlpha=.25+.5*(i+1)/paths.length;path(p.pts,"--a");c.globalAlpha=1});
+ path(pre,"--muted",[5,5],1.5);
+ if(target!==null){c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(X(target),h-24);c.lineTo(X(target),h-24-28);c.stroke();c.fillStyle=K.css("--warn");c.beginPath();c.moveTo(X(target),h-24-28);c.lineTo(X(target)+16,h-24-22);c.lineTo(X(target),h-24-16);c.fill();
+  c.strokeStyle=K.css("--warn");c.beginPath();c.moveTo(X(target-1.5),h-20);c.lineTo(X(target+1.5),h-20);c.stroke()}
+ let b;if(cur){b=at(cur.pts,cur.t);path(cur.pts.filter(q=>q.t<=cur.t),"--accent",[],3)}else b={x:0,y:S.h,vx:S.v*Math.cos(K.rad(S.a)),vy:S.v*Math.sin(K.rad(S.a))};
+ c.fillStyle=K.css("--b");c.beginPath();c.arc(X(b.x),Y(b.y),5,0,7);c.fill();
+ if(S.comp){const k=sc*.5;K.arrow(c,X(b.x),Y(b.y),X(b.x)+b.vx*k,Y(b.y),K.css("--good"),2.5);K.arrow(c,X(b.x),Y(b.y),X(b.x),Y(b.y)-b.vy*k,K.css("--b"),2.5)}
+ const pl=pre[pre.length-1],mh=Math.max.apply(null,pre.map(q=>q.y));
+ $("#ro").innerHTML="<span>range <b>"+K.f(pl.x)+" m</b></span><span>max height <b>"+K.f(mh)+" m</b></span><span>time of flight <b>"+K.f(pl.t,2)+" s</b></span>"+(cur?"<span>vx <b>"+K.f(b.vx)+"</b></span><span>vy <b>"+K.f(b.vy)+" m/s</b></span>":"");
 }
-reset();K.loop(update,draw);
+K.loop(update,draw);
 
 })();
 </script>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Falling Target · Mr. D's Sims</title>
+<title>Measuring g · Mr. D's Sims</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -83,35 +83,41 @@ footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
 <body>
 <div class="wrap">
 <header>
-<a class="back" href="index.html">&larr; All simulations</a>
-<h1>Falling Target</h1>
-<p class="sub">A rifle fires at a target that lets go the instant the shot leaves the barrel. Where should you aim?</p>
+<a class="back" href="../index.html">&larr; Physics sims</a>
+<h1>Measuring g</h1>
+<p class="sub">An electromagnet drops a sphere past two light gates. Measure how long it takes to fall between them, then find g from a graph.</p>
 </header>
 
 <div class="layout">
- <div class="stagewrap"><canvas id="cv" aria-label="Rifle on the left aimed at a target hanging in the air on the right"></canvas><div class="readout" id="ro"></div></div>
+ <div class="stagewrap"><canvas id="cv" aria-label="Sphere falling past two light gates, with a graph of fall distance against time squared"></canvas><div class="readout" id="ro"></div></div>
  <div class="side">
-  <fieldset class="card"><legend>Setup</legend>
+  <fieldset class="card"><legend>Apparatus</legend>
+   <div class="row" style="margin-top:0"><label for="ball" style="align-self:center">Sphere</label><select id="ball"><option value="solid">Solid</option><option value="hollow">Hollow</option></select></div>
    <div id="sl"></div>
-   <label class="chk"><input type="checkbox" id="laser" checked> Show laser pointer</label>
-   <label class="chk"><input type="checkbox" id="grav" checked> Gravity on</label>
+   <div class="row"><button class="btn primary" id="rel">Release</button><button class="btn" id="rst">Reset</button></div>
+   <div class="row"><button class="btn" id="store" disabled>Store reading</button></div>
+   <p class="hint" id="last">Release the sphere, then store the reading.</p>
   </fieldset>
-  <div class="card">
-   <div class="row"><button class="btn primary" id="fire">Fire</button><button class="btn" id="aim">Aim at target</button><button class="btn" id="reset">Pick target up</button></div>
-   <p class="msg" id="msg" aria-live="polite"></p>
-  </div>
+  <div class="card scroll"><table><thead><tr><th>#</th><th>s (m)</th><th>t (s)</th><th>t&sup2; (s&sup2;)</th></tr></thead><tbody id="tb"></tbody></table>
+   <div class="row"><button class="btn" id="clr">Clear data</button></div></div>
+  <div class="card"><div class="q" style="margin-top:0">Your value of g</div>
+   <div class="row"><input type="number" id="gin" step="0.01" placeholder="m/s&sup2;" aria-label="Your value of g in metres per second squared"><button class="btn" id="chk">Check</button></div>
+   <p class="msg" id="msg" aria-live="polite"></p></div>
  </div>
 </div>
-<details><summary>Instructions</summary><ol><li>Press <b>Fire</b> to see what happens. The target is released at the moment the bullet leaves the rifle.</li>
-<li>Press <b>Pick target up</b>, then change the target's height or distance with the sliders.</li>
-<li>Use <b>Angle</b> to tilt the rifle up or down, or press <b>Aim at target</b> to point the laser straight at it.</li>
-<li>Change the bullet speed. Does a faster bullet change where you should aim?</li>
-<li>Turn gravity off and fire again. What is different, and what stays the same?</li></ol></details>
-<details><summary>Theory</summary><p>It feels as if you should aim a little below the target, because the target is falling. Gravity pulls on the bullet too, so the net effect is that no correction is needed. The rifle points straight at the target's starting position and the bullet still hits.</p>
-<p>The simplest case has the target level with the rifle. The bullet's horizontal velocity is constant if air resistance is ignored. Its vertical motion is a free fall, <code>&frac12;gt&sup2;</code>. The target falls <code>&frac12;gt&sup2;</code> in the same time. At every instant the two are at the same height, so the bullet still hits.</p>
-<p>When the target is above or below the rifle the argument takes one more step. Write the bullet's position as its straight aim line plus a drop of <code>&frac12;gt&sup2;</code>. Write the target's position as its starting point plus the same drop. A bullet that meets the target at the start point on the aim line meets it wherever the drop has carried both.</p>
-<p>It fails only if the target reaches the ground before the bullet reaches it. Raise the bullet speed until it works.</p></details>
-<footer>Rebuilt in HTML from the LabVIEW simulation "Falling Target".</footer>
+<details><summary>Instructions</summary><ol><li>Start with the <b>solid</b> sphere. Put the first gate at 0.00 m, right at the top.</li>
+<li>Choose where the second gate goes with the <b>Second gate</b> slider.</li>
+<li>Press <b>Release</b>. The electromagnet lets go, the sphere cuts the first beam and starts the clock, and the second beam stops it.</li>
+<li>Press <b>Store reading</b> to add the fall distance and time to the table.</li>
+<li>Press <b>Reset</b>, move the second gate, and repeat. After five or six points the graph of <code>s</code> against <code>t&sup2;</code> appears.</li>
+<li>Work out g from the line and type it in. Press <b>Check</b>.</li>
+<li>Move the first gate down a little and repeat. Then repeat the whole experiment with the <b>hollow</b> sphere. What do you notice?</li></ol></details>
+<details><summary>Theory</summary><p>The electromagnet holds the sphere just above the first light gate. When the magnet switches off, the sphere falls, blocks the first beam and starts the clock. When it passes the second gate the clock stops.</p>
+<p>If the acceleration is uniform, <code>s = ut + &frac12;at&sup2;</code>. With the first gate right at the top, <code>u = 0</code> and this becomes <code>s = &frac12;at&sup2;</code>, where <code>a = g</code>.</p>
+<p>A graph of <code>s</code> against <code>t&sup2;</code> is a straight line through the origin, and its gradient is exactly <code>&frac12;g</code>. Double the gradient to get g.</p>
+<p>Move the first gate down and the sphere is already moving at the first beam, so <code>u</code> is no longer zero. The points stop lying on a line through the origin.</p>
+<p>The hollow sphere is light for its size, so air resistance matters. It slows the fall, the slope of the graph flattens, and the gradient no longer represents <code>&frac12;g</code>. The fall heads toward terminal velocity, where the acceleration is zero.</p></details>
+<footer>Rebuilt in HTML from the LabVIEW simulation "Gravity". Timing carries a small random error, as a real timer would.</footer>
 </div>
 <script>
 const K={};
@@ -195,78 +201,63 @@ K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+101390422
 (function(){
 "use strict";
 
-const $=K.$,g=K.G,WD=50,HH=25,P0={x:2,y:1.5};
-let st=null;
-const S={D:35,H:10,v:35,ang:0,grav:true,laser:true};
-$("#sl").innerHTML=K.ctl({id:"s-d",label:"Target distance",min:15,max:46,step:1,value:35,unit:"m"})+
- K.ctl({id:"s-h",label:"Target height",min:3,max:22,step:1,value:10,unit:"m"})+
- K.ctl({id:"s-v",label:"Bullet speed",min:15,max:70,step:1,value:35,unit:"m/s"})+
- K.ctl({id:"s-a",label:"Rifle angle",min:-5,max:60,step:0.01,value:14,unit:"&deg;"});
-const aimA=()=>K.deg(Math.atan2(S.H-P0.y,S.D-P0.x));
-function setAngle(a){S.ang=a;const el=$("#s-a");el.value=a;el.dispatchEvent(new Event("input"))}
-K.wire(document,id=>{
- if(id==="s-d")S.D=+$("#s-d").value; if(id==="s-h")S.H=+$("#s-h").value; if(id==="s-v")S.v=+$("#s-v").value;
- if(id==="s-a")S.ang=+$("#s-a").value; st=null;$("#fire").disabled=false;msg("");
-});
-S.D=35;S.H=10;S.v=35;setAngle(aimA());
-$("#laser").onchange=e=>S.laser=e.target.checked;
-$("#grav").onchange=e=>{S.grav=e.target.checked;st=null;$("#fire").disabled=false;msg("")};
-$("#aim").onclick=()=>{st=null;$("#fire").disabled=false;msg("");setAngle(aimA())};
-$("#reset").onclick=()=>{st=null;$("#fire").disabled=false;msg("")};
-function msg(t,cls){const m=$("#msg");m.textContent=t;m.className="msg "+(cls||"")}
-const tY=t=>Math.max(.4,S.H-(S.grav?.5*g*t*t:0));
-$("#fire").onclick=()=>{const a=K.rad(S.ang);
- st={t:0,x:P0.x,y:P0.y,vx:S.v*Math.cos(a),vy:S.v*Math.sin(a),trail:[[P0.x,P0.y]],strobe:[],nextS:.15,done:false,hit:false};
- $("#fire").disabled=true;msg("")};
-function finish(){
- $("#fire").disabled=false;
- const off=Math.abs(S.ang-aimA());
- if(st.hit){
-  const d=.5*g*st.t*st.t;
-  msg(S.grav?"Hit after "+K.f(st.t,2)+" s. In that time gravity pulled the bullet "+K.f(d,1)+" m below its aim line and the target "+K.f(d,1)+" m below where it started. Equal drops, so the aim line needed no correction.":
-   "Hit after "+K.f(st.t,2)+" s. Gravity is off, so nothing falls and a straight shot lands.","ok");
- }else if(off>.6){
-  msg("Miss. The rifle points "+K.f(S.ang,1)+"° and the target started at "+K.f(aimA(),1)+"°. Press Aim at target and fire again.","bad");
- }else{
-  const tf=(S.D-P0.x)/(S.v*Math.cos(K.rad(S.ang))),tg=Math.sqrt(2*(S.H-.4)/g);
-  msg("Miss, although the aim was right. The bullet needs "+K.f(tf,2)+" s to get there and the target reaches the ground in "+K.f(tg,2)+" s. Raise the bullet speed.","bad");
- }
+const $=K.$,g=K.G,TUBE=3.2;
+$("#sl").innerHTML=K.ctl({id:"g1",label:"First gate (from top)",min:0,max:1,step:.05,value:0,unit:"m"})+
+ K.ctl({id:"g2",label:"Second gate (from top)",min:.4,max:3,step:.05,value:1.5,unit:"m"});
+let g1=0,g2=1.5,hollow=false;
+const data=[],rng=K.rand(7);
+function gauss(){let u=0,v=0;while(!u)u=rng();while(!v)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+K.wire(document,id=>{g1=+$("#g1").value;g2=+$("#g2").value;
+ if(g2<g1+.35){g2=g1+.35;$("#g2").value=g2;$("#g2").dispatchEvent(new Event("input"))}reset()});
+$("#ball").onchange=e=>{hollow=e.target.value==="hollow";reset()};
+let st;
+function reset(){st={on:false,t:0,y:0,v:0,t1:null,t2:null,done:false,meas:null};$("#store").disabled=true;$("#rel").disabled=false}
+$("#rst").onclick=reset;
+$("#rel").onclick=()=>{reset();st.on=true;$("#rel").disabled=true};
+$("#store").onclick=()=>{if(!st.meas)return;data.push({s:g2-g1,t:st.meas});st.meas=null;$("#store").disabled=true;table();$("#last").textContent="Stored. Press Reset, move a gate, and release again."};
+$("#clr").onclick=()=>{data.length=0;table();msg("")};
+function table(){$("#tb").innerHTML=data.map((d,i)=>"<tr><td>"+(i+1)+"</td><td>"+K.f(d.s,2)+"</td><td>"+K.f(d.t,3)+"</td><td>"+K.f(d.t*d.t,3)+"</td></tr>").join("")}
+function fitLine(){
+ const n=data.length;if(n<2)return null;
+ let sx=0,sy=0,sxx=0,sxy=0;data.forEach(d=>{const x=d.t*d.t;sx+=x;sy+=d.s;sxx+=x*x;sxy+=x*d.s});
+ const den=n*sxx-sx*sx;if(Math.abs(den)<1e-9)return null;
+ const m=(n*sxy-sx*sy)/den;return {m:m,b:(sy-m*sx)/n};
 }
+function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
+$("#chk").onclick=()=>{
+ const v=parseFloat($("#gin").value);if(!isFinite(v)){msg("Type your value of g first.","bad");return}
+ const e=Math.abs(v-g)/g*100;
+ msg(e<4?"Within "+K.f(e,1)+"% of 9.81 m/s². Good.":"Your value is "+K.f(e,0)+"% away from 9.81 m/s². "+(hollow?"The hollow sphere is slowed by air, so its graph gives a low value.":"Check the gradient: g is twice it."),e<4?"ok":"bad");
+};
 function update(dt){
- if(!st||st.done)return;
- const n=Math.ceil(dt/.002),h=dt/n;
+ if(!st.on||st.done)return;
+ const n=Math.ceil(dt/.001),h=dt/n,c=hollow?.35:0;
  for(let i=0;i<n&&!st.done;i++){
-  st.t+=h;st.vy-=(S.grav?g:0)*h;st.x+=st.vx*h;st.y+=st.vy*h;
-  if(Math.hypot(st.x-S.D,st.y-tY(st.t))<.6){st.done=true;st.hit=true}
-  if(st.x>WD+1||st.y<0||st.x>S.D+3)st.done=true;
-  if(st.t>=st.nextS){st.strobe.push({x:st.x,y:st.y,ty:tY(st.t)});st.nextS+=.15}
+  const a=g-c*st.v*st.v,y0=st.y;st.v+=a*h;st.y+=st.v*h;st.t+=h;
+  if(st.t1===null&&st.y>=g1){st.t1=st.t-h*(st.y-g1)/(st.y-y0)}
+  if(st.t2===null&&st.y>=g2){st.t2=st.t-h*(st.y-g2)/(st.y-y0);st.meas=Math.max(.01,st.t2-st.t1+.002*gauss());st.done=true;$("#store").disabled=false;
+   $("#last").textContent="Measured: s = "+K.f(g2-g1,2)+" m, t = "+K.f(st.meas,3)+" s."}
  }
- st.trail.push([st.x,st.y]);
- if(st.done)finish();
-}
-function draw(){
- const {c,w,h}=K.fit(cv,.5),s=w/WD,X=x=>x*s,Y=y=>h-y*s;
- c.clearRect(0,0,w,h);
- c.strokeStyle=K.css("--grid");c.lineWidth=1;c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="left";
- for(let y=5;y<HH;y+=5){c.beginPath();c.moveTo(0,Y(y));c.lineTo(w,Y(y));c.stroke();c.fillText(y+" m",4,Y(y)-3)}
- c.fillStyle=K.css("--line");c.fillRect(0,Y(0),w,h-Y(0));
- const t=st?st.t:0,ty=tY(t),a=K.rad(S.ang);
- if(S.laser){c.strokeStyle=K.css("--warn");c.setLineDash([6,5]);c.lineWidth=1.5;c.beginPath();c.moveTo(X(P0.x),Y(P0.y));c.lineTo(X(P0.x+90*Math.cos(a)),Y(P0.y+90*Math.sin(a)));c.stroke();c.setLineDash([])}
- if(st){
-  c.strokeStyle=K.css("--muted");c.lineWidth=1;c.setLineDash([2,3]);
-  st.strobe.forEach(p=>{c.beginPath();c.moveTo(X(p.x),Y(p.y));c.lineTo(X(S.D),Y(p.ty));c.stroke()});c.setLineDash([]);
-  st.strobe.forEach(p=>{c.fillStyle=K.css("--a");c.beginPath();c.arc(X(p.x),Y(p.y),3,0,7);c.fill();c.fillStyle=K.css("--b");c.beginPath();c.arc(X(S.D),Y(p.ty),3,0,7);c.fill()});
- }
- if(!st||st.t===0){c.strokeStyle=K.css("--ink");c.lineWidth=3;c.beginPath();c.moveTo(X(S.D),Y(S.H+.5));c.lineTo(X(S.D),Y(S.H+3));c.stroke();c.beginPath();c.moveTo(X(S.D-1.2),Y(S.H+3));c.lineTo(X(S.D+1.2),Y(S.H+3));c.stroke()}
- [[1.2,K.css("--b")],[.8,K.css("--surface")],[.4,K.css("--b")]].forEach(p=>{c.fillStyle=p[1];c.beginPath();c.arc(X(S.D),Y(ty),p[0]*s*.6,0,7);c.fill()});
- c.strokeStyle=K.css("--ink");c.lineWidth=5;c.lineCap="round";c.beginPath();c.moveTo(X(P0.x-2.2*Math.cos(a)),Y(P0.y-2.2*Math.sin(a)));c.lineTo(X(P0.x),Y(P0.y));c.stroke();c.lineCap="butt";
- c.fillStyle=K.css("--ink");c.beginPath();c.arc(X(P0.x-1),Y(.5),.6*s,0,7);c.fill();
- if(st){c.fillStyle=K.css("--a");c.beginPath();c.arc(X(st.x),Y(st.y),4,0,7);c.fill()}
- const tf=(S.D-P0.x)/(S.v*Math.cos(a)),tg=Math.sqrt(2*(S.H-.4)/g);
- $("#ro").innerHTML="<span>t <b>"+K.f(t,2)+" s</b></span><span>aim line to target <b>"+K.f(aimA(),1)+"&deg;</b></span><span>flight time <b>"+K.f(tf,2)+" s</b></span><span>fall time <b>"+(S.grav?K.f(tg,2)+" s":"never")+"</b></span>";
 }
 const cv=$("#cv");
-K.loop(update,draw);
+function draw(){
+ const {c,w,h}=K.fit(cv,.7);c.clearRect(0,0,w,h);
+ const tw=Math.min(190,w*.38),top=26,bot=h-18,Y=y=>top+(y/TUBE)*(bot-top);
+ c.fillStyle=K.css("--stage");c.fillRect(0,0,tw,h);
+ c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="left";
+ for(let m=0;m<=3;m+=.5){c.beginPath();c.moveTo(0,Y(m));c.lineTo(tw,Y(m));c.stroke();c.fillText(K.f(m,1)+" m",4,Y(m)-3)}
+ c.fillStyle=K.css("--ink");c.fillRect(tw*.5-14,top-22,28,14);
+ [[g1,"--a"],[g2,"--b"]].forEach(p=>{c.strokeStyle=K.css(p[1]);c.lineWidth=2;c.beginPath();c.moveTo(tw*.18,Y(p[0]));c.lineTo(tw*.82,Y(p[0]));c.stroke();c.fillStyle=K.css(p[1]);c.fillRect(tw*.12,Y(p[0])-6,8,12);c.fillRect(tw*.80,Y(p[0])-6,8,12)});
+ const r=hollow?11:7;c.fillStyle=hollow?K.css("--surface"):K.css("--ink");c.strokeStyle=K.css("--ink");c.lineWidth=hollow?3:1;
+ c.beginPath();c.arc(tw*.5,Y(st.y)-0+0,r,0,7);c.fill();c.stroke();
+ const gx=tw+44,gw=w-gx-14,gh=h-48,f=fitLine();
+ const xm=Math.max(.7,Math.ceil(Math.max.apply(null,data.map(d=>d.t*d.t).concat([0]))*10+1)/10);
+ const pts=data.map(d=>[d.t*d.t,d.s]),ser=[{pts:pts,color:"--accent",dots:true}];
+ if(f)ser.unshift({pts:[[0,f.b],[xm,f.b+f.m*xm]],color:"--b",dash:[6,4],width:1.5});
+ K.plot(c,{x:gx,y:22,w:gw,h:gh},{xmin:0,xmax:xm,ymin:0,ymax:3.2,title:"fall distance s (m) against t² (s²)",xlabel:"t² (s²)",series:ser});
+ $("#ro").innerHTML="<span>gate gap <b>"+K.f(g2-g1,2)+" m</b></span><span>clock <b>"+(st.meas!==null?K.f(st.meas,3)+" s":st.done?"stored":st.on?"running":"ready")+"</b></span>"+(f?"<span>gradient <b>"+K.f(f.m,2)+" m/s&sup2;</b></span><span>intercept <b>"+K.f(f.b,2)+" m</b></span>":"");
+}
+reset();K.loop(update,draw);
 
 })();
 </script>

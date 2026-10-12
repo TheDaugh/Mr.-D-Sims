@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Motion Graphs on a Hill · Mr. D's Sims</title>
+<title>Rolling Disc · Mr. D's Sims</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -83,33 +83,42 @@ footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
 <body>
 <div class="wrap">
 <header>
-<a class="back" href="index.html">&larr; All simulations</a>
-<h1>Motion Graphs on a Hill</h1>
-<p class="sub">Drive a car along a hilly road with the throttle and brake, and watch position, velocity and acceleration graphs build as you go.</p>
+<a class="back" href="../index.html">&larr; Physics sims</a>
+<h1>Rolling Disc</h1>
+<p class="sub">A disc rolls without slipping. Two points on it have speeds that change as it turns. When are they equal?</p>
 </header>
 
 <div class="layout">
- <div class="stagewrap"><canvas id="cv" aria-label="A car on a hilly road above graphs of position, velocity and acceleration"></canvas><div class="readout" id="ro"></div></div>
+ <div class="stagewrap"><canvas id="cv" aria-label="A rolling disc with two marked points, their paths, and a graph of their speeds"></canvas><div class="readout" id="ro"></div></div>
  <div class="side">
-  <fieldset class="card"><legend>Driver</legend>
+  <fieldset class="card"><legend>The problem</legend>
+   <p class="hint" style="margin-top:0">A disc rolls without slipping. Point A starts at the top of the rim. Point B starts halfway between the centre and A. Find when A's speed first matches B's, using the rule chosen below.</p>
+   <div class="row"><button class="btn" id="p7">Problem 7 numbers</button><button class="btn" id="p8">Problem 8 numbers</button></div>
+   <div class="row" style="margin-top:8px"><label for="mode" style="align-self:center">Compare A with</label></div>
+   <select id="mode" style="width:100%;margin-top:4px"><option value="init">B&rsquo;s starting speed (fixed number)</option><option value="live">B&rsquo;s speed at the same moment</option></select>
    <div id="sl"></div>
-   <p class="hint">Positive is throttle, negative is brake. You can change it while the car is moving.</p>
-   <div class="row"><button class="btn primary" id="go">Start</button><button class="btn" id="rst">Reset</button></div>
-   <p class="msg" id="msg" aria-live="polite"></p>
   </fieldset>
-  <div class="card"><p class="q" style="margin-top:0">Look for</p>
-   <p class="hint" style="margin-top:4px">With the pedal held steady, what makes the acceleration graph wobble? When the car climbs a hill, which graph shows it slowing down?</p></div>
+  <fieldset class="card"><legend>Step 1 · Predict</legend>
+   <div class="ctl" style="margin-top:2px"><label for="ta">Time until first equal (s)</label><span></span><input type="number" id="ta" step="any" style="grid-column:1/-1;width:100%"></div>
+   <div class="ctl"><label for="sa">That common speed (m/s)</label><span></span><input type="number" id="sa" step="any" style="grid-column:1/-1;width:100%"></div>
+   <div class="ctl"><label for="da">Distance the centre has moved (m)</label><span></span><input type="number" id="da" step="any" style="grid-column:1/-1;width:100%"></div>
+   <div class="row"><button class="btn primary" id="run">Roll &amp; check</button><button class="btn" id="rst">Reset</button></div>
+   <p class="msg" id="msg" aria-live="polite"></p>
+   <label class="chk"><span>Playback</span><input type="range" id="sp" min="0.25" max="3" step="0.25" value="1" aria-label="Playback speed"></label>
+  </fieldset>
+  <div class="row" style="margin-top:0"><button class="btn" id="sol">Show solution</button></div>
+  <div class="card" id="solbox" hidden></div>
  </div>
 </div>
-<details><summary>Instructions</summary><ol><li>Press <b>Start</b>. The car begins at 10 m/s at the left end of the road.</li>
-<li>Move the <b>Pedal</b> slider while it drives. Use positive values to speed up and negative values to brake.</li>
-<li>Watch the three graphs. The black line marks now.</li>
-<li>Try this: hold the pedal at zero and let the hills do the work. Match the bumps on the acceleration graph to the hills on the road.</li>
-<li>Try to get to the end of the road in under 30 seconds without passing 25 m/s.</li></ol></details>
-<details><summary>Theory</summary><p>Position, velocity and acceleration are linked by slopes. The slope of the position graph at any moment is the velocity. The slope of the velocity graph is the acceleration.</p>
-<p>With a steady pedal on a level road the acceleration graph is flat. On a hill gravity adds its own acceleration along the road, <code>&minus;g sin&theta;</code>. Uphill it is negative and the car slows, downhill it is positive and the car speeds up. The acceleration graph therefore follows the slope of the road.</p>
-<p>The velocity graph is the running total of the acceleration. Where the acceleration is positive the velocity rises, and where it is negative the velocity falls.</p></details>
-<footer>Rebuilt in HTML from the LabVIEW simulation "Motion Graphs". The original file held little text; its road graph, slope and brake-pressure panels suggested this car-on-a-road design.</footer>
+<details><summary>Instructions</summary><ol><li>Choose <b>Problem 7 numbers</b> or <b>Problem 8 numbers</b>, or set your own radius and speed. The comparison rule is chosen for you with the buttons.</li>
+<li>Work out the time, the speed at that moment and the distance on paper. Enter all three.</li>
+<li>Press <b>Roll &amp; check</b>. The disc rolls through one turn. The two traced curves are the paths of A and B. The vertical line on the graph marks the first time the speeds match.</li>
+<li>Look at the dashed lines from the contact point to each marked point. A point's speed is its distance from the contact point multiplied by the angular speed.</li></ol></details>
+<details><summary>Theory</summary><p>A rolling disc without slipping can be seen two ways. In the first, the centre moves forward at <code>v</code> while the disc spins about the centre at <code>&omega; = v/R</code>. A point on the disc has the centre's velocity plus its spin velocity. At the top, the two add and the speed is <code>2v</code>. At the bottom they cancel and the speed is zero.</p>
+<p>In the second, the whole disc is turning about the point touching the ground, the <b>instantaneous axis</b>. Every point's speed is then <code>&omega;</code> times its distance from the contact point. This makes each speed easy to write.</p>
+<p>A point at distance <code>&rho;</code> from the centre and turned <code>&phi;</code> from the top has a speed <code>v&radic;(1 + (&rho;/R)&sup2; + 2(&rho;/R)cos&phi;)</code>. For a rim point this simplifies to <code>2v cos(&phi;/2)</code>. The turn angle is tied to the distance moved: <code>&phi; = (distance)/R</code>.</p>
+<p>Setting A's speed equal to B's gives a single equation for <code>&phi;</code>, and then <code>t = &phi;R/v</code>.</p></details>
+<footer>Challenge problems from a collection of kinematics problems, reworded for this page. The numbers were checked analytically and numerically.</footer>
 </div>
 <script>
 const K={};
@@ -193,48 +202,66 @@ K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+101390422
 (function(){
 "use strict";
 
-const $=K.$,g=K.G,cv=$("#cv"),LEN=400;
-$("#sl").innerHTML=K.ctl({id:"u",label:"Pedal (driver acceleration)",min:-5,max:3,step:.1,value:1,unit:"m/s&sup2;"});
-let U=1;K.wire(document,(id,v)=>{U=v});
-const hgt=x=>5*Math.sin(x/60+2)+2.5*Math.sin(x/23+1)+8, slope=x=>5/60*Math.cos(x/60+2)+2.5/23*Math.cos(x/23+1);
-let st;
-function reset(){st={on:false,t:0,x:0,v:10,a:0,pts:[],last:-1,done:false};$("#go").disabled=false;msg("")}
-function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
-$("#go").onclick=()=>{reset();st.on=true;$("#go").disabled=true};$("#rst").onclick=reset;
-function update(dt){
- if(!st.on||st.done)return;
- const n=Math.ceil(dt/.005),h=dt/n;
- for(let i=0;i<n&&!st.done;i++){
-  const s=slope(st.x),sn=s/Math.sqrt(1+s*s);
-  const sg=st.v>0?1:st.v<0?-1:0,pedal=U>=0?U:(st.v>0?U:0);
-  let a=pedal-g*sn-sg*(.15+.0006*st.v*st.v);
-  if(U<0&&st.v>0&&st.v+a*h<0){a=-st.v/h}
-  st.a=a;st.v+=a*h;st.x+=st.v*h/Math.sqrt(1+s*s);st.t+=h;
-  if(st.x<0){st.x=0;st.v=Math.max(0,st.v)}
-  if(st.t-st.last>=.1){st.pts.push([st.t,st.x,st.v,st.a]);st.last=st.t}
-  if(st.x>=LEN){st.done=true;msg("Reached the end in "+K.f(st.t,1)+" s.","ok");$("#go").disabled=false}
-  if(st.t>240){st.done=true;msg("Stopped: time limit.","bad");$("#go").disabled=false}
- }
+const $=K.$,cv=$("#cv");
+$("#sl").innerHTML=K.ctl({id:"R",label:"Disc radius",min:.05,max:1.5,step:.05,value:1,unit:"m"})+
+ K.ctl({id:"v",label:"Speed of centre",min:.1,max:6,step:.1,value:.5,unit:"m/s"})+
+ K.ctl({id:"k",label:"B's distance from centre (fraction of radius)",min:.1,max:.9,step:.05,value:.5,unit:""});
+const S={R:1,v:.5,k:.5,mode:"live"};let st={phi:0,run:false,done:false,hit:null};
+K.wire(document,id=>{S.R=+$("#R").value;S.v=+$("#v").value;S.k=+$("#k").value;reset()});
+$("#mode").onchange=e=>{S.mode=e.target.value;reset()};
+function preset(R,v,m){$("#R").value=R;$("#v").value=v;$("#k").value=.5;$("#mode").value=m;S.mode=m;["R","v","k"].forEach(i=>$("#"+i).dispatchEvent(new Event("input")))}
+$("#p7").onclick=()=>preset(.1,4,"init");$("#p8").onclick=()=>preset(1,.5,"live");
+const spA=phi=>S.v*Math.sqrt(Math.max(0,2+2*Math.cos(phi))),spB=phi=>S.v*Math.sqrt(1+S.k*S.k+2*S.k*Math.cos(phi));
+const target=phi=>S.mode==="init"?S.v*(1+S.k):spB(phi);
+function exact(){
+ const phi=S.mode==="init"?2*Math.acos((1+S.k)/2):Math.acos(-(1+S.k)/2);
+ return {phi:phi,t:phi*S.R/S.v,speed:spA(phi),dist:S.R*phi};
 }
+function reset(){st={phi:0,run:false,done:false,hit:null};$("#msg").textContent="";$("#msg").className="msg"}
+$("#rst").onclick=reset;
+$("#run").onclick=()=>{
+ const E=exact(),ta=parseFloat($("#ta").value),sa=parseFloat($("#sa").value),da=parseFloat($("#da").value),m=$("#msg"),ok=(a,b)=>isFinite(a)&&Math.abs(a-b)<=Math.max(.02*Math.abs(b),1e-9+0.005*Math.abs(b));
+ st={phi:0,run:true,done:false,hit:E.phi};
+ const parts=[["time",ta,E.t,"s"],["speed",sa,E.speed,"m/s"],["distance",da,E.dist,"m"]],good=parts.filter(p=>ok(p[1],p[2]));
+ m.innerHTML=parts.map(p=>(isFinite(p[1])?(ok(p[1],p[2])?"<b>"+p[0]+": correct.</b> ":"<b>"+p[0]+":</b> not quite, the answer is "+K.f(p[2],p[2]<.1?4:3)+" "+p[3]+". "):"<b>"+p[0]+":</b> not entered, it is "+K.f(p[2],p[2]<.1?4:3)+" "+p[3]+". ")).join("<br>");
+ m.className="msg "+(good.length===3?"ok":"bad");
+};
+$("#sol").onclick=()=>{
+ const b=$("#solbox"),E=exact();b.hidden=!b.hidden;if(b.hidden)return;
+ const k=S.k;
+ b.innerHTML='<p class="q" style="margin-top:0">Solution</p><ol style="padding-left:1.2em;margin:.4em 0">'+
+ '<li>Rolling without slipping: &omega; = v/R. A rim point has speed 2v cos(&phi;/2); B (at '+k+'R) has speed v&radic;(1 + '+K.f(k*k,2)+' + '+K.f(2*k,1)+' cos&phi;).</li>'+
+ (S.mode==="init"?'<li>B\'s starting speed is v(1 + '+k+') = '+K.f(S.v*(1+k),2)+' m/s. Set 2v cos(&phi;/2) equal to it: cos(&phi;/2) = '+K.f((1+k)/2,3)+', so &phi; = '+K.f(E.phi,4)+' rad.</li>':
+ '<li>Equal speeds: 2 + 2cos&phi; = 1 + '+K.f(k*k,2)+' + '+K.f(2*k,1)+' cos&phi;, which gives cos&phi; = &minus;'+K.f((1+k)/2,3)+', so &phi; = '+K.f(E.phi,4)+' rad ('+K.f(E.phi*180/Math.PI,1)+'&deg;).</li>')+
+ '<li>Time: t = &phi;R/v = <b>'+K.f(E.t,E.t<.1?4:3)+' s</b>.</li><li>Speed: 2v cos(&phi;/2) = <b>'+K.f(E.speed,3)+' m/s</b>.</li><li>Distance moved by the centre: vt = R&phi; = <b>'+K.f(E.dist,3)+' m</b>.</li></ol>';
+};
+function update(dt){if(st.run){st.phi+=dt*S_sp();if(st.phi>=2*Math.PI){st.phi=2*Math.PI;st.run=false;st.done=true}}}
+const S_sp=()=>+$("#sp").value;
 function draw(){
- const {c,w,h}=K.fit(cv,.98);c.clearRect(0,0,w,h);
- const rh=Math.round(h*.2),px0=34,pw=w-px0-12;
- c.fillStyle=K.css("--stage");c.fillRect(0,0,w,rh+10);
- const X=x=>px0+x/LEN*pw,Y=y=>rh+4-y/20*(rh-12);
- c.fillStyle=K.css("--line");c.beginPath();c.moveTo(X(0),rh+10);for(let x=0;x<=LEN;x+=3)c.lineTo(X(x),Y(hgt(x)));c.lineTo(X(LEN),rh+10);c.closePath();c.fill();
- c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();for(let x=0;x<=LEN;x+=3)x?c.lineTo(X(x),Y(hgt(x))):c.moveTo(X(x),Y(hgt(x)));c.stroke();
- const sl=slope(st.x),ang=Math.atan(sl),cx=X(st.x),cy=Y(hgt(st.x));
- c.save();c.translate(cx,cy);c.rotate(-ang);c.fillStyle=K.css("--b");c.beginPath();c.roundRect(-11,-12,22,9,2);c.fill();c.fillStyle=K.css("--ink");c.beginPath();c.arc(-6,-2,3,0,7);c.arc(6,-2,3,0,7);c.fill();c.restore();
- c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="left";c.fillText("road height 0–20 m, length 400 m, finish at right",px0,12);
- const gx=50,gw=w-gx-12,top=rh+34,gh=(h-top-80)/3,tm=Math.max(20,Math.ceil((st.t+1)/10)*10);
- const xs=st.pts.map(p=>[p[0],p[1]]),vs=st.pts.map(p=>[p[0],p[2]]),as=st.pts.map(p=>[p[0],p[3]]);
- const cur=st.on?st.t:null;
- K.plot(c,{x:gx,y:top,w:gw,h:gh},{xmin:0,xmax:tm,ymin:0,ymax:LEN,title:"position along road (m)",series:[{pts:xs,color:"--a"}],cursorX:cur});
- K.plot(c,{x:gx,y:top+gh+22,w:gw,h:gh},{xmin:0,xmax:tm,ymin:Math.min(0,Math.floor(Math.min.apply(null,vs.map(p=>p[1]).concat([0]))/5)*5),ymax:Math.max(30,Math.ceil(Math.max.apply(null,vs.map(p=>p[1]).concat([0]))/5)*5),title:"velocity (m/s)",series:[{pts:vs,color:"--accent"}],cursorX:cur});
- K.plot(c,{x:gx,y:top+2*(gh+22),w:gw,h:gh},{xmin:0,xmax:tm,ymin:-6,ymax:5,title:"acceleration (m/s²)",xlabel:"time (s)",series:[{pts:as,color:"--warn"}],hlines:[{y:0}],cursorX:cur});
- $("#ro").innerHTML="<span>t <b>"+K.f(st.t)+" s</b></span><span>x <b>"+K.f(st.x,0)+" m</b></span><span>v <b>"+K.f(st.v)+" m/s</b></span><span>a <b>"+K.f(st.a)+" m/s&sup2;</b></span><span>slope <b>"+K.f(K.deg(Math.atan(slope(st.x))),0)+"&deg;</b></span>";
+ const {c,w,h}=K.fit(cv,.95);c.clearRect(0,0,w,h);
+ const sh=Math.round(h*.45),L=2*Math.PI*S.R+2.2*S.R,sc=(w-30)/L,gy=sh-18,R=S.R*sc,cx=15+S.R*sc+S.R*st.phi*sc,cy=gy-R;
+ c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.moveTo(0,gy);c.lineTo(w,gy);c.stroke();
+ const pt=(rho,th,phi0)=>{const a=phi0+th;return [15+S.R*sc+S.R*phi0*sc+rho*Math.sin(a)*R/S.R*S.R,0]};
+ const pos=(rho,phi)=>[15+S.R*sc+S.R*phi*sc+rho*R*Math.sin(phi),gy-R-rho*R*Math.cos(phi)];
+ [[1,"--a"],[S.k,"--b"]].forEach(p=>{c.strokeStyle=K.css(p[1]);c.lineWidth=1.5;c.globalAlpha=.6;c.beginPath();for(let f=0;f<=Math.min(st.phi,2*Math.PI)+.001;f+=.05){const q=pos(p[0],f);f===0?c.moveTo(q[0],q[1]):c.lineTo(q[0],q[1])}c.stroke();c.globalAlpha=1});
+ const disc=(phi,alpha)=>{const x=15+S.R*sc+S.R*phi*sc;c.globalAlpha=alpha;c.fillStyle=K.css("--surface");c.strokeStyle=K.css("--ink");c.lineWidth=2;c.beginPath();c.arc(x,gy-R,R,0,7);c.fill();c.stroke();
+  c.lineWidth=1;c.strokeStyle=K.css("--line");c.beginPath();c.moveTo(x,gy-R);c.lineTo(x+R*Math.sin(phi+2),gy-R-R*Math.cos(phi+2));c.moveTo(x,gy-R);c.lineTo(x+R*Math.sin(phi+4.2),gy-R-R*Math.cos(phi+4.2));c.stroke();c.globalAlpha=1};
+ if(st.hit!==null&&st.phi>st.hit)disc(st.hit,.3);
+ disc(st.phi,1);
+ const A=pos(1,st.phi),B=pos(S.k,st.phi),P=[cx,gy];
+ c.setLineDash([4,4]);c.strokeStyle=K.css("--muted");c.lineWidth=1;[A,B].forEach(q=>{c.beginPath();c.moveTo(P[0],P[1]);c.lineTo(q[0],q[1]);c.stroke()});c.setLineDash([]);
+ const vel=(rho)=>[S.v+S.v*rho*Math.cos(st.phi),-S.v*rho*Math.sin(st.phi)],ak=R*.5/S.v;
+ [[A,1,"--a"],[B,S.k,"--b"]].forEach(p=>{const u=vel(p[1]);K.arrow(c,p[0][0],p[0][1],p[0][0]+u[0]*ak,p[0][1]+u[1]*ak,K.css(p[2]),2.5);c.fillStyle=K.css(p[2]);c.beginPath();c.arc(p[0][0],p[0][1],4.5,0,7);c.fill()});
+ c.fillStyle=K.css("--ink");c.beginPath();c.arc(P[0],P[1],3,0,7);c.fill();c.font="600 11px "+K.css("--mono");c.textAlign="center";c.fillText("A",A[0],A[1]-9);c.fillText("B",B[0],B[1]-9);
+ const pts=(f)=>{const o=[];for(let q=0;q<=2*Math.PI+.001;q+=.03)o.push([q*S.R/S.v,f(q)]);return o};
+ const tmax=2*Math.PI*S.R/S.v,vm=2*S.v*1.08,E=exact(),tn=st.phi*S.R/S.v;
+ const ser=[{pts:pts(spA),color:"--a",width:2.5},{pts:pts(spB),color:"--b",width:2.5}];
+ const hl=S.mode==="init"?[{y:S.v*(1+S.k),color:"--b",dash:[4,3]}]:[];
+ K.plot(c,{x:48,y:sh+18,w:w-64,h:h-sh-48},{xmin:0,xmax:tmax,ymin:0,ymax:vm,title:"speed (m/s): A teal, B orange",xlabel:"time (s)",series:ser,hlines:hl,vlines:(st.hit!==null?[{x:E.t,color:"--warn"}]:[]),cursorX:tn});
+ $("#ro").innerHTML="<span>t <b>"+K.f(tn,tn<.1?3:2)+" s</b></span><span>speed A <b>"+K.f(spA(st.phi),2)+" m/s</b></span><span>speed B <b>"+K.f(spB(st.phi),2)+" m/s</b></span><span>turned <b>"+K.f(st.phi*180/Math.PI,0)+"&deg;</b></span>";
 }
-reset();K.loop(update,draw);
+K.loop(update,draw);
+preset(1,.5,"live");
 
 })();
 </script>

@@ -1,35 +1,26 @@
 # Mr. D's Sims
 
-Physics simulations for the classroom. Each one is a single HTML file that runs in any modern browser, so there is nothing to install and they work on Chromebooks and phones.
+Classroom simulations. Each one is a single HTML file that runs in any modern browser, so there is nothing to install and they work on Chromebooks and phones.
 
-Open `index.html` to see them all.
+Open `index.html` for the front page. It links to `physics/` and `chemistry/`, and each has its own hub.
 
-## Rebuilt from the LabVIEW originals
+## Physics
 
-| Page | Original |
+The `physics/` folder has a hub at `physics/index.html` that lists sims by unit. The list lives in `physics/sims.js`; add a line there to add a card.
+
+| Unit | Pages |
 |---|---|
-| `graphs.html` | Graphs.exe |
-| `bouncing-graphs.html` | Bouncing_Graphs.exe |
-| `ticker-timer.html` | Ticker_Timer.exe |
-| `motion-graphs.html` | Motion_Graphs.exe |
-| `gravity.html` | Gravity.exe |
-| `terminal-velocity.html` | Terminal_Velocity.exe |
-| `bounce-meter.html` | Bounce_Meter.exe |
-| `projectiles.html` | Projectiles.exe |
-| `falling-target.html` | Falling_Target.exe |
-| `ballistic-trolley.html` | Ballistic_Trolley.exe |
+| `motion-and-graphs/` | `graphs`, `bouncing-graphs`, `ticker-timer`, `motion-graphs` |
+| `free-fall/` | `gravity`, `terminal-velocity`, `bounce-meter` |
+| `projectiles/` | `projectiles`, `falling-target`, `ballistic-trolley` |
+| `predict-first/` | `predict-first` (Two Carts, Hill Roll, Cut the String; each asks for a prediction before the run) |
+| `challenge-problems/` | `exploding-projectile`, `ball-and-bullet`, `rolling-disc` (solve on paper, enter the answer, the sim tests it) |
 
-Instructions and theory text come from the originals wherever the executables contained it. The Ticker Timer, Motion Graphs and Projectiles originals held little readable text, so those three follow their titles and may differ from the old programs.
-
-## New
-
-`exploding-projectile.html`, `ball-and-bullet.html` and `rolling-disc.html` turn three challenge problems into predict-then-check sims. Students solve the problem on paper, enter the answer, and the sim tests it. Each has a worked solution.
-
-`predict-first.html` has three tabs (Two Carts, Hill Roll, Cut the String). Each asks students to commit to a prediction before the simulation runs, then checks it against the equation.
+The first ten rebuild the LabVIEW originals (Graphs.exe, Gravity.exe and so on). Instructions and theory text come from the originals wherever the executables contained it. Ticker Timer, Motion Graphs and Projectiles held little readable text, so those three follow their titles and may differ from the old programs.
 
 ## Using them
 
-- **Locally:** double-click any `.html` file.
+- **Locally:** double-click `index.html`, or any sim file.
 - **On the web:** turn on GitHub Pages for this repo (Settings, Pages, deploy from the `main` branch) and share the link.
 - **Bounce Meter** can listen through the microphone. Browsers only allow that over `https` (GitHub Pages is fine) or from a local file. If the microphone is blocked, the page has a simulated ball.
 
