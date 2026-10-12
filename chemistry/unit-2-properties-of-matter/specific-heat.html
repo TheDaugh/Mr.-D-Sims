@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Specific Heat Calorimetry</title>
+<meta name="description" content="Identify a mystery metal by measuring how much it warms cool water.">
+<link rel="stylesheet" href="../shared/lab.css">
+<style>
+  @keyframes rise { from { transform: translateY(0); opacity: .9; } to { transform: translateY(-60px); opacity: 0; } }
+  .bub { animation: rise 1.3s linear infinite; }
+  .steps { margin: 0; padding-left: 1.2em; }
+  .steps li { margin-bottom: 4px; }
+  .legend { display: flex; gap: 16px; font-size: .8rem; color: var(--muted); margin-top: 6px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; vertical-align: 3px; margin-right: 5px; }
+  details { margin-top: 10px; } summary { cursor: pointer; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="back" href="../">← Lab hub</a>
+    <span class="crumb">Unit 2 · Properties of Matter</span>
+  </header>
+  <h1>Specific Heat Calorimetry</h1>
+  <p class="lead">A mystery metal sample has been sitting in boiling water at 100 °C. You will drop it into a foam-cup calorimeter of cool water, read the final temperature, and use the heat balance to find the metal's specific heat. Then you identify the metal.</p>
+
+  <div class="grid">
+    <div class="stack">
+      <section class="card" aria-label="Lab bench">
+        <svg id="scene" class="scene" viewBox="0 0 480 300" role="img" aria-label="Boiling water bath with a metal sample and a foam cup calorimeter">
+          <defs><linearGradient id="metalG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9dde2"/><stop offset="1" stop-color="#8d949c"/></linearGradient></defs>
+          <!-- bench -->
+          <rect x="0" y="268" width="480" height="32" fill="#cbbfa9" opacity=".55"/>
+          <!-- hot plate + bath -->
+          <rect x="18" y="254" width="176" height="20" rx="6" fill="#39404a"/>
+          <circle cx="176" cy="264" r="4" fill="#ff5a3c"/>
+          <clipPath id="bathClip"><rect x="33" y="130" width="146" height="122"/></clipPath>
+          <rect x="33" y="160" width="146" height="92" fill="#4f9fe0" opacity=".7" clip-path="url(#bathClip)"/>
+          <g clip-path="url(#bathClip)" opacity=".95">
+            <circle class="bub" cx="55" cy="240" r="4" fill="#fff" style="animation-delay:0s"/>
+            <circle class="bub" cx="85" cy="245" r="3" fill="#fff" style="animation-delay:.4s"/>
+            <circle class="bub" cx="140" cy="242" r="4" fill="#fff" style="animation-delay:.8s"/>
+            <circle class="bub" cx="165" cy="246" r="3" fill="#fff" style="animation-delay:.2s"/>
+          </g>
+          <path d="M30 120 L30 244 Q30 254 40 254 L172 254 Q182 254 182 244 L182 120" fill="none" stroke="#6e8294" stroke-width="4" stroke-linecap="round"/>
+          <text x="106" y="110" font-size="11" text-anchor="middle" fill="#6b7886" font-family="system-ui, sans-serif">Boiling water bath · 100 °C</text>
+          <!-- foam cup calorimeter -->
+          <clipPath id="cupClip"><path d="M292 160 L430 160 L418 250 L304 250 Z"/></clipPath>
+          <rect id="cupWater" x="290" y="190" width="142" height="62" fill="#4f9fe0" opacity=".65" clip-path="url(#cupClip)"/>
+          <path d="M292 150 L430 150 L418 250 Q417 256 411 256 L311 256 Q305 256 304 250 Z" fill="none" stroke="#9a8f7b" stroke-width="5" stroke-linejoin="round"/>
+          <path d="M292 150 L430 150 L418 250 L304 250 Z" fill="#efe7d5" opacity=".28"/>
+          <rect x="286" y="140" width="150" height="10" rx="4" fill="#b8ad98"/>
+          <text x="361" y="288" font-size="11" text-anchor="middle" fill="#6b7886" font-family="system-ui, sans-serif">Foam-cup calorimeter</text>
+          <!-- cup thermometer -->
+          <rect x="400" y="60" width="11" height="170" rx="5.5" fill="#fff" stroke="#6e8294" stroke-width="2.2"/>
+          <circle cx="405.5" cy="236" r="10" fill="#d5412a" stroke="#6e8294" stroke-width="2.2"/>
+          <rect id="cupMerc" x="402.5" y="150" width="6" height="86" fill="#d5412a"/>
+          <text id="cupTxt" x="405" y="50" font-size="13" font-weight="700" text-anchor="middle" fill="#1c2530" font-family="system-ui, sans-serif">22.0 °C</text>
+          <!-- support rod -->
+          <rect x="60" y="10" width="340" height="4" rx="2" fill="#8a96a3"/>
+          <!-- sample on string -->
+          <g id="sample">
+            <line id="string" x1="0" y1="-18" x2="0" y2="-70" stroke="#6b7886" stroke-width="1.5"/>
+            <rect x="-15" y="-17" width="30" height="34" rx="5" fill="url(#metalG)" stroke="#5c636b" stroke-width="1.5"/>
+            <text x="0" y="5" font-size="12" font-weight="700" text-anchor="middle" fill="#2b3138" font-family="system-ui, sans-serif">?</text>
+          </g>
+          <text id="sampleTxt" x="106" y="78" font-size="13" font-weight="700" text-anchor="middle" fill="#1c2530" font-family="system-ui, sans-serif"></text>
+        </svg>
+        <div class="readout" style="margin-top:12px" aria-live="polite">
+          <div class="stat"><b id="rMetal">22.0 °C</b><span>Metal sample</span></div>
+          <div class="stat"><b id="rWater">22.0 °C</b><span>Water in cup</span></div>
+          <div class="stat"><b id="rStage">Ready</b><span>Step</span></div>
+        </div>
+        <div class="controls" style="margin-top:12px">
+          <label>Mass of metal
+            <select id="mm"><option>40</option><option selected>60</option><option>80</option><option>100</option></select>
+          </label>
+          <label>Mass of water
+            <select id="mw"><option>50</option><option selected>75</option><option>100</option></select>
+          </label>
+          <button id="b1" class="primary">1 · Heat metal in boiling water</button>
+          <button id="b2" disabled>2 · Drop it in the cup</button>
+          <button id="b3">New mystery metal</button>
+        </div>
+        <p class="hint" style="margin-bottom:0">Grams for both masses. Metal and water start at the temperatures shown. Treat the cup as perfectly insulated.</p>
+      </section>
+
+      <section class="card" aria-label="Graph">
+        <h2>Temperature vs. time after the drop</h2>
+        <canvas id="graph" width="560" height="300" aria-label="Metal and water temperature graph"></canvas>
+        <div class="legend"><span><i style="border-color:#c0392b"></i>metal</span><span><i style="border-color:#2f6fb3"></i>water</span></div>
+      </section>
+    </div>
+
+    <div class="stack">
+      <section class="card" aria-label="Instructions">
+        <h2>Instructions</h2>
+        <ol class="steps">
+          <li>Read the starting masses and temperatures. Change the masses if you like. <span class="hint">(Try a small mass of water. What happens to the temperature change you have to measure?)</span></li>
+          <li>Press <b>Heat metal</b> and wait until the sample reaches 100 °C.</li>
+          <li>Press <b>Drop it in the cup</b> and watch both temperatures approach each other.</li>
+          <li>When they match, that is the final temperature. Fill in the data table and answer the questions.</li>
+        </ol>
+      </section>
+
+      <section class="card" aria-label="Data table">
+        <h2>Your data</h2>
+        <table>
+          <tbody>
+            <tr><th>Mass of metal</th><td id="dMm"></td></tr>
+            <tr><th>Starting temperature of metal</th><td id="dTm">—</td></tr>
+            <tr><th>Mass of water</th><td id="dMw"></td></tr>
+            <tr><th>Starting temperature of water</th><td id="dTw">—</td></tr>
+            <tr><th>Final temperature of both</th><td id="dTf">—</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card" aria-label="Questions">
+        <h2>Analysis</h2>
+        <div class="note" style="margin-bottom:12px">
+          c<sub>water</sub> = 4.184 J/g·°C. Heat lost by the metal = heat gained by the water, so <b>q<sub>water</sub> = q<sub>metal</sub></b> and q = m·c·ΔT (ΔT is always final − start for the water, start − final for the metal, so it is positive).
+        </div>
+        <div class="q">
+          <p><b>A. How much heat did the water gain?</b></p>
+          <div class="row"><input type="number" step="any" id="inA" aria-label="Heat gained by water in joules" style="width:150px"> <span>J</span> <button id="cA">Check</button></div>
+          <div class="fb" id="fA" role="status"></div>
+        </div>
+        <div class="q">
+          <p><b>B. What is the specific heat of the metal?</b></p>
+          <p class="hint" style="margin:0 0 8px">c = q ÷ (m × ΔT) for the metal.</p>
+          <div class="row"><input type="number" step="any" id="inB" aria-label="Specific heat of the metal" style="width:150px"> <span>J/g·°C</span> <button id="cB">Check</button></div>
+          <div class="fb" id="fB" role="status"></div>
+        </div>
+        <div class="q">
+          <p><b>C. Which metal is it?</b></p>
+          <div class="row"><select id="inC" aria-label="Metal"><option value="">Choose…</option></select> <button id="cC">Check</button></div>
+          <div class="fb" id="fC" role="status"></div>
+        </div>
+        <div class="q">
+          <p><b>D. You use only 50 g of water instead of 100 g with the same metal. How does that help?</b></p>
+          <div class="opts">
+            <label><input type="radio" name="D" value="0"><span>The water gains more heat, so the answer is more accurate</span></label>
+            <label><input type="radio" name="D" value="1"><span>The same heat warms less water by a bigger amount, so the thermometer reading is a larger number and a 0.1 °C reading error matters less</span></label>
+            <label><input type="radio" name="D" value="2"><span>Less water means the metal is hotter</span></label>
+          </div>
+          <div class="row" style="margin-top:8px"><button id="cD">Check</button></div>
+          <div class="fb" id="fD" role="status"></div>
+        </div>
+        <details>
+          <summary>Reference: specific heats of common metals (J/g·°C)</summary>
+          <table id="ref" style="margin-top:6px"></table>
+        </details>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var CW = 4.184;
+  var METALS = [
+    { n: "Aluminum", c: 0.897 }, { n: "Iron", c: 0.449 }, { n: "Copper", c: 0.385 },
+    { n: "Silver", c: 0.235 }, { n: "Lead", c: 0.129 }
+  ];
+  METALS.slice().sort(function (a, b) { return a.n < b.n ? -1 : 1; }).forEach(function (m) {
+    var o = document.createElement("option"); o.value = m.n; o.textContent = m.n; $("inC").appendChild(o);
+  });
+  METALS.forEach(function (m) {
+    var tr = document.createElement("tr"); tr.innerHTML = "<td>" + m.n + "</td><td>" + m.c.toFixed(3) + "</td>"; $("ref").appendChild(tr);
+  });
+
+  // ---- experiment state ----
+  var stage = "ready";       // ready | heating | hot | moving | mixing | done
+  var metal, mm, mw, Tw0, Tm0 = 100, Tf, tau = 5;
+  var stageT = 0, mixT = 0, MIX_LEN = 40, last = 0;
+  var Tmetal = 22, Twater = 22;
+  var curve = [];            // {t, Tw, Tm}
+  var sx = 106, sy = 96;     // sample position
+
+  function newRun() {
+    metal = METALS[Math.floor(Math.random() * METALS.length)];
+    Tw0 = Math.round((21 + Math.random() * 3) * 10) / 10;
+    stage = "ready"; stageT = 0; mixT = 0; curve = [];
+    Tmetal = Tw0; Twater = Tw0; sx = 106; sy = 96;
+    $("b1").disabled = false; $("b2").disabled = true; $("mm").disabled = false; $("mw").disabled = false;
+    ["inA", "inB"].forEach(function (i) { $(i).value = ""; });
+    ["fA", "fB", "fC", "fD"].forEach(function (i) { $(i).className = "fb"; $(i).textContent = ""; });
+    $("inC").value = "";
+    readMasses(); fillTable();
+  }
+  function readMasses() { mm = +$("mm").value; mw = +$("mw").value; $("dMm").textContent = mm + " g"; $("dMw").textContent = mw + " g"; }
+  function fillTable() {
+    $("dTm").textContent = (stage === "hot" || stage === "moving" || stage === "mixing" || stage === "done") ? Tm0.toFixed(1) + " °C" : "—";
+    $("dTw").textContent = (stage === "ready" || stage === "heating" || stage === "hot" || stage === "moving") ? Tw0.toFixed(1) + " °C" : Tw0.toFixed(1) + " °C";
+    $("dTf").textContent = stage === "done" ? Tf.toFixed(1) + " °C" : "—";
+  }
+  function equilibrium() {
+    var a = mm * metal.c, b = mw * CW;
+    return Math.round(((a * Tm0 + b * Tw0) / (a + b)) * 10) / 10;
+  }
+  // ---- drawing ----
+  function setMerc(T) {
+    // scale: 15 °C at y=236, 105 °C at y=150
+    var y = 236 - ((T - 15) / 90) * 86; y = Math.max(150, Math.min(236, y));
+    $("cupMerc").setAttribute("y", y); $("cupMerc").setAttribute("height", 236 - y);
+  }
+  function drawScene() {
+    $("sample").setAttribute("transform", "translate(" + sx.toFixed(1) + "," + sy.toFixed(1) + ")");
+    $("string").setAttribute("y2", (14 - sy).toFixed(1));   // string always reaches the rod at y = 14
+    $("cupWater").setAttribute("y", 252 - (mw / 100) * 70 - 12);
+    $("cupWater").setAttribute("height", 252);
+    setMerc(Twater);
+    $("cupTxt").textContent = Twater.toFixed(1) + " °C";
+    $("sampleTxt").textContent = (stage === "heating" || stage === "hot") ? "Sample: " + Tmetal.toFixed(1) + " °C" : "";
+    $("rMetal").textContent = Tmetal.toFixed(1) + " °C";
+    $("rWater").textContent = Twater.toFixed(1) + " °C";
+    $("rStage").textContent = { ready: "Ready", heating: "Heating metal…", hot: "Metal at 100 °C", moving: "Transferring…", mixing: "Equalizing…", done: "Done" }[stage];
+  }
+  var gc = $("graph"), g = gc.getContext("2d");
+  (function () { var d = Math.min(window.devicePixelRatio || 1, 2); gc.width = 560 * d; gc.height = 300 * d; g.setTransform(d, 0, 0, d, 0, 0); })();
+  function drawGraph() {
+    var W = 560, H = 300, L = 50, R = 14, T = 14, B = 40;
+    g.clearRect(0, 0, W, H);
+    var ink = getComputedStyle(document.body).color;
+    var lo = 15, hi = 105;
+    function X(t) { return L + (t / MIX_LEN) * (W - L - R); }
+    function Y(v) { return T + (1 - (v - lo) / (hi - lo)) * (H - T - B); }
+    g.font = "11px system-ui, sans-serif"; g.lineWidth = 1; g.fillStyle = "#8a95a2"; g.strokeStyle = "rgba(140,150,160,.25)"; g.textAlign = "right";
+    for (var v = 20; v <= 100; v += 20) { g.beginPath(); g.moveTo(L, Y(v)); g.lineTo(W - R, Y(v)); g.stroke(); g.fillText(v, L - 6, Y(v) + 4); }
+    g.textAlign = "center";
+    for (var t = 0; t <= MIX_LEN; t += 10) { g.beginPath(); g.moveTo(X(t), T); g.lineTo(X(t), H - B); g.stroke(); g.fillText(t, X(t), H - B + 15); }
+    g.fillStyle = ink; g.font = "12px system-ui, sans-serif"; g.fillText("Time after the drop (s)", (L + W - R) / 2, H - 6);
+    g.save(); g.translate(13, (T + H - B) / 2); g.rotate(-Math.PI / 2); g.fillText("Temperature (°C)", 0, 0); g.restore();
+    g.strokeStyle = "rgba(140,150,160,.9)"; g.lineWidth = 1.5; g.beginPath(); g.moveTo(L, T); g.lineTo(L, H - B); g.lineTo(W - R, H - B); g.stroke();
+    if (!curve.length) return;
+    g.lineWidth = 3; g.lineJoin = "round";
+    g.strokeStyle = "#c0392b"; g.setLineDash([7, 4]); g.beginPath();
+    curve.forEach(function (p, i) { if (i) g.lineTo(X(p.t), Y(p.Tm)); else g.moveTo(X(p.t), Y(p.Tm)); }); g.stroke();
+    g.setLineDash([]); g.strokeStyle = "#2f6fb3"; g.beginPath();
+    curve.forEach(function (p, i) { if (i) g.lineTo(X(p.t), Y(p.Tw)); else g.moveTo(X(p.t), Y(p.Tw)); }); g.stroke();
+  }
+  // ---- animation loop ----
+  function ease(u) { return u < 0 ? 0 : u > 1 ? 1 : u * u * (3 - 2 * u); }
+  function frame(ts) {
+    var dt = last ? Math.min(0.05, (ts - last) / 1000) : 0.016; last = ts;
+    stageT += dt;
+    if (stage === "heating") {
+      // lower into bath, then warm to 100
+      var d = ease(stageT / 0.8); sy = 96 + d * 108;
+      Tmetal = Tw0 + (Tm0 - Tw0) * ease((stageT - 0.6) / 3.2);
+      if (stageT >= 4) { Tmetal = Tm0; stage = "hot"; $("b2").disabled = false; fillTable(); }
+    } else if (stage === "moving") {
+      var u = stageT / 2.2;
+      if (u < 0.3) { sx = 106; sy = 204 - ease(u / 0.3) * 120; }
+      else if (u < 0.75) { sx = 106 + ease((u - 0.3) / 0.45) * 255; sy = 84; }
+      else { sx = 361; sy = 84 + ease((u - 0.75) / 0.25) * 130; }
+      if (u >= 1) { stage = "mixing"; mixT = 0; curve = []; stageT = 0; }
+    } else if (stage === "mixing") {
+      mixT += dt * 5;   // 5 simulated seconds per real second
+      var e = Math.exp(-mixT / tau);
+      var tfTrue = (mm * metal.c * Tm0 + mw * CW * Tw0) / (mm * metal.c + mw * CW);
+      Twater = tfTrue - (tfTrue - Tw0) * e; Tmetal = tfTrue + (Tm0 - tfTrue) * e;
+      curve.push({ t: Math.min(mixT, MIX_LEN), Tw: Twater, Tm: Tmetal });
+      if (mixT >= MIX_LEN) { stage = "done"; Twater = Tf; Tmetal = Tf; fillTable(); }
+    }
+    drawScene(); drawGraph();
+    requestAnimationFrame(frame);
+  }
+
+  // ---- buttons ----
+  $("b1").addEventListener("click", function () {
+    if (stage !== "ready") return;
+    stage = "heating"; stageT = 0; $("b1").disabled = true; $("mm").disabled = true; $("mw").disabled = true;
+    readMasses(); Tf = equilibrium();
+  });
+  $("b2").addEventListener("click", function () {
+    if (stage !== "hot") return;
+    stage = "moving"; stageT = 0; $("b2").disabled = true; Twater = Tw0; fillTable();
+  });
+  $("b3").addEventListener("click", newRun);
+  $("mm").addEventListener("change", readMasses); $("mw").addEventListener("change", readMasses);
+
+  // ---- checks ----
+  function show(id, ok, msg) { var f = $(id); f.className = "fb show " + (ok ? "ok" : "no"); f.textContent = msg; }
+  function ready(id) { if (stage !== "done") { show(id, false, "Finish the experiment first. Both temperatures need to settle."); return false; } return true; }
+  function qWater() { return mw * CW * (Tf - Tw0); }
+  function cMetal() { return qWater() / (mm * (Tm0 - Tf)); }
+  $("cA").addEventListener("click", function () {
+    if (!ready("fA")) return;
+    var v = parseFloat($("inA").value); if (isNaN(v)) return show("fA", false, "Type a number first.");
+    var e = qWater();
+    if (Math.abs(v - e) / e <= 0.03) show("fA", true, "Correct: " + Math.round(e).toLocaleString("en-US") + " J. That is " + mw + " g × 4.184 × " + (Tf - Tw0).toFixed(1) + " °C.");
+    else show("fA", false, "Not quite. Water's ΔT is final − start = " + Tf.toFixed(1) + " − " + Tw0.toFixed(1) + ". Multiply by its mass and 4.184.");
+  });
+  $("cB").addEventListener("click", function () {
+    if (!ready("fB")) return;
+    var v = parseFloat($("inB").value); if (isNaN(v)) return show("fB", false, "Type a number first.");
+    var e = cMetal();
+    if (Math.abs(v - e) / e <= 0.04) show("fB", true, "Correct: about " + e.toFixed(3) + " J/g·°C. The metal's ΔT is " + (Tm0 - Tf).toFixed(1) + " °C (start − final).");
+    else show("fB", false, "Not quite. The heat is the same as in part A, but the metal's ΔT is 100.0 − " + Tf.toFixed(1) + " and its mass is " + mm + " g.");
+  });
+  $("cC").addEventListener("click", function () {
+    if (!ready("fC")) return;
+    var v = $("inC").value; if (!v) return show("fC", false, "Choose a metal.");
+    var e = cMetal(), best = METALS.slice().sort(function (a, b) { return Math.abs(a.c - e) - Math.abs(b.c - e); })[0];
+    if (v === metal.n) {
+      var err = Math.abs(e - metal.c) / metal.c * 100;
+      show("fC", true, "Yes, it is " + metal.n + " (accepted c = " + metal.c.toFixed(3) + "). Your measured value was off by " + err.toFixed(1) + "%.");
+    } else show("fC", false, "Compare your c (" + e.toFixed(3) + ") with the reference table. Which metal is closest?");
+  });
+  $("cD").addEventListener("click", function () {
+    var s = document.querySelector('input[name="D"]:checked');
+    if (!s) return show("fD", false, "Choose an answer first.");
+    if (s.value === "1") show("fD", true, "Right. The heat is the same either way, but it is shared among fewer grams of water, so ΔT is larger. A thermometer error of 0.1 °C is a smaller percent of a bigger ΔT. Try it with lead.");
+    else show("fD", false, "Think about q = m·c·ΔT. If q stays the same and m goes down, what happens to ΔT?");
+  });
+
+  newRun();
+  requestAnimationFrame(frame);
+  window.__lab = { get stage() { return stage; }, get Tf() { return Tf; }, get metal() { return metal; }, METALS: METALS };
+})();
+</script>
+</body>
+</html>

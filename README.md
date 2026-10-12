@@ -36,3 +36,14 @@ Instructions and theory text come from the originals wherever the executables co
 ## Editing
 
 Every page is plain HTML with its styles and script inside the file. The physics constants sit at the top of each `<script>` block, and the instruction and theory text is ordinary HTML near the end of the page body.
+
+## Chemistry
+
+The `chemistry/` folder holds virtual labs, with a hub page at `chemistry/index.html` that lists them by unit. Each lab opens with the glassware already set up and the instructions on the page.
+
+| Unit | Lab |
+|---|---|
+| 2 · Properties of Matter | `heating-curve.html` (phase changes, temperature, energy) |
+| 2 · Properties of Matter | `specific-heat.html` (calorimetry with a mystery metal) |
+
+To add a lab, put the page in its unit folder and add one entry to `chemistry/labs.js`. Chemistry pages share `chemistry/shared/lab.css`, so keep the `../shared/lab.css` link when copying one.
