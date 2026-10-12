@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chemistry Virtual Labs</title>
+<meta name="description" content="Virtual chemistry labs for Mr. D's classes.">
+<link rel="stylesheet" href="shared/lab.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="back" href="../">← All sims</a>
+    <span class="crumb">Mr. D's Sims</span>
+  </header>
+  <h1>Chemistry Virtual Labs</h1>
+  <p class="lead">Pick a lab. The glassware is already set up and the instructions are on the page. Predict first, then run it.</p>
+  <main class="units" id="units"></main>
+</div>
+<script src="labs.js"></script>
+<script>
+(function () {
+  var root = document.getElementById("units");
+  window.UNITS.forEach(function (u) {
+    var sec = document.createElement("section");
+    var h = document.createElement("h2"); h.textContent = u.title; sec.appendChild(h);
+    var p = document.createElement("p"); p.className = "hint"; p.style.margin = "0"; p.textContent = u.blurb; sec.appendChild(p);
+    var cards = document.createElement("div"); cards.className = "cards";
+    u.labs.forEach(function (l) {
+      var a = document.createElement("a"); a.className = "lab-card"; a.href = l.href;
+      var ic = document.createElement("div"); ic.className = "icon"; ic.textContent = l.icon; ic.setAttribute("aria-hidden", "true");
+      var t = document.createElement("h3"); t.textContent = l.title;
+      var b = document.createElement("p"); b.textContent = l.blurb;
+      a.appendChild(ic); a.appendChild(t); a.appendChild(b);
+      l.tags.forEach(function (tag) {
+        var s = document.createElement("span"); s.className = "pill"; s.textContent = tag; s.style.marginRight = "6px";
+        a.appendChild(s);
+      });
+      cards.appendChild(a);
+    });
+    sec.appendChild(cards); root.appendChild(sec);
+  });
+})();
+</script>
+</body>
+</html>
