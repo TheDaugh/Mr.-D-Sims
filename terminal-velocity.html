@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Terminal Velocity · Mr. D's Sims</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2f6; --surface:#ffffff; --stage:#f7fafc;
+  --ink:#142230; --muted:#566878; --line:#cbd6e0; --grid:#dde5ed;
+  --a:#0e7c86; --b:#cf7420; --accent:#2b4fd9; --good:#1c7d4a; --warn:#b3412e;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);padding-inline:16px;padding-block:18px 48px}
+.wrap{max-width:1080px;margin-inline:auto}
+header{display:flex;flex-direction:column;gap:.35rem;margin-bottom:18px}
+.back{font:600 .8rem var(--mono);color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent)}
+h1{font:800 clamp(1.8rem,5vw,2.6rem)/1.05 var(--display);letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,20rem);gap:20px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+.stagewrap{min-width:0;display:flex;flex-direction:column;gap:10px}
+canvas{display:block;width:100%;background:var(--stage);border:1px solid var(--line);border-radius:6px;touch-action:none}
+.readout{display:flex;flex-wrap:wrap;gap:4px 20px;font:400 .85rem var(--mono);color:var(--muted)}
+.readout b{color:var(--ink);font-weight:600}
+.side{min-width:0;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px 14px;margin:0;min-width:0}
+fieldset.card{margin:0}
+legend{font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-top:8px}
+.ctl:first-of-type{margin-top:2px}
+.ctl label{font-size:.92rem}
+.ctl output{font:600 .85rem var(--mono);text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:2px 0}
+.hint{font-size:.85rem;color:var(--muted);margin:.5rem 0 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn{font:600 .95rem var(--body);padding:9px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0e161e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0e161e}}
+.btn:disabled{opacity:.5;cursor:default}
+.chk{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.95rem}
+.choices{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}
+.choices label{display:flex;gap:6px;align-items:center;font-size:.95rem}
+select,input[type=number],input[type=text]{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:0}
+input[type=number]{width:7.5em}
+.q{margin:10px 0 0;font-weight:600;font-size:.95rem}
+.msg{margin:.6rem 0 0;font-size:.95rem}
+.msg.ok{color:var(--good)} .msg.bad{color:var(--warn)}
+.tag{display:inline-block;font:600 .75rem var(--mono);padding:1px 7px;border-radius:3px;margin-right:6px;background:var(--muted);color:var(--surface)}
+.tag.ok{background:var(--good);color:#fff}.tag.bad{background:var(--warn);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font:600 .72rem var(--mono);color:var(--muted);letter-spacing:.04em}
+.scroll{overflow-x:auto}
+.plots{display:flex;flex-direction:column;gap:8px}
+details{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+summary{cursor:pointer;font:600 1rem var(--body)}
+details p,details li{max-width:70ch}
+details code,.card code{font:400 .9em var(--mono)}
+footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<a class="back" href="index.html">&larr; All simulations</a>
+<h1>Terminal Velocity</h1>
+<p class="sub">Drop a parcel from a helicopter, open the parachute when you choose, and watch the velocity and acceleration graphs.</p>
+</header>
+
+<div class="layout">
+ <div class="stagewrap"><canvas id="cv" aria-label="Altitude view of a parcel falling, with velocity and acceleration graphs"></canvas><div class="readout" id="ro"></div></div>
+ <div class="side">
+  <fieldset class="card"><legend>Setup</legend>
+   <div id="sl"></div>
+  </fieldset>
+  <div class="card">
+   <div class="row"><button class="btn primary" id="drop">Drop</button><button class="btn" id="chute" disabled>Deploy parachute</button><button class="btn" id="clear">Clear &amp; reset</button></div>
+   <p class="msg" id="msg" aria-live="polite"></p>
+  </div>
+ </div>
+</div>
+<details><summary>Instructions</summary><ol><li>Press <b>Drop</b> to release the parcel from the helicopter.</li>
+<li>Watch the velocity and acceleration graphs. What is happening to the velocity? To the acceleration?</li>
+<li>Press <b>Deploy parachute</b> when you want to open it.</li>
+<li>Look at both graphs again. How do they compare with before the parachute opened?</li>
+<li>Change the <b>Parachute size</b> and drop again. How does it change the rate of descent?</li>
+<li>Press <b>Clear &amp; reset</b> to drop a new parcel.</li></ol></details>
+<details><summary>Theory</summary><p>On the Moon, how fast objects fall does not depend on their size or density, because there is no air. Objects keep accelerating until they hit the surface, which is why the Moon is covered in craters.</p>
+<p>On Earth the air resists motion. The resistance grows with the size of the object and with its speed. As a falling object speeds up, the retarding force eventually matches the weight pulling it down. The net force is then zero, the acceleration is zero, and the object falls at constant velocity. That is <b>terminal velocity</b>.</p>
+<p>Terminal velocity changes with size. A parachute adds area, so the drag force is bigger at any given speed. When it opens, the parcel slows until the drag has dropped to equal the weight again, at a much lower speed. A bigger parachute means a lower terminal velocity.</p>
+<p>The same thing happens on a bicycle freewheeling down a long hill. Crouch down and your terminal velocity rises. Sit upright with your coat open and it falls. Keep your hands on the handlebars.</p>
+<p>The model here is <code>ma = mg &minus; kv&sup2;</code>, where <code>k</code> grows with the area. At terminal velocity <code>v = &radic;(mg/k)</code>.</p></details>
+<footer>Rebuilt in HTML from the LabVIEW simulation "Terminal Velocity". Parcel mass 20 kg.</footer>
+</div>
+<script>
+const K={};
+K.$=(s,r)=>(r||document).querySelector(s);
+K.css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+K.rad=d=>d*Math.PI/180;K.deg=r=>r*180/Math.PI;
+K.f=(x,n)=>(+x).toFixed(n===undefined?1:n);
+K.G=9.81;
+K.fit=function(cv,ratio){
+  const w=cv.clientWidth||600,h=Math.round(w*ratio),d=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(w*d)||cv.height!==Math.round(h*d)){cv.width=Math.round(w*d);cv.height=Math.round(h*d);cv.style.height=h+"px"}
+  const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return {c:c,w:w,h:h};
+};
+K.ctl=function(o){
+  return '<div class="ctl"><label for="'+o.id+'">'+o.label+'</label><output id="'+o.id+'-o" for="'+o.id+'"></output>'+
+  '<input type="range" id="'+o.id+'" min="'+o.min+'" max="'+o.max+'" step="'+o.step+'" value="'+o.value+'" data-unit="'+(o.unit||"")+'"></div>';
+};
+K.wire=function(root,cb){
+  root.querySelectorAll("input[type=range]").forEach(function(i){
+    const out=root.querySelector("#"+i.id+"-o");
+    const dec=String(i.step).indexOf(".")>=0?String(i.step).split(".")[1].length:0;
+    const show=function(){out.textContent=(+i.value).toFixed(dec)+(i.dataset.unit?" "+i.dataset.unit:"")};
+    show();i.addEventListener("input",function(){show();if(cb)cb(i.id,+i.value)});
+  });
+};
+K.arrow=function(c,x0,y0,x1,y1,col,lw,dash){
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=lw||2;if(dash)c.setLineDash(dash);
+  c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();c.setLineDash([]);
+  const a=Math.atan2(y1-y0,x1-x0),L=Math.hypot(x1-x0,y1-y0);
+  if(L>6){c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-9*Math.cos(a-.4),y1-9*Math.sin(a-.4));c.lineTo(x1-9*Math.cos(a+.4),y1-9*Math.sin(a+.4));c.closePath();c.fill()}
+  c.restore();
+};
+K.ticks=function(a,b,n){
+  const raw=(b-a)/n;if(!(raw>0))return [a];
+  const p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;
+  const s=(m<1.5?1:m<3?2:m<7?5:10)*p,out=[];
+  for(let v=Math.ceil(a/s-1e-9)*s;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));
+  return out;
+};
+/* K.plot(c, {x,y,w,h}, {xmin,xmax,ymin,ymax,title,xlabel,series:[{pts,color,width,dash,dots}],cursorX,vlines:[{x,color}],hlines:[{y,color,dash}]}) */
+K.plot=function(c,bx,o){
+  const X=function(v){return bx.x+(v-o.xmin)/(o.xmax-o.xmin)*bx.w};
+  const Y=function(v){return bx.y+bx.h-(v-o.ymin)/(o.ymax-o.ymin)*bx.h};
+  c.save();c.fillStyle=K.css("--surface");c.fillRect(bx.x,bx.y,bx.w,bx.h);
+  c.font="10px "+K.css("--mono");c.lineWidth=1;
+  const gx=K.ticks(o.xmin,o.xmax,Math.max(2,Math.round(bx.w/60))),gy=K.ticks(o.ymin,o.ymax,Math.max(2,Math.round(bx.h/32)));
+  c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");
+  c.textAlign="center";c.textBaseline="top";
+  gx.forEach(function(v){c.beginPath();c.moveTo(X(v),bx.y);c.lineTo(X(v),bx.y+bx.h);c.stroke();c.fillText(String(+v.toFixed(6)),X(v),bx.y+bx.h+3)});
+  c.textAlign="right";c.textBaseline="middle";
+  gy.forEach(function(v){c.beginPath();c.moveTo(bx.x,Y(v));c.lineTo(bx.x+bx.w,Y(v));c.stroke();c.fillText(String(+v.toFixed(6)),bx.x-4,Y(v))});
+  c.strokeStyle=K.css("--muted");
+  if(o.ymin<0&&o.ymax>0){c.beginPath();c.moveTo(bx.x,Y(0));c.lineTo(bx.x+bx.w,Y(0));c.stroke()}
+  if(o.xmin<0&&o.xmax>0){c.beginPath();c.moveTo(X(0),bx.y);c.lineTo(X(0),bx.y+bx.h);c.stroke()}
+  c.beginPath();c.rect(bx.x,bx.y,bx.w,bx.h);c.clip();
+  (o.hlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--muted");c.setLineDash(l.dash||[4,4]);c.beginPath();c.moveTo(bx.x,Y(l.y));c.lineTo(bx.x+bx.w,Y(l.y));c.stroke()});
+  (o.vlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--b");c.setLineDash(l.dash||[]);c.beginPath();c.moveTo(X(l.x),bx.y);c.lineTo(X(l.x),bx.y+bx.h);c.stroke()});
+  c.setLineDash([]);
+  (o.series||[]).forEach(function(s){
+    c.strokeStyle=K.css(s.color||"--accent");c.fillStyle=c.strokeStyle;c.lineWidth=s.width||2;c.setLineDash(s.dash||[]);
+    if(s.dots){s.pts.forEach(function(p){c.beginPath();c.arc(X(p[0]),Y(p[1]),s.r||3.5,0,7);c.fill()})}
+    else{c.beginPath();s.pts.forEach(function(p,i){i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1]))});c.stroke()}
+  });
+  c.setLineDash([]);
+  if(o.cursorX!==undefined&&o.cursorX!==null){c.strokeStyle=K.css("--ink");c.lineWidth=1;c.beginPath();c.moveTo(X(o.cursorX),bx.y);c.lineTo(X(o.cursorX),bx.y+bx.h);c.stroke()}
+  c.restore();
+  c.save();c.strokeStyle=K.css("--line");c.strokeRect(bx.x+.5,bx.y+.5,bx.w-1,bx.h-1);
+  c.fillStyle=K.css("--ink");c.font="600 11px "+K.css("--mono");c.textAlign="left";c.textBaseline="top";
+  if(o.title)c.fillText(o.title,bx.x+6,bx.y+4);
+  if(o.xlabel){c.fillStyle=K.css("--muted");c.textAlign="right";c.fillText(o.xlabel,bx.x+bx.w-6,bx.y+4)}
+  c.restore();
+  return {X:X,Y:Y};
+};
+K.loop=function(update,draw){
+  let last=performance.now();
+  function fr(now){const dt=Math.min((now-last)/1000,.1);last=now;update(dt);draw();requestAnimationFrame(fr)}
+  requestAnimationFrame(fr);
+};
+K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296}};
+
+(function(){
+"use strict";
+
+const $=K.$,g=K.G,M=20,KB=.2,ALT=800;
+$("#sl").innerHTML=K.ctl({id:"p-a",label:"Parachute size (area)",min:1,max:8,step:.5,value:3,unit:"m&sup2;"})+
+ K.ctl({id:"p-s",label:"Animation speed",min:1,max:6,step:1,value:3,unit:"&times;"});
+let area=3,spd=3;
+K.wire(document,id=>{if(id==="p-a")area=+$("#p-a").value;if(id==="p-s")spd=+$("#p-s").value});
+const cv=$("#cv");
+let st;
+function reset(){st={on:false,t:0,y:ALT,v:0,a:g,chuteT:null,pts:[],landed:false};$("#drop").disabled=false;$("#chute").disabled=true;msg("")}
+function msg(t,c){const m=$("#msg");m.textContent=t;m.className="msg "+(c||"")}
+$("#clear").onclick=reset;
+$("#drop").onclick=()=>{st.on=true;$("#drop").disabled=true;$("#chute").disabled=false};
+$("#chute").onclick=()=>{if(st.chuteT===null){st.chuteT=st.t;$("#chute").disabled=true;st.chutes=(st.chutes||[]);st.chutes.push(st.t)}};
+function kNow(){
+ if(st.chuteT===null)return KB;
+ const f=Math.min(1,(st.t-st.chuteT)/2);
+ return KB+.9*area*f;
+}
+function update(dt){
+ if(!st.on||st.landed)return;
+ dt*=spd;const n=Math.ceil(dt/.005),h=dt/n;
+ for(let i=0;i<n&&!st.landed;i++){
+  const k=kNow();st.a=g-k*st.v*st.v/M;st.v+=st.a*h;st.y-=st.v*h;st.t+=h;
+  if(st.t-(st.last||0)>=.1){st.pts.push([st.t,st.v,st.a]);st.last=st.t}
+  if(st.y<=0){st.y=0;st.landed=true;st.pts.push([st.t,st.v,st.a]);
+   msg("Landed after "+K.f(st.t,1)+" s at "+K.f(st.v,1)+" m/s.",st.v<8?"ok":"bad");$("#chute").disabled=true}
+ }
+}
+function draw(){
+ const {c,w,h}=K.fit(cv,.72);c.clearRect(0,0,w,h);
+ const lw=Math.min(150,w*.3),top=14,bot=h-22;
+ c.fillStyle=K.css("--stage");c.fillRect(0,0,lw,h);
+ c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="left";
+ const Y=a=>bot-(a/ALT)*(bot-top);
+ for(let a=0;a<=ALT;a+=200){c.beginPath();c.moveTo(0,Y(a));c.lineTo(lw,Y(a));c.stroke();c.fillText(a+" m",4,Y(a)-3)}
+ c.fillStyle=K.css("--line");c.fillRect(0,bot,lw,h-bot);
+ const px=lw*.62,py=Y(st.y)-10;
+ c.fillStyle=K.css("--ink");c.fillRect(lw*.15,top-6,lw*.34,8);c.fillRect(lw*.15+lw*.17-1,top-12,2,6);
+ if(st.chuteT!==null){const f=Math.min(1,(st.t-st.chuteT)/2),r=(10+Math.sqrt(area)*9)*f+3;
+  c.fillStyle=K.css("--b");c.beginPath();c.arc(px,py-22*f-6,r,Math.PI,0);c.fill();
+  c.strokeStyle=K.css("--ink");c.lineWidth=1;c.beginPath();c.moveTo(px-r,py-22*f-6);c.lineTo(px,py);c.lineTo(px+r,py-22*f-6);c.stroke()}
+ c.fillStyle=K.css("--a");c.fillRect(px-6,py,12,12);
+ const gx=lw+38,gw=w-gx-12,gh=(h-60)/2,tmax=Math.max(10,Math.ceil((st.t+1)/5)*5);
+ const vs=st.pts.map(p=>[p[0],p[1]]),as=st.pts.map(p=>[p[0],p[2]]);
+ const vmax=Math.max(40,Math.ceil(Math.max.apply(null,vs.map(p=>p[1]).concat([0]))/10)*10);
+ const amin=Math.min(-4,Math.floor(Math.min.apply(null,as.map(p=>p[1]).concat([0]))/10)*10);
+ const vl=(st.chutes||[]).map(t=>({x:t,color:"--b",dash:[4,3]}));
+ K.plot(c,{x:gx,y:18,w:gw,h:gh},{xmin:0,xmax:tmax,ymin:0,ymax:vmax,title:"velocity (m/s, down)",series:[{pts:vs,color:"--a"}],vlines:vl});
+ K.plot(c,{x:gx,y:gh+42,w:gw,h:gh},{xmin:0,xmax:tmax,ymin:amin,ymax:12,title:"acceleration (m/s², down +)",xlabel:"time (s)",series:[{pts:as,color:"--accent"}],vlines:vl,hlines:[{y:0}]});
+ const kk=kNow(),vt=Math.sqrt(M*g/kk);
+ $("#ro").innerHTML="<span>t <b>"+K.f(st.t)+" s</b></span><span>speed <b>"+K.f(st.v)+" m/s</b></span><span>accel <b>"+K.f(st.a)+" m/s&sup2;</b></span><span>terminal velocity now <b>"+K.f(vt)+" m/s</b></span>";
+}
+reset();K.loop(update,draw);
+
+})();
+</script>
+</body>
+</html>

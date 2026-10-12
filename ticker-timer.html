@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ticker Timer · Mr. D's Sims</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2f6; --surface:#ffffff; --stage:#f7fafc;
+  --ink:#142230; --muted:#566878; --line:#cbd6e0; --grid:#dde5ed;
+  --a:#0e7c86; --b:#cf7420; --accent:#2b4fd9; --good:#1c7d4a; --warn:#b3412e;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161e; --surface:#16212b; --stage:#101a23;
+  --ink:#e6edf3; --muted:#92a3b3; --line:#2a3a48; --grid:#1f2d39;
+  --a:#3cc4cf; --b:#f0a04b; --accent:#8aa4ff; --good:#4fcf8c; --warn:#ff7d68; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);padding-inline:16px;padding-block:18px 48px}
+.wrap{max-width:1080px;margin-inline:auto}
+header{display:flex;flex-direction:column;gap:.35rem;margin-bottom:18px}
+.back{font:600 .8rem var(--mono);color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent)}
+h1{font:800 clamp(1.8rem,5vw,2.6rem)/1.05 var(--display);letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,20rem);gap:20px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+.stagewrap{min-width:0;display:flex;flex-direction:column;gap:10px}
+canvas{display:block;width:100%;background:var(--stage);border:1px solid var(--line);border-radius:6px;touch-action:none}
+.readout{display:flex;flex-wrap:wrap;gap:4px 20px;font:400 .85rem var(--mono);color:var(--muted)}
+.readout b{color:var(--ink);font-weight:600}
+.side{min-width:0;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px 14px;margin:0;min-width:0}
+fieldset.card{margin:0}
+legend{font:600 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin-top:8px}
+.ctl:first-of-type{margin-top:2px}
+.ctl label{font-size:.92rem}
+.ctl output{font:600 .85rem var(--mono);text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:2px 0}
+.hint{font-size:.85rem;color:var(--muted);margin:.5rem 0 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn{font:600 .95rem var(--body);padding:9px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0e161e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0e161e}}
+.btn:disabled{opacity:.5;cursor:default}
+.chk{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.95rem}
+.choices{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}
+.choices label{display:flex;gap:6px;align-items:center;font-size:.95rem}
+select,input[type=number],input[type=text]{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:0}
+input[type=number]{width:7.5em}
+.q{margin:10px 0 0;font-weight:600;font-size:.95rem}
+.msg{margin:.6rem 0 0;font-size:.95rem}
+.msg.ok{color:var(--good)} .msg.bad{color:var(--warn)}
+.tag{display:inline-block;font:600 .75rem var(--mono);padding:1px 7px;border-radius:3px;margin-right:6px;background:var(--muted);color:var(--surface)}
+.tag.ok{background:var(--good);color:#fff}.tag.bad{background:var(--warn);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font:600 .72rem var(--mono);color:var(--muted);letter-spacing:.04em}
+.scroll{overflow-x:auto}
+.plots{display:flex;flex-direction:column;gap:8px}
+details{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+summary{cursor:pointer;font:600 1rem var(--body)}
+details p,details li{max-width:70ch}
+details code,.card code{font:400 .9em var(--mono)}
+footer{margin-top:28px;font:400 .75rem var(--mono);color:var(--muted)}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<a class="back" href="index.html">&larr; All simulations</a>
+<h1>Ticker Timer</h1>
+<p class="sub">A trolley pulls a paper tape through a timer that taps a dot every 0.02 s. Read the spacing of the dots to work out how the trolley moved.</p>
+</header>
+
+<div class="layout">
+ <div class="stagewrap"><canvas id="cv" aria-label="A paper tape with dots, above a chart of strip lengths"></canvas><div class="readout" id="ro">Hover over the tape to measure the gap between two dots.</div></div>
+ <div class="side">
+  <fieldset class="card"><legend>Experiment</legend>
+   <div class="row" style="margin-top:0"><label for="kind" style="align-self:center">Trolley</label><select id="kind">
+    <option value="0">Constant speed</option><option value="1">Speeding up steadily</option><option value="2">Speeding up from a push</option><option value="3">Slowing down steadily</option><option value="4">Speeds up, then constant</option><option value="m">Mystery tape</option></select></div>
+   <div class="row"><button class="btn primary" id="run">Run the trolley</button><button class="btn" id="cut" disabled>Cut into strips</button></div>
+   <p class="hint">Every dot is 0.02 s after the last. A strip of five gaps is 0.1 s long.</p>
+  </fieldset>
+  <fieldset class="card"><legend>Analyse</legend>
+   <label class="q" for="desc" style="display:block;margin-top:0">How did the trolley move?</label>
+   <div class="row" style="margin-top:6px"><select id="desc"><option value="">Choose…</option><option value="0">Constant speed</option><option value="1">Speeding up steadily</option><option value="3">Slowing down steadily</option><option value="4">Speeding up, then constant speed</option></select><button class="btn" id="c1">Check</button></div>
+   <p class="msg" id="m1" aria-live="polite"></p>
+   <label class="q" for="acc" style="display:block">Acceleration (cm/s²)</label>
+   <div class="row" style="margin-top:6px"><input type="number" id="acc" step="1"><button class="btn" id="c2">Check</button></div>
+   <p class="msg" id="m2" aria-live="polite"></p>
+  </fieldset>
+ </div>
+</div>
+<details><summary>Instructions</summary><ol><li>Pick a trolley motion and press <b>Run the trolley</b>. The tape appears with its dots.</li>
+<li>Look at the spacing. Far-apart dots mean the trolley moved fast between taps. Close dots mean slow.</li>
+<li>Hover over the tape to measure the gap between two neighbouring dots. Divide by 0.02 s to get the speed at that moment.</li>
+<li>Press <b>Cut into strips</b>. Each strip of five gaps covers 0.1 s. The chart stacks the strips side by side, and the line through their tops is a velocity–time graph.</li>
+<li>Say how the trolley moved, then work out the acceleration from how fast the strips grow.</li>
+<li>Try <b>Mystery tape</b> for a motion you do not know in advance.</li></ol></details>
+<details><summary>Theory</summary><p>A ticker timer taps a paper tape at a steady rate, here 50 times a second. The tape is fixed to a trolley and pulled through, so each tap leaves a dot. The dots are always <b>0.02 s</b> apart in time. How far apart they are on the tape depends on how fast the trolley was going.</p>
+<p>Wide spacing means high speed and tight spacing means low speed. Equal spacing means constant velocity. Spacing that grows steadily means constant acceleration.</p>
+<p>The average velocity across any gap is <code>v = distance / 0.02 s</code>. Cutting the tape every five gaps gives strips that each cover 0.1 s. Their lengths are proportional to the average velocity over that 0.1 s. Standing the strips side by side builds a velocity–time bar chart.</p>
+<p>If the strip lengths grow by the same amount each time, the acceleration is constant: <code>a = &Delta;v / &Delta;t = (&Delta;strip length / 0.1 s) / 0.1 s</code>.</p></details>
+<footer>Rebuilt in HTML from the LabVIEW simulation "Ticker Timer".</footer>
+</div>
+<script>
+const K={};
+K.$=(s,r)=>(r||document).querySelector(s);
+K.css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+K.rad=d=>d*Math.PI/180;K.deg=r=>r*180/Math.PI;
+K.f=(x,n)=>(+x).toFixed(n===undefined?1:n);
+K.G=9.81;
+K.fit=function(cv,ratio){
+  const w=cv.clientWidth||600,h=Math.round(w*ratio),d=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(w*d)||cv.height!==Math.round(h*d)){cv.width=Math.round(w*d);cv.height=Math.round(h*d);cv.style.height=h+"px"}
+  const c=cv.getContext("2d");c.setTransform(d,0,0,d,0,0);return {c:c,w:w,h:h};
+};
+K.ctl=function(o){
+  return '<div class="ctl"><label for="'+o.id+'">'+o.label+'</label><output id="'+o.id+'-o" for="'+o.id+'"></output>'+
+  '<input type="range" id="'+o.id+'" min="'+o.min+'" max="'+o.max+'" step="'+o.step+'" value="'+o.value+'" data-unit="'+(o.unit||"")+'"></div>';
+};
+K.wire=function(root,cb){
+  root.querySelectorAll("input[type=range]").forEach(function(i){
+    const out=root.querySelector("#"+i.id+"-o");
+    const dec=String(i.step).indexOf(".")>=0?String(i.step).split(".")[1].length:0;
+    const show=function(){out.textContent=(+i.value).toFixed(dec)+(i.dataset.unit?" "+i.dataset.unit:"")};
+    show();i.addEventListener("input",function(){show();if(cb)cb(i.id,+i.value)});
+  });
+};
+K.arrow=function(c,x0,y0,x1,y1,col,lw,dash){
+  c.save();c.strokeStyle=col;c.fillStyle=col;c.lineWidth=lw||2;if(dash)c.setLineDash(dash);
+  c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();c.setLineDash([]);
+  const a=Math.atan2(y1-y0,x1-x0),L=Math.hypot(x1-x0,y1-y0);
+  if(L>6){c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-9*Math.cos(a-.4),y1-9*Math.sin(a-.4));c.lineTo(x1-9*Math.cos(a+.4),y1-9*Math.sin(a+.4));c.closePath();c.fill()}
+  c.restore();
+};
+K.ticks=function(a,b,n){
+  const raw=(b-a)/n;if(!(raw>0))return [a];
+  const p=Math.pow(10,Math.floor(Math.log10(raw))),m=raw/p;
+  const s=(m<1.5?1:m<3?2:m<7?5:10)*p,out=[];
+  for(let v=Math.ceil(a/s-1e-9)*s;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));
+  return out;
+};
+/* K.plot(c, {x,y,w,h}, {xmin,xmax,ymin,ymax,title,xlabel,series:[{pts,color,width,dash,dots}],cursorX,vlines:[{x,color}],hlines:[{y,color,dash}]}) */
+K.plot=function(c,bx,o){
+  const X=function(v){return bx.x+(v-o.xmin)/(o.xmax-o.xmin)*bx.w};
+  const Y=function(v){return bx.y+bx.h-(v-o.ymin)/(o.ymax-o.ymin)*bx.h};
+  c.save();c.fillStyle=K.css("--surface");c.fillRect(bx.x,bx.y,bx.w,bx.h);
+  c.font="10px "+K.css("--mono");c.lineWidth=1;
+  const gx=K.ticks(o.xmin,o.xmax,Math.max(2,Math.round(bx.w/60))),gy=K.ticks(o.ymin,o.ymax,Math.max(2,Math.round(bx.h/32)));
+  c.strokeStyle=K.css("--grid");c.fillStyle=K.css("--muted");
+  c.textAlign="center";c.textBaseline="top";
+  gx.forEach(function(v){c.beginPath();c.moveTo(X(v),bx.y);c.lineTo(X(v),bx.y+bx.h);c.stroke();c.fillText(String(+v.toFixed(6)),X(v),bx.y+bx.h+3)});
+  c.textAlign="right";c.textBaseline="middle";
+  gy.forEach(function(v){c.beginPath();c.moveTo(bx.x,Y(v));c.lineTo(bx.x+bx.w,Y(v));c.stroke();c.fillText(String(+v.toFixed(6)),bx.x-4,Y(v))});
+  c.strokeStyle=K.css("--muted");
+  if(o.ymin<0&&o.ymax>0){c.beginPath();c.moveTo(bx.x,Y(0));c.lineTo(bx.x+bx.w,Y(0));c.stroke()}
+  if(o.xmin<0&&o.xmax>0){c.beginPath();c.moveTo(X(0),bx.y);c.lineTo(X(0),bx.y+bx.h);c.stroke()}
+  c.beginPath();c.rect(bx.x,bx.y,bx.w,bx.h);c.clip();
+  (o.hlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--muted");c.setLineDash(l.dash||[4,4]);c.beginPath();c.moveTo(bx.x,Y(l.y));c.lineTo(bx.x+bx.w,Y(l.y));c.stroke()});
+  (o.vlines||[]).forEach(function(l){c.strokeStyle=K.css(l.color||"--b");c.setLineDash(l.dash||[]);c.beginPath();c.moveTo(X(l.x),bx.y);c.lineTo(X(l.x),bx.y+bx.h);c.stroke()});
+  c.setLineDash([]);
+  (o.series||[]).forEach(function(s){
+    c.strokeStyle=K.css(s.color||"--accent");c.fillStyle=c.strokeStyle;c.lineWidth=s.width||2;c.setLineDash(s.dash||[]);
+    if(s.dots){s.pts.forEach(function(p){c.beginPath();c.arc(X(p[0]),Y(p[1]),s.r||3.5,0,7);c.fill()})}
+    else{c.beginPath();s.pts.forEach(function(p,i){i?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1]))});c.stroke()}
+  });
+  c.setLineDash([]);
+  if(o.cursorX!==undefined&&o.cursorX!==null){c.strokeStyle=K.css("--ink");c.lineWidth=1;c.beginPath();c.moveTo(X(o.cursorX),bx.y);c.lineTo(X(o.cursorX),bx.y+bx.h);c.stroke()}
+  c.restore();
+  c.save();c.strokeStyle=K.css("--line");c.strokeRect(bx.x+.5,bx.y+.5,bx.w-1,bx.h-1);
+  c.fillStyle=K.css("--ink");c.font="600 11px "+K.css("--mono");c.textAlign="left";c.textBaseline="top";
+  if(o.title)c.fillText(o.title,bx.x+6,bx.y+4);
+  if(o.xlabel){c.fillStyle=K.css("--muted");c.textAlign="right";c.fillText(o.xlabel,bx.x+bx.w-6,bx.y+4)}
+  c.restore();
+  return {X:X,Y:Y};
+};
+K.loop=function(update,draw){
+  let last=performance.now();
+  function fr(now){const dt=Math.min((now-last)/1000,.1);last=now;update(dt);draw();requestAnimationFrame(fr)}
+  requestAnimationFrame(fr);
+};
+K.rand=function(seed){let s=seed>>>0||1;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296}};
+
+(function(){
+"use strict";
+
+const $=K.$,cv=$("#cv"),DT=.02,NT=70,rnd=K.rand(Date.now()%99991);
+const KINDS=[
+ {n:"Constant speed",u:40,a:0},
+ {n:"Speeding up steadily",u:0,a:60},
+ {n:"Speeding up from a push",u:25,a:45},
+ {n:"Slowing down steadily",u:110,a:-65},
+ {n:"Speeds up, then constant",u:0,a:80,tc:.8}
+];
+let cur=null,dots=[],cut=false,hover=-1;
+function pos(k,t){const u=k.u,a=k.a;if(k.tc!==undefined&&t>k.tc){const v1=u+a*k.tc;return u*k.tc+.5*a*k.tc*k.tc+v1*(t-k.tc)}return u*t+.5*a*t*t}
+$("#run").onclick=()=>{
+ let v=$("#kind").value;
+ if(v==="m"){const opts=[0,1,2,3,4];v=opts[Math.floor(rnd()*5)];cur={idx:v,mystery:true}}else{cur={idx:+v,mystery:false}}
+ cur.k=KINDS[cur.idx];
+ dots=[];for(let j=0;j<=NT;j++)dots.push(pos(cur.k,j*DT));
+ cut=false;hover=-1;$("#cut").disabled=false;$("#m1").textContent="";$("#m2").textContent="";$("#acc").value="";$("#desc").value="";
+ $("#ro").textContent="Hover over the tape to measure the gap between two dots.";
+};
+$("#cut").onclick=()=>{if(cur){cut=true;$("#cut").disabled=true}};
+function strips(){const s=[];for(let i=0;i*5+5<=NT;i++)s.push(dots[i*5+5]-dots[i*5]);return s}
+function msg(id,t,c){const m=$(id);m.textContent=t;m.className="msg "+(c||"")}
+$("#c1").onclick=()=>{
+ if(!cur){msg("#m1","Run the trolley first.","bad");return}
+ const d=$("#desc").value;if(d===""){msg("#m1","Choose an answer first.","bad");return}
+ const ok=+d===cur.idx;
+ msg("#m1",ok?"Yes: "+cur.k.n.toLowerCase()+".":"Not quite. Compare the gaps at the start and the end of the tape. The tape shows: "+cur.k.n.toLowerCase()+".",ok?"ok":"bad");
+};
+$("#c2").onclick=()=>{
+ if(!cur){msg("#m2","Run the trolley first.","bad");return}
+ const v=parseFloat($("#acc").value);if(!isFinite(v)){msg("#m2","Type a value first.","bad");return}
+ const a=cur.k.a,ok=Math.abs(v-a)<=Math.max(8,Math.abs(a)*.15);
+ msg("#m2",ok?"Close enough. The trolley accelerated at "+a+" cm/s².":"Not quite. The actual acceleration was "+a+" cm/s². Take two strips, subtract their lengths, then divide by 0.1 s twice.",ok?"ok":"bad");
+};
+cv.addEventListener("pointermove",e=>{
+ if(!cur)return;const r=cv.getBoundingClientRect(),px=e.clientX-r.left,s=tape.s;
+ let best=-1,bd=1e9;for(let j=0;j<NT;j++){const m=(tape.x0+(dots[j]+dots[j+1])/2*s);const d=Math.abs(px-m);if(d<bd){bd=d;best=j}}
+ hover=bd<30?best:-1;
+ if(hover>=0){const g=dots[hover+1]-dots[hover];$("#ro").innerHTML="Gap between dots "+hover+" and "+(hover+1)+": <b>"+K.f(g,2)+" cm</b> in 0.02 s, so v = <b>"+K.f(g/DT,0)+" cm/s</b>"}
+});
+cv.addEventListener("pointerleave",()=>{hover=-1});
+const tape={x0:24,s:1};
+function draw(){
+ const {c,w,h}=K.fit(cv,.8);c.clearRect(0,0,w,h);
+ const th=Math.round(h*.24);
+ c.fillStyle=K.css("--surface");c.fillRect(0,0,w,th+30);c.strokeStyle=K.css("--line");c.strokeRect(.5,.5,w-1,th+29);
+ if(!cur){c.fillStyle=K.css("--muted");c.font="14px "+K.css("--body");c.textAlign="center";c.fillText("Choose a trolley and press Run to make a tape.",w/2,th/2+16);return}
+ const L=dots[NT],s=(w-tape.x0*2)/L;tape.s=s;
+ c.fillStyle=K.css("--stage");c.fillRect(tape.x0-10,18,L*s+20,th-6);
+ c.strokeStyle=K.css("--line");c.strokeRect(tape.x0-10+.5,18.5,L*s+20,th-6);
+ const ym=18+(th-6)/2;
+ for(let j=0;j<=NT;j++){c.fillStyle=(j%5===0)?K.css("--b"):K.css("--ink");c.beginPath();c.arc(tape.x0+dots[j]*s,ym,j%5===0?3.4:2.4,0,7);c.fill()}
+ if(hover>=0){c.strokeStyle=K.css("--accent");c.lineWidth=3;c.beginPath();c.moveTo(tape.x0+dots[hover]*s,ym+12);c.lineTo(tape.x0+dots[hover+1]*s,ym+12);c.stroke();c.lineWidth=1}
+ if(cut){for(let j=0;j<=NT;j+=5){c.strokeStyle=K.css("--warn");c.setLineDash([3,3]);c.beginPath();c.moveTo(tape.x0+dots[j]*s,14);c.lineTo(tape.x0+dots[j]*s,th+4);c.stroke();c.setLineDash([])}}
+ c.fillStyle=K.css("--muted");c.font="10px "+K.css("--mono");c.textAlign="left";c.fillText("tape (time runs left to right, scale "+K.f(s*10/1,0)+" px per 10 cm)",tape.x0,12);
+ const by=th+44,bh=h-by-30,st=strips(),mx=Math.ceil(Math.max.apply(null,st)*1.1);
+ if(!cut){c.fillStyle=K.css("--muted");c.font="13px "+K.css("--body");c.textAlign="center";c.fillText("Press Cut into strips to build the velocity–time chart.",w/2,by+bh/2);return}
+ const ov=K.plot(c,{x:50,y:by,w:w-66,h:bh},{xmin:0,xmax:st.length,ymin:0,ymax:mx,title:"strip length (cm) per 0.1 s",xlabel:"strip number (each 0.1 s)",series:[]});
+ st.forEach((l,i)=>{c.fillStyle=K.css("--a");c.globalAlpha=.8;c.fillRect(ov.X(i)+3,ov.Y(l),ov.X(1)-ov.X(0)-6,ov.Y(0)-ov.Y(l));c.globalAlpha=1;
+  c.strokeStyle=K.css("--ink");c.strokeRect(ov.X(i)+3.5,ov.Y(l)+.5,ov.X(1)-ov.X(0)-7,ov.Y(0)-ov.Y(l))});
+ c.fillStyle=K.css("--muted");c.textAlign="center";c.font="10px "+K.css("--mono");
+ const d=(st[st.length-1]-st[0])/(st.length-1);
+ $("#ro").innerHTML="Strips: "+st.map(x=>K.f(x,1)).join(", ")+" cm. They change by about <b>"+K.f(d,2)+" cm</b> per strip.";
+}
+K.loop(()=>{},draw);
+
+})();
+</script>
+</body>
+</html>
