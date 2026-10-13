@@ -7,7 +7,9 @@ import { createRoomRenderer } from "./roomview.js";
 import { $, h, mulberry32 } from "./dom.js";
 import { createMicroView } from "./micro.js";
 import { microModel, legend } from "../engine/micro.js";
-import { renderIntro, renderPrelab, renderCER, theoryNodes } from "./stages.js";
+import { renderIntro, renderPrelab, renderCER, renderCERHeat, theoryNodes } from "./stages.js";
+import { createHeatBook, drawGraph, goodRows } from "./heatbook.js";
+import { profile, stateAt, reading, assign } from "../engine/heating.js";
 import { runDemo } from "./demo.js";
 import { questDone, questProgress } from "../engine/quests.js";
 import { drawIcon } from "./icons.js";
@@ -16,13 +18,16 @@ import { resolveMode } from "../mode.js";
 import { indexHazards, losePoints } from "../engine/hazards.js";
 import { parseRoom, step, facingTile, hasPPE, tileAt } from "../engine/room.js";
 
+const LABS = { "unknown-solids": "01-unknown-solids.json", heating: "02-heating-curves.json" };
+const PRACTICE = { id: "practice", mass: 10, power: 100, T0: 20, mp: 50, bp: 150, Tend: 90, cs: 2, cl: 2.5, cg: 2, Lf: 200, Lv: 1000 };
 const SHORT = { NaCl: "Salt", sucrose: "Sugar", NaHCO3: "B.Soda", CaCO3: "Chalk", starch: "Starch", citric: "Citric", water: "Water", vinegar: "Vinegar", iodine: "Iodine" };
 
 async function boot() {
   try {
-    const urls = ["content/species.json", "content/reactions.json", "content/labs/01-unknown-solids.json", "content/rooms/main-lab.json", "content/hazards.json", "content/config.json"];
+    const params = new URLSearchParams(location.search), labFile = LABS[params.get("lab")] || LABS["unknown-solids"];
+    const urls = ["content/species.json", "content/reactions.json", "content/labs/" + labFile, "content/rooms/main-lab.json", "content/hazards.json", "content/config.json"];
     const [species, reactions, lab, roomDef, hazardData, config] = await Promise.all(urls.map((u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); })));
-    const params = new URLSearchParams(location.search), modeInfo = await resolveMode(params, config), key = "vlab:" + lab.id;
+    const modeInfo = await resolveMode(params, config), key = "vlab:" + lab.id;
     let saved = null; try { saved = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) { saved = null; }
     if (saved && (saved.lab !== lab.id || saved.version !== 1)) saved = null;
     const go = (resume) => start(species, reactions, lab, roomDef, hazardData, modeInfo, resume);
@@ -42,29 +47,41 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   $("#boot").hidden = true;
   const world = buildWorld(speciesData, reactionData);
   const EL = speciesData.electrolytes;
+  const HEAT = lab.kind === "heating";
+  for (const [id, txt] of Object.entries(lab.roomText || {})) for (const e of Object.values(roomDef.legend)) if (e.id === id) e.text = txt;
   const solids = speciesData.species.filter((s) => s.phase === "s").map((s) => s.id);
   const params = new URLSearchParams(location.search);
   const seed = resume ? resume.seed : params.get("seed") ? parseInt(params.get("seed"), 10) : Math.floor(Math.random() * 1e9);
   const rng = mulberry32(seed);
   const order = solids.slice().sort(() => rng() - 0.5);
-  const unknowns = order.slice(0, 4).map((id, i) => ({ label: "ABCD"[i], id }));
-  const truth = {}; for (const id of solids) truth[id] = fingerprint(world, EL, id, lab.standard);
+  const hsubs = HEAT ? assign(lab.substances.map((x) => x.id), seed, lab.tubes.length) : [];
+  const unknowns = HEAT ? lab.tubes.map((L, i) => ({ label: L, id: hsubs[i] })) : order.slice(0, 4).map((id, i) => ({ label: "ABCD"[i], id }));
+  const truth = {}; if (!HEAT) for (const id of solids) truth[id] = fingerprint(world, EL, id, lab.standard);
   const log = new Log();
 
   const CONT = [
     { key: "b1", label: "B1", name: "Beaker 1", kind: "beaker", cap: 250, empty: 105.0, loc: "bench", slot: 0 },
     { key: "b2", label: "B2", name: "Beaker 2", kind: "beaker", cap: 250, empty: 105.0, loc: "bench", slot: 1 },
     { key: "wg", label: "WG", name: "Watch glass", kind: "watch", cap: 0, empty: 20.0, loc: "bench", slot: 2 }
-  ];
+  ].filter((c) => !(HEAT && c.key === "wg"));
   CONT.forEach((c) => { c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; });
-  const sources = [
+  const sources = HEAT ? unknowns.map((u, i) => ({ key: "s" + u.label, id: u.label, label: `Sample ${u.label}`, short: u.label, group: "Unknown samples", phase: "s", shelf: 0, idx: i, heatSub: u.id, color: "#e8e4d6" })) : [
     ...unknowns.map((u, i) => ({ key: "u" + u.label, id: u.id, label: `Unknown ${u.label}`, short: u.label, group: "Unknown samples", phase: "s", shelf: 0, idx: i })),
     ...["water", "vinegar", "iodine"].map((id, i) => ({ key: id, id, label: speciesData.species.find((s) => s.id === id).name, short: SHORT[id], group: "Liquids", phase: "l", shelf: 0, idx: 4 + i })),
     ...solids.map((id, i) => ({ key: id, id, label: speciesData.species.find((s) => s.id === id).name + " (known)", short: SHORT[id], group: "Known samples", phase: "s", shelf: 1, idx: i }))
   ];
-  sources.forEach((s) => { s.color = speciesData.species.find((x) => x.id === s.id).color; });
+  if (!HEAT) sources.forEach((s) => { s.color = speciesData.species.find((x) => x.id === s.id).color; });
 
-  const S = { sel: "b1", srcKey: sources[0].key, ppe: { goggles: false, apron: false, tongs: false }, inv: [], view: "room", panel: null, mode: modeInfo.mode, incident: null, safety: { points: 100, incidents: [] }, plateOn: false, plateC: 150, bulb: null, bulbUntil: 0, feed: [], notebook: {}, student: "", stage: "intro", prelab: { answers: {}, prediction: "" }, cer: {}, submitted: false, cerDone: false, touched: {}, demo: false, nbSeen: 0 };
+  const S = { sel: "b1", srcKey: sources[0].key, ppe: { goggles: false, apron: false, tongs: false }, inv: [], view: "room", panel: null, mode: modeInfo.mode, incident: null, safety: { points: 100, incidents: [] }, plateOn: false, plateC: 150, bulb: null, bulbUntil: 0, feed: [], notebook: {}, student: "", stage: "intro", prelab: { answers: {}, prediction: "" }, cer: {}, submitted: false, cerDone: false, touched: {}, demo: false, nbSeen: 0, heat: Object.fromEntries(unknowns.map((u) => [u.label, { rows: [], items: [], axes: { title: "", x: "", y: "" } }])), speed: 1, paused: false, stepTo: null, interval: 15 };
+  // ---------- heating model (heating lab only): constant-power plate, temperature from the sample's enthalpy ----------
+  const subOfSrc = (src) => (src.heatSub === "practice" ? PRACTICE : lab.substances.find((x) => x.id === src.heatSub));
+  const hsub = (c) => (c.heat.sub === "practice" ? PRACTICE : lab.substances.find((x) => x.id === c.heat.sub));
+  const hprof = (c) => profile(hsub(c), c.heat.mass);
+  const hdur = (c) => hprof(c).total / hsub(c).power;
+  const hstate = (c) => stateAt(hprof(c), c.heat.E);
+  const hread = (c) => reading(hstate(c).T, seed, Math.floor(c.heat.E / hsub(c).power));
+  const axesFor = (k) => { const u = unknowns.find((x) => x.label === k), b = lab.substances.find((x) => x.id === u.id), dur = profile(b, lab.standardMass).total / b.power, ymin = Math.floor((b.T0 - 10) / 20) * 20, ymax = Math.ceil((b.Tend + 10) / 20) * 20; return { xmax: Math.ceil(dur / 60) * 60, ymin, ymax, xs: 30, ys: ymax - ymin <= 120 ? 10 : 20 }; };
+  const mmss = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
   const byKey = (k) => CONT.find((c) => c.key === k);
 
   // ---------- feedback and rules ----------
@@ -143,7 +160,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     $("#modeLine").textContent = S.mode === "guided" ? "Guided mode: unsafe actions are blocked and explained." : S.mode === "sandbox" ? "Sandbox mode: everything is allowed. Nothing is graded." : `Consequences mode: unsafe actions have real results. Safety points: ${S.safety.points} / 100.`;
   }
   const cur = () => byKey(S.sel);
-  function rawMass(c) { return c.empty + massAccounting(world, c.c).inside; }
+  function rawMass(c) { return c.empty + massAccounting(world, c.c).inside + (c.heat ? c.heat.mass : 0); }
 
   // ---------- actions ----------
   function moveTo(loc) {
@@ -157,11 +174,21 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     c.loc = loc;
     say(`${c.name} is on the ${loc === "hotplate" ? "hot plate" : loc}.`);
   }
+  function addSample(c, src, amt) {
+    if (c.loc !== "balance") return blocked("solid_off_balance", "Weigh solids on the balance. Move the beaker to the balance first.");
+    if (amt > 50) return blocked("too_much_solid", "That is more than a tube holds. Use 50 g or less.");
+    if (c.heat && c.heat.E > 0) return blocked("add_to_hot", "This sample has already been heated. Empty and rinse the beaker, then start again.");
+    if (c.heat && c.heat.sample !== src.id) return blocked("mixed_samples", "That beaker already holds a different sample. Mixing samples ruins both. Empty and rinse it first.");
+    c.heat = c.heat || { sample: src.id, sub: src.heatSub, mass: 0, E: 0, ended: false }; c.heat.mass += amt;
+    log.add("add", { container: c.key, sample: src.id, shown_as: src.label, amount: amt, unit: "g" });
+    say(`Added ${amt} g of ${src.label} to ${c.name}. The balance reads ${(rawMass(c) - c.tare).toFixed(1)} g.`);
+  }
   function addSubstance() {
     if (!ppeOk(true)) return;
     const c = cur(), src = sources.find((s) => s.key === S.srcKey && S.inv.includes(s.key)), amt = parseFloat($("#amt").value);
     if (!src) return blocked("not_carrying", "You are not carrying that jar. Go back to the room and take it from its shelf.");
     if (!(amt > 0)) return say("Enter an amount first.", "warn");
+    if (HEAT) return addSample(c, src, amt);
     if (src.phase === "s") {
       if (c.loc !== "balance") return blocked("solid_off_balance", "Weigh solids on the balance. Move the container to the balance first.");
       if (amt > 100) return blocked("too_much_solid", "That is more than the spatula can carry. Use 100 g or less.");
@@ -206,7 +233,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (!ppeOk(true)) return;
     const c = cur();
     if (c.c.T > 50 && !S.ppe.tongs) return fire("hot_container", { container: c });
-    c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; S.touched[c.key] = [];
+    c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; c.heat = null; S.touched[c.key] = [];
     log.add("empty", { container: c.key }); say(`${c.name} is emptied and rinsed.`);
   }
   function skip(seconds) {
@@ -227,8 +254,19 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
 
   // ---------- time ----------
+  function heatStep(c, dt) {
+    const onPlate = c.loc === "hotplate" && S.plateOn;
+    if (!c.heat) return;
+    if (onPlate && !c.heat.ended) {
+      const sub = hsub(c), total = hprof(c).total;
+      c.heat.E = Math.min(total, c.heat.E + sub.power * dt);
+      if (c.heat.E >= total) { c.heat.ended = true; if (!S.demo) log.add("heat_end", { container: c.key, sample: c.heat.sample }); say(`${c.name}: the run is finished. The heater has reached the end of its range.`, "obs"); if (S.stepTo != null) { S.stepTo = null; S.paused = true; } }
+    }
+    c.c.T = hstate(c).T;
+  }
   function stepAll(dt) {
     for (const c of CONT) {
+      if (HEAT) { heatStep(c, dt); continue; }
       const before = Object.values(c.c.gasLostMol).reduce((a, b) => a + b, 0);
       for (const ev of advance(world, c.c, dt)) {
         say(`${c.name}: ${ev.observations.join("; ")}.`, "obs");
@@ -263,11 +301,12 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function view() {
     const onBalance = CONT.find((c) => c.loc === "balance");
     return {
-      sources: S.inv.map((k, i) => ({ ...sources.find((s) => s.key === k), shelf: 0, idx: i })), selectedSource: S.srcKey, plateOn: S.plateOn, plateC: S.plateC,
+      sources: S.inv.map((k, i) => ({ ...sources.find((s) => s.key === k), shelf: 0, idx: i })), selectedSource: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, plateLabel: HEAT ? "HEATING" : undefined,
       bulb: performance.now() < S.bulbUntil ? S.bulb : null,
       balanceText: onBalance ? `${(rawMass(onBalance) - onBalance.tare).toFixed(1)} g` : "0.0 g",
       containers: CONT.map((c) => {
         const pos = c.loc === "balance" ? SLOTS.balance : c.loc === "hotplate" ? SLOTS.hotplate : SLOTS.bench[c.slot];
+        if (c.heat) { const st = hstate(c); return { key: c.key, label: c.label, kind: c.kind, cap: c.cap, x: pos.x, y: pos.y, liquidMl: 60 * (st.fm - st.fv), liquidColor: "rgba(120,185,235,.78)", pile: st.fm < 1 ? { h: 1 + Math.round(8 * (1 - st.fm)), color: "#ece8da" } : null, fizz: st.phase === "boiling" ? 0.6 : 0, T: st.T, steam: st.phase === "boiling" || st.phase === "gas", selected: c.key === S.sel }; }
         return { key: c.key, label: c.label, kind: c.kind, cap: c.cap, x: pos.x, y: pos.y, liquidMl: c.c.solution.mL, liquidColor: liquidColor(c.c), pile: pileOf(c.c), fizz: c.fizz, T: c.c.T, steam: c.c.T > 95 && c.c.solution.mL > 0, selected: c.key === S.sel };
       })
     };
@@ -297,24 +336,47 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
 
   const ctl = $("#controls");
-  ctl.append(
-    h("div", { class: "controls" },
-      h("label", {}, "Container", h("select", { id: "cont", onchange: (e) => { S.sel = e.target.value; renderControls(); } }, CONT.map((c) => h("option", { value: c.key }, c.name)))),
-      h("div", {}, h("div", { class: "hint" }, "Move it to"), h("div", { class: "controls", style: "gap:6px" },
-        h("button", { onclick: () => moveTo("bench") }, "Bench"), h("button", { onclick: () => moveTo("balance") }, "Balance"), h("button", { onclick: () => moveTo("hotplate") }, "Hot plate")))),
-    h("p", { id: "where", class: "note", style: "margin:10px 0" }),
-    h("div", { class: "controls" },
-      h("label", {}, "Take from", srcSel),
-      h("label", {}, "Amount", h("span", { style: "display:flex;gap:6px;align-items:center" }, h("input", { id: "amt", type: "number", min: "0.1", step: "0.1", value: "1.0", style: "width:90px" }), h("span", { id: "unit" }, "g"))),
-      h("button", { class: "primary", onclick: addSubstance }, "Add")),
-    h("div", { class: "controls", style: "margin-top:10px" },
-      h("button", { onclick: tare }, "Tare balance"), h("button", { onclick: stir }, "Stir"), h("button", { onclick: conduct }, "Test conductivity"),
-      h("button", { onclick: () => skip(60) }, "Skip ahead 60 s"), h("button", { onclick: empty }, "Empty & rinse")),
-    h("div", { class: "controls", style: "margin-top:10px" },
-      h("label", {}, "Hot plate setting", h("span", { style: "display:flex;gap:8px;align-items:center" }, h("input", { id: "plate", type: "range", min: "50", max: "250", step: "10", value: "150", oninput: (e) => setPlate(undefined, +e.target.value) }), h("b", { id: "plateTxt" }, "150 °C"))),
-      h("button", { id: "plateBtn", onclick: () => setPlate(!S.plateOn) }, "Turn on")));
+  const movers = h("div", { class: "controls" },
+    h("label", {}, "Container", h("select", { id: "cont", onchange: (e) => { S.sel = e.target.value; renderControls(); } }, CONT.map((c) => h("option", { value: c.key }, c.name)))),
+    h("div", {}, h("div", { class: "hint" }, "Move it to"), h("div", { class: "controls", style: "gap:6px" },
+      h("button", { onclick: () => moveTo("bench") }, "Bench"), h("button", { onclick: () => moveTo("balance") }, "Balance"), h("button", { onclick: () => moveTo("hotplate") }, "Hot plate"))));
+  const adder = h("div", { class: "controls" },
+    h("label", {}, "Take from", srcSel),
+    h("label", {}, "Amount", h("span", { style: "display:flex;gap:6px;align-items:center" }, h("input", { id: "amt", type: "number", min: "0.1", step: "0.1", value: HEAT ? "10.0" : "1.0", style: "width:90px" }), h("span", { id: "unit" }, "g"))),
+    h("button", { class: "primary", onclick: addSubstance }, "Add"));
+  const timeCtl = () => {
+    const seg = h("span", { class: "seg", id: "speedSeg" }, [1, 5, 20].map((n) => h("button", { "data-s": n, onclick: () => { S.speed = n; log.add("speed", { speed: n }); renderControls(); } }, "×" + n)));
+    const iv = h("select", { id: "ivSel", "aria-label": "Step size", onchange: (e) => { S.interval = +e.target.value; } }, [10, 15].map((n) => h("option", { value: n }, n + " s")));
+    return [h("div", { class: "controls", style: "margin:6px 0 12px" }, h("button", { id: "plateBtn", class: "primary", onclick: () => setPlate(!S.plateOn) }, "Turn plate on"), h("button", { id: "pauseBtn", onclick: () => togglePause() }, "⏸ Pause"), seg, h("label", {}, "Step ", iv), h("button", { id: "advBtn", onclick: advance1 }, "Advance one step")),
+      h("div", { class: "read", style: "margin:0" }, h("div", {}, h("b", { id: "rTime" }, "0:00"), h("span", {}, "Time heated (min:s)")), h("div", {}, h("b", { id: "rTemp" }, "--"), h("span", {}, "Thermometer (°C)")))];
+  };
+  const [timeRow, timeRead] = HEAT ? timeCtl() : [];
+  if (HEAT) ctl.append(timeRead, timeRow);
+  ctl.append(movers, h("p", { id: "where", class: "note", style: "margin:10px 0" }), adder,
+    ...(HEAT ? [h("div", { class: "controls", style: "margin-top:10px" }, h("button", { onclick: tare }, "Tare balance"), h("button", { onclick: empty }, "Empty & rinse"))] : [
+      h("div", { class: "controls", style: "margin-top:10px" },
+        h("button", { onclick: tare }, "Tare balance"), h("button", { onclick: stir }, "Stir"), h("button", { onclick: conduct }, "Test conductivity"),
+        h("button", { onclick: () => skip(60) }, "Skip ahead 60 s"), h("button", { onclick: empty }, "Empty & rinse")),
+      h("div", { class: "controls", style: "margin-top:10px" },
+        h("label", {}, "Hot plate setting", h("span", { style: "display:flex;gap:8px;align-items:center" }, h("input", { id: "plate", type: "range", min: "50", max: "250", step: "10", value: "150", oninput: (e) => setPlate(undefined, +e.target.value) }), h("b", { id: "plateTxt" }, "150 °C"))),
+        h("button", { id: "plateBtn", onclick: () => setPlate(!S.plateOn) }, "Turn on"))]));
+  function togglePause() { S.paused = !S.paused; S.stepTo = null; log.add(S.paused ? "pause" : "play", { sel: S.sel }); renderControls(); }
+  function advance1() {
+    if (!ppeOk()) return; const c = cur();
+    if (!c.heat || c.loc !== "hotplate" || !S.plateOn) return say("Put a weighed sample on the hot plate and turn the plate on first.", "warn");
+    if (c.heat.ended) return say("This run is finished.", "warn");
+    const t = c.heat.E / hsub(c).power; S.stepTo = (Math.floor(t / S.interval + 1e-9) + 1) * S.interval; S.paused = false; log.add("advance", { container: c.key, to: S.stepTo }); renderControls();
+  }
   function renderControls() {
     $("#cont").value = S.sel; const c = cur();
+    if (HEAT) {
+      const st = c.heat ? hstate(c) : null, t = c.heat ? c.heat.E / hsub(c).power : 0;
+      $("#where").textContent = `${c.name} is on the ${c.loc === "hotplate" ? "hot plate" : c.loc}. ` + (c.heat ? `Sample ${c.heat.sample}, ${c.heat.mass.toFixed(1)} g. Hot plate is ${S.plateOn ? "on" : "off"}.` : "It is empty.");
+      $("#rTime").textContent = mmss(t); $("#rTemp").textContent = c.heat ? hread(c).toFixed(1) : "--";
+      $("#plateBtn").textContent = S.plateOn ? "Turn plate off" : "Turn plate on"; $("#pauseBtn").textContent = S.paused ? "▶ Play" : "⏸ Pause";
+      $("#speedSeg").querySelectorAll("button").forEach((b) => b.classList.toggle("on", +b.dataset.s === S.speed)); $("#ivSel").value = String(S.interval);
+      return;
+    }
     const d = describe(world, c.c);
     const parts = [];
     if (c.c.solution.mL > 0) parts.push(`${c.c.solution.mL.toFixed(0)} mL of ${c.c.seen.starch_iodine ? "blue-black" : (c.c.solution.comps.I2 || 0) > 0 ? "amber" : "clear"} liquid`);
@@ -328,16 +390,19 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
 
   // ---------- lab sheet ----------
   $("#title").textContent = lab.title;
-  $("#steps").replaceChildren(...lab.steps.map((s) => h("li", {}, s)));
-  $("#tests").replaceChildren(...lab.tests.map((t) => h("li", {}, h("b", {}, t.name + ". "), t.how)));
-  const table = $("#table");
-  table.replaceChildren(
+  const table = HEAT ? document.createElement("table") : $("#table");
+  if (!HEAT) { $("#steps").replaceChildren(...lab.steps.map((s) => h("li", {}, s))); $("#tests").replaceChildren(...lab.tests.map((t) => h("li", {}, h("b", {}, t.name + ". "), t.how))); }
+  if (!HEAT) table.replaceChildren(
     h("thead", {}, h("tr", {}, h("th", {}, "Sample"), lab.tests.map((t) => h("th", {}, t.name)), h("th", {}, "I think it is"))),
     h("tbody", {}, unknowns.map((u) => h("tr", { "data-u": u.label },
       h("th", { scope: "row" }, "Unknown " + u.label),
       lab.tests.map((t) => h("td", {}, h("select", { "data-u": u.label, "data-t": t.key, "aria-label": `${t.name} of unknown ${u.label}` }, h("option", { value: "" }, "—"), t.options.map(([v, l]) => h("option", { value: v }, l))))),
       h("td", {}, h("select", { "data-u": u.label, "data-t": "id", "aria-label": `Identity of unknown ${u.label}` }, h("option", { value: "" }, "—"), solids.map((id) => h("option", { value: id }, speciesData.species.find((s) => s.id === id).name))))))));
-  // ---------- go ----------
+  let ready = false;
+  const book = HEAT ? createHeatBook({ getData: () => S.heat, axesFor, allowed: () => ["lab", "postlab", "done"].includes(S.stage) || S.demo, act: (t, d) => { if (!S.demo) log.add(t, d); }, onChange: () => { if (ready) renderQuests(); } }) : null;
+  if (HEAT) $("#sheet").replaceChildren(h("button", { class: "x", "data-close": "" }, "Close ✕"), h("h2", {}, "Notebook"),
+    h("details", {}, h("summary", {}, h("b", {}, "Steps")), h("ol", {}, lab.introSteps.map((t) => h("li", {}, t)))), book.el,
+    h("div", { class: "controls foot" }, h("button", { id: "nbToCer", class: "primary", onclick: () => finishData() }, "I'm done with the data → write the CER")));
   // ---------- the room ----------
   const room = parseRoom(roomDef), P = { x: room.start.x, y: room.start.y, face: room.start.face || "u" };
   const roomCanvas = $("#room"), roomR = createRoomRenderer(roomCanvas, room), visited = new Set();
@@ -346,6 +411,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function setView(v) {
     S.view = v; closePanel();
     roomCanvas.hidden = v !== "room"; canvas.hidden = v !== "bench"; $("#controlsCard").hidden = v !== "bench";
+    { const cc = $("#controlsCard"), st = cc.parentNode; if (v === "bench") st.insertBefore(cc, $("#panelCard").nextSibling); else st.appendChild(cc); }
     $("#viewHint").textContent = v === "room" ? "Arrow keys or WASD move you along the floor tiles (diagonally on screen). Press E, or click an object next to you, to use it." : "Click a jar to choose it, or a container to select it. Esc returns to the room.";
     log.add("view", { to: v });
   }
@@ -365,7 +431,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function renderPanel() {
     const t = S.panel; if (!t) return;
     $("#panelCard").hidden = false; $("#panelTitle").textContent = t.type === "shelf" ? t.group : t.type === "locker" ? "Locker" : "Tong rack";
-    if (t.type === "shelf") $("#panelBody").replaceChildren(...GROUP_OF(t.group).map((s) => { const has = S.inv.includes(s.key); return h("div", {}, h("span", {}, s.label.replace(" (known)", "")), h("button", { onclick: () => (has ? putBack(s.key) : take(s.key)) }, has ? "Put back" : "Take")); }));
+    if (t.type === "shelf" && !GROUP_OF(t.group).length) $("#panelBody").replaceChildren(h("p", { class: "hint" }, "Nothing on this shelf is needed for today's lab."));
+    else if (t.type === "shelf") $("#panelBody").replaceChildren(...GROUP_OF(t.group).map((s) => { const has = S.inv.includes(s.key); return h("div", {}, h("span", {}, s.label.replace(" (known)", "")), h("button", { onclick: () => (has ? putBack(s.key) : take(s.key)) }, has ? "Put back" : "Take")); }));
     else {
       const NAME = { goggles: "Goggles", apron: "Apron", tongs: "Tongs" };
       $("#panelBody").replaceChildren(...t.items.map((k) => h("div", {}, h("span", {}, NAME[k]), h("button", { onclick: () => { togglePPE(k); renderPanel(); } }, S.ppe[k] ? (k === "tongs" ? "Put back" : "Take off") : (k === "tongs" ? "Pick up" : "Put on")))));
@@ -397,6 +464,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (k === "escape") { if (S.panel) closePanel(); else if (S.view === "bench") setView("room"); return; }
     if (!["lab", "postlab", "done"].includes(S.stage)) return;
     if (k === "n") return openNotebook(); if (k === "t") return openDlg("dlgTheory"); if (k === "m") return openMicro();
+    if (HEAT && S.view === "bench" && k === " ") { e.preventDefault(); togglePause(); return; }
     if (S.view !== "room" || e.target.tagName === "BUTTON") return;
     if (DIRS[k]) { e.preventDefault(); walk(...DIRS[k]); }
     else if (k === "e" || k === "enter" || k === " ") { e.preventDefault(); interact(facingTile(room, P)); }
@@ -414,7 +482,14 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     S.student = $("#student").value.trim();
     S.notebook = {}; table.querySelectorAll("select").forEach((x) => { (S.notebook[x.dataset.u] ||= {})[x.dataset.t] = x.value; });
   }
+  function heatRecord() {
+    const off = document.createElement("canvas"); off.width = 640; off.height = 400; const samples = {};
+    for (const u of unknowns) { const d = S.heat[u.label]; drawGraph(off, d, axesFor(u.label)); samples[u.label] = { substance: u.id, rows: d.rows, items: d.items, axes: d.axes, plotPng: off.toDataURL("image/png") }; }
+    const qs = lab.prelab.questions, correct = qs.filter((q) => S.prelab.answers[q.id] === q.correct).length;
+    return { version: 2, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, stage: S.stage, submitted: S.cerDone, prelab: { correct, total: qs.length, prediction: S.prelab.prediction, answers: S.prelab.answers }, samples, cer: S.cerDone ? S.cer : null, safety: S.safety, events: log.events };
+  }
   function record() {
+    if (HEAT) return heatRecord();
     collectNotebook();
     return { version: 2, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, unknowns, notebook: S.notebook, stage: S.stage, submitted: S.submitted, prelab: S.prelab, cer: S.cerDone ? S.cer : null, safety: S.safety, summary: { blocked_hazards: log.count("hazard"), blocked_procedures: log.count("procedure"), checks: log.count("check") }, events: log.events };
   }
@@ -426,19 +501,19 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function snapshot() {
     collectNotebook();
     return { version: 1, lab: lab.id, seed, student: S.student, savedAt: new Date().toISOString(), started: log.started, elapsed: (performance.now() - log.t0) / 1000, events: log.events,
-      S: { ppe: S.ppe, inv: S.inv, srcKey: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, safety: S.safety, sel: S.sel, stage: S.stage, prelab: S.prelab, cer: S.cer, submitted: S.submitted, cerDone: S.cerDone, touched: S.touched, nbSeen: S.nbSeen }, P, visited: [...visited], notebook: S.notebook,
-      cont: CONT.map((c) => ({ key: c.key, loc: c.loc, slot: c.slot, tare: c.tare, c: c.c })) };
+      S: { ppe: S.ppe, inv: S.inv, srcKey: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, safety: S.safety, sel: S.sel, stage: S.stage, prelab: S.prelab, cer: S.cer, submitted: S.submitted, cerDone: S.cerDone, touched: S.touched, nbSeen: S.nbSeen, heat: S.heat, speed: S.speed, paused: S.paused, interval: S.interval }, P, visited: [...visited], notebook: S.notebook,
+      cont: CONT.map((c) => ({ key: c.key, loc: c.loc, slot: c.slot, tare: c.tare, c: c.c, heat: c.heat || null })) };
   }
   function autosave() { if (S.demo || S.stage === "intro") return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot())); } catch (e) { /* storage blocked: file save still works */ } }
   function restore(sn, quiet) {
     Object.assign(S.ppe, sn.S.ppe); S.inv = sn.S.inv; S.srcKey = sn.S.srcKey; S.plateOn = sn.S.plateOn; S.plateC = sn.S.plateC; S.safety = sn.S.safety; S.sel = sn.S.sel;
-    for (const k of ["stage", "prelab", "cer", "submitted", "cerDone", "touched", "nbSeen"]) if (sn.S[k] !== undefined) S[k] = sn.S[k];
-    for (const r of sn.cont) { const c = byKey(r.key); c.loc = r.loc; c.slot = r.slot; c.tare = r.tare; c.c = r.c; }
+    for (const k of ["stage", "prelab", "cer", "submitted", "cerDone", "touched", "nbSeen", "heat", "speed", "paused", "interval"]) if (sn.S[k] !== undefined) S[k] = sn.S[k];
+    for (const r of sn.cont) { const c = byKey(r.key); c.loc = r.loc; c.slot = r.slot; c.tare = r.tare; c.c = r.c; c.heat = r.heat || null; }
     Object.assign(P, sn.P); sn.visited.forEach((v) => visited.add(v));
     log.events = sn.events; log.started = sn.started; log.t0 = performance.now() - sn.elapsed * 1000;
     $("#student").value = sn.student || "";
     table.querySelectorAll("select").forEach((x) => { const v = (sn.notebook[x.dataset.u] || {})[x.dataset.t]; if (v) x.value = v; });
-    $("#plate").value = S.plateC; syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
+    if (!HEAT) $("#plate").value = S.plateC; if (book) book.refresh(); syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
     lockTable(); if (!quiet) { log.add("resume", { savedAt: sn.savedAt }); say("Welcome back. Your saved lab is restored."); }
   }
   $("#save").addEventListener("click", () => { autosave(); downloadJSON(fileName("lab-save"), snapshot()); say("Progress saved to your Downloads folder, and kept in this browser.", "obs"); });
@@ -474,11 +549,12 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const tip = $("#tip"), FIX = { balance: ["Balance", "Weighs solids. Tare it with the empty container on it."], hotplate: ["Hot plate", "Heats a container. Anything on it gets hot, so use tongs."], tester: ["Conductivity tester", "A bulb that glows when the liquid carries electric current."] };
   function infoForBench(hit) {
     if (hit.type === "fixture") return { name: FIX[hit.key][0], blurb: FIX[hit.key][1], icon: hit.key };
+    if (HEAT && hit.type === "container") { const c = byKey(hit.key); return { name: c.name, blurb: `${c.cap} mL. ${c.heat ? `Sample ${c.heat.sample}, ${c.heat.mass.toFixed(1)} g, ${hread(c).toFixed(1)} °C` : "Empty"}. ${c.key === S.sel ? "Click again to zoom in on the particles." : "Click to select."}`, icon: "beaker" }; }
     if (hit.type === "container") { const c = byKey(hit.key), d = describe(world, c.c); return { name: c.name, blurb: c.kind === "watch" ? "Holds solids only. Never liquid." : `${c.cap} mL. ${c.c.solution.mL > 0 ? c.c.solution.mL.toFixed(0) + " mL inside" : "Empty"}${d.undissolvedG > 0.02 ? ", solid at the bottom" : ""}. ${c.c.T.toFixed(0)} °C. ${c.key === S.sel ? "Click again to zoom in on the particles." : "Click to select."}`, icon: c.kind === "watch" ? "watch" : "beaker" };
     
     }
     const sr = sources.find((x) => x.key === hit.key);
-    return { name: sr.label, blurb: sr.key.startsWith("u") ? "One of six white solids. Test it to find out which." : sr.phase === "l" ? "A liquid. Measured in mL." : "Known sample to compare against. Measured in g.", icon: "jar", color: sr.color };
+    return { name: sr.label, blurb: sr.heatSub ? "A sealed tube of an unidentified solid. Weigh some out and heat it." : sr.key.startsWith("u") ? "One of six white solids. Test it to find out which." : sr.phase === "l" ? "A liquid. Measured in mL." : "Known sample to compare against. Measured in g.", icon: "jar", color: sr.color };
   }
   function showTip(ev, info) {
     if (!info) { tip.hidden = true; return; }
@@ -496,8 +572,13 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   document.querySelectorAll("dialog [data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
   const nbCells = () => [...table.querySelectorAll("select")];
   const nbFilled = () => nbCells().filter((x) => x.value).length;
-  function lockTable() { nbCells().forEach((x) => { x.disabled = S.submitted; }); const b = $("#nbSubmit"); if (b) b.hidden = S.submitted; $("#nbDone").hidden = !S.submitted; }
+  function lockTable() { if (HEAT) return; nbCells().forEach((x) => { x.disabled = S.submitted; }); const b = $("#nbSubmit"); if (b) b.hidden = S.submitted; $("#nbDone").hidden = !S.submitted; }
+  function finishData() {
+    if (S.stage === "lab") { S.stage = "postlab"; log.add("data_done", {}); }
+    closeDlg("dlgNotebook"); say("Data finished. Now write your Claim, Evidence, Reasoning.", "obs"); openCER(); renderQuests();
+  }
   function openNotebook() {
+    if (HEAT) { if (!S.paused) { S.paused = true; S.stepTo = null; say("The clock pauses while your notebook is open. Press Play at the bench to continue."); } const hc = cur(); if (hc.heat && S.heat[hc.heat.sample]) book.select(hc.heat.sample); else book.refresh(); log.add("notebook_open"); return openDlg("dlgNotebook"); }
     S.nbSeen = log.events.filter((e) => e.type === "conductivity" || e.type === "observe").length; log.add("notebook_open");
     updateNb(); openDlg("dlgNotebook");
   }
@@ -508,15 +589,16 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     $("#nbCount").textContent = S.submitted ? "Submitted." : `${n} of ${tot} boxes filled. No answer check: retest anything you doubt before you submit.`;
   }
   table.addEventListener("change", () => { confirmSubmit = false; updateNb(); });
-  $("#nbSubmit").addEventListener("click", () => {
+  $("#nbSubmit")?.addEventListener("click", () => {
     if (!confirmSubmit) { confirmSubmit = true; return updateNb(); }
     collectNotebook(); S.submitted = true; S.stage = "postlab"; lockTable(); log.add("submit", { notebook: S.notebook }); closeDlg("dlgNotebook");
     say("Answers submitted. Now write your Claim, Evidence, Reasoning.", "obs"); openCER();
   });
-  function openCER() { renderCER($("#cerBody"), stageCtx); openDlg("dlgCER"); }
+  function openCER() { (HEAT ? renderCERHeat : renderCER)($("#cerBody"), stageCtx); openDlg("dlgCER"); }
   const stageCtx = {
     lab, S, seed, unknowns,
     getNotebook: () => { collectNotebook(); return S.notebook; },
+    getRows: () => Object.fromEntries(Object.keys(S.heat).map((k) => [k, goodRows(S.heat[k])])),
     onDemo: () => demoStart(),
     onIntroDone: (name) => { S.student = name; S.stage = "prelab"; log.add("stage", { to: "prelab", name }); closeDlg("dlgIntro"); renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); },
     onAnswer: (id, choice, correct) => log.add("prelab_answer", { q: id, choice, correct }),
@@ -533,11 +615,11 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   // quest list and coach bar
   let qsig = "";
   function renderQuests() {
-    const st = { ppe: S.ppe, notebookFilled: nbFilled(), submitted: S.submitted, cerDone: S.cerDone };
+    const hk = Object.keys(S.heat), st = { ppe: S.ppe, notebookFilled: nbFilled(), submitted: S.submitted, cerDone: S.cerDone, heat: { rows: Object.fromEntries(hk.map((k) => [k, goodRows(S.heat[k]).length])), plot: Object.fromEntries(hk.map((k) => [k, S.heat[k].items.filter((i) => i.k === "p").length])), lines: Object.fromEntries(hk.map((k) => [k, S.heat[k].items.filter((i) => i.k === "l").length])) } };
     const items = lab.quests.map((q) => ({ q, done: questDone(q, log.events, st), prog: questProgress(q, log.events, st) }));
     const ai = items.findIndex((i) => !i.done), stage = S.stage, obs = log.events.filter((e) => e.type === "conductivity" || e.type === "observe").length;
     const sig = stage + "|" + items.map((i) => (i.done ? 1 : 0) + ":" + (i.prog ?? "")).join("|") + "|" + (obs > S.nbSeen);
-    $("#nbDot").hidden = !(obs > S.nbSeen) || S.submitted; $("#btnCER").hidden = stage !== "postlab";
+    $("#nbDot").hidden = HEAT || !(obs > S.nbSeen) || S.submitted; $("#btnCER").hidden = stage !== "postlab";
     if (sig === qsig) return; qsig = sig;
     const doneN = items.filter((i) => i.done).length, from = Math.max(0, (ai < 0 ? items.length : ai) - 1), shown = items.slice(from, from + 5);
     $("#questHead").textContent = `Tasks (${doneN} of ${items.length})`;
@@ -546,25 +628,27 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
 
   // microscope: click a container twice (or press M) to zoom in
-  const micro = createMicroView($("#microCanvas"), (m) => $("#microLegend").replaceChildren(...legend(m).map((l) => h("li", {}, h("i", { style: `background:${l.color}` }), l.text))));
+  const PHASE_KEY = [{ color: "#b9c8ff", text: "Solid: particles vibrate in place" }, { color: "#7fb3ff", text: "Liquid: particles slide past each other" }, { color: "#ffc16b", text: "Gas: particles fly freely" }];
+  const micro = createMicroView($("#microCanvas"), (m) => $("#microLegend").replaceChildren(...(m.phase ? PHASE_KEY : legend(m)).map((l) => h("li", {}, h("i", { style: `background:${l.color}` }), l.text))));
   function openMicro(key) {
     if (!S.demo && !["lab", "postlab", "done"].includes(S.stage)) return;
     const c = byKey(key || S.sel), anon = !S.submitted && (S.touched[c.key] || []).some((k) => k.startsWith("u"));
     $("#microTitle").textContent = `${c.name} under the microscope`; $("#microNote").textContent = anon ? "Particle names are hidden while your unknowns are unidentified. Colors show charge: blue +, red −." : "";
     log.add("micro", { container: c.key });
-    micro.open(() => microModel(world, c.c, speciesData.micro, { fizz: c.fizz, anon }), c.name); openDlg("dlgMicro");
+    micro.open(() => (c.heat ? { T: hstate(c).T, liquidMl: 0, water: false, lattice: [], dissolved: [], gas: [], phase: { fm: hstate(c).fm, fv: hstate(c).fv } } : microModel(world, c.c, speciesData.micro, { fizz: c.fizz, anon })), c.name); openDlg("dlgMicro");
   }
   dlg("dlgMicro").addEventListener("close", () => micro.close());
 
   // scripted demo: runs on the real room and bench, then restores the student's own state
   const demoApi = {
-    demo: { running: false, stop() {} },
+    demo: { running: false, stop() {} }, heat: HEAT,
     freeze() {
       const snap = structuredClone(snapshot()), extra = { feed: S.feed.slice(), view: S.view };
       S.demo = true; demoApi.demo.running = true;
       Object.assign(S.ppe, { goggles: false, apron: false, tongs: false }); S.inv = []; S.panel = null; S.plateOn = false; S.touched = {}; visited.clear();
       Object.assign(P, { x: room.start.x, y: room.start.y, face: "u" });
-      CONT.forEach((c, i) => { c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; c.loc = "bench"; c.slot = i; }); S.sel = "b1";
+      CONT.forEach((c, i) => { c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; c.loc = "bench"; c.slot = i; c.heat = null; }); S.sel = "b1";
+      if (HEAT) { S.heat = Object.fromEntries(unknowns.map((u) => [u.label, { rows: [], items: [], axes: { title: "", x: "", y: "" } }])); Object.assign(S, { speed: 1, paused: false, stepTo: null, interval: 10 }); book.refresh(); }
       document.querySelectorAll("dialog[open]").forEach((d) => d.close()); setView("room"); renderPPE(); renderInv(); syncUnit();
       return { snap, extra };
     },
@@ -573,17 +657,17 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       S.demo = false; demoApi.demo.running = false; $("#demoBar").hidden = true; document.querySelectorAll("dialog[open]").forEach((d) => d.close());
       setView(extra.view); renderPPE(); renderInv(); renderControls(); syncUnit(); qsig = "";
     },
-    caption(n, text) { $("#demoBar").hidden = false; $("#demoText").textContent = `Demo ${n} of 9 · ${text}`; },
+    caption(n, text) { $("#demoBar").hidden = false; $("#demoText").textContent = `Demo ${n} of ${HEAT ? 10 : 9} · ${text}`; },
     walk: (d) => walk(d[0], d[1]), interact: () => interact(facingTile(room, P)), closePanel, togglePPE, take,
     addPractice() {
       world.species.set("practice", { id: "practice", name: "Practice salt (NaI)", formula: "NaI", phase: "s", solubility: 184, color: "#f4f4f0", heatEvents: [] });
       EL.NaI = { type: "strong", lambda: 100 }; speciesData.micro.NaI = { kind: "ionic", label: "NaI", ions: [{ label: "Na⁺", color: "#e0a030", per: 1 }, { label: "I⁻", color: "#7a3b9c", per: 1 }] };
-      sources.push({ key: "practice", id: "practice", label: "Practice salt", short: "Salt", group: "Practice", phase: "s", shelf: 0, idx: 0, color: "#f4f4f0" });
+      sources.push({ key: "practice", id: "practice", label: HEAT ? "Practice tube" : "Practice salt", short: "Salt", group: "Practice", phase: "s", shelf: 0, idx: 0, color: "#f4f4f0", heatSub: HEAT ? "practice" : undefined });
       S.inv.push("practice"); renderInv(); syncUnit();
     },
     removePractice() { world.species.delete("practice"); delete EL.NaI; delete speciesData.micro.NaI; const i = sources.findIndex((x) => x.key === "practice"); if (i >= 0) sources.splice(i, 1); },
-    act: { moveTo, tare, stir, conduct, add: addSubstance, pick: (key, amt) => { S.srcKey = key; syncUnit(); $("#amt").value = amt; } },
-    openMicro: () => openMicro("b1"), closeMicro: () => closeDlg("dlgMicro"), openNotebook: () => { updateNb(); openDlg("dlgNotebook"); }, closeNotebook: () => closeDlg("dlgNotebook")
+    act: { plate: (on) => setPlate(on), advance: advance1, row() { const c = cur(), t = c.heat.E / hsub(c).power; book.addRow({ t: String(Math.round(t)), T: String(hread(c)), s: hstate(c).phase === "melting" ? "solid + liquid" : hstate(c).phase === "solid" ? "solid" : "liquid" }); }, graph: () => book.pane("graph"), plot() { for (const r of S.heat.X.rows) { book.addPoint(Math.round(+r.t / 6) * 6, Math.round(+r.T / 2) * 2); } S.heat.X.axes = { title: "Heating curve of practice sample", x: "Time (s)", y: "Temperature (°C)" }; book.refresh(); }, moveTo, tare, stir, conduct, add: addSubstance, pick: (key, amt) => { S.srcKey = key; syncUnit(); $("#amt").value = amt; } },
+    openMicro: () => openMicro("b1"), closeMicro: () => closeDlg("dlgMicro"), openNotebook: () => { if (HEAT) { book.refresh(); S.paused = true; } else updateNb(); openDlg("dlgNotebook"); }, closeNotebook: () => closeDlg("dlgNotebook")
   };
   $("#demoStop").addEventListener("click", () => demoApi.demo.stop());
   async function demoStart() {
@@ -594,6 +678,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   const intro = () => { renderIntro($("#introBody"), stageCtx); openDlg("dlgIntro"); };
 
+  ready = true;
   syncUnit(); renderPPE(); renderControls(); renderFeed(); renderInv(); renderSafety(); setView("room");
   if (modeInfo.rejected) { log.add("mode_rejected", { asked: modeInfo.rejected }); say("This link's mode could not be verified, so you are in Guided mode.", "warn"); }
   say("Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
@@ -601,11 +686,17 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   renderQuests();
   if (S.stage === "intro") intro(); else if (S.stage === "prelab") { renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); }
   setInterval(autosave, 5000);
-  $("#boot").hidden = true; $("#app").hidden = false;
+  $("#boot").hidden = true; $("#app").hidden = false; if (HEAT) $("#print").hidden = true;
   let last = performance.now(), t0 = last, lastCtl = 0;
   function frame(now) {
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
-    stepAll(dt); tickIncident(now);
+    let sdt = dt;
+    if (HEAT) {
+      if (S.paused) sdt = 0;
+      else { sdt = dt * (S.stepTo != null ? 20 : S.speed); const c = cur(); if (S.stepTo != null && c.heat && c.loc === "hotplate" && S.plateOn) sdt = Math.min(sdt, Math.max(S.stepTo - c.heat.E / hsub(c).power, 0)); }
+    }
+    stepAll(sdt); tickIncident(now);
+    if (HEAT && S.stepTo != null) { const c = cur(); if (!c.heat || c.loc !== "hotplate" || !S.plateOn) S.stepTo = null; else if (c.heat.E / hsub(c).power >= S.stepTo - 1e-6) { S.stepTo = null; S.paused = true; say(`Paused at ${mmss(c.heat.E / hsub(c).power)}. Write the reading down.`); } }
     if (S.view === "room") roomR.draw(P, S.ppe, hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
     if (now - lastCtl > 250) { renderControls(); renderQuests(); lastCtl = now; }
     requestAnimationFrame(frame);

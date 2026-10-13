@@ -5,6 +5,8 @@ export function theoryNodes(lab) {
   return lab.theory.map((s, i) => h("details", { open: i === 0 }, h("summary", {}, h("b", {}, s.title)), s.body.map((p) => h("p", {}, p))));
 }
 
+const DEFAULT_STEPS = ["Watch the demo to see the controls in action (about a minute).", "Do the pre-lab: read the theory, answer six questions, and write a prediction. The lab door stays locked until you finish.", "Suit up, collect your jars, and run the five tests at your bench.", "Record only what you observe in your notebook, then submit.", "Write a Claim, Evidence, Reasoning to finish."];
+
 export function renderIntro(box, ctx) {
   const { lab } = ctx;
   const key = (k, t) => h("tr", {}, h("td", {}, h("kbd", {}, k)), h("td", {}, t));
@@ -15,11 +17,11 @@ export function renderIntro(box, ctx) {
   box.replaceChildren(
     h("h2", {}, lab.title), h("p", {}, lab.intro),
     h("h3", {}, "How this lab works"),
-    h("ol", {}, h("li", {}, "Watch the demo to see the controls in action (about a minute)."), h("li", {}, "Do the pre-lab: read the theory, answer six questions, and write a prediction. The lab door stays locked until you finish."), h("li", {}, "Suit up, collect your jars, and run the five tests at your bench."), h("li", {}, "Record only what you observe in your notebook, then submit."), h("li", {}, "Write a Claim, Evidence, Reasoning to finish.")),
+    h("ol", {}, (lab.introSteps || DEFAULT_STEPS).map((t) => h("li", {}, t))),
     h("h3", {}, "Controls"),
     h("table", { class: "keys" },
       key("← ↑ → ↓ or W A S D", "Walk. On screen you move along the floor diagonals."), key("E", "Use what you are facing (locker, shelf, bench, sink…)."), key("N / T / M", "Notebook, Theory, Microscope."),
-      key("Esc", "Step away from the bench, or close a window."), key("Hover", "Point at anything to see its name and picture.")),
+      key("Esc", "Step away from the bench, or close a window."), key("Hover", "Point at anything to see its name and picture."), ...(lab.introKeys || []).map(([k, t]) => key(k, t))),
     h("p", { class: "hint" }, "The bar along the bottom is your log. It tells you what happened and why. Read it."),
     h("label", { style: "display:block;margin:12px 0" }, "Your name ", name),
     h("div", { class: "controls foot" }, h("button", { onclick: ctx.onDemo }, "▶ Watch the demo"), go));
@@ -96,4 +98,34 @@ export function renderCER(box, ctx) {
     h("h3", {}, "Reasoning"), h("p", { class: "hint" }, "Explain why that evidence means that substance. Use particles. Evidence says what happened; reasoning says why it matters."), chips(post.starters.reasoning, reasoning), h("p", { class: "hint" }, "Word bank (click to insert):"), chips(post.wordBank, reasoning), reasoning, rc,
     h("h3", {}, "Check yourself"), checks, status, h("div", { class: "controls foot" }, h("button", { onclick: () => ctx.onCerClose() }, "Back to the lab"), submit));
   evidence();
+}
+
+// CER for the heating lab: name both samples from the reference table, cite readings from your own table.
+export function renderCERHeat(box, ctx) {
+  const { lab, S } = ctx, post = lab.postlab, C = S.cer, rowsOf = ctx.getRows();
+  const opts = () => [h("option", { value: "" }, "— choose —"), ...lab.reference.map((r) => h("option", { value: r.id }, r.name))];
+  const selX = h("select", {}, ...opts()), selY = h("select", {}, ...opts()); selX.value = C.X || ""; selY.value = C.Y || "";
+  const claim = h("textarea", { rows: 2, style: "width:100%", "aria-label": "Claim" }), reasoning = h("textarea", { rows: 6, style: "width:100%", "aria-label": "Reasoning" }), note = h("textarea", { rows: 2, style: "width:100%", placeholder: "Anything else from your data (optional)" });
+  claim.value = C.claim || ""; reasoning.value = C.reasoning || ""; note.value = C.note || "";
+  const evBox = h("div", { class: "ev" }), checks = h("div", {}), st = h("p", { class: "hint", role: "status" }), picks = new Set(C.evidence || []);
+  const items = []; for (const k of Object.keys(rowsOf)) for (const r of rowsOf[k]) items.push(`Sample ${k}, ${r.t} s: ${r.T} °C${r.s ? ", " + r.s : ""}`);
+  evBox.replaceChildren(...(items.length ? items.map((t) => h("label", { class: "ck" }, h("input", { type: "checkbox", value: t, checked: picks.has(t) ? "" : null, onchange: (e) => { e.target.checked ? picks.add(t) : picks.delete(t); update(); } }), t)) : [h("p", { class: "hint" }, "Your table is empty. Close this window and record some readings first.")]));
+  const submit = h("button", { class: "primary", disabled: true, onclick: () => ctx.onCerDone({ ...C }) }, "Submit CER");
+  function update() {
+    const nc = wordCount(claim.value), nr = wordCount(reasoning.value), ne = picks.size + (wordCount(note.value) >= post.minWords.evidence ? 1 : 0), all = [...checks.querySelectorAll("input")].every((i) => i.checked);
+    const ok = selX.value && selY.value && nc >= post.minWords.claim && ne >= 2 && nr >= post.minWords.reasoning && all; submit.disabled = !ok;
+    st.textContent = ok ? "Ready to submit." : `Needed: both substances chosen, a claim (${post.minWords.claim} words), two pieces of evidence, ${post.minWords.reasoning} words of reasoning (you have ${nr}), and every box ticked.`;
+    Object.assign(C, { X: selX.value, Y: selY.value, claim: claim.value, reasoning: reasoning.value, note: note.value, evidence: [...picks] });
+  }
+  for (const el of [claim, reasoning, note, selX, selY]) el.addEventListener("input", update);
+  checks.replaceChildren(...post.checklist.map((t) => h("label", { class: "ck" }, h("input", { type: "checkbox", onchange: update }), t)));
+  const chips = (list, ta) => h("div", { class: "chips" }, list.map((t) => h("button", { class: "chip", type: "button", onclick: () => { insertAt(ta, t); update(); } }, t)));
+  box.replaceChildren(h("h2", {}, "Claim, Evidence, Reasoning"), h("p", {}, post.prompt),
+    h("h3", {}, "Reference table"), h("table", { class: "keys" }, h("tbody", {}, lab.reference.map((r) => h("tr", {}, h("td", {}, r.name), h("td", {}, `melts ${r.mp} °C`), h("td", {}, `boils ${r.bp} °C`))))),
+    h("p", {}, "Sample X is ", selX, "  Sample Y is ", selY),
+    h("h3", {}, "Claim"), h("p", { class: "hint" }, "One or two sentences that answer the question."), chips(post.starters.claim, claim), claim,
+    h("h3", {}, "Evidence"), h("p", { class: "hint" }, "Tick readings from your own table that support the claim. Plateau readings are the strongest."), evBox, note,
+    h("h3", {}, "Reasoning"), h("p", { class: "hint" }, "Explain why that evidence points to that substance. Say where the energy goes during a plateau. Evidence says what happened; reasoning says why it matters."), chips(post.starters.reasoning, reasoning), h("div", { class: "chips" }, post.wordBank.map((t) => h("button", { class: "chip", type: "button", onclick: () => { insertAt(reasoning, t + " "); update(); } }, t))), reasoning,
+    h("h3", {}, "Check yourself"), checks, st, h("div", { class: "controls foot" }, h("button", { onclick: () => ctx.onCerClose() }, "Back to the lab"), submit));
+  update();
 }

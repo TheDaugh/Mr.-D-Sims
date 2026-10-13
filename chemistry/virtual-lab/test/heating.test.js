@@ -16,8 +16,8 @@ test("every substance plateaus at its melting point and (if reached) boiling poi
 test("run lengths suit a class period and give enough rows", () => {
   for (const s of lab.substances) { const sec = profile(s, s.mass).total / s.power; assert.ok(sec > 180 && sec < 420, s.id + " " + sec); }
 });
-test("water mass 10 g follows q = mcΔT: 0 to 100 C liquid takes 4184 J", () => {
-  const w = sub("water"), p = profile(w, w.mass); assert.ok(Math.abs(p.segs[2].J - 10 * 4.18 * 100) < 5);
+test("q = mcΔT: naphthalene liquid piece takes m·c·ΔT", () => {
+  const n = sub("naphthalene"), p = profile(n, n.mass); assert.ok(Math.abs(p.segs[2].J - 10 * 1.7 * (218 - 80)) < 1);
 });
 test("reading wobble is small and repeatable", () => {
   assert.equal(reading(50, 7, 30), reading(50, 7, 30)); assert.ok(Math.abs(reading(50, 7, 30) - 50) <= 0.3);
@@ -31,6 +31,6 @@ test("reference table never contains a duplicate melting and boiling pair", () =
   for (const s of lab.substances) { const r = lab.reference.find((x) => x.id === s.id); assert.ok(r && r.mp === s.mp && r.bp === s.bp, s.id); }
 });
 test("checkData flags a wrong temperature", () => {
-  const w = sub("water"), t = 100; const truth = stateAt(profile(w, w.mass), t * w.power).T;
+  const w = sub("lauric"), t = 100; const truth = stateAt(profile(w, w.mass), t * w.power).T;
   const r = checkData(w, w.mass, w.power, [{ t, T: truth }, { t, T: truth + 20 }]); assert.deepEqual(r, { good: 1, bad: 1 });
 });

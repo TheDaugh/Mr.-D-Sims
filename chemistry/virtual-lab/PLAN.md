@@ -192,10 +192,12 @@ Every action appends one small JSON event. The log is the grading record, the te
 - Needs Ian's review: `micro` table in species.json, theory text, pre-lab questions, quests, CER rubric.
 - Next: heating-curve lab (students type data and plot by hand), then specific heat; single-file bundle.
 
-## Lab 2: heating curves (`heating.html`)
-- Same flow as lab 1: intro and slower scripted demo (practice sample), theory, pre-lab, bench, CER, downloadable record.
-- Two blinded samples (X, Y) drawn from water, lauric acid, naphthalene by seed. Constant-power heater; pause, ×1/×5/×20, "advance one step" (10 or 15 s).
-- Students type time, temperature and state; plot dots and lines by hand on a blank graph (snap to minor gridlines); the computer never draws the curve.
-- Record holds table, graph image, CER and event log. `teacher.html` shows graphs, data accuracy (within 3 °C of truth), CER and a 4-part rubric (claim, evidence, reasoning, graph).
-- Needs Ian's review: substance constants (approximate), theory, pre-lab questions, rubric.
+## Lab 2: heating curves (same app: `index.html?lab=heating`)
+- One app, many labs: `?lab=` picks `content/labs/<file>.json`; `lab.kind` ("heating") switches the bench behavior. Same room, PPE, locker, tongs rack, shelves, inventory, hazards, modes, microscope, tasks, bottom log, demo.
+- Samples X and Y (two of lauric acid, naphthalene, p-dichlorobenzene, by seed) are tubes on the UNKNOWNS shelf. Students weigh 10 g on the balance (any mass works and scales the plateau length), move the beaker to the hot plate with tongs, and turn the plate on.
+- Constant-power plate; temperature from the sample's enthalpy (`engine/heating.js`). Pause, ×1/×5/×20, "advance one step" (10 or 15 s). The clock pauses when the notebook opens.
+- Notebook (`ui/heatbook.js`): students type time, temperature and state; plot dots and lines on a blank graph (snap to minor gridlines). The computer never draws the curve.
+- Microscope shows solid / liquid / gas particles from the same state.
+- Record holds table, graph image, CER and event log. `teacher.html` shows graphs, data accuracy (within 3 °C), CER and a 4-part rubric (claim, evidence, reasoning, graph).
+- Needs Ian's review: substance constants (approximate), theory, pre-lab questions, quests, rubric.
 - Next: specific-heat lab (scaffolded, second), single-file bundle.

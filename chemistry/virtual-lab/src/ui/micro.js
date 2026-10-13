@@ -43,10 +43,31 @@ export function createMicroView(canvas, legendBox) {
     else if (p.shape === "chain") { ctx.strokeStyle = p.color; ctx.lineWidth = 1.8; ctx.beginPath(); for (let i = 0; i < 6; i++) { const x = p.x - 7 + i * 3, y = p.y + Math.sin(p.ang + i) * 2; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); }
     else { dot(p.x, p.y, 2.4, p.color); dot(p.x + Math.cos(p.ang) * 3.4, p.y + Math.sin(p.ang) * 3.4, 1.6, p.color); dot(p.x + Math.cos(p.ang + 2.3) * 3.4, p.y + Math.sin(p.ang + 2.3) * 3.4, 1.6, p.color); }
   }
+  // Phase view for the heating lab: solid particles jiggle in place, liquid ones slide in a pool, gas ones fly free.
+  let pp = null;
+  function drawPhase(dt) {
+    const { fm, fv } = model.phase, k = Math.sqrt((model.T + 273) / 300), n = 60;
+    if (!pp) pp = Array.from({ length: n }, (_, i) => ({ r: Math.random(), hx: 40 + (i % 12) * 20, hy: FLOOR - 12 - Math.floor(i / 12) * 15, x: 0, y: 0, a: rnd(0, 6.3), m: 0, ph: rnd(0, 6.3), w: rnd(4, 8) }));
+    R(0, 0, W, H, "#10202e"); R(6, 14, 2, FLOOR - 4, "#9db6c7"); R(W - 8, 14, 2, FLOOR - 4, "#9db6c7"); R(6, FLOOR + 2, W - 12, 3, "#9db6c7");
+    const t = performance.now() / 1000;
+    for (const p of pp) {
+      const mode = p.r < fv ? 2 : p.r < fm ? 1 : 0;
+      if (mode === 0) { const A = 0.7 + 1.5 * k; p.x = p.hx + A * Math.sin(t * p.w + p.ph); p.y = p.hy + A * Math.cos(t * p.w * 0.9 + p.ph); }
+      else {
+        if (p.m !== mode) { if (p.m === 0) { p.x = p.hx; p.y = p.hy; } p.m = mode; }
+        p.a += rnd(-1.4, 1.4) * dt * 3; const v = (mode === 1 ? 16 : 60) * k; p.x += Math.cos(p.a) * v * dt; p.y += Math.sin(p.a) * v * dt;
+        const top = mode === 1 ? FLOOR - 75 : 8;
+        if (p.x < 12) { p.x = 12; p.a = Math.PI - p.a; } if (p.x > W - 12) { p.x = W - 12; p.a = Math.PI - p.a; } if (p.y < top) { p.y = top; p.a = -p.a; } if (p.y > FLOOR - 6) { p.y = FLOOR - 6; p.a = -p.a; }
+      }
+      dot(p.x, p.y, 3.2, mode === 2 ? "#ffc16b" : mode === 1 ? "#7fb3ff" : "#b9c8ff"); dot(p.x + 1, p.y - 1, 1, "rgba(255,255,255,.55)");
+    }
+    ctx.fillStyle = "#cfe3f2"; ctx.font = "bold 6px monospace"; ctx.textAlign = "left"; ctx.fillText(`${title}  ·  zoom about 100,000,000×  ·  only a few of the billions of particles`, 10, 9);
+  }
   function frame(now) {
     if (!running) return;
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
     if (now - modelAt > 250 || !model) { model = getModel(); modelAt = now; sync(); legendBox(model); }
+    if (model.phase) { drawPhase(dt); raf = requestAnimationFrame(frame); return; }
     const speed = 14 * Math.sqrt((model.T + 273) / 295), jit = Math.min(1.6, Math.max(0.15, (model.T - 20) / 60));
     R(0, 0, W, H, "#10202e");
     if (model.water) { R(8, SURFACE, W - 16, FLOOR - SURFACE, "rgba(120,185,235,.22)"); R(8, SURFACE, W - 16, 1, "rgba(255,255,255,.5)"); }
@@ -63,7 +84,7 @@ export function createMicroView(canvas, legendBox) {
     raf = requestAnimationFrame(frame);
   }
   return {
-    open(getter, name) { getModel = getter; title = name; parts = []; water = []; bubbles = []; model = null; running = true; last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame); },
+    open(getter, name) { getModel = getter; title = name; parts = []; water = []; bubbles = []; model = null; pp = null; running = true; last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame); },
     close() { running = false; cancelAnimationFrame(raf); }
   };
 }

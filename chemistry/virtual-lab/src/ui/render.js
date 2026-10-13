@@ -69,7 +69,7 @@ export function createRenderer(canvas) {
     R(198, 160, 70, 10, COL.steelDark);
     R(204, 157, 58, 3, view.plateOn ? "#e0472c" : "#565c66");
     if (view.plateOn) { R(206, 156, 54, 1, "#ff9b6b"); }
-    T(view.plateOn ? `${view.plateC}°C` : "OFF", 233, 168, "#d5dae1", 5, "center");
+    T(view.plateOn ? (view.plateLabel || `${view.plateC}°C`) : "OFF", 233, 168, "#d5dae1", 5, "center");
     // conductivity tester
     R(295, 146, 3, 24, "#6b7480"); R(288, 168, 17, 3, COL.steel);
     const glow = view.bulb === "bright" ? "#fff35c" : view.bulb === "dim" ? "#b9a24e" : "#4d535c";

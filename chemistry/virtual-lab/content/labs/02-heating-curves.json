@@ -1,28 +1,13 @@
 {
  "id": "02-heating-curves",
- "title": "Virtual Lab: Heating Curves of Unknown Samples (BETA)",
- "intro": "Two sealed tubes, Sample X and Sample Y, each hold a different pure substance. A heater adds energy at a steady rate. You record the temperature as time passes, plot the data by hand, and use the plateaus to identify each substance.",
+ "title": "Virtual Lab: Heating Curves of Unknown Solids (BETA)",
+ "intro": "Two sealed tubes, Sample X and Sample Y, each hold a different pure solid. You will weigh out 10 g of each, heat it on the hot plate at a steady rate, and record the temperature as time passes. Then you plot the data by hand and use the plateaus to identify each substance.",
  "substances": [
-  {
-   "id": "water",
-   "name": "Water",
-   "mass": 10,
-   "power": 100,
-   "T0": -20,
-   "mp": 0,
-   "bp": 100,
-   "Tend": 120,
-   "cs": 2.09,
-   "cl": 4.18,
-   "cg": 2.01,
-   "Lf": 334,
-   "Lv": 2260
-  },
   {
    "id": "lauric",
    "name": "Lauric acid",
-   "mass": 20,
-   "power": 30,
+   "mass": 10,
+   "power": 15,
    "T0": 20,
    "mp": 44,
    "bp": 298,
@@ -36,8 +21,8 @@
   {
    "id": "naphthalene",
    "name": "Naphthalene",
-   "mass": 20,
-   "power": 50,
+   "mass": 10,
+   "power": 25,
    "T0": 20,
    "mp": 80,
    "bp": 218,
@@ -47,6 +32,21 @@
    "cg": 1.2,
    "Lf": 148,
    "Lv": 340
+  },
+  {
+   "id": "pdcb",
+   "name": "p-Dichlorobenzene",
+   "mass": 10,
+   "power": 20,
+   "T0": 20,
+   "mp": 53,
+   "bp": 174,
+   "Tend": 185,
+   "cs": 1.2,
+   "cl": 1.35,
+   "cg": 1.0,
+   "Lf": 122,
+   "Lv": 272
   }
  ],
  "reference": [
@@ -87,7 +87,6 @@
    "bp": 361
   }
  ],
- "samples": 2,
  "theory": [
   {
    "title": "What a heating curve shows",
@@ -296,49 +295,169 @@
  },
  "quests": [
   {
+   "id": "gear",
+   "text": "Put on goggles and an apron",
+   "hint": "Walk to the blue LOCKER (bottom left) and press E. Choose Put on for the goggles and the apron.",
+   "state": "ppe"
+  },
+  {
+   "id": "door",
+   "text": "Go through the door into the lab",
+   "hint": "The light on the DOOR turns green when you are geared up. Walk up through it.",
+   "state": "entered_lab"
+  },
+  {
+   "id": "tubes",
+   "text": "Take Sample X and Sample Y",
+   "hint": "Walk to the UNKNOWNS shelf at the back wall, face it and press E, then choose Take on each tube.",
+   "event": "take",
+   "where": {
+    "jar": "^s[XY]$"
+   },
+   "distinct": "jar",
+   "count": 2
+  },
+  {
+   "id": "tongs",
+   "text": "Pick up tongs from the rack",
+   "hint": "The TONGS rack is on the bottom-left wall. Hot beakers need tongs.",
+   "event": "ppe",
+   "where": {
+    "item": "tongs",
+    "on": true
+   }
+  },
+  {
+   "id": "bench",
+   "text": "Go to your lab bench",
+   "hint": "Face the long BENCH and press E to step up to it.",
+   "event": "view",
+   "where": {
+    "to": "bench"
+   }
+  },
+  {
+   "id": "weighX",
+   "text": "Weigh 10 g of Sample X into a beaker",
+   "hint": "Move a beaker to the Balance, press Tare, choose Sample X, enter 10 and press Add.",
+   "event": "add",
+   "where": {
+    "sample": "X"
+   }
+  },
+  {
    "id": "runX",
    "text": "Heat Sample X to the end of the run",
-   "hint": "Press Play, or Advance one interval at a time."
+   "hint": "Move the beaker to the Hot plate, turn the plate on, then use Play or Advance one step.",
+   "event": "heat_end",
+   "where": {
+    "sample": "X"
+   }
   },
   {
    "id": "rowsX",
    "text": "Record 12 or more readings for X",
-   "hint": "Pause, then type the time, temperature and state into the table."
+   "hint": "Open the notebook (N). Pause, then type the time, temperature and state into the table.",
+   "state": "heat_rows",
+   "sample": "X",
+   "count": 12
   },
   {
    "id": "plotX",
    "text": "Plot X on the graph (12 or more points)",
-   "hint": "Open the Graph tab and click where each reading belongs."
+   "hint": "Notebook, Graph tab: click where each reading belongs.",
+   "state": "heat_plot",
+   "sample": "X",
+   "count": 12
   },
   {
    "id": "lineX",
    "text": "Draw lines through the pieces of X's curve",
-   "hint": "Switch to Line, then click the two ends of each straight piece."
+   "hint": "Switch to Line, then click the two ends of each straight piece.",
+   "state": "heat_lines",
+   "sample": "X",
+   "count": 3
+  },
+  {
+   "id": "weighY",
+   "text": "Weigh 10 g of Sample Y into a beaker",
+   "hint": "Move a beaker to the Balance, press Tare, choose Sample Y, enter 10 and press Add.",
+   "event": "add",
+   "where": {
+    "sample": "Y"
+   }
   },
   {
    "id": "runY",
    "text": "Heat Sample Y to the end of the run",
-   "hint": "Use the Y tab."
+   "hint": "Move the beaker to the Hot plate, turn the plate on, then use Play or Advance one step.",
+   "event": "heat_end",
+   "where": {
+    "sample": "Y"
+   }
   },
   {
    "id": "rowsY",
    "text": "Record 12 or more readings for Y",
-   "hint": "Same as X."
+   "hint": "Open the notebook (N). Pause, then type the time, temperature and state into the table.",
+   "state": "heat_rows",
+   "sample": "Y",
+   "count": 12
   },
   {
    "id": "plotY",
    "text": "Plot Y on the graph (12 or more points)",
-   "hint": "Graph tab, Y."
+   "hint": "Notebook, Graph tab: click where each reading belongs.",
+   "state": "heat_plot",
+   "sample": "Y",
+   "count": 12
   },
   {
    "id": "lineY",
    "text": "Draw lines through the pieces of Y's curve",
-   "hint": "Line tool."
+   "hint": "Switch to Line, then click the two ends of each straight piece.",
+   "state": "heat_lines",
+   "sample": "Y",
+   "count": 3
   },
   {
    "id": "cer",
    "text": "Write your Claim, Evidence, Reasoning",
-   "hint": "Open CER from the top bar."
+   "hint": "Open Write CER from the top bar.",
+   "state": "cer_done"
   }
+ ],
+ "kind": "heating",
+ "standardMass": 10,
+ "introSteps": [
+  "Watch the demo to see the controls (about a minute).",
+  "Do the pre-lab: read the theory, answer six questions, write a prediction. The lab door stays locked until you finish.",
+  "Suit up at the locker, go through the door, and take both sample tubes from the UNKNOWNS shelf. Fetch tongs: hot glass burns.",
+  "At your bench, weigh 10.0 g of Sample X into a beaker on the balance, move it to the hot plate and turn the plate on.",
+  "Open the notebook. Pause to read the clock and thermometer, then type the time, temperature and state into the table. Look at the beaker and the microscope to decide the state.",
+  "Plot your readings on the blank graph yourself: dots first, then straight lines through each piece. Repeat for Sample Y, then write your Claim, Evidence, Reasoning."
+ ],
+ "introKeys": [
+  [
+   "Space",
+   "At the bench: pause or resume the clock."
+  ],
+  [
+   "Step",
+   "Advance one step moves the clock exactly one step, then pauses. Best for evenly spaced readings."
+  ],
+  [
+   "Notebook (N)",
+   "Your table and graph live here."
+  ]
+ ],
+ "roomText": {
+  "shelf_unknown": "Two sealed tubes of unidentified solids: Sample X and Sample Y.",
+  "shelf_liquids": "Nothing here is needed for this lab.",
+  "shelf_known": "Nothing here is needed for this lab."
+ },
+ "tubes": [
+  "X",
+  "Y"
  ]
 }

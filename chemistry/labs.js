@@ -28,9 +28,9 @@ window.UNITS = [
         tags: ["beta", "lab safety", "properties of matter"]
       },
       {
-        title: "Virtual Lab: Heating Curves of Unknown Samples (BETA)",
+        title: "Virtual Lab: Heating Curves of Unknown Solids (BETA)",
         icon: "🌡️",
-        href: "virtual-lab/heating.html",
+        href: "virtual-lab/index.html?lab=heating",
         blurb: "Heat two unknown samples, pause to record readings, plot the curves by hand, and use the plateaus to name each substance. Pre-lab and a written CER are required.",
         tags: ["beta", "phase changes", "CER"]
       }

@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="../shared/lab.css">
 <style>
   [hidden] { display: none !important; }
-  body { padding-bottom: 190px; }
+  body { padding-bottom: 145px; }
   .wrap { max-width: 1280px; }
   #bench, #room { width: 100%; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 10px; border: 2px solid var(--line); cursor: pointer; display: block; }
   .vl { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start; }
@@ -44,7 +44,7 @@
   #tip b { display: block; } #tip span { color: var(--muted); font-size: .85rem; }
   .btnlike { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; background: var(--panel); }
   /* the log along the bottom */
-  #logbar { position: fixed; left: 0; right: 0; bottom: 0; height: 170px; z-index: 50; background: #161c24; color: #e8edf2; border-top: 3px solid #6a5a3c; box-shadow: 0 -4px 14px rgba(0,0,0,.35); }
+  #logbar { position: fixed; left: 0; right: 0; bottom: 0; height: 130px; z-index: 50; background: #161c24; color: #e8edf2; border-top: 3px solid #6a5a3c; box-shadow: 0 -4px 14px rgba(0,0,0,.35); }
   #logbar .inner { max-width: 1280px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; padding: 6px 16px 8px; }
   #logbar h2 { margin: 0 0 4px; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: #c9b48a; }
   #feed { flex: 1; overflow-y: auto; font-size: .95rem; line-height: 1.45; }
@@ -69,6 +69,15 @@
   .foot { position: sticky; bottom: -22px; background: var(--panel); padding: 10px 0; margin-top: 8px; border-top: 1px solid var(--line); }
   #report { display: none; }
   @media print { .wrap, #tip, #logbar, dialog { display: none !important; } body { padding: 0; } #report { display: block !important; color: #000; background: #fff; font: 12pt/1.4 Georgia, serif; } #report table { border-collapse: collapse; width: 100%; } #report th, #report td { border: 1px solid #888; padding: 4px 6px; font-size: 10pt; text-align: left; } body { background: #fff !important; } }
+  .read { display: flex; gap: 24px; align-items: baseline; margin: 10px 0 0; }
+  .read b { font: 700 1.8rem ui-monospace, Menlo, monospace; } .read span { color: var(--muted); font-size: .85rem; display: block; }
+  .tabs { display: flex; gap: 6px; margin: 4px 0 8px; }
+  .tabs button { min-height: 38px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px 10px 0 0; background: var(--panel); color: var(--ink); cursor: pointer; font: inherit; font-weight: 600; }
+  .tabs button.on, .seg button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .seg { display: inline-flex; } .seg button { border-radius: 0; } .seg button:first-child { border-radius: 8px 0 0 8px; } .seg button:last-child { border-radius: 0 8px 8px 0; }
+  #graph { width: 100%; height: auto; border: 2px solid var(--line); border-radius: 10px; background: #fff; cursor: crosshair; display: block; }
+  .gtools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; } .gtools input[type=text] { width: 14em; }
+  #rows input[type=number] { width: 7em; } #rows td, #rows th { padding: 3px 6px; text-align: left; }
 </style>
 </head>
 <body>
@@ -104,9 +113,9 @@
       </div>
       <div class="stack">
         <section class="card" id="incident" role="alert" hidden></section>
-        <section class="card" aria-label="Tasks"><h2 id="questHead">Tasks</h2><ul id="quests"></ul></section>
-        <section class="card" aria-label="Inventory"><h2>Carrying <span id="invCount"></span></h2><div id="inv"></div></section>
         <section class="card" id="panelCard" hidden><h2 id="panelTitle"></h2><div id="panelBody"></div><button id="panelClose">Close</button></section>
+        <section class="card" id="tasksCard" aria-label="Tasks"><h2 id="questHead">Tasks</h2><ul id="quests"></ul></section>
+        <section class="card" aria-label="Inventory"><h2>Carrying <span id="invCount"></span></h2><div id="inv"></div></section>
         <section class="card" id="controlsCard" aria-label="Controls" hidden><h2>Bench controls</h2><button id="leaveBench" style="margin-bottom:10px">← Back to the room</button><div id="controls"></div><p class="hint">Click a container, then click it again to zoom in on its particles.</p></section>
       </div>
     </div>
