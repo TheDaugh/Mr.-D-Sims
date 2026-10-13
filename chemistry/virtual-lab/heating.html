@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab: Heating Curves</title>
+<meta name="description" content="Heat unknown samples, record the data, plot the curve by hand, and identify each substance.">
+<link rel="stylesheet" href="../shared/lab.css">
+<style>
+  [hidden] { display: none !important; }
+  body { padding-bottom: 190px; }
+  .wrap { max-width: 1280px; }
+  #bench, #room { width: 100%; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 10px; border: 2px solid var(--line); cursor: pointer; display: block; }
+  .vl { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start; }
+  @media (max-width: 980px) { .vl { grid-template-columns: minmax(0, 1fr); } }
+  .hudbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 4px 0 10px; }
+  .hudbar h1 { margin: 0; font-size: 1.35rem; }
+  .hud { display: flex; gap: 6px; flex-wrap: wrap; }
+  .hudbtn { position: relative; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); cursor: pointer; font: inherit; font-size: .9rem; }
+  .hudbtn:hover { border-color: var(--accent); }
+  .dot { position: absolute; top: 4px; right: 4px; width: 10px; height: 10px; border-radius: 50%; background: #e0472c; }
+  .coach { display: flex; gap: 10px; align-items: center; padding: 10px 14px; margin-bottom: 12px; border-radius: 10px; background: var(--note-bg); border: 1px solid var(--line); font-size: .98rem; }
+  .coach b { color: var(--accent); white-space: nowrap; }
+  #demoBar { display: flex; gap: 12px; align-items: center; padding: 10px 14px; margin-bottom: 10px; border-radius: 10px; background: #1d2a36; color: #fff; }
+  #demoBar span { flex: 1; }
+  #quests { list-style: none; margin: 0; padding: 0; }
+  #quests li { padding: 6px 8px; border-radius: 8px; font-size: .93rem; color: var(--muted); }
+  #quests li.done { text-decoration: line-through; opacity: .65; }
+  #quests li.active { background: var(--note-bg); color: var(--ink); font-weight: 600; border: 1px solid var(--line); }
+  #quests .tick { display: inline-block; width: 1.2em; }
+  #quests li.more { font-size: .8rem; }
+  .chip { padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: .85rem; color: var(--muted); background: transparent; font-family: inherit; }
+  .chip.on { background: var(--ok); color: #fff; border-color: var(--ok); }
+  button.chip { cursor: pointer; color: var(--ink); } button.chip:hover { border-color: var(--accent); }
+  #ppe { display: flex; gap: 8px; flex-wrap: wrap; }
+  #inv { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .slot { border: 2px dashed var(--line); border-radius: 8px; min-height: 36px; padding: 4px 6px; font-size: .8rem; display: flex; align-items: center; gap: 6px; }
+  .slot.full { border-style: solid; }
+  .slot i { width: 12px; height: 16px; border: 1px solid #555; display: inline-block; flex: none; }
+  #panelBody { display: grid; gap: 6px; margin: 8px 0; }
+  #panelBody > div { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  #tip { position: fixed; z-index: 2000; display: flex; gap: 10px; align-items: center; max-width: 280px; padding: 8px 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); pointer-events: none; }
+  #tip canvas { width: 48px; height: 48px; image-rendering: pixelated; flex: none; background: var(--note-bg); border-radius: 6px; }
+  #tip b { display: block; } #tip span { color: var(--muted); font-size: .85rem; }
+  .btnlike { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; background: var(--panel); }
+  /* the log along the bottom */
+  #logbar { position: fixed; left: 0; right: 0; bottom: 0; height: 170px; z-index: 50; background: #161c24; color: #e8edf2; border-top: 3px solid #6a5a3c; box-shadow: 0 -4px 14px rgba(0,0,0,.35); }
+  #logbar .inner { max-width: 1280px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; padding: 6px 16px 8px; }
+  #logbar h2 { margin: 0 0 4px; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: #c9b48a; }
+  #feed { flex: 1; overflow-y: auto; font-size: .95rem; line-height: 1.45; }
+  #feed div { padding: 1px 0; } #feed .f-stop { color: #ff9c8a; font-weight: 600; } #feed .f-warn { color: #ffd27a; } #feed .f-obs { color: #8fe0a8; font-weight: 600; }
+  /* windows */
+  dialog.dlg { border: 1px solid var(--line); border-radius: 14px; padding: 0; width: min(920px, 94vw); background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
+  dialog.dlg::backdrop { background: rgba(8, 12, 18, .62); }
+  .dlg .body { padding: 18px 24px 22px; max-height: 82vh; overflow: auto; }
+  .dlg .x { position: sticky; top: 0; float: right; }
+  .dlg details { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; margin: 8px 0; }
+  .dlg summary { cursor: pointer; }
+  table.keys td { padding: 3px 12px 3px 0; vertical-align: top; } kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; font-size: .85rem; background: var(--note-bg); }
+  .pq { margin: 14px 0; } .opts { display: grid; gap: 6px; margin: 6px 0; } .opts button { text-align: left; }
+  .opts button.right { border-color: var(--ok); background: var(--ok-bg); } .opts button.wrong { border-color: var(--bad); background: var(--bad-bg); }
+  .ck { display: flex; gap: 8px; align-items: flex-start; margin: 4px 0; } .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+  #microWrap { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+  @media (max-width: 800px) { #microWrap { grid-template-columns: 1fr; } }
+  #microCanvas { width: 100%; height: auto; border-radius: 10px; image-rendering: auto; }
+  #microLegend { list-style: none; margin: 0; padding: 0; font-size: .9rem; } #microLegend li { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+  #microLegend i { flex: none; width: 14px; height: 14px; border-radius: 50%; margin-top: 3px; }
+  #sheet select { max-width: 11.5em; min-height: 34px; font-size: .85rem; } #sheet th { white-space: nowrap; } .scrollx { overflow-x: auto; }
+  .foot { position: sticky; bottom: -22px; background: var(--panel); padding: 10px 0; margin-top: 8px; border-top: 1px solid var(--line); }
+  #report { display: none; }
+  @media print { .wrap, #tip, #logbar, dialog { display: none !important; } body { padding: 0; } #report { display: block !important; color: #000; background: #fff; font: 12pt/1.4 Georgia, serif; } #report table { border-collapse: collapse; width: 100%; } #report th, #report td { border: 1px solid #888; padding: 4px 6px; font-size: 10pt; text-align: left; } body { background: #fff !important; } }
+
+  .vl { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  #bench { width: 100%; height: auto; border: 2px solid var(--line); border-radius: 10px; background: #1b2530; display: block; }
+  #graph { width: 100%; height: auto; border: 2px solid var(--line); border-radius: 10px; background: #fff; cursor: crosshair; display: block; touch-action: none; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+  .tabs button { min-height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: 10px 10px 0 0; background: var(--panel); color: var(--ink); cursor: pointer; font: inherit; font-weight: 600; }
+  .tabs button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .read { display: flex; gap: 24px; align-items: baseline; margin: 8px 0; }
+  .read b { font: 700 2rem ui-monospace, Menlo, monospace; } .read span { color: var(--muted); font-size: .85rem; display: block; }
+  #rows input[type=number] { width: 7em; } #rows select { max-width: 11em; }
+  #rows td, #rows th { padding: 3px 6px; text-align: left; }
+  .gtools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+  .gtools input[type=text] { width: 15em; }
+  .on { outline: 2px solid var(--accent); }
+  .seg { display: inline-flex; } .seg button { border-radius: 0; } .seg button:first-child { border-radius: 8px 0 0 8px; } .seg button:last-child { border-radius: 0 8px 8px 0; }
+  #logbar { height: 128px; } body { padding-bottom: 140px; } #bench { margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><a class="back" href="../">← Chemistry hub</a><span class="crumb">Virtual Lab · beta</span></header>
+  <div class="hudbar">
+    <h1>Heating Curves of Unknown Samples</h1>
+    <div class="hud">
+      <button class="hudbtn" id="btnTheory" title="Theory (T)">📖 Theory</button>
+      <button class="hudbtn" id="btnCER">✍ Write CER</button>
+      <button class="hudbtn" id="btnDemo">▶ Demo</button>
+      <button class="hudbtn" id="btnMenu">💾 Save / Hand in</button>
+    </div>
+  </div>
+  <div id="boot" class="note">Loading the lab…</div>
+  <div id="app" hidden>
+  <div class="coach"><b>Next:</b><span id="coachText"></span></div>
+  <div id="demoBar" hidden><span id="demoText"></span><button id="demoStop">Skip demo</button></div>
+  <div class="grid vl">
+    <section class="card">
+      <div class="tabs" id="tabs"></div>
+      <div class="read"><div><b id="rTime">0:00</b><span>Time (min:s)</span></div><div><b id="rTemp">--</b><span>Thermometer (°C)</span></div><div><b id="rPhase" style="font:600 1rem system-ui">&nbsp;</b><span>Look at the tube and the particles for the state</span></div></div>
+      <div class="controls">
+        <button id="play" class="primary">▶ Play</button>
+        <span class="seg" id="speed"><button data-s="1">×1</button><button data-s="5">×5</button><button data-s="20">×20</button></span>
+        <label>Step <select id="interval"><option value="10">10 s</option><option value="15" selected>15 s</option></select></label>
+        <button id="advance">Advance one step</button>
+      </div>
+      <canvas id="bench" width="520" height="250" aria-label="Sample tube, thermometer and particle view"></canvas>
+      <p class="hint">Pause any time to write down a reading. The heater adds energy at a steady rate. You cannot rewind, so record as you go.</p>
+    </section>
+    <section class="card">
+      <div class="tabs"><button id="tabData" class="on">Data table</button><button id="tabGraph">Graph</button></div>
+      <div id="paneData">
+        <div class="scrollx"><table id="rows"></table></div>
+        <div class="controls"><button id="addRow">+ Add row</button><button id="delRow">Remove last row</button><span class="hint" id="rowCount"></span></div>
+        <p class="hint">Type the time and the temperature yourself, and choose what state you see. Nothing is filled in for you.</p>
+      </div>
+      <div id="paneGraph" hidden>
+        <canvas id="graph" width="640" height="400" aria-label="Blank graph. Click to plot points."></canvas>
+        <div class="gtools"><span class="seg"><button id="toolP" class="on">• Point</button><button id="toolL">╱ Line</button></span><button id="undo">Undo</button><button id="clearG">Clear graph</button></div>
+        <div class="gtools"><label>Title <input type="text" id="gTitle" placeholder="Name the graph"></label><label>x-axis <input type="text" id="gX" placeholder="label and unit"></label><label>y-axis <input type="text" id="gY" placeholder="label and unit"></label></div>
+        <p class="hint" id="gHint"></p>
+      </div>
+    </section>
+  </div>
+  <div class="card" style="margin-top:12px"><h2 id="questHead">Tasks</h2><ul id="quests"></ul></div>
+  </div>
+</div>
+<div id="logbar" role="log" aria-live="polite"><div class="inner"><h2>What happened</h2><div id="feed"></div></div></div>
+<dialog class="dlg" id="dlgIntro"><div class="body" id="introBody"></div></dialog>
+<dialog class="dlg" id="dlgPrelab"><div class="body" id="prelabBody"></div></dialog>
+<dialog class="dlg" id="dlgTheory"><div class="body"><button class="x" data-close>Close ✕</button><h2>Theory</h2><div id="theoryBody"></div></div></dialog>
+<dialog class="dlg" id="dlgCER"><div class="body" id="cerBody"></div></dialog>
+<dialog class="dlg" id="dlgMenu"><div class="body"><button class="x" data-close>Close ✕</button><h2>Save and hand in</h2>
+  <div class="controls" style="flex-direction:column;align-items:stretch;max-width:340px">
+    <label class="btnlike">Load a saved record <input id="load" type="file" accept=".json,application/json" hidden></label>
+    <button id="download" class="primary">Download lab record (hand this in)</button>
+    <button id="reset">Start over (new student)</button></div>
+  <p class="hint">Your progress also saves automatically in this browser. The record holds your table, your graph, your CER and a log of what you did. Turn in the file your teacher asks for.</p></div></dialog>
+<dialog class="dlg" id="dlgDone"><div class="body"><h2>Lab complete</h2><p>Your CER is saved. Download your lab record and turn it in.</p>
+  <div class="controls"><button class="primary" id="doneMenu">Hand in…</button><button data-close>Close</button></div></div></dialog>
+<script type="module" src="src/heating.js"></script>
+</body>
+</html>

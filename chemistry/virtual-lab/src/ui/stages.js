@@ -58,7 +58,7 @@ export function renderPrelab(box, ctx) {
   update();
 }
 
-const insertAt = (ta, text) => { const s = ta.selectionStart ?? ta.value.length; ta.value = ta.value.slice(0, s) + text + ta.value.slice(ta.selectionEnd ?? s); ta.focus(); ta.selectionStart = ta.selectionEnd = s + text.length; ta.dispatchEvent(new Event("input")); };
+export const insertAt = (ta, text) => { const s = ta.selectionStart ?? ta.value.length; ta.value = ta.value.slice(0, s) + text + ta.value.slice(ta.selectionEnd ?? s); ta.focus(); ta.selectionStart = ta.selectionEnd = s + text.length; ta.dispatchEvent(new Event("input")); };
 
 export function renderCER(box, ctx) {
   const { lab, S } = ctx, post = lab.postlab, nb = ctx.getNotebook(), C = S.cer;

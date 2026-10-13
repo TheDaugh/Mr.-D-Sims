@@ -26,6 +26,13 @@ window.UNITS = [
         href: "virtual-lab/index.html",
         blurb: "Walk the lab, suit up, carry jars to your bench, and run five tests to identify four unknown solids. Beta: keyboard and a laptop screen work best. Tell Mr. D what breaks.",
         tags: ["beta", "lab safety", "properties of matter"]
+      },
+      {
+        title: "Virtual Lab: Heating Curves of Unknown Samples (BETA)",
+        icon: "🌡️",
+        href: "virtual-lab/heating.html",
+        blurb: "Heat two unknown samples, pause to record readings, plot the curves by hand, and use the plateaus to name each substance. Pre-lab and a written CER are required.",
+        tags: ["beta", "phase changes", "CER"]
       }
     ]
   }

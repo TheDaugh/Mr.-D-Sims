@@ -1,0 +1,344 @@
+{
+ "id": "02-heating-curves",
+ "title": "Virtual Lab: Heating Curves of Unknown Samples (BETA)",
+ "intro": "Two sealed tubes, Sample X and Sample Y, each hold a different pure substance. A heater adds energy at a steady rate. You record the temperature as time passes, plot the data by hand, and use the plateaus to identify each substance.",
+ "substances": [
+  {
+   "id": "water",
+   "name": "Water",
+   "mass": 10,
+   "power": 100,
+   "T0": -20,
+   "mp": 0,
+   "bp": 100,
+   "Tend": 120,
+   "cs": 2.09,
+   "cl": 4.18,
+   "cg": 2.01,
+   "Lf": 334,
+   "Lv": 2260
+  },
+  {
+   "id": "lauric",
+   "name": "Lauric acid",
+   "mass": 20,
+   "power": 30,
+   "T0": 20,
+   "mp": 44,
+   "bp": 298,
+   "Tend": 90,
+   "cs": 1.7,
+   "cl": 2.2,
+   "cg": 1.7,
+   "Lf": 183,
+   "Lv": 300
+  },
+  {
+   "id": "naphthalene",
+   "name": "Naphthalene",
+   "mass": 20,
+   "power": 50,
+   "T0": 20,
+   "mp": 80,
+   "bp": 218,
+   "Tend": 230,
+   "cs": 1.3,
+   "cl": 1.7,
+   "cg": 1.2,
+   "Lf": 148,
+   "Lv": 340
+  }
+ ],
+ "reference": [
+  {
+   "id": "water",
+   "name": "Water",
+   "mp": 0,
+   "bp": 100
+  },
+  {
+   "id": "lauric",
+   "name": "Lauric acid",
+   "mp": 44,
+   "bp": 298
+  },
+  {
+   "id": "naphthalene",
+   "name": "Naphthalene",
+   "mp": 80,
+   "bp": 218
+  },
+  {
+   "id": "benzoic",
+   "name": "Benzoic acid",
+   "mp": 122,
+   "bp": 250
+  },
+  {
+   "id": "pdcb",
+   "name": "p-Dichlorobenzene",
+   "mp": 53,
+   "bp": 174
+  },
+  {
+   "id": "stearic",
+   "name": "Stearic acid",
+   "mp": 69,
+   "bp": 361
+  }
+ ],
+ "samples": 2,
+ "theory": [
+  {
+   "title": "What a heating curve shows",
+   "body": [
+    "A heating curve graphs temperature (up) against time (across) while a heater adds energy at a steady rate. Because the heater never changes, time stands in for energy: twice as long means twice as much energy added.",
+    "The curve has slanted pieces and flat pieces. Each one tells you what the added energy is doing."
+   ]
+  },
+  {
+   "title": "Temperature and particle motion",
+   "body": [
+    "Temperature measures the average kinetic energy of the particles: how fast they jiggle, slide or fly. A slanted piece means the particles are speeding up, so the thermometer climbs.",
+    "Particles also hold potential energy, stored in the attractions between them. Pulling particles apart raises that energy and costs the heater energy, but it does not speed the particles up."
+   ]
+  },
+  {
+   "title": "Plateaus",
+   "body": [
+    "On a plateau the heater keeps running and the temperature stays put. The energy is going into potential energy: breaking the attractions that hold the solid in place (melting) or that hold the liquid together (boiling).",
+    "Mixed solid and liquid sit at the melting point together. Mixed liquid and gas sit at the boiling point. The thermometer cannot rise until the change is finished."
+   ]
+  },
+  {
+   "title": "Reading the graph",
+   "body": [
+    "Slope: on a slanted piece, a steeper line means each joule buys more degrees, so the substance has a smaller specific heat in that state.",
+    "Plateau length: a longer plateau means more energy was needed to separate the particles. Boiling plateaus are much longer than melting plateaus because gas particles must break away from each other entirely.",
+    "Plateau height: the temperature of a plateau is a melting or boiling point. For a pure substance it does not depend on how much you heat."
+   ]
+  },
+  {
+   "title": "Identifying a substance",
+   "body": [
+    "A melting point and a boiling point are physical properties. They stay the same for any amount of a pure substance, so they work like a fingerprint. Compare your plateau temperatures with the reference table.",
+    "A bigger sample has the same plateau heights but longer plateaus, because there are more particles to separate."
+   ]
+  },
+  {
+   "title": "How to plot by hand",
+   "body": [
+    "Pick axes that use most of the graph. Label each axis with a name and its unit. Number the gridlines evenly.",
+    "Mark each data point as its own dot. Do not connect them one by one. Draw straight lines through the slanted pieces and the plateaus, so a flat piece is flat and the corners show where each change starts and stops."
+   ]
+  }
+ ],
+ "prelab": {
+  "questions": [
+   {
+    "id": "h1",
+    "q": "A heating curve is flat for two minutes while the heater is on. Where is the energy going?",
+    "options": [
+     "Into pulling particles away from each other, which raises their potential energy",
+     "Into making the particles move faster",
+     "Into the thermometer",
+     "Nowhere; the heater has stopped working"
+    ],
+    "correct": 0,
+    "explain": "Temperature tracks particle speed, and it is not changing. The energy goes into overcoming the attractions between particles during a phase change."
+   },
+   {
+    "id": "h2",
+    "q": "What does temperature measure?",
+    "options": [
+     "The average kinetic energy of the particles",
+     "The total energy in the sample",
+     "The attractions between the particles",
+     "The number of particles"
+    ],
+    "correct": 0,
+    "explain": "Temperature is average kinetic energy per particle. Total energy depends on how much sample you have and on potential energy as well."
+   },
+   {
+    "id": "h3",
+    "q": "On one curve the boiling plateau is much longer than the melting plateau. What does this tell you?",
+    "options": [
+     "Separating particles into a gas takes much more energy than loosening a solid into a liquid",
+     "The substance melts at a higher temperature than it boils",
+     "The heater slowed down during boiling",
+     "Melting is a chemical change"
+    ],
+    "correct": 0,
+    "explain": "The heater delivers the same energy every second, so a longer plateau means more energy was needed. Gas particles must break away from all their neighbors."
+   },
+   {
+    "id": "h4",
+    "q": "Two samples of the same pure substance are heated: 10 g and 20 g, same heater. How do their curves compare?",
+    "options": [
+     "Same plateau temperatures; the 20 g sample has longer plateaus",
+     "Different plateau temperatures; the same plateau lengths",
+     "Same everything",
+     "The 20 g sample melts at a higher temperature"
+    ],
+    "correct": 0,
+    "explain": "Melting and boiling points do not depend on amount. More particles need more energy to separate, so the plateaus last longer."
+   },
+   {
+    "id": "h5",
+    "q": "The solid piece of a curve is steeper than the liquid piece. Which statement fits?",
+    "options": [
+     "The solid needs less energy per gram per degree, so it has the smaller specific heat",
+     "The solid has more particles",
+     "The solid is hotter",
+     "The heater is stronger during that time"
+    ],
+    "correct": 0,
+    "explain": "A steeper line means more degrees per second at the same power, so fewer joules are needed for each degree."
+   },
+   {
+    "id": "h6",
+    "q": "Why is a melting point useful for identifying a pure substance?",
+    "options": [
+     "It is a physical property that stays the same for any amount of the substance",
+     "It changes with the size of the sample so it tells you the mass",
+     "Every substance melts at the same temperature",
+     "It tells you the color"
+    ],
+    "correct": 0,
+    "explain": "Properties that do not depend on amount can be compared against a reference table, which is how unknowns get identified."
+   }
+  ],
+  "prediction": {
+   "prompt": "Sketch the shape of a heating curve for a solid that melts and then boils, in words: how many slanted pieces and flat pieces, in what order? For each flat piece, say what the energy is doing to the particles. Predict which flat piece will be longer and why.",
+   "minWords": 40
+  }
+ },
+ "postlab": {
+  "prompt": "Identify Sample X and Sample Y using the reference table. Support each claim with numbers from your own table and graph, and explain with particles why that evidence points to that substance.",
+  "minWords": {
+   "claim": 8,
+   "evidence": 12,
+   "reasoning": 40
+  },
+  "starters": {
+   "claim": [
+    "Sample X is ",
+    "Sample Y is "
+   ],
+   "reasoning": [
+    "The plateau happens because ",
+    "The temperature stays constant because the energy goes into ",
+    "This rules out ___ because its melting point is "
+   ]
+  },
+  "wordBank": [
+   "kinetic energy",
+   "potential energy",
+   "melting point",
+   "boiling point",
+   "plateau",
+   "attractions",
+   "particles",
+   "phase change",
+   "temperature",
+   "gas"
+  ],
+  "checklist": [
+   "My claims name a substance for X and for Y.",
+   "My evidence quotes temperatures from my own table.",
+   "I used the plateau temperature, not a guess.",
+   "I ruled out at least one other substance from the reference table.",
+   "My reasoning explains where the energy goes during a plateau.",
+   "I used particle language."
+  ],
+  "rubric": [
+   {
+    "key": "claim",
+    "name": "Claim",
+    "levels": [
+     "Missing",
+     "Vague or wrong",
+     "Names both, partly correct",
+     "Both correct, clear"
+    ]
+   },
+   {
+    "key": "evidence",
+    "name": "Evidence",
+    "levels": [
+     "None",
+     "Vague, not from data",
+     "Some numbers from the table",
+     "Specific plateau temperatures for both samples"
+    ]
+   },
+   {
+    "key": "reasoning",
+    "name": "Reasoning",
+    "levels": [
+     "None",
+     "Restates evidence",
+     "Connects plateau to property",
+     "Energy to potential energy, particles, rules out another substance"
+    ]
+   },
+   {
+    "key": "graph",
+    "name": "Graph",
+    "levels": [
+     "Not plotted",
+     "Few points or no labels",
+     "Labeled and mostly accurate",
+     "Labeled, scaled, accurate, plateaus drawn flat"
+    ]
+   }
+  ]
+ },
+ "quests": [
+  {
+   "id": "runX",
+   "text": "Heat Sample X to the end of the run",
+   "hint": "Press Play, or Advance one interval at a time."
+  },
+  {
+   "id": "rowsX",
+   "text": "Record 12 or more readings for X",
+   "hint": "Pause, then type the time, temperature and state into the table."
+  },
+  {
+   "id": "plotX",
+   "text": "Plot X on the graph (12 or more points)",
+   "hint": "Open the Graph tab and click where each reading belongs."
+  },
+  {
+   "id": "lineX",
+   "text": "Draw lines through the pieces of X's curve",
+   "hint": "Switch to Line, then click the two ends of each straight piece."
+  },
+  {
+   "id": "runY",
+   "text": "Heat Sample Y to the end of the run",
+   "hint": "Use the Y tab."
+  },
+  {
+   "id": "rowsY",
+   "text": "Record 12 or more readings for Y",
+   "hint": "Same as X."
+  },
+  {
+   "id": "plotY",
+   "text": "Plot Y on the graph (12 or more points)",
+   "hint": "Graph tab, Y."
+  },
+  {
+   "id": "lineY",
+   "text": "Draw lines through the pieces of Y's curve",
+   "hint": "Line tool."
+  },
+  {
+   "id": "cer",
+   "text": "Write your Claim, Evidence, Reasoning",
+   "hint": "Open CER from the top bar."
+  }
+ ]
+}

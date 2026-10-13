@@ -7,7 +7,7 @@ export async function runDemo(api) {
   const snap = api.freeze();
   let stopped = false; api.demo.stop = () => { stopped = true; wake(); };
   let wake = () => {};
-  const wait = (ms) => new Promise((r) => { const t = setTimeout(r, ms); wake = () => { clearTimeout(t); r(); }; });
+  const SLOW = 1.8; const wait = (ms) => new Promise((r) => { const t = setTimeout(r, ms * SLOW); wake = () => { clearTimeout(t); r(); }; });
   const live = () => { if (stopped) throw new Error("stop"); };
   const say = async (n, text, ms = 2600) => { live(); api.caption(n, text); await wait(ms); live(); };
   const walk = async (route) => { for (const d of path(route)) { live(); api.walk(d); await wait(230); } };

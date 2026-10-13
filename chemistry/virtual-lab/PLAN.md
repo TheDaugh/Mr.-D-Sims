@@ -191,3 +191,11 @@ Every action appends one small JSON event. The log is the grading record, the te
 - No in-sim answer checking. The teacher grades the record: notebook, pre-lab, CER (rubric 0–3 for claim, evidence, reasoning in `teacher.html`).
 - Needs Ian's review: `micro` table in species.json, theory text, pre-lab questions, quests, CER rubric.
 - Next: heating-curve lab (students type data and plot by hand), then specific heat; single-file bundle.
+
+## Lab 2: heating curves (`heating.html`)
+- Same flow as lab 1: intro and slower scripted demo (practice sample), theory, pre-lab, bench, CER, downloadable record.
+- Two blinded samples (X, Y) drawn from water, lauric acid, naphthalene by seed. Constant-power heater; pause, ×1/×5/×20, "advance one step" (10 or 15 s).
+- Students type time, temperature and state; plot dots and lines by hand on a blank graph (snap to minor gridlines); the computer never draws the curve.
+- Record holds table, graph image, CER and event log. `teacher.html` shows graphs, data accuracy (within 3 °C of truth), CER and a 4-part rubric (claim, evidence, reasoning, graph).
+- Needs Ian's review: substance constants (approximate), theory, pre-lab questions, rubric.
+- Next: specific-heat lab (scaffolded, second), single-file bundle.
