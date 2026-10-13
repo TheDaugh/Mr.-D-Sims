@@ -31,7 +31,8 @@
       "type": "door",
       "id": "door",
       "label": "DOOR",
-      "text": "The lab door. It stays shut unless you are wearing goggles and an apron."
+      "text": "The lab door. It stays shut unless you are wearing goggles and an apron.",
+      "name": "Lab door"
     },
     "L": {
       "type": "locker",
@@ -41,7 +42,9 @@
       "items": [
         "goggles",
         "apron"
-      ]
+      ],
+      "name": "PPE locker",
+      "text": "Goggles and aprons. Suit up here before you go in."
     },
     "R": {
       "type": "rack",
@@ -50,77 +53,92 @@
       "label": "TONGS",
       "items": [
         "tongs"
-      ]
+      ],
+      "name": "Tongs rack",
+      "text": "Tongs for moving hot glass."
     },
     "A": {
       "type": "info",
       "solid": true,
       "id": "first_aid",
       "label": "FIRST AID",
-      "text": "First-aid kit: bandages, burn gel and gauze. Burns get cool running water first."
+      "text": "First-aid kit: bandages, burn gel and gauze. Burns get cool running water first.",
+      "name": "First-aid kit"
     },
     "1": {
       "type": "shelf",
       "solid": true,
       "id": "shelf_unknown",
       "label": "UNKNOWNS",
-      "group": "Unknown samples"
+      "group": "Unknown samples",
+      "name": "Unknown samples shelf",
+      "text": "Four jars of unidentified white solids."
     },
     "2": {
       "type": "shelf",
       "solid": true,
       "id": "shelf_liquids",
       "label": "LIQUIDS",
-      "group": "Liquids"
+      "group": "Liquids",
+      "name": "Liquids shelf",
+      "text": "Water, vinegar and iodine solution."
     },
     "3": {
       "type": "shelf",
       "solid": true,
       "id": "shelf_known",
       "label": "KNOWNS",
-      "group": "Known samples"
+      "group": "Known samples",
+      "name": "Known samples shelf",
+      "text": "Labeled samples to compare the unknowns against."
     },
     "K": {
       "type": "info",
       "solid": true,
       "id": "sink",
       "label": "SINK",
-      "text": "The sink. Rinse glassware here. Never pour anything down it unless your teacher says it is safe."
+      "text": "The sink. Rinse glassware here. Never pour anything down it unless your teacher says it is safe.",
+      "name": "Sink"
     },
     "H": {
       "type": "info",
       "solid": true,
       "id": "hood",
       "label": "HOOD",
-      "text": "The fume hood. Not needed for today's lab, but vapors that smell or sting belong in here."
+      "text": "The fume hood. Not needed for today's lab, but vapors that smell or sting belong in here.",
+      "name": "Fume hood"
     },
     "Y": {
       "type": "info",
       "solid": true,
       "id": "eyewash",
       "label": "EYEWASH",
-      "text": "The eyewash station. If a chemical gets in your eye, you rinse here for 15 minutes."
+      "text": "The eyewash station. If a chemical gets in your eye, you rinse here for 15 minutes.",
+      "name": "Eyewash station"
     },
     "W": {
       "type": "info",
       "solid": true,
       "id": "waste",
       "label": "WASTE",
-      "text": "Waste bins: broken glass in the hard box, chemical waste in the labeled jug."
+      "text": "Waste bins: broken glass in the hard box, chemical waste in the labeled jug.",
+      "name": "Waste bins"
     },
     "F": {
       "type": "info",
       "solid": true,
       "id": "extinguisher",
       "label": "EXTING.",
-      "text": "A fire extinguisher. Pull the pin, aim at the base, squeeze, sweep."
+      "text": "A fire extinguisher. Pull the pin, aim at the base, squeeze, sweep.",
+      "name": "Fire extinguisher"
     },
     "B": {
       "type": "station",
       "solid": true,
       "id": "bench",
       "label": "BENCH",
-      "text": "Your lab bench: balance, hot plate and conductivity tester."
+      "text": "Your lab bench: balance, hot plate and conductivity tester.",
+      "name": "Lab bench"
     }
   }
 }

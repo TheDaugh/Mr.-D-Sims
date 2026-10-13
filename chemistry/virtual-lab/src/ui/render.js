@@ -79,6 +79,7 @@ export function createRenderer(canvas) {
     R(288, 146, 1, 8, "#c0392b"); R(304, 146, 1, 8, "#2c5aa0");
     T("TESTER", 296, 178, "#4a3624", 5, "center");
     T("BALANCE", 44, 178, "#4a3624", 5, "center");
+    regions.push({ type: "fixture", key: "balance", x: 10, y: 152, w: 68, h: 20 }, { type: "fixture", key: "hotplate", x: 198, y: 154, w: 70, h: 18 }, { type: "fixture", key: "tester", x: 284, y: 126, w: 24, h: 48 });
     T("HOT PLATE", 233, 178, "#4a3624", 5, "center");
   }
 

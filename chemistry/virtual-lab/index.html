@@ -29,6 +29,13 @@
   .slot i { width: 12px; height: 16px; border: 1px solid #555; display: inline-block; flex: none; }
   #panelBody { display: grid; gap: 6px; margin: 8px 0; }
   #panelBody > div { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  #tip { position: fixed; z-index: 20; display: flex; gap: 10px; align-items: center; max-width: 280px; padding: 8px 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); pointer-events: none; }
+  #tip[hidden] { display: none; }
+  #tip canvas { width: 48px; height: 48px; image-rendering: pixelated; flex: none; background: var(--note-bg); border-radius: 6px; }
+  #tip b { display: block; } #tip span { color: var(--muted); font-size: .85rem; }
+  .btnlike { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; background: var(--panel); }
+  #report { display: none; }
+  @media print { .wrap, #tip { display: none !important; } #report { display: block !important; color: #000; background: #fff; font: 12pt/1.4 Georgia, serif; } #report table { border-collapse: collapse; width: 100%; } #report th, #report td { border: 1px solid #888; padding: 4px 6px; font-size: 10pt; text-align: left; } body { background: #fff !important; } }
   ol.tests li, ol.steps li { margin-bottom: 6px; }
 </style>
 </head>
@@ -78,11 +85,16 @@
       <div class="controls" style="margin-top:12px">
         <button id="check" class="primary">Check</button>
         <button id="download">Download lab record</button>
+        <button id="print">Print report</button>
+        <button id="save">Save progress</button>
+        <label class="btnlike">Load a saved lab <input id="load" type="file" accept=".json,application/json" hidden></label>
       </div>
       <div id="result" class="fb" role="status"></div>
     </section>
   </div>
 </div>
+<div id="tip" role="tooltip" hidden><canvas id="tipIcon" width="48" height="48"></canvas><div><b id="tipName"></b><span id="tipBlurb"></span></div></div>
+<div id="report"></div>
 <script type="module" src="src/ui/app.js"></script>
 </body>
 </html>

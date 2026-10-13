@@ -4,6 +4,8 @@ import { fingerprint } from "../engine/lab1.js";
 import { Log, downloadJSON } from "../log.js";
 import { createRenderer, SLOTS } from "./render.js";
 import { createRoomRenderer } from "./roomview.js";
+import { drawIcon } from "./icons.js";
+import { buildReport } from "../report.js";
 import { resolveMode } from "../mode.js";
 import { indexHazards, losePoints } from "../engine/hazards.js";
 import { parseRoom, step, facingTile, hasPPE, tileAt } from "../engine/room.js";
@@ -27,19 +29,29 @@ async function boot() {
   try {
     const urls = ["content/species.json", "content/reactions.json", "content/labs/01-unknown-solids.json", "content/rooms/main-lab.json", "content/hazards.json", "content/config.json"];
     const [species, reactions, lab, roomDef, hazardData, config] = await Promise.all(urls.map((u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); })));
-    const modeInfo = await resolveMode(new URLSearchParams(location.search), config);
-    start(species, reactions, lab, roomDef, hazardData, modeInfo);
+    const params = new URLSearchParams(location.search), modeInfo = await resolveMode(params, config), key = "vlab:" + lab.id;
+    let saved = null; try { saved = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) { saved = null; }
+    if (saved && (saved.lab !== lab.id || saved.version !== 1)) saved = null;
+    const go = (resume) => start(species, reactions, lab, roomDef, hazardData, modeInfo, resume);
+    if (!saved) return go(null);
+    if (params.get("resume") === "1") return go(saved);
+    $("#boot").replaceChildren(h("p", {}, `You have a saved lab${saved.student ? " for " + saved.student : ""} from ${new Date(saved.savedAt).toLocaleString()}.`),
+      h("div", { class: "controls" }, h("button", { class: "primary", onclick: () => go(saved) }, "Continue where I left off"),
+        h("button", { onclick: () => { try { localStorage.removeItem(key); } catch (e) { /* ignore */ } go(null); } }, "Start over")));
   } catch (e) {
+    console.error(e);
+    $("#boot").hidden = false;
     $("#boot").replaceChildren(h("p", {}, "This lab has to be opened from the web (GitHub Pages) or a local server. Double-clicking the file does not work because browsers block the files it loads."), h("p", { class: "hint" }, String(e.message || e)));
   }
 }
 
-function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo) {
+function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, resume) {
+  $("#boot").hidden = true;
   const world = buildWorld(speciesData, reactionData);
   const EL = speciesData.electrolytes;
   const solids = speciesData.species.filter((s) => s.phase === "s").map((s) => s.id);
   const params = new URLSearchParams(location.search);
-  const seed = params.get("seed") ? parseInt(params.get("seed"), 10) : Math.floor(Math.random() * 1e9);
+  const seed = resume ? resume.seed : params.get("seed") ? parseInt(params.get("seed"), 10) : Math.floor(Math.random() * 1e9);
   const rng = mulberry32(seed);
   const order = solids.slice().sort(() => rng() - 0.5);
   const unknowns = order.slice(0, 4).map((id, i) => ({ label: "ABCD"[i], id }));
@@ -122,13 +134,13 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo) {
       kids.push(h("p", {}, h("b", {}, "What went wrong: "), hz.why), h("p", {}, hz.quiz.q));
       kids.push(...hz.quiz.options.map(([text, ok], i) => h("div", {}, h("button", { onclick: () => answer(ok) }, text))));
     }
-    if (inc.phase === "cooldown") kids.push(h("p", {}, inc.correct ? "Correct." : "Not quite. Re-read what went wrong above."), h("p", {}, "Resetting the bench… ", h("b", {}, h("span", { id: "incLeft" }, "8"), " s")), h("button", { id: "incResume", class: "primary", disabled: true, onclick: resume }, "Back to work"));
+    if (inc.phase === "cooldown") kids.push(h("p", {}, inc.correct ? "Correct." : "Not quite. Re-read what went wrong above."), h("p", {}, "Resetting the bench… ", h("b", {}, h("span", { id: "incLeft" }, "8"), " s")), h("button", { id: "incResume", class: "primary", disabled: true, onclick: closeIncident }, "Back to work"));
     box.replaceChildren(...kids);
   }
   function answer(ok) {
     const inc = S.incident; inc.correct = ok; inc.phase = "cooldown"; inc.cooldownUntil = performance.now() + 8000; renderIncident();
   }
-  function resume() {
+  function closeIncident() {
     const inc = S.incident;
     log.add("incident", { id: inc.hz.id, treated: inc.treated, escalated: inc.escalated, quiz_correct: inc.correct, points_lost: inc.hz.points * (inc.escalated ? 2 : 1) });
     S.safety.incidents.push({ id: inc.hz.id, treated: inc.treated, escalated: inc.escalated, quiz_correct: inc.correct });
@@ -350,12 +362,6 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo) {
     $("#result").textContent = msg; $("#result").className = "fb show " + (right === 4 && wrongCells === 0 ? "ok" : "no");
   }
   $("#check").addEventListener("click", check);
-  $("#download").addEventListener("click", () => {
-    S.student = $("#student").value.trim();
-    S.notebook = {}; table.querySelectorAll("select").forEach((s) => { (S.notebook[s.dataset.u] ||= {})[s.dataset.t] = s.value; });
-    downloadJSON(`lab-record-${(S.student || "student").replace(/\W+/g, "-")}.json`, { version: 1, lab: lab.id, student: S.student, seed, started: log.started, unknowns, notebook: S.notebook, mode: S.mode, safety: S.safety, summary: { blocked_hazards: log.count("hazard"), blocked_procedures: log.count("procedure"), checks: log.count("check") }, events: log.events });
-  });
-
   // ---------- go ----------
   // ---------- the room ----------
   const room = parseRoom(roomDef), P = { x: room.start.x, y: room.start.y, face: room.start.face || "u" };
@@ -424,9 +430,86 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo) {
   $("#panelClose").addEventListener("click", closePanel);
   $("#leaveBench").addEventListener("click", () => setView("room"));
 
+  function collectNotebook() {
+    S.student = $("#student").value.trim();
+    S.notebook = {}; table.querySelectorAll("select").forEach((x) => { (S.notebook[x.dataset.u] ||= {})[x.dataset.t] = x.value; });
+  }
+  function record() {
+    collectNotebook();
+    return { version: 1, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, unknowns, notebook: S.notebook, safety: S.safety, summary: { blocked_hazards: log.count("hazard"), blocked_procedures: log.count("procedure"), checks: log.count("check") }, events: log.events };
+  }
+  const fileName = (prefix) => `${prefix}-${(S.student || "student").replace(/\W+/g, "-")}.json`;
+  $("#download").addEventListener("click", () => { const r = record(); downloadJSON(fileName("lab-record"), r); });
+
+  // ---------- save and resume ----------
+  const SAVE_KEY = "vlab:" + lab.id;
+  function snapshot() {
+    collectNotebook();
+    return { version: 1, lab: lab.id, seed, student: S.student, savedAt: new Date().toISOString(), started: log.started, elapsed: (performance.now() - log.t0) / 1000, events: log.events,
+      S: { ppe: S.ppe, inv: S.inv, srcKey: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, safety: S.safety, sel: S.sel }, P, visited: [...visited], notebook: S.notebook,
+      cont: CONT.map((c) => ({ key: c.key, loc: c.loc, slot: c.slot, tare: c.tare, c: c.c })) };
+  }
+  function autosave() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot())); } catch (e) { /* storage blocked: file save still works */ } }
+  function restore(sn) {
+    Object.assign(S.ppe, sn.S.ppe); S.inv = sn.S.inv; S.srcKey = sn.S.srcKey; S.plateOn = sn.S.plateOn; S.plateC = sn.S.plateC; S.safety = sn.S.safety; S.sel = sn.S.sel;
+    for (const r of sn.cont) { const c = byKey(r.key); c.loc = r.loc; c.slot = r.slot; c.tare = r.tare; c.c = r.c; }
+    Object.assign(P, sn.P); sn.visited.forEach((v) => visited.add(v));
+    log.events = sn.events; log.started = sn.started; log.t0 = performance.now() - sn.elapsed * 1000;
+    $("#student").value = sn.student || "";
+    table.querySelectorAll("select").forEach((x) => { const v = (sn.notebook[x.dataset.u] || {})[x.dataset.t]; if (v) x.value = v; });
+    $("#plate").value = S.plateC; syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
+    log.add("resume", { savedAt: sn.savedAt }); say("Welcome back. Your saved lab is restored.");
+  }
+  $("#save").addEventListener("click", () => { autosave(); downloadJSON(fileName("lab-save"), snapshot()); say("Progress saved to your Downloads folder, and kept in this browser.", "obs"); });
+  $("#load").addEventListener("change", (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    f.text().then((txt) => {
+      const sn = JSON.parse(txt); if (sn.lab !== lab.id || sn.version !== 1) throw new Error("That file is not a save from this lab.");
+      localStorage.setItem(SAVE_KEY, txt); const q = new URLSearchParams(location.search); q.set("resume", "1"); q.delete("seed"); location.search = q.toString();
+    }).catch((err) => say(String(err.message || err), "warn"));
+  });
+
+  // ---------- printable report ----------
+  $("#print").addEventListener("click", () => {
+    const rec = record(), r = buildReport(rec, truth, H), mm = (sec) => `${Math.floor(sec / 60)} min ${sec % 60} s`;
+    const mark = (ok) => (ok === null ? "—" : ok ? "✔" : "✘");
+    $("#report").replaceChildren(...[
+      h("h1", {}, lab.title), h("p", {}, `${r.student} · ${new Date(r.started).toLocaleString()} · ${r.mode} mode · time in lab ${mm(r.seconds)}`),
+      h("h2", {}, "Setup and safety"), h("ul", {}, r.setup.map((x) => h("li", {}, `${mark(x.ok)} ${x.label}`)), r.points !== null && r.mode === "consequences" ? h("li", {}, `Safety points: ${r.points} / 100`) : null),
+      h("p", {}, `Unsafe actions blocked: ${r.blocked.hazards}. Procedure errors blocked: ${r.blocked.procedures}.`),
+      r.incidents.length ? h("div", {}, h("h2", {}, "Incidents"), h("ul", {}, r.incidents.map((i) => h("li", {}, h("b", {}, i.title), `. ${i.treated === false && i.escalated ? "Treatment was too slow. " : ""}${i.why} Review question ${i.quizCorrect ? "answered correctly" : "missed"}.`)))) : null,
+      h("h2", {}, "Tests you ran"), h("ul", {}, r.tests.map((x) => h("li", {}, `${x.done ? "✔" : "✘"} ${x.label}`))),
+      h("h2", {}, "Your observations"),
+      h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Sample"), lab.tests.map((t) => h("th", {}, t.name)), h("th", {}, "Identified as"))),
+        h("tbody", {}, unknowns.map((u) => h("tr", {}, h("th", {}, "Unknown " + u.label), [...lab.tests.map((t) => t.key), "id"].map((k) => { const c = r.grade.cells.find((x) => x.unknown === u.label && x.test === k); return h("td", {}, c ? `${c.ok ? "✔" : "✘"} ${c.answer}${c.ok ? "" : " (should be " + c.correct + ")"}` : "—"); }))))),
+      h("p", {}, `Identified correctly: ${r.grade.identified} of ${r.grade.total}. Cells that did not match: ${r.grade.wrong}.`)].filter(Boolean));
+    window.print();
+  });
+
+  // ---------- hover names and pictures ----------
+  const tip = $("#tip"), FIX = { balance: ["Balance", "Weighs solids. Tare it with the empty container on it."], hotplate: ["Hot plate", "Heats a container. Anything on it gets hot, so use tongs."], tester: ["Conductivity tester", "A bulb that glows when the liquid carries electric current."] };
+  function infoForBench(hit) {
+    if (hit.type === "fixture") return { name: FIX[hit.key][0], blurb: FIX[hit.key][1], icon: hit.key };
+    if (hit.type === "container") { const c = byKey(hit.key), d = describe(world, c.c); return { name: c.name, blurb: c.kind === "watch" ? "Holds solids only. Never liquid." : `${c.cap} mL. ${c.c.solution.mL > 0 ? c.c.solution.mL.toFixed(0) + " mL inside" : "Empty"}${d.undissolvedG > 0.02 ? ", solid at the bottom" : ""}. ${c.c.T.toFixed(0)} °C.`, icon: c.kind === "watch" ? "watch" : "beaker" };
+    }
+    const sr = sources.find((x) => x.key === hit.key);
+    return { name: sr.label, blurb: sr.key.startsWith("u") ? "One of six white solids. Test it to find out which." : sr.phase === "l" ? "A liquid. Measured in mL." : "Known sample to compare against. Measured in g.", icon: "jar", color: sr.color };
+  }
+  function showTip(ev, info) {
+    if (!info) { tip.hidden = true; return; }
+    $("#tipName").textContent = info.name; $("#tipBlurb").textContent = info.blurb || ""; drawIcon($("#tipIcon"), info.icon, info.color);
+    tip.hidden = false; const w = tip.offsetWidth, hgt = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, ev.clientX + 16)) + "px"; tip.style.top = Math.max(8, Math.min(innerHeight - hgt - 8, ev.clientY + 16)) + "px";
+  }
+  canvas.addEventListener("mousemove", (ev) => { const r = canvas.getBoundingClientRect(), hit = renderer.hit((ev.clientX - r.left) * (320 / r.width), (ev.clientY - r.top) * (180 / r.height)); showTip(ev, hit && infoForBench(hit)); });
+  roomCanvas.addEventListener("mousemove", (ev) => { const r = roomCanvas.getBoundingClientRect(), p = roomR.tileFromPoint((ev.clientX - r.left) * (320 / r.width), (ev.clientY - r.top) * (180 / r.height)), t = tileAt(room, p.x, p.y); showTip(ev, t && t.name ? { name: t.name, blurb: t.text, icon: t.id } : null); });
+  for (const cv of [canvas, roomCanvas]) cv.addEventListener("mouseleave", () => { tip.hidden = true; });
+
   syncUnit(); renderPPE(); renderControls(); renderFeed(); renderInv(); renderSafety(); setView("room");
   if (modeInfo.rejected) { log.add("mode_rejected", { asked: modeInfo.rejected }); say("This link's mode could not be verified, so you are in Guided mode.", "warn"); }
   say("Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
+  if (resume) restore(resume);
+  setInterval(autosave, 5000);
   $("#boot").hidden = true; $("#app").hidden = false;
   let last = performance.now(), t0 = last, lastCtl = 0;
   function frame(now) {
