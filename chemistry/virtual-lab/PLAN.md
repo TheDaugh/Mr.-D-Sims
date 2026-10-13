@@ -175,11 +175,11 @@ Every action appends one small JSON event. The log is the grading record, the te
 - **Scope.** The room + bench + engine + modes is a real application. Milestones 0 to 1 give you something playable quickly; the room is the part you can cut or delay without losing the lab.
 - **Accuracy is a content problem, not a coding problem.** The review file in section 2 is where your time goes.
 - **No server.** Section 1's limits apply. Decide early if you want the Google Sheet logging.
-- **Phones.** The bench works with tap; the overworld wants a keyboard or an on-screen d-pad. Plan the d-pad.
+- **Devices (decided):** school Chromebooks only, no phone support. Keyboard (WASD/arrows + E) for the room, mouse/trackpad drag for the bench, touchscreen taps work as a bonus. No on-screen d-pad, and the layout targets a laptop screen (about 1366×768) instead of a phone.
 
 ## 10. Open questions
 
-1. Devices: school Chromebooks only, or phones too? (Decides the d-pad and the bundle.)
+1. ~~Devices~~ Decided: Chromebooks only.
 2. Do you use Google Classroom or Drive for turning work in? (Decides the hand-in path and whether Sheet logging is worth it.)
 3. Which class and unit does the first real lab serve? (I assumed Unit 2, unknown solids.)
 4. Do you want the teacher code to be a single class code or one per period?
