@@ -253,5 +253,155 @@
       "dimAbove_mS_per_cm": 0.2,
       "brightAbove_mS_per_cm": 5
     }
+  },
+  "micro": {
+    "_note": "How each substance looks at the particle level. Used only by the microscope view. Needs your review.",
+    "NaCl": {
+      "kind": "ionic",
+      "label": "NaCl",
+      "ions": [
+        {
+          "label": "Na⁺",
+          "color": "#e0a030",
+          "per": 1
+        },
+        {
+          "label": "Cl⁻",
+          "color": "#3aa05a",
+          "per": 1
+        }
+      ]
+    },
+    "NaHCO3": {
+      "kind": "ionic",
+      "label": "NaHCO₃",
+      "ions": [
+        {
+          "label": "Na⁺",
+          "color": "#e0a030",
+          "per": 1
+        },
+        {
+          "label": "HCO₃⁻",
+          "color": "#8a5fc0",
+          "per": 1
+        }
+      ]
+    },
+    "CaCO3": {
+      "kind": "ionic",
+      "label": "CaCO₃",
+      "ions": [
+        {
+          "label": "Ca²⁺",
+          "color": "#a9b4c4",
+          "per": 1
+        },
+        {
+          "label": "CO₃²⁻",
+          "color": "#555b66",
+          "per": 1
+        }
+      ]
+    },
+    "NaCH3COO": {
+      "kind": "ionic",
+      "label": "sodium acetate",
+      "ions": [
+        {
+          "label": "Na⁺",
+          "color": "#e0a030",
+          "per": 1
+        },
+        {
+          "label": "CH₃COO⁻",
+          "color": "#d98a5a",
+          "per": 1
+        }
+      ]
+    },
+    "Ca(CH3COO)2": {
+      "kind": "ionic",
+      "label": "calcium acetate",
+      "ions": [
+        {
+          "label": "Ca²⁺",
+          "color": "#a9b4c4",
+          "per": 1
+        },
+        {
+          "label": "CH₃COO⁻",
+          "color": "#d98a5a",
+          "per": 2
+        }
+      ]
+    },
+    "Na3C6H5O7": {
+      "kind": "ionic",
+      "label": "sodium citrate",
+      "ions": [
+        {
+          "label": "Na⁺",
+          "color": "#e0a030",
+          "per": 3
+        },
+        {
+          "label": "citrate³⁻",
+          "color": "#c9a63a",
+          "per": 1
+        }
+      ]
+    },
+    "Ca3(C6H5O7)2": {
+      "kind": "ionic",
+      "label": "calcium citrate",
+      "ions": [
+        {
+          "label": "Ca²⁺",
+          "color": "#a9b4c4",
+          "per": 3
+        },
+        {
+          "label": "citrate³⁻",
+          "color": "#c9a63a",
+          "per": 2
+        }
+      ]
+    },
+    "C12H22O11": {
+      "kind": "molecular",
+      "label": "sucrose",
+      "color": "#d9779a"
+    },
+    "C6H8O7": {
+      "kind": "molecular",
+      "label": "citric acid",
+      "color": "#e6c040"
+    },
+    "C6H10O5": {
+      "kind": "polymer",
+      "label": "starch",
+      "color": "#c9b48a"
+    },
+    "CH3COOH": {
+      "kind": "molecular",
+      "label": "acetic acid",
+      "color": "#d9a066"
+    },
+    "I2": {
+      "kind": "molecular",
+      "label": "I₂",
+      "color": "#7a3b12"
+    },
+    "CO2": {
+      "kind": "gas",
+      "label": "CO₂",
+      "color": "#8a929c"
+    },
+    "H2O": {
+      "kind": "water",
+      "label": "H₂O",
+      "color": "#78b9eb"
+    }
   }
 }

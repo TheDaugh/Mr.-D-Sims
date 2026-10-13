@@ -49,6 +49,8 @@ export function buildReport(record, truth, hazards = {}) {
     incidents: incidents.map((e) => ({ id: e.id, title: (hazards[e.id] || {}).title || e.id, why: (hazards[e.id] || {}).why || "", treated: e.treated, escalated: e.escalated, quizCorrect: e.quiz_correct, pointsLost: e.points_lost })),
     blocked: { hazards: hz.filter((e) => e.outcome === "blocked").length, procedures: by("procedure").length },
     points: record.safety ? record.safety.points : null,
-    scouted: by("visit").map((e) => e.object)
+    scouted: by("visit").map((e) => e.object),
+    prelab: { correct: by("prelab_answer").filter((e) => e.correct).length, total: by("prelab_answer").length, prediction: (record.prelab || {}).prediction || "" },
+    cer: record.cer || null, submitted: !!record.submitted
   };
 }

@@ -3,28 +3,465 @@
   "title": "Lab 1: Identify the Unknown White Solids",
   "intro": "Four jars hold unidentified white solids. Each is one of the six known samples on the shelf. You will run the same five tests on the unknowns and on the knowns, record what you observe, and decide which is which. Several of the solids look alike, so no single test is enough.",
   "standard": {
-    "solubility":   { "g": 5, "mL": 20 },
-    "conductivity": { "g": 1, "mL": 50 },
-    "vinegar":      { "g": 1, "mL": 20, "seconds": 60 },
-    "iodine":       { "g": 1, "mL": 10 },
-    "heat":         { "g": 1, "plateC": 250, "seconds": 300 }
+    "solubility": {
+      "g": 5,
+      "mL": 20
+    },
+    "conductivity": {
+      "g": 1,
+      "mL": 50
+    },
+    "vinegar": {
+      "g": 1,
+      "mL": 20,
+      "seconds": 60
+    },
+    "iodine": {
+      "g": 1,
+      "mL": 10
+    },
+    "heat": {
+      "g": 1,
+      "plateC": 250,
+      "seconds": 300
+    }
   },
   "tests": [
-    { "key": "solubility", "name": "Solubility", "how": "Weigh 5.0 g on the balance, add it to a beaker, move the beaker to the bench, add 20 mL of water, and stir. Does it all dissolve, some of it, or none of it?",
-      "options": [["full", "all dissolves"], ["partial", "some dissolves, some left"], ["none", "none dissolves"]] },
-    { "key": "conductivity", "name": "Conductivity", "how": "Dissolve 1.0 g in 50 mL of water, stir, and test with the conductivity tester. Use the same amounts every time so the readings can be compared.",
-      "options": [["bright", "bulb bright"], ["dim", "bulb dim"], ["off", "bulb off"]] },
-    { "key": "vinegar", "name": "Vinegar test", "how": "Add 1.0 g to 20 mL of vinegar and watch for a minute. Skip ahead if the reaction is slow.",
-      "options": [["fast", "fast fizzing"], ["slow", "slow bubbling"], ["none", "no bubbles"]] },
-    { "key": "iodine", "name": "Iodine test", "how": "Add 1.0 g to 10 mL of iodine solution.",
-      "options": [["blue-black", "turns blue-black"], ["no change", "stays amber"]] },
-    { "key": "heating", "name": "Heating", "how": "Put 1.0 g on the watch glass, set the hot plate to 250 °C, and watch as it heats. Use tongs to handle anything hot.",
-      "options": [["none", "no change"], ["melts", "melts to a clear liquid"], ["browns", "browns or chars"], ["bubbles", "gives off gas bubbles"]] }
+    {
+      "key": "solubility",
+      "name": "Solubility",
+      "how": "Weigh 5.0 g on the balance, add it to a beaker, move the beaker to the bench, add 20 mL of water, and stir. Does it all dissolve, some of it, or none of it?",
+      "options": [
+        [
+          "full",
+          "all dissolves"
+        ],
+        [
+          "partial",
+          "some dissolves, some left"
+        ],
+        [
+          "none",
+          "none dissolves"
+        ]
+      ]
+    },
+    {
+      "key": "conductivity",
+      "name": "Conductivity",
+      "how": "Dissolve 1.0 g in 50 mL of water, stir, and test with the conductivity tester. Use the same amounts every time so the readings can be compared.",
+      "options": [
+        [
+          "bright",
+          "bulb bright"
+        ],
+        [
+          "dim",
+          "bulb dim"
+        ],
+        [
+          "off",
+          "bulb off"
+        ]
+      ]
+    },
+    {
+      "key": "vinegar",
+      "name": "Vinegar test",
+      "how": "Add 1.0 g to 20 mL of vinegar and watch for a minute. Skip ahead if the reaction is slow.",
+      "options": [
+        [
+          "fast",
+          "fast fizzing"
+        ],
+        [
+          "slow",
+          "slow bubbling"
+        ],
+        [
+          "none",
+          "no bubbles"
+        ]
+      ]
+    },
+    {
+      "key": "iodine",
+      "name": "Iodine test",
+      "how": "Add 1.0 g to 10 mL of iodine solution.",
+      "options": [
+        [
+          "blue-black",
+          "turns blue-black"
+        ],
+        [
+          "no change",
+          "stays amber"
+        ]
+      ]
+    },
+    {
+      "key": "heating",
+      "name": "Heating",
+      "how": "Put 1.0 g on the watch glass, set the hot plate to 250 °C, and watch as it heats. Use tongs to handle anything hot.",
+      "options": [
+        [
+          "none",
+          "no change"
+        ],
+        [
+          "melts",
+          "melts to a clear liquid"
+        ],
+        [
+          "browns",
+          "browns or chars"
+        ],
+        [
+          "bubbles",
+          "gives off gas bubbles"
+        ]
+      ]
+    }
   ],
   "steps": [
-    "Put on goggles and an apron before you touch anything.",
-    "Test each unknown with all five tests. Test the known samples too so you can compare.",
-    "Record what you see in the table below. Only record what you observed, not what you expect.",
-    "Choose an identity for each unknown, then press Check. Retest anything marked wrong."
+    "Finish the pre-lab (theory, questions, prediction). The lab door stays shut until you do.",
+    "Suit up at the locker, then go through the door.",
+    "Collect the jars you need from the shelves. You can carry six.",
+    "Run the five tests on every unknown, and on the known samples so you have something to compare against.",
+    "Record only what you observe in your notebook. Do not guess.",
+    "Choose an identity for each unknown and submit. There is no answer check, so retest before you submit.",
+    "Write your Claim, Evidence, Reasoning."
+  ],
+  "theory": [
+    {
+      "title": "What you are doing",
+      "body": [
+        "Four jars hold unidentified white solids. Each one is a different substance from the six known samples on the shelf. They look alike, so you identify them by how they behave.",
+        "Each test gives a different clue. No single test is enough, because several solids give the same result on one test. Together the five tests give each substance its own fingerprint."
+      ]
+    },
+    {
+      "title": "Solubility",
+      "body": [
+        "A solid dissolves when the attraction between water and its particles beats the attraction holding the solid together. Different substances have different solubilities, so the same amount of each behaves differently in the same water.",
+        "In this lab you stir 5 g in 20 mL of water and record whether it dissolves fully, partly, or hardly at all."
+      ]
+    },
+    {
+      "title": "Conductivity and ions",
+      "body": [
+        "Electric current flows through water only when it carries charged particles that can move. Those are ions.",
+        "An ionic solid such as NaCl breaks into ions when it dissolves (Na⁺ and Cl⁻), so the bulb glows. A molecular solid such as sugar dissolves as whole molecules with no charge, so the bulb stays off. A weak acid makes only a few ions, so the bulb glows dimly."
+      ]
+    },
+    {
+      "title": "Reaction with vinegar",
+      "body": [
+        "Vinegar is a dilute solution of acetic acid. Acids react with carbonates and bicarbonates and make carbon dioxide gas.",
+        "Baking soda: NaHCO₃ + CH₃COOH → NaCH₃COO + H₂O + CO₂. The bubbles are a new substance forming, which is evidence of a chemical change. Some carbonates react very slowly because only their surface touches the acid."
+      ]
+    },
+    {
+      "title": "The iodine test",
+      "body": [
+        "Iodine solution is amber. In the presence of starch it turns blue-black, because iodine slips inside the coiled starch molecule. Nothing else on your shelf does that, so it identifies starch."
+      ]
+    },
+    {
+      "title": "Heating",
+      "body": [
+        "Solids change in different ways when heated. Some melt. Some decompose and give off gas. Some change color because a new substance forms. Some do nothing at all at the temperatures on this hot plate.",
+        "Use tongs for any hot container. Hot glass looks the same as cold glass."
+      ]
+    },
+    {
+      "title": "How to write a CER",
+      "body": [
+        "Claim: one sentence that answers the question. Example: Unknown B is baking soda.",
+        "Evidence: the specific observations from your own data that support the claim. Say what you saw, not what you expected to see.",
+        "Reasoning: the science that connects the evidence to the claim. Explain why that observation means that substance, using particles. Evidence says what happened. Reasoning says why it matters."
+      ]
+    }
+  ],
+  "prelab": {
+    "questions": [
+      {
+        "id": "p1",
+        "q": "Which of these is a physical property you can measure without changing the substance into something else?",
+        "options": [
+          "How much of it dissolves in water",
+          "Whether it fizzes with vinegar",
+          "Whether it turns brown when burned",
+          "Whether it forms a gas when mixed with acid"
+        ],
+        "correct": 0,
+        "explain": "Dissolving does not make a new substance; the particles are still there. Fizzing, browning and gas formation all produce new substances."
+      },
+      {
+        "id": "p2",
+        "q": "A solid dissolves in water and the conductivity bulb glows brightly. What does this tell you?",
+        "options": [
+          "The solution contains many mobile ions",
+          "The solid is a molecular compound",
+          "The solid reacted with the bulb",
+          "The solution contains whole neutral molecules"
+        ],
+        "correct": 0,
+        "explain": "Current needs mobile charges. A bright bulb means many ions, which points to an ionic compound."
+      },
+      {
+        "id": "p3",
+        "q": "Sugar dissolves completely in water, but the bulb stays off. The best explanation is:",
+        "options": [
+          "Sugar dissolves as whole molecules, so there are no ions to carry current",
+          "Sugar did not really dissolve",
+          "Sugar makes the water too thick for current",
+          "Sugar ions are too large to move"
+        ],
+        "correct": 0,
+        "explain": "Sugar is molecular. It spreads out as intact molecules with no charge, so it dissolves without making ions."
+      },
+      {
+        "id": "p4",
+        "q": "You add vinegar to a white solid and see bubbles of gas. What does this show?",
+        "options": [
+          "A chemical change made a new substance",
+          "A physical change only",
+          "The solid is starch",
+          "The solid melted"
+        ],
+        "correct": 0,
+        "explain": "A gas that was not there before is a new substance. Carbonates and bicarbonates make CO₂ with an acid."
+      },
+      {
+        "id": "p5",
+        "q": "Two of your unknowns both dissolve and both make the bulb glow. What should you do?",
+        "options": [
+          "Run the other tests to find one that tells them apart",
+          "Pick either one",
+          "Run the conductivity test again",
+          "Assume they are the same substance"
+        ],
+        "correct": 0,
+        "explain": "Different substances can match on one test. Each extra test narrows the possibilities until only one substance fits."
+      },
+      {
+        "id": "p6",
+        "q": "A chemical splashes into your eye. What do you do first?",
+        "options": [
+          "Go straight to the eyewash station and flush",
+          "Wipe it with a paper towel",
+          "Keep working and tell the teacher later",
+          "Close your eye and wait to see if it hurts"
+        ],
+        "correct": 0,
+        "explain": "Eye damage starts within seconds. Flush with the eyewash immediately for a full 15 minutes, and get help."
+      }
+    ],
+    "prediction": {
+      "prompt": "Choose one known sample from the list: salt, sugar, baking soda, chalk, cornstarch, citric acid. Predict what you will see when you (1) stir it in water, (2) test the solution's conductivity, and (3) add vinegar. Explain each prediction using what you know about particles.",
+      "minWords": 30
+    }
+  },
+  "postlab": {
+    "prompt": "Choose one of your four unknowns. What substance is it, and how do you know?",
+    "minWords": {
+      "claim": 5,
+      "evidence": 10,
+      "reasoning": 25
+    },
+    "starters": {
+      "claim": [
+        "Unknown __ is ",
+        "I claim that unknown __ is "
+      ],
+      "reasoning": [
+        "This evidence supports my claim because ",
+        "The particles explain this because ",
+        "This rules out ___ because "
+      ]
+    },
+    "wordBank": [
+      "ions",
+      "dissolve",
+      "molecules",
+      "mobile charges",
+      "conducts",
+      "gas",
+      "new substance",
+      "carbonate",
+      "starch",
+      "melts",
+      "chemical change",
+      "physical property"
+    ],
+    "checklist": [
+      "My claim answers the question in one sentence.",
+      "My evidence is specific observations from my own data.",
+      "My evidence includes at least two different tests.",
+      "My reasoning explains why the evidence means that substance.",
+      "I used particle language (ions, molecules, dissolve)."
+    ],
+    "rubric": [
+      {
+        "key": "claim",
+        "name": "Claim",
+        "levels": [
+          "Missing or does not answer the question",
+          "Answers, but vague or incorrect",
+          "Answers the question; partly correct",
+          "Clear, correct, one sentence"
+        ]
+      },
+      {
+        "key": "evidence",
+        "name": "Evidence",
+        "levels": [
+          "None",
+          "Not from their data or very vague",
+          "Some specific observations",
+          "Specific observations from two or more tests"
+        ]
+      },
+      {
+        "key": "reasoning",
+        "name": "Reasoning",
+        "levels": [
+          "None",
+          "Restates the evidence",
+          "Connects evidence to claim without particles",
+          "Connects evidence to claim using particle-level science"
+        ]
+      }
+    ]
+  },
+  "quests": [
+    {
+      "id": "gear",
+      "text": "Put on goggles and an apron",
+      "hint": "Walk to the blue LOCKER (bottom left) and press E. Choose Put on for the goggles and the apron.",
+      "state": "ppe"
+    },
+    {
+      "id": "door",
+      "text": "Go through the door into the lab",
+      "hint": "The light on the DOOR turns green when you are geared up. Walk up through it.",
+      "state": "entered_lab"
+    },
+    {
+      "id": "jars",
+      "text": "Take the four unknown jars",
+      "hint": "Walk to the UNKNOWNS shelf at the back wall, face it and press E, then choose Take on each jar.",
+      "event": "take",
+      "where": {
+        "jar": "^u"
+      },
+      "distinct": "jar",
+      "count": 4
+    },
+    {
+      "id": "liquids",
+      "text": "Take water, vinegar and iodine",
+      "hint": "The LIQUIDS shelf is next to the unknowns. Take all three.",
+      "event": "take",
+      "where": {
+        "jar": "^(water|vinegar|iodine)$"
+      },
+      "distinct": "jar",
+      "count": 3
+    },
+    {
+      "id": "bench",
+      "text": "Go to your lab bench",
+      "hint": "Face the long BENCH and press E to step up to it.",
+      "event": "view",
+      "where": {
+        "to": "bench"
+      }
+    },
+    {
+      "id": "weigh",
+      "text": "Weigh a solid on the balance",
+      "hint": "Pick a container, press Balance to move it there, press Tare, choose a jar and an amount, then Add.",
+      "event": "add",
+      "where": {
+        "unit": "g"
+      }
+    },
+    {
+      "id": "sol",
+      "text": "Solubility: add 20 mL of water to each unknown",
+      "hint": "Move the container back to the bench, choose water, set 20 mL, press Add, then Stir.",
+      "event": "add",
+      "where": {
+        "substance": "water"
+      },
+      "count": 4
+    },
+    {
+      "id": "cond",
+      "text": "Conductivity: test each unknown solution",
+      "hint": "With the solution on the bench press Test conductivity and watch the bulb.",
+      "event": "conductivity",
+      "count": 4
+    },
+    {
+      "id": "vin",
+      "text": "Vinegar: test each unknown",
+      "hint": "Weigh 1 g of the unknown into a clean beaker, add 20 mL of vinegar, then watch and press Skip ahead.",
+      "event": "add",
+      "where": {
+        "substance": "vinegar"
+      },
+      "count": 4
+    },
+    {
+      "id": "iod",
+      "text": "Iodine: test each unknown",
+      "hint": "Weigh 1 g of the unknown, add 10 mL of iodine solution, and look at the color.",
+      "event": "add",
+      "where": {
+        "substance": "iodine"
+      },
+      "count": 4
+    },
+    {
+      "id": "heat",
+      "text": "Heating: heat a sample on the hot plate",
+      "hint": "Put 1 g on the watch glass, move it to the hot plate, set 250 °C, press Turn on, then Skip ahead. Use tongs to move it afterward.",
+      "event": "hotplate",
+      "where": {
+        "on": "true"
+      }
+    },
+    {
+      "id": "known",
+      "text": "Test known samples to compare",
+      "hint": "Repeat the tests on the known jars. Without knowns you have nothing to match against.",
+      "event": "add",
+      "where": {
+        "shown_as": "^.*\\(known\\)$"
+      },
+      "count": 3
+    },
+    {
+      "id": "notebook",
+      "text": "Fill in the whole notebook",
+      "hint": "Open the notebook (the book icon at the top, or press N) and fill every box.",
+      "state": "notebook",
+      "count": 24
+    },
+    {
+      "id": "submit",
+      "text": "Submit your answers",
+      "hint": "Open the notebook and press Submit. You cannot change answers after, and there is no answer check.",
+      "state": "submitted"
+    },
+    {
+      "id": "cer",
+      "text": "Write your Claim, Evidence, Reasoning",
+      "hint": "The CER form opens after you submit. Use your own data as evidence.",
+      "state": "cer_done"
+    }
   ]
 }

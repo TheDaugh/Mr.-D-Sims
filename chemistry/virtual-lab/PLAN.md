@@ -183,3 +183,11 @@ Every action appends one small JSON event. The log is the grading record, the te
 2. Do you use Google Classroom or Drive for turning work in? (Decides the hand-in path and whether Sheet logging is worth it.)
 3. Which class and unit does the first real lab serve? (I assumed Unit 2, unknown solids.)
 4. Do you want the teacher code to be a single class code or one per period?
+
+## M5 redesign (task-driven flow)
+- Stages: intro (name, controls, scripted demo) → pre-lab (theory, 6 one-attempt questions, prediction) → lab → CER → done. Door and movement stay locked until the pre-lab is finished.
+- Tasks list with coach bar replaces the buried lab sheet; event log sits at the bottom (Baldur's Gate style).
+- Click-to-zoom microscope per container; unknown identities are anonymized until the notebook is submitted.
+- No in-sim answer checking. The teacher grades the record: notebook, pre-lab, CER (rubric 0–3 for claim, evidence, reasoning in `teacher.html`).
+- Needs Ian's review: `micro` table in species.json, theory text, pre-lab questions, quests, CER rubric.
+- Next: heating-curve lab (students type data and plot by hand), then specific heat; single-file bundle.

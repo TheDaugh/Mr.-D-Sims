@@ -41,25 +41,39 @@ function addRecord(rec, file) {
   if (rec.cont) return `${file}: that is a save file, not a turned-in record.`;
   if (!rec.events || !rec.unknowns || rec.lab !== lab.id) return `${file}: not a record from this lab.`;
   const r = buildReport(rec, truth, H);
-  rows.push({ rec, r, file });
+  const x = { rec, r, file, scores: {} }; loadScores(x); rows.push(x);
   return null;
 }
+const rubric = lab.postlab.rubric, RK = "vlab-rubric:";
+const key = (x) => RK + lab.id + ":" + x.r.student + ":" + x.rec.started;
+function loadScores(x) { try { x.scores = JSON.parse(localStorage.getItem(key(x))) || {}; } catch (e) { x.scores = {}; } }
+const cerTotal = (x) => rubric.reduce((a, c) => a + (+x.scores[c.key] || 0), 0);
 const ok = (v) => v === null ? h("span", { class: "dim" }, "—") : v ? h("span", { class: "good" }, "✔") : h("span", { class: "badc" }, "✘");
 function render() {
   rows.sort((a, b) => a.r.student.localeCompare(b.r.student));
   $("#rosterCard").hidden = !rows.length;
   $("#roster").replaceChildren(
-    h("thead", {}, h("tr", {}, ["Student", "Mode", "Identified", "Wrong cells", "Goggles", "Apron", "Incidents", "Safety pts", "Time", ""].map((t) => h("th", {}, t)))),
+    h("thead", {}, h("tr", {}, ["Student", "Mode", "Identified", "Wrong cells", "Goggles", "Apron", "Pre-lab", "CER /9", "Incidents", "Safety pts", "Time", ""].map((t) => h("th", {}, t)))),
     h("tbody", {}, rows.map((x) => {
       const r = x.r, g = r.setup;
       return h("tr", {}, h("td", {}, r.student), h("td", {}, r.mode), h("td", {}, `${r.grade.identified} / ${r.grade.total}`), h("td", {}, String(r.grade.wrong)),
-        h("td", {}, ok(g[0].ok)), h("td", {}, ok(g[1].ok)), h("td", {}, r.incidents.length ? h("span", { class: "badc" }, String(r.incidents.length)) : "0"),
+        h("td", {}, ok(g[0].ok)), h("td", {}, ok(g[1].ok)), h("td", {}, r.prelab ? `${r.prelab.correct}/${r.prelab.total}` : "—"), h("td", {}, r.cer ? String(cerTotal(x)) : h("span", { class: "dim" }, "—")),
+        h("td", {}, r.incidents.length ? h("span", { class: "badc" }, String(r.incidents.length)) : "0"),
         h("td", {}, r.mode === "consequences" && r.points !== null ? String(r.points) : "—"), h("td", {}, mmss(r.seconds)), h("td", {}, h("button", { onclick: () => detail(x) }, "Timeline")));
     })));
 }
 function detail(x) {
   const r = x.r;
-  $("#detail").replaceChildren(h("h3", {}, `${r.student}: timeline`),
+  const C = x.rec.cer, words = (t) => (String(t || "").trim().match(/\S+/g) || []).length;
+  const cerBox = !C ? h("p", { class: "hint" }, "No CER submitted.") : h("div", {}, h("h3", {}, "CER"),
+    h("p", {}, h("b", {}, "Pre-lab prediction: "), r.prelab && r.prelab.prediction || "—"),
+    h("p", {}, h("b", {}, "Identified: "), `Unknown ${C.unknown}`), h("p", {}, h("b", {}, "Claim: "), C.claim),
+    h("p", {}, h("b", {}, "Evidence: "), (C.evidence || []).join("; ") + (C.note ? ` | Note: ${C.note}` : "")),
+    h("p", {}, h("b", {}, `Reasoning (${words(C.reasoning)} words): `), C.reasoning),
+    h("div", { class: "controls" }, rubric.map((c) => h("label", { title: c.levels.join("\n") }, c.name + " ",
+      h("select", { onchange: (e) => { x.scores[c.key] = +e.target.value; try { localStorage.setItem(key(x), JSON.stringify(x.scores)); } catch (_) {} render(); } },
+        [0, 1, 2, 3].map((n) => h("option", { value: n, selected: (+x.scores[c.key] || 0) === n ? "" : null }, `${n}: ${c.levels[n]}`)))))));
+  $("#detail").replaceChildren(h("h3", {}, `${r.student}: timeline`), cerBox,
     h("p", { class: "hint" }, `Scouted: ${r.scouted.join(", ") || "nothing"}. Tests run: ${r.tests.filter((t) => t.done).map((t) => t.label).join(", ") || "none"}.`),
     r.incidents.map((i) => h("p", {}, h("b", {}, i.title), `: ${i.why} Treated: ${i.treated}. Review question: ${i.quizCorrect ? "right" : "wrong"}.`)),
     h("div", { class: "tl" }, x.rec.events.map((e) => h("div", { class: e.type === "incident" || (e.type === "hazard" && e.outcome !== "blocked") ? "inc" : "" }, `${mmss(Math.round(e.t))}  ${summarize(e)}`))));
@@ -79,8 +93,8 @@ drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove
 $("#clear").addEventListener("click", () => { rows = []; $("#detail").replaceChildren(); render(); });
 $("#csv").addEventListener("click", () => {
   const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
-  const lines = [["student", "mode", "identified", "wrong_cells", "goggles_before_chemicals", "apron_before_chemicals", "incidents", "safety_points", "seconds"].join(",")];
-  for (const { r } of rows) lines.push([r.student, r.mode, r.grade.identified, r.grade.wrong, r.setup[0].ok, r.setup[1].ok, r.incidents.length, r.points ?? "", r.seconds].map(q).join(","));
+  const lines = [["student", "mode", "identified", "wrong_cells", "goggles_before_chemicals", "apron_before_chemicals", "incidents", "prelab_correct", "prelab_total", "cer_claim", "cer_evidence", "cer_reasoning", "rubric_claim", "rubric_evidence", "rubric_reasoning", "safety_points", "seconds"].join(",")];
+  for (const { r, rec, scores } of rows) lines.push([r.student, r.mode, r.grade.identified, r.grade.wrong, r.setup[0].ok, r.setup[1].ok, r.incidents.length, r.prelab ? r.prelab.correct : "", r.prelab ? r.prelab.total : "", rec.cer ? rec.cer.claim : "", rec.cer ? (rec.cer.evidence || []).join("; ") : "", rec.cer ? rec.cer.reasoning : "", ...rubric.map((c) => scores[c.key] ?? ""), r.points ?? "", r.seconds].map(q).join(","));
   const a = h("a", { href: URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" })), download: "class-records.csv" }); document.body.append(a); a.click(); a.remove();
 });
 window.__teacher = { load, rows: () => rows };

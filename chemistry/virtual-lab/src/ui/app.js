@@ -4,24 +4,17 @@ import { fingerprint } from "../engine/lab1.js";
 import { Log, downloadJSON } from "../log.js";
 import { createRenderer, SLOTS } from "./render.js";
 import { createRoomRenderer } from "./roomview.js";
+import { $, h, mulberry32 } from "./dom.js";
+import { createMicroView } from "./micro.js";
+import { microModel, legend } from "../engine/micro.js";
+import { renderIntro, renderPrelab, renderCER, theoryNodes } from "./stages.js";
+import { runDemo } from "./demo.js";
+import { questDone, questProgress } from "../engine/quests.js";
 import { drawIcon } from "./icons.js";
 import { buildReport } from "../report.js";
 import { resolveMode } from "../mode.js";
 import { indexHazards, losePoints } from "../engine/hazards.js";
 import { parseRoom, step, facingTile, hasPPE, tileAt } from "../engine/room.js";
-
-const $ = (s) => document.querySelector(s);
-function h(tag, props = {}, ...kids) {
-  const e = document.createElement(tag);
-  for (const k in props) {
-    if (k === "class") e.className = props[k];
-    else if (k.startsWith("on")) e.addEventListener(k.slice(2), props[k]);
-    else if (props[k] !== false && props[k] != null) e.setAttribute(k, props[k] === true ? "" : props[k]);
-  }
-  for (const kid of kids.flat()) if (kid != null) e.append(kid.nodeType ? kid : document.createTextNode(kid));
-  return e;
-}
-function mulberry32(a) { return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
 const SHORT = { NaCl: "Salt", sucrose: "Sugar", NaHCO3: "B.Soda", CaCO3: "Chalk", starch: "Starch", citric: "Citric", water: "Water", vinegar: "Vinegar", iodine: "Iodine" };
 
@@ -71,11 +64,11 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   ];
   sources.forEach((s) => { s.color = speciesData.species.find((x) => x.id === s.id).color; });
 
-  const S = { sel: "b1", srcKey: sources[0].key, ppe: { goggles: false, apron: false, tongs: false }, inv: [], view: "room", panel: null, mode: modeInfo.mode, incident: null, safety: { points: 100, incidents: [] }, plateOn: false, plateC: 150, bulb: null, bulbUntil: 0, feed: [], notebook: {}, student: "" };
+  const S = { sel: "b1", srcKey: sources[0].key, ppe: { goggles: false, apron: false, tongs: false }, inv: [], view: "room", panel: null, mode: modeInfo.mode, incident: null, safety: { points: 100, incidents: [] }, plateOn: false, plateC: 150, bulb: null, bulbUntil: 0, feed: [], notebook: {}, student: "", stage: "intro", prelab: { answers: {}, prediction: "" }, cer: {}, submitted: false, cerDone: false, touched: {}, demo: false, nbSeen: 0 };
   const byKey = (k) => CONT.find((c) => c.key === k);
 
   // ---------- feedback and rules ----------
-  function say(text, kind = "info") { S.feed.unshift({ text, kind, t: log.events.length ? log.events[log.events.length - 1].t : 0 }); S.feed = S.feed.slice(0, 40); renderFeed(); }
+  function say(text, kind = "info") { S.feed.push({ text, kind }); S.feed = S.feed.slice(-80); renderFeed(); }
   const H = indexHazards(hazardData);
   function hazard(id, text) { log.add("hazard", { id, mode: S.mode, outcome: "blocked" }); say(text, "stop"); }
   function blocked(id, text) { log.add("procedure", { id, outcome: "blocked" }); say(text, "warn"); }
@@ -95,7 +88,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   function applyEffect(hz, ctx) {
     if (hz.effect === "drop_container" && ctx.container) {
-      const c = ctx.container; c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; c.loc = "bench";
+      const c = ctx.container; c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; c.loc = "bench"; S.touched[c.key] = [];
       c.slot = [0, 1, 2].find((n) => !CONT.some((o) => o !== c && o.loc === "bench" && o.slot === n)) ?? 0;
       say(`${c.name} shattered. A fresh, empty one is on the bench.`);
     }
@@ -179,6 +172,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     }
     try { add(world, c.c, src.id, amt); }
     catch (e) { if (e.code === "OVERFLOW") { fire("overflow", { container: c }); return; } throw e; }
+    (S.touched[c.key] ||= []).push(src.key);
     log.add("add", { container: c.key, substance: src.id, shown_as: src.label, amount: amt, unit: src.phase === "s" ? "g" : "mL" });
     say(`Added ${amt} ${src.phase === "s" ? "g" : "mL"} of ${src.label} to ${c.name}.`);
   }
@@ -212,7 +206,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (!ppeOk(true)) return;
     const c = cur();
     if (c.c.T > 50 && !S.ppe.tongs) return fire("hot_container", { container: c });
-    c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0;
+    c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; S.touched[c.key] = [];
     log.add("empty", { container: c.key }); say(`${c.name} is emptied and rinsed.`);
   }
   function skip(seconds) {
@@ -285,7 +279,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const r = canvas.getBoundingClientRect();
     const hit = renderer.hit((ev.clientX - r.left) * (320 / r.width), (ev.clientY - r.top) * (180 / r.height));
     if (!hit) return;
-    if (hit.type === "container") { S.sel = hit.key; renderControls(); } else { S.srcKey = hit.key; syncUnit(); }
+    if (hit.type === "container") { if (S.sel === hit.key) openMicro(hit.key); else { S.sel = hit.key; renderControls(); } } else if (hit.type === "source") { S.srcKey = hit.key; syncUnit(); }
   });
 
   const ppeBox = $("#ppe");
@@ -329,12 +323,11 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     $("#plateTxt").textContent = `${S.plateC} °C`; $("#plateBtn").textContent = S.plateOn ? "Turn off" : "Turn on";
   }
   function renderFeed() {
-    $("#feed").replaceChildren(...S.feed.map((f) => h("li", { class: "f-" + f.kind }, f.text)));
+    const box = $("#feed"); box.replaceChildren(...S.feed.map((f) => h("div", { class: "f-" + f.kind }, f.text))); box.scrollTop = box.scrollHeight;
   }
 
   // ---------- lab sheet ----------
   $("#title").textContent = lab.title;
-  $("#intro").textContent = lab.intro;
   $("#steps").replaceChildren(...lab.steps.map((s) => h("li", {}, s)));
   $("#tests").replaceChildren(...lab.tests.map((t) => h("li", {}, h("b", {}, t.name + ". "), t.how)));
   const table = $("#table");
@@ -344,24 +337,6 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       h("th", { scope: "row" }, "Unknown " + u.label),
       lab.tests.map((t) => h("td", {}, h("select", { "data-u": u.label, "data-t": t.key, "aria-label": `${t.name} of unknown ${u.label}` }, h("option", { value: "" }, "—"), t.options.map(([v, l]) => h("option", { value: v }, l))))),
       h("td", {}, h("select", { "data-u": u.label, "data-t": "id", "aria-label": `Identity of unknown ${u.label}` }, h("option", { value: "" }, "—"), solids.map((id) => h("option", { value: id }, speciesData.species.find((s) => s.id === id).name))))))));
-  function check() {
-    let right = 0, wrongCells = 0, filled = 0;
-    for (const u of unknowns) {
-      const row = table.querySelector(`tr[data-u="${u.label}"]`);
-      row.querySelectorAll("select").forEach((sel) => {
-        sel.classList.remove("ok", "bad");
-        const v = sel.value; if (!v) return; filled++;
-        const t = sel.dataset.t, correct = t === "id" ? u.id : truth[u.id][t];
-        if (v === correct) { sel.classList.add("ok"); if (t === "id") right++; } else { sel.classList.add("bad"); wrongCells++; }
-      });
-    }
-    log.add("check", { identified_correct: right, wrong_cells: wrongCells, filled });
-    const msg = right === 4 && wrongCells === 0 ? "All four identified and every observation matches. Download your lab record." :
-      right === 4 ? "All four identities are right, but some recorded observations don't match. Retest the cells marked in red." :
-      `${right} of 4 identified correctly. Cells in red don't match what the test should show. Retest them before changing an answer.`;
-    $("#result").textContent = msg; $("#result").className = "fb show " + (right === 4 && wrongCells === 0 ? "ok" : "no");
-  }
-  $("#check").addEventListener("click", check);
   // ---------- go ----------
   // ---------- the room ----------
   const room = parseRoom(roomDef), P = { x: room.start.x, y: room.start.y, face: room.start.face || "u" };
@@ -407,6 +382,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     return true;
   }
   function walk(dx, dy) {
+    if (!S.demo && !["lab", "postlab", "done"].includes(S.stage)) return;
     const now = performance.now(); if (now - lastMove < 110) return; lastMove = now;
     const r = step(room, P, dx, dy, S.mode === "guided" ? S.ppe : { goggles: true, apron: true });
     if (r.blocked && now - lastBlock > 1500) { lastBlock = now; hazard("no_ppe_door", "Stop. The lab door will not open. You need goggles and an apron, and they are in the locker."); }
@@ -416,8 +392,12 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   window.addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
     if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (S.demo) { if (k === "escape") demoApi.demo.stop(); return; }
+    if (document.querySelector("dialog[open]") || /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
     if (k === "escape") { if (S.panel) closePanel(); else if (S.view === "bench") setView("room"); return; }
-    if (S.view !== "room" || /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(e.target.tagName)) return;
+    if (!["lab", "postlab", "done"].includes(S.stage)) return;
+    if (k === "n") return openNotebook(); if (k === "t") return openDlg("dlgTheory"); if (k === "m") return openMicro();
+    if (S.view !== "room" || e.target.tagName === "BUTTON") return;
     if (DIRS[k]) { e.preventDefault(); walk(...DIRS[k]); }
     else if (k === "e" || k === "enter" || k === " ") { e.preventDefault(); interact(facingTile(room, P)); }
   });
@@ -436,7 +416,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   function record() {
     collectNotebook();
-    return { version: 1, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, unknowns, notebook: S.notebook, safety: S.safety, summary: { blocked_hazards: log.count("hazard"), blocked_procedures: log.count("procedure"), checks: log.count("check") }, events: log.events };
+    return { version: 2, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, unknowns, notebook: S.notebook, stage: S.stage, submitted: S.submitted, prelab: S.prelab, cer: S.cerDone ? S.cer : null, safety: S.safety, summary: { blocked_hazards: log.count("hazard"), blocked_procedures: log.count("procedure"), checks: log.count("check") }, events: log.events };
   }
   const fileName = (prefix) => `${prefix}-${(S.student || "student").replace(/\W+/g, "-")}.json`;
   $("#download").addEventListener("click", () => { const r = record(); downloadJSON(fileName("lab-record"), r); });
@@ -446,19 +426,20 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function snapshot() {
     collectNotebook();
     return { version: 1, lab: lab.id, seed, student: S.student, savedAt: new Date().toISOString(), started: log.started, elapsed: (performance.now() - log.t0) / 1000, events: log.events,
-      S: { ppe: S.ppe, inv: S.inv, srcKey: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, safety: S.safety, sel: S.sel }, P, visited: [...visited], notebook: S.notebook,
+      S: { ppe: S.ppe, inv: S.inv, srcKey: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, safety: S.safety, sel: S.sel, stage: S.stage, prelab: S.prelab, cer: S.cer, submitted: S.submitted, cerDone: S.cerDone, touched: S.touched, nbSeen: S.nbSeen }, P, visited: [...visited], notebook: S.notebook,
       cont: CONT.map((c) => ({ key: c.key, loc: c.loc, slot: c.slot, tare: c.tare, c: c.c })) };
   }
-  function autosave() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot())); } catch (e) { /* storage blocked: file save still works */ } }
-  function restore(sn) {
+  function autosave() { if (S.demo || S.stage === "intro") return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot())); } catch (e) { /* storage blocked: file save still works */ } }
+  function restore(sn, quiet) {
     Object.assign(S.ppe, sn.S.ppe); S.inv = sn.S.inv; S.srcKey = sn.S.srcKey; S.plateOn = sn.S.plateOn; S.plateC = sn.S.plateC; S.safety = sn.S.safety; S.sel = sn.S.sel;
+    for (const k of ["stage", "prelab", "cer", "submitted", "cerDone", "touched", "nbSeen"]) if (sn.S[k] !== undefined) S[k] = sn.S[k];
     for (const r of sn.cont) { const c = byKey(r.key); c.loc = r.loc; c.slot = r.slot; c.tare = r.tare; c.c = r.c; }
     Object.assign(P, sn.P); sn.visited.forEach((v) => visited.add(v));
     log.events = sn.events; log.started = sn.started; log.t0 = performance.now() - sn.elapsed * 1000;
     $("#student").value = sn.student || "";
     table.querySelectorAll("select").forEach((x) => { const v = (sn.notebook[x.dataset.u] || {})[x.dataset.t]; if (v) x.value = v; });
     $("#plate").value = S.plateC; syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
-    log.add("resume", { savedAt: sn.savedAt }); say("Welcome back. Your saved lab is restored.");
+    lockTable(); if (!quiet) { log.add("resume", { savedAt: sn.savedAt }); say("Welcome back. Your saved lab is restored."); }
   }
   $("#save").addEventListener("click", () => { autosave(); downloadJSON(fileName("lab-save"), snapshot()); say("Progress saved to your Downloads folder, and kept in this browser.", "obs"); });
   $("#load").addEventListener("change", (e) => {
@@ -470,19 +451,22 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   });
 
   // ---------- printable report ----------
+  const optLabel = (t, v) => ((t.options.find((o) => o[0] === v) || [])[1]) || v;
   $("#print").addEventListener("click", () => {
-    const rec = record(), r = buildReport(rec, truth, H), mm = (sec) => `${Math.floor(sec / 60)} min ${sec % 60} s`;
-    const mark = (ok) => (ok === null ? "—" : ok ? "✔" : "✘");
+    const rec = record(), r = buildReport(rec, truth, H), mm = (sec) => `${Math.floor(sec / 60)} min ${sec % 60} s`, mark = (ok) => (ok === null ? "—" : ok ? "✔" : "✘");
+    const right = Object.entries(S.prelab.answers).filter(([id, i]) => lab.prelab.questions.find((q) => q.id === id).correct === i).length;
     $("#report").replaceChildren(...[
       h("h1", {}, lab.title), h("p", {}, `${r.student} · ${new Date(r.started).toLocaleString()} · ${r.mode} mode · time in lab ${mm(r.seconds)}`),
+      h("h2", {}, "Pre-lab"), h("p", {}, `Concept questions correct on the first attempt: ${right} of ${lab.prelab.questions.length}.`), h("p", {}, h("b", {}, "Prediction: "), S.prelab.prediction || "(none)"),
       h("h2", {}, "Setup and safety"), h("ul", {}, r.setup.map((x) => h("li", {}, `${mark(x.ok)} ${x.label}`)), r.points !== null && r.mode === "consequences" ? h("li", {}, `Safety points: ${r.points} / 100`) : null),
       h("p", {}, `Unsafe actions blocked: ${r.blocked.hazards}. Procedure errors blocked: ${r.blocked.procedures}.`),
-      r.incidents.length ? h("div", {}, h("h2", {}, "Incidents"), h("ul", {}, r.incidents.map((i) => h("li", {}, h("b", {}, i.title), `. ${i.treated === false && i.escalated ? "Treatment was too slow. " : ""}${i.why} Review question ${i.quizCorrect ? "answered correctly" : "missed"}.`)))) : null,
+      r.incidents.length ? h("div", {}, h("h2", {}, "Incidents"), h("ul", {}, r.incidents.map((i) => h("li", {}, h("b", {}, i.title), `. ${i.why} Review question ${i.quizCorrect ? "answered correctly" : "missed"}.`)))) : null,
       h("h2", {}, "Tests you ran"), h("ul", {}, r.tests.map((x) => h("li", {}, `${x.done ? "✔" : "✘"} ${x.label}`))),
       h("h2", {}, "Your observations"),
       h("table", {}, h("thead", {}, h("tr", {}, h("th", {}, "Sample"), lab.tests.map((t) => h("th", {}, t.name)), h("th", {}, "Identified as"))),
-        h("tbody", {}, unknowns.map((u) => h("tr", {}, h("th", {}, "Unknown " + u.label), [...lab.tests.map((t) => t.key), "id"].map((k) => { const c = r.grade.cells.find((x) => x.unknown === u.label && x.test === k); return h("td", {}, c ? `${c.ok ? "✔" : "✘"} ${c.answer}${c.ok ? "" : " (should be " + c.correct + ")"}` : "—"); }))))),
-      h("p", {}, `Identified correctly: ${r.grade.identified} of ${r.grade.total}. Cells that did not match: ${r.grade.wrong}.`)].filter(Boolean));
+        h("tbody", {}, unknowns.map((u) => h("tr", {}, h("th", {}, "Unknown " + u.label), lab.tests.map((t) => h("td", {}, optLabel(t, (S.notebook[u.label] || {})[t.key]) || "—")), h("td", {}, (speciesData.species.find((x) => x.id === (S.notebook[u.label] || {}).id) || {}).name || "—"))))),
+      S.cerDone ? h("div", {}, h("h2", {}, "Claim, Evidence, Reasoning"), h("p", {}, h("b", {}, `Unknown ${S.cer.unknown}. Claim: `), S.cer.claim), h("p", {}, h("b", {}, "Evidence: ")), h("ul", {}, S.cer.evidence.map((x) => h("li", {}, x)), S.cer.note ? h("li", {}, S.cer.note) : null), h("p", {}, h("b", {}, "Reasoning: "), S.cer.reasoning)) : null
+    ].filter(Boolean));
     window.print();
   });
 
@@ -490,7 +474,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const tip = $("#tip"), FIX = { balance: ["Balance", "Weighs solids. Tare it with the empty container on it."], hotplate: ["Hot plate", "Heats a container. Anything on it gets hot, so use tongs."], tester: ["Conductivity tester", "A bulb that glows when the liquid carries electric current."] };
   function infoForBench(hit) {
     if (hit.type === "fixture") return { name: FIX[hit.key][0], blurb: FIX[hit.key][1], icon: hit.key };
-    if (hit.type === "container") { const c = byKey(hit.key), d = describe(world, c.c); return { name: c.name, blurb: c.kind === "watch" ? "Holds solids only. Never liquid." : `${c.cap} mL. ${c.c.solution.mL > 0 ? c.c.solution.mL.toFixed(0) + " mL inside" : "Empty"}${d.undissolvedG > 0.02 ? ", solid at the bottom" : ""}. ${c.c.T.toFixed(0)} °C.`, icon: c.kind === "watch" ? "watch" : "beaker" };
+    if (hit.type === "container") { const c = byKey(hit.key), d = describe(world, c.c); return { name: c.name, blurb: c.kind === "watch" ? "Holds solids only. Never liquid." : `${c.cap} mL. ${c.c.solution.mL > 0 ? c.c.solution.mL.toFixed(0) + " mL inside" : "Empty"}${d.undissolvedG > 0.02 ? ", solid at the bottom" : ""}. ${c.c.T.toFixed(0)} °C. ${c.key === S.sel ? "Click again to zoom in on the particles." : "Click to select."}`, icon: c.kind === "watch" ? "watch" : "beaker" };
+    
     }
     const sr = sources.find((x) => x.key === hit.key);
     return { name: sr.label, blurb: sr.key.startsWith("u") ? "One of six white solids. Test it to find out which." : sr.phase === "l" ? "A liquid. Measured in mL." : "Known sample to compare against. Measured in g.", icon: "jar", color: sr.color };
@@ -505,10 +490,116 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   roomCanvas.addEventListener("mousemove", (ev) => { const r = roomCanvas.getBoundingClientRect(), p = roomR.tileFromPoint((ev.clientX - r.left) * (320 / r.width), (ev.clientY - r.top) * (180 / r.height)), t = tileAt(room, p.x, p.y); showTip(ev, t && t.name ? { name: t.name, blurb: t.text, icon: t.id } : null); });
   for (const cv of [canvas, roomCanvas]) cv.addEventListener("mouseleave", () => { tip.hidden = true; });
 
+  // ---------- dialogs, stages, quests, microscope, demo ----------
+  const dlg = (id) => document.getElementById(id), openDlg = (id) => { if (!dlg(id).open) dlg(id).showModal(); }, closeDlg = (id) => { if (dlg(id).open) dlg(id).close(); };
+  for (const id of ["dlgIntro", "dlgPrelab"]) dlg(id).addEventListener("cancel", (e) => e.preventDefault());
+  document.querySelectorAll("dialog [data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
+  const nbCells = () => [...table.querySelectorAll("select")];
+  const nbFilled = () => nbCells().filter((x) => x.value).length;
+  function lockTable() { nbCells().forEach((x) => { x.disabled = S.submitted; }); const b = $("#nbSubmit"); if (b) b.hidden = S.submitted; $("#nbDone").hidden = !S.submitted; }
+  function openNotebook() {
+    S.nbSeen = log.events.filter((e) => e.type === "conductivity" || e.type === "observe").length; log.add("notebook_open");
+    updateNb(); openDlg("dlgNotebook");
+  }
+  let confirmSubmit = false;
+  function updateNb() {
+    const n = nbFilled(), tot = nbCells().length, b = $("#nbSubmit"); if (!b) return;
+    b.disabled = n < tot; b.textContent = confirmSubmit ? "Really submit? You cannot change answers after." : "Submit answers";
+    $("#nbCount").textContent = S.submitted ? "Submitted." : `${n} of ${tot} boxes filled. No answer check: retest anything you doubt before you submit.`;
+  }
+  table.addEventListener("change", () => { confirmSubmit = false; updateNb(); });
+  $("#nbSubmit").addEventListener("click", () => {
+    if (!confirmSubmit) { confirmSubmit = true; return updateNb(); }
+    collectNotebook(); S.submitted = true; S.stage = "postlab"; lockTable(); log.add("submit", { notebook: S.notebook }); closeDlg("dlgNotebook");
+    say("Answers submitted. Now write your Claim, Evidence, Reasoning.", "obs"); openCER();
+  });
+  function openCER() { renderCER($("#cerBody"), stageCtx); openDlg("dlgCER"); }
+  const stageCtx = {
+    lab, S, seed, unknowns,
+    getNotebook: () => { collectNotebook(); return S.notebook; },
+    onDemo: () => demoStart(),
+    onIntroDone: (name) => { S.student = name; S.stage = "prelab"; log.add("stage", { to: "prelab", name }); closeDlg("dlgIntro"); renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); },
+    onAnswer: (id, choice, correct) => log.add("prelab_answer", { q: id, choice, correct }),
+    onPrelabDone: () => { S.stage = "lab"; log.add("prelab_done", { prediction: S.prelab.prediction }); closeDlg("dlgPrelab"); renderQuests(); say("Pre-lab done. The lab door will open once you have goggles and an apron."); },
+    onCerDone: (c) => { S.cer = c; S.cerDone = true; S.stage = "done"; log.add("cer", c); closeDlg("dlgCER"); openDlg("dlgDone"); },
+    onCerClose: () => closeDlg("dlgCER")
+  };
+  $("#theoryBody").replaceChildren(...theoryNodes(lab));
+  $("#btnTheory").addEventListener("click", () => openDlg("dlgTheory")); $("#btnNotebook").addEventListener("click", openNotebook);
+  $("#btnMicro").addEventListener("click", () => openMicro()); $("#btnDemo").addEventListener("click", () => demoStart());
+  $("#btnMenu").addEventListener("click", () => openDlg("dlgMenu")); $("#btnCER").addEventListener("click", openCER);
+  $("#doneMenu").addEventListener("click", () => { closeDlg("dlgDone"); openDlg("dlgMenu"); });
+
+  // quest list and coach bar
+  let qsig = "";
+  function renderQuests() {
+    const st = { ppe: S.ppe, notebookFilled: nbFilled(), submitted: S.submitted, cerDone: S.cerDone };
+    const items = lab.quests.map((q) => ({ q, done: questDone(q, log.events, st), prog: questProgress(q, log.events, st) }));
+    const ai = items.findIndex((i) => !i.done), stage = S.stage, obs = log.events.filter((e) => e.type === "conductivity" || e.type === "observe").length;
+    const sig = stage + "|" + items.map((i) => (i.done ? 1 : 0) + ":" + (i.prog ?? "")).join("|") + "|" + (obs > S.nbSeen);
+    $("#nbDot").hidden = !(obs > S.nbSeen) || S.submitted; $("#btnCER").hidden = stage !== "postlab";
+    if (sig === qsig) return; qsig = sig;
+    const doneN = items.filter((i) => i.done).length, from = Math.max(0, (ai < 0 ? items.length : ai) - 1), shown = items.slice(from, from + 5);
+    $("#questHead").textContent = `Tasks (${doneN} of ${items.length})`;
+    $("#quests").replaceChildren(...shown.map((i) => h("li", { class: i.done ? "done" : i === items[ai] ? "active" : "" }, h("span", { class: "tick" }, i.done ? "✔" : i === items[ai] ? "▶" : "○"), " ", i.q.text, i.q.count > 1 && i.prog !== null && !i.done ? ` (${i.prog}/${i.q.count})` : "")), ...(items.length - from - 5 > 0 ? [h("li", { class: "more" }, `+ ${items.length - from - 5} more`)] : []));
+    $("#coachText").textContent = stage === "intro" || stage === "prelab" ? "Finish the pre-lab. The lab door stays locked until you do." : stage === "done" ? "Lab complete. Open Save / Print to hand in your record." : stage === "postlab" && ai < 0 ? "Write your CER with the button at the top." : ai >= 0 ? items[ai].q.hint : "All tasks done.";
+  }
+
+  // microscope: click a container twice (or press M) to zoom in
+  const micro = createMicroView($("#microCanvas"), (m) => $("#microLegend").replaceChildren(...legend(m).map((l) => h("li", {}, h("i", { style: `background:${l.color}` }), l.text))));
+  function openMicro(key) {
+    if (!S.demo && !["lab", "postlab", "done"].includes(S.stage)) return;
+    const c = byKey(key || S.sel), anon = !S.submitted && (S.touched[c.key] || []).some((k) => k.startsWith("u"));
+    $("#microTitle").textContent = `${c.name} under the microscope`; $("#microNote").textContent = anon ? "Particle names are hidden while your unknowns are unidentified. Colors show charge: blue +, red −." : "";
+    log.add("micro", { container: c.key });
+    micro.open(() => microModel(world, c.c, speciesData.micro, { fizz: c.fizz, anon }), c.name); openDlg("dlgMicro");
+  }
+  dlg("dlgMicro").addEventListener("close", () => micro.close());
+
+  // scripted demo: runs on the real room and bench, then restores the student's own state
+  const demoApi = {
+    demo: { running: false, stop() {} },
+    freeze() {
+      const snap = structuredClone(snapshot()), extra = { feed: S.feed.slice(), view: S.view };
+      S.demo = true; demoApi.demo.running = true;
+      Object.assign(S.ppe, { goggles: false, apron: false, tongs: false }); S.inv = []; S.panel = null; S.plateOn = false; S.touched = {}; visited.clear();
+      Object.assign(P, { x: room.start.x, y: room.start.y, face: "u" });
+      CONT.forEach((c, i) => { c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; c.loc = "bench"; c.slot = i; }); S.sel = "b1";
+      document.querySelectorAll("dialog[open]").forEach((d) => d.close()); setView("room"); renderPPE(); renderInv(); syncUnit();
+      return { snap, extra };
+    },
+    thaw({ snap, extra }) {
+      demoApi.removePractice(); visited.clear(); restore(snap, true); S.feed = extra.feed; renderFeed();
+      S.demo = false; demoApi.demo.running = false; $("#demoBar").hidden = true; document.querySelectorAll("dialog[open]").forEach((d) => d.close());
+      setView(extra.view); renderPPE(); renderInv(); renderControls(); syncUnit(); qsig = "";
+    },
+    caption(n, text) { $("#demoBar").hidden = false; $("#demoText").textContent = `Demo ${n} of 9 · ${text}`; },
+    walk: (d) => walk(d[0], d[1]), interact: () => interact(facingTile(room, P)), closePanel, togglePPE, take,
+    addPractice() {
+      world.species.set("practice", { id: "practice", name: "Practice salt (NaI)", formula: "NaI", phase: "s", solubility: 184, color: "#f4f4f0", heatEvents: [] });
+      EL.NaI = { type: "strong", lambda: 100 }; speciesData.micro.NaI = { kind: "ionic", label: "NaI", ions: [{ label: "Na⁺", color: "#e0a030", per: 1 }, { label: "I⁻", color: "#7a3b9c", per: 1 }] };
+      sources.push({ key: "practice", id: "practice", label: "Practice salt", short: "Salt", group: "Practice", phase: "s", shelf: 0, idx: 0, color: "#f4f4f0" });
+      S.inv.push("practice"); renderInv(); syncUnit();
+    },
+    removePractice() { world.species.delete("practice"); delete EL.NaI; delete speciesData.micro.NaI; const i = sources.findIndex((x) => x.key === "practice"); if (i >= 0) sources.splice(i, 1); },
+    act: { moveTo, tare, stir, conduct, add: addSubstance, pick: (key, amt) => { S.srcKey = key; syncUnit(); $("#amt").value = amt; } },
+    openMicro: () => openMicro("b1"), closeMicro: () => closeDlg("dlgMicro"), openNotebook: () => { updateNb(); openDlg("dlgNotebook"); }, closeNotebook: () => closeDlg("dlgNotebook")
+  };
+  $("#demoStop").addEventListener("click", () => demoApi.demo.stop());
+  async function demoStart() {
+    if (S.incident) return say("Finish the incident first.", "warn");
+    const wasIntro = dlg("dlgIntro").open; if (wasIntro) { S.student = $("#student").value.trim(); closeDlg("dlgIntro"); }
+    await runDemo(demoApi);
+    if (S.stage === "intro") { renderIntro($("#introBody"), stageCtx); openDlg("dlgIntro"); }
+  }
+  const intro = () => { renderIntro($("#introBody"), stageCtx); openDlg("dlgIntro"); };
+
   syncUnit(); renderPPE(); renderControls(); renderFeed(); renderInv(); renderSafety(); setView("room");
   if (modeInfo.rejected) { log.add("mode_rejected", { asked: modeInfo.rejected }); say("This link's mode could not be verified, so you are in Guided mode.", "warn"); }
   say("Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
   if (resume) restore(resume);
+  renderQuests();
+  if (S.stage === "intro") intro(); else if (S.stage === "prelab") { renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); }
   setInterval(autosave, 5000);
   $("#boot").hidden = true; $("#app").hidden = false;
   let last = performance.now(), t0 = last, lastCtl = 0;
@@ -516,11 +607,11 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
     stepAll(dt); tickIncident(now);
     if (S.view === "room") roomR.draw(P, S.ppe, hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
-    if (now - lastCtl > 250) { renderControls(); lastCtl = now; }
+    if (now - lastCtl > 250) { renderControls(); renderQuests(); lastCtl = now; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  window.__vl = { H, S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE, check }, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
+  window.__vl = { H, S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE }, stageCtx, demoApi, openMicro, openNotebook, openCER, quests: () => lab.quests, nbCells, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
 }
 
 boot();
