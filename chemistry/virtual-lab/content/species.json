@@ -1,0 +1,67 @@
+{
+  "_note": "Stock substances for Lab 1 (identify unknown white solids). Every numeric property has a source and a verified flag. verified:false means 'entered from memory of standard references, not yet checked by Mr. D against the cited source'. The ship gate (npm run gate) fails while any value is unverified. Solubility is g per 100 mL of solvent at 20 C, treated as independent of volume change (a simplification). Densities are true (crystal) densities, not bulk powder densities.",
+  "species": [
+    {
+      "id": "NaCl", "name": "sodium chloride (table salt)", "phase": "s", "formula": "NaCl", "molarMass": 58.44,
+      "density": 2.165, "solubility": 35.9, "conductivity": "strong", "mp": 801,
+      "appearance": "white cubic crystals", "heating": "no change at hot-plate temperatures; it melts at 801 C",
+      "source": "CRC Handbook of Chemistry and Physics (physical constants of inorganic compounds)", "verified": false
+    },
+    {
+      "id": "sucrose", "name": "sucrose (table sugar)", "phase": "s", "formula": "C12H22O11", "molarMass": 342.30,
+      "density": 1.587, "solubility": 200, "conductivity": "none", "mp": 186,
+      "appearance": "white granular crystals", "heating": "melts and caramelizes to brown near 186 C, then darkens and smokes",
+      "source": "CRC Handbook; sucrose solubility ~204 g/100 g water at 20 C", "verified": false
+    },
+    {
+      "id": "NaHCO3", "name": "sodium bicarbonate (baking soda)", "phase": "s", "formula": "NaHCO3", "molarMass": 84.007,
+      "density": 2.20, "solubility": 9.6, "conductivity": "strong", "mp": null,
+      "appearance": "fine white powder", "heating": "decomposes above about 80 C, slowly giving off CO2 and water; leaves sodium carbonate",
+      "source": "CRC Handbook; solubility ~9.6 g/100 g water at 20 C", "verified": false
+    },
+    {
+      "id": "CaCO3", "name": "calcium carbonate (powdered chalk)", "phase": "s", "formula": "CaCO3", "molarMass": 100.087,
+      "density": 2.71, "solubility": 0.0013, "conductivity": "none", "mp": null,
+      "appearance": "fine white powder", "heating": "no change at hot-plate temperatures; it decomposes near 825 C",
+      "source": "CRC Handbook (calcite); solubility ~0.0013 g/100 mL at 25 C", "verified": false
+    },
+    {
+      "id": "starch", "name": "cornstarch", "phase": "s", "formula": "C6H10O5", "molarMass": 162.14,
+      "density": 1.50, "solubility": 0, "conductivity": "none", "mp": null,
+      "appearance": "fine white powder that squeaks when pressed", "heating": "browns and chars well above 200 C, smoking",
+      "_formulaNote": "Formula is one glucose unit of the polymer (C6H10O5)n; molar mass is per unit.",
+      "source": "approximate true density of native starch granules ~1.5 g/cm3", "verified": false
+    },
+    {
+      "id": "citric", "name": "citric acid (anhydrous)", "phase": "s", "formula": "C6H8O7", "molarMass": 192.124,
+      "density": 1.665, "solubility": 59, "conductivity": "weak", "mp": 153,
+      "appearance": "colorless-white crystals", "heating": "melts near 153 C to a clear liquid",
+      "source": "CRC Handbook; solubility ~59 g/100 g water at 20 C", "verified": false
+    },
+    {
+      "id": "water", "name": "distilled water", "phase": "l", "medium": true, "density": 1.000,
+      "components": { "H2O": 1.000 },
+      "appearance": "clear, colorless", "source": "definition at 4 C; 0.998 at 20 C", "verified": false
+    },
+    {
+      "id": "vinegar", "name": "vinegar (5% acetic acid)", "phase": "l", "medium": true, "density": 1.005,
+      "components": { "H2O": 0.955, "CH3COOH": 0.050 },
+      "appearance": "clear, colorless, sharp smell", "source": "labelled 5% w/v acetic acid; density ~1.005 g/mL", "verified": false
+    },
+    {
+      "id": "iodine", "name": "iodine test solution (dilute I2 in KI)", "phase": "l", "medium": true, "density": 1.000,
+      "components": { "H2O": 0.9975, "I2": 0.0025 },
+      "appearance": "clear, amber-brown",
+      "_note": "Approximate teaching-lab strength (~0.01 M). The KI that keeps I2 dissolved is not modeled as a separate component.",
+      "source": "typical starch-test strength", "verified": false
+    }
+  ],
+  "products": [
+    { "formula": "CO2", "name": "carbon dioxide", "phase": "g" },
+    { "formula": "H2O", "name": "water", "phase": "l" },
+    { "formula": "NaCH3COO", "name": "sodium acetate", "phase": "aq" },
+    { "formula": "Ca(CH3COO)2", "name": "calcium acetate", "phase": "aq" },
+    { "formula": "Na3C6H5O7", "name": "sodium citrate", "phase": "aq" },
+    { "formula": "Ca3(C6H5O7)2", "name": "calcium citrate", "phase": "s" }
+  ]
+}

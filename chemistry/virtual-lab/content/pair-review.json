@@ -1,0 +1,4 @@
+{
+  "_note": "Mr. D marks each pair of stock substances as reviewed after checking what the sim says happens when they meet. Keys are the two species ids sorted alphabetically and joined by '+'. Example: \"NaHCO3+vinegar\": { \"by\": \"Mr. D\", \"date\": \"2026-10-14\" }. Run `npm run review` to see every pair and its status.",
+  "reviewed": {}
+}

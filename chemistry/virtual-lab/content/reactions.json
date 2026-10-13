@@ -1,0 +1,51 @@
+{
+  "_note": "One row per reaction. Reactants and products are formulas with integer coefficients and must balance (tests enforce it). k is a per-second rate constant tuned to classroom observation ('game parameter'), not measured; rateVerified says so. Reactions run in file order each time step on whatever is left, which is a simplification when two reactions compete for one reagent.",
+  "reactions": [
+    {
+      "id": "bicarb_vinegar",
+      "reactants": { "NaHCO3": 1, "CH3COOH": 1 },
+      "products": { "NaCH3COO": 1, "H2O": 1, "CO2": 1 },
+      "needsMedium": true, "k": 0.6, "rateClass": "fast", "rateVerified": "qualitative",
+      "dH_kJ_per_mol": null,
+      "observations": ["vigorous fizzing as CO2 gas escapes", "the solid disappears", "the mixture feels slightly cool"],
+      "source": "standard acid + hydrogencarbonate reaction", "verified": false
+    },
+    {
+      "id": "chalk_vinegar",
+      "reactants": { "CaCO3": 1, "CH3COOH": 2 },
+      "products": { "Ca(CH3COO)2": 1, "H2O": 1, "CO2": 1 },
+      "needsMedium": true, "k": 0.003, "rateClass": "slow", "rateVerified": "qualitative",
+      "dH_kJ_per_mol": null,
+      "observations": ["steady stream of small bubbles from the powder", "the powder slowly shrinks"],
+      "source": "standard acid + carbonate reaction; calcium acetate is soluble", "verified": false
+    },
+    {
+      "id": "bicarb_citric_aq",
+      "reactants": { "NaHCO3": 3, "C6H8O7": 1 },
+      "products": { "Na3C6H5O7": 1, "H2O": 3, "CO2": 3 },
+      "needsMedium": true, "k": 0.25, "rateClass": "fast", "rateVerified": "qualitative",
+      "dH_kJ_per_mol": null,
+      "observations": ["strong fizzing once water is present", "the mixture gets noticeably cold"],
+      "_note": "Dry, the two powders sit together without reacting. Water lets them dissolve and meet. The cooling is real (the overall reaction is endothermic); the size of the effect is not yet modeled.",
+      "source": "3 NaHCO3 + H3Cit -> Na3Cit + 3 H2O + 3 CO2", "verified": false
+    },
+    {
+      "id": "chalk_citric_aq",
+      "reactants": { "CaCO3": 3, "C6H8O7": 2 },
+      "products": { "Ca3(C6H5O7)2": 1, "H2O": 3, "CO2": 3 },
+      "needsMedium": true, "k": 0.002, "rateClass": "slow", "rateVerified": "qualitative",
+      "dH_kJ_per_mol": null,
+      "observations": ["slow bubbling", "a fine white solid (calcium citrate) forms, which is hard to tell from leftover chalk"],
+      "source": "3 CaCO3 + 2 H3Cit -> Ca3(Cit)2 + 3 H2O + 3 CO2; calcium citrate is only slightly soluble", "verified": false
+    },
+    {
+      "id": "starch_iodine",
+      "kind": "observation",
+      "reactants": { "C6H10O5": 1, "I2": 1 },
+      "needsMedium": true,
+      "observations": ["the amber solution turns deep blue-black where it touches the starch"],
+      "_note": "Starch-iodine complex. No balanced equation and no mass change; this row is a color test only.",
+      "source": "standard starch test", "verified": false
+    }
+  ]
+}
