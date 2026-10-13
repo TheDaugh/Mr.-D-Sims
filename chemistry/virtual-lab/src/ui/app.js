@@ -296,7 +296,7 @@ function start(speciesData, reactionData, lab, roomDef) {
   function setView(v) {
     S.view = v; closePanel();
     roomCanvas.hidden = v !== "room"; canvas.hidden = v !== "bench"; $("#controlsCard").hidden = v !== "bench";
-    $("#viewHint").textContent = v === "room" ? "Walk with the arrow keys or WASD. Press E (or click something next to you) to use it." : "Click a jar to choose it, or a container to select it. Esc returns to the room.";
+    $("#viewHint").textContent = v === "room" ? "Arrow keys or WASD move you along the floor tiles (diagonally on screen). Press E, or click an object next to you, to use it." : "Click a jar to choose it, or a container to select it. Esc returns to the room.";
     log.add("view", { to: v });
   }
   function closePanel() { S.panel = null; $("#panelCard").hidden = true; }

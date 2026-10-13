@@ -1,34 +1,126 @@
 {
   "id": "main-lab",
-  "start": { "x": 9, "y": 9, "face": "u" },
+  "start": {
+    "x": 4,
+    "y": 10,
+    "face": "u"
+  },
   "rows": [
-    "####################",
-    "#..1..2..3..K..H..Y#",
-    "#..................#",
-    "#....BBBBBB........#",
-    "#..................#",
-    "#.W..........F.....#",
-    "########D###########",
-    "#L..R..A...........#",
-    "#..................#",
-    "#..................#",
-    "####################"
+    "############",
+    "#.1..2..3.Y#",
+    "#K.........#",
+    "#..........#",
+    "#H.BBBBBB..#",
+    "#..........#",
+    "#W........F#",
+    "####D#######",
+    "#L.R.A.....#",
+    "#..........#",
+    "#..........#",
+    "############"
   ],
   "legend": {
-    "#": { "type": "wall", "solid": true },
-    ".": { "type": "floor" },
-    "D": { "type": "door", "id": "door", "label": "DOOR", "text": "The lab door. It stays shut unless you are wearing goggles and an apron." },
-    "L": { "type": "locker", "solid": true, "id": "locker", "label": "LOCKER", "items": ["goggles", "apron"] },
-    "R": { "type": "rack", "solid": true, "id": "tongs_rack", "label": "TONGS", "items": ["tongs"] },
-    "A": { "type": "info", "solid": true, "id": "first_aid", "label": "FIRST AID", "text": "First-aid kit: bandages, burn gel and gauze. Burns get cool running water first." },
-    "1": { "type": "shelf", "solid": true, "id": "shelf_unknown", "label": "UNKNOWNS", "group": "Unknown samples" },
-    "2": { "type": "shelf", "solid": true, "id": "shelf_liquids", "label": "LIQUIDS", "group": "Liquids" },
-    "3": { "type": "shelf", "solid": true, "id": "shelf_known", "label": "KNOWNS", "group": "Known samples" },
-    "K": { "type": "info", "solid": true, "id": "sink", "label": "SINK", "text": "The sink. Rinse glassware here. Never pour anything down it unless your teacher says it is safe." },
-    "H": { "type": "info", "solid": true, "id": "hood", "label": "HOOD", "text": "The fume hood. Not needed for today's lab, but vapors that smell or sting belong in here." },
-    "Y": { "type": "info", "solid": true, "id": "eyewash", "label": "EYEWASH", "text": "The eyewash station. If a chemical gets in your eye, you rinse here for 15 minutes." },
-    "W": { "type": "info", "solid": true, "id": "waste", "label": "WASTE", "text": "Waste bins: broken glass in the hard box, chemical waste in the labeled jug." },
-    "F": { "type": "info", "solid": true, "id": "extinguisher", "label": "EXTING.", "text": "A fire extinguisher. Pull the pin, aim at the base, squeeze, sweep." },
-    "B": { "type": "station", "solid": true, "id": "bench", "label": "BENCH", "text": "Your lab bench: balance, hot plate and conductivity tester." }
+    "#": {
+      "type": "wall",
+      "solid": true
+    },
+    ".": {
+      "type": "floor"
+    },
+    "D": {
+      "type": "door",
+      "id": "door",
+      "label": "DOOR",
+      "text": "The lab door. It stays shut unless you are wearing goggles and an apron."
+    },
+    "L": {
+      "type": "locker",
+      "solid": true,
+      "id": "locker",
+      "label": "LOCKER",
+      "items": [
+        "goggles",
+        "apron"
+      ]
+    },
+    "R": {
+      "type": "rack",
+      "solid": true,
+      "id": "tongs_rack",
+      "label": "TONGS",
+      "items": [
+        "tongs"
+      ]
+    },
+    "A": {
+      "type": "info",
+      "solid": true,
+      "id": "first_aid",
+      "label": "FIRST AID",
+      "text": "First-aid kit: bandages, burn gel and gauze. Burns get cool running water first."
+    },
+    "1": {
+      "type": "shelf",
+      "solid": true,
+      "id": "shelf_unknown",
+      "label": "UNKNOWNS",
+      "group": "Unknown samples"
+    },
+    "2": {
+      "type": "shelf",
+      "solid": true,
+      "id": "shelf_liquids",
+      "label": "LIQUIDS",
+      "group": "Liquids"
+    },
+    "3": {
+      "type": "shelf",
+      "solid": true,
+      "id": "shelf_known",
+      "label": "KNOWNS",
+      "group": "Known samples"
+    },
+    "K": {
+      "type": "info",
+      "solid": true,
+      "id": "sink",
+      "label": "SINK",
+      "text": "The sink. Rinse glassware here. Never pour anything down it unless your teacher says it is safe."
+    },
+    "H": {
+      "type": "info",
+      "solid": true,
+      "id": "hood",
+      "label": "HOOD",
+      "text": "The fume hood. Not needed for today's lab, but vapors that smell or sting belong in here."
+    },
+    "Y": {
+      "type": "info",
+      "solid": true,
+      "id": "eyewash",
+      "label": "EYEWASH",
+      "text": "The eyewash station. If a chemical gets in your eye, you rinse here for 15 minutes."
+    },
+    "W": {
+      "type": "info",
+      "solid": true,
+      "id": "waste",
+      "label": "WASTE",
+      "text": "Waste bins: broken glass in the hard box, chemical waste in the labeled jug."
+    },
+    "F": {
+      "type": "info",
+      "solid": true,
+      "id": "extinguisher",
+      "label": "EXTING.",
+      "text": "A fire extinguisher. Pull the pin, aim at the base, squeeze, sweep."
+    },
+    "B": {
+      "type": "station",
+      "solid": true,
+      "id": "bench",
+      "label": "BENCH",
+      "text": "Your lab bench: balance, hot plate and conductivity tester."
+    }
   }
 }

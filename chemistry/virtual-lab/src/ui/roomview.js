@@ -1,52 +1,73 @@
-// Top-down pixel room. Draws map + player from state; knows no chemistry.
+// Isometric pixel room. Draws map + player from state; knows no chemistry.
+// Grid x runs down-right on screen, grid y runs down-left. Arrow keys move along the grid axes.
 import { tileAt } from "../engine/room.js";
-export const TILE = 16, OY = 2;
+
+const OX = 156, OY = 22, TX = 12, TY = 6, ZS = 1.5;   // tile half-width, half-height, height scale
+const HEIGHT = { shelf: 14, locker: 18, rack: 15, first_aid: 13, sink: 8, hood: 18, eyewash: 14, waste: 9, extinguisher: 13, station: 10, door: 14 };
+
+function shade(c, f) {
+  const n = c.replace("#", ""), v = [0, 2, 4].map((i) => Math.min(255, Math.round(parseInt(n.slice(i, i + 2), 16) * f)));
+  return `rgb(${v[0]},${v[1]},${v[2]})`;
+}
 
 export function createRoomRenderer(canvas, room) {
   canvas.width = 640; canvas.height = 360;
   const ctx = canvas.getContext("2d"); ctx.setTransform(2, 0, 0, 2, 0, 0);
-  const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
-  const T = (s, x, y, c, align = "center") => {
-    ctx.font = "bold 5px monospace"; ctx.textAlign = align; ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = "#1e2630"; ctx.fillText(s, Math.round(x) + 1, Math.round(y) + 1);
-    ctx.fillStyle = c; ctx.fillText(s, Math.round(x), Math.round(y));
+  const P = (gx, gy, z = 0) => [Math.round(OX + (gx - gy) * TX), Math.round(OY + (gx + gy) * TY - z * ZS)];
+  const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+  const poly = (pts, fill) => { ctx.fillStyle = fill; ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); ctx.fill(); };
+  const T = (s, x, y, c = "#fff") => {
+    ctx.font = "bold 5px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = "#1e2630"; ctx.fillText(s, Math.round(x) + 1, Math.round(y) + 1); ctx.fillStyle = c; ctx.fillText(s, Math.round(x), Math.round(y));
   };
-  let ax = room.start.x, ay = room.start.y, lastT = 0;
+  // box with top (light), +y face (mid), +x face (dark)
+  function box(x, y, w, d, h, c, z = 0) {
+    poly([P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)], shade(c, 1.15));
+    poly([P(x, y + d, z + h), P(x + w, y + d, z + h), P(x + w, y + d, z), P(x, y + d, z)], shade(c, 0.9));
+    poly([P(x + w, y, z + h), P(x + w, y + d, z + h), P(x + w, y + d, z), P(x + w, y, z)], shade(c, 0.68));
+  }
+  const fl = (x0, yf, u0, u1, z0, z1, c) => poly([P(x0 + u0, yf, z1), P(x0 + u1, yf, z1), P(x0 + u1, yf, z0), P(x0 + u0, yf, z0)], c);   // patch on a +y face
 
   const ART = {
-    wall: (x, y, px, py) => { R(px, py, 16, 16, "#7d8b99"); R(px, py, 16, 2, "#9aa8b5"); R(px, py + 8, 16, 1, "#6a7784"); R(px + (y % 2 ? 4 : 12), py, 1, 8, "#6a7784"); R(px + (y % 2 ? 12 : 4), py + 9, 1, 7, "#6a7784"); },
-    door: (x, y, px, py, s) => { R(px, py, 16, 16, "#6a7784"); R(px + 2, py, 12, 16, "#c9a066"); R(px + 2, py, 12, 2, "#a3804c"); R(px + 11, py + 8, 2, 2, "#3a3a3a"); R(px + 6, py + 3, 4, 4, s.ready ? "#3ecf6a" : "#e0472c"); },
-    locker: (x, y, px, py) => { R(px, py, 16, 16, "#5f7f9f"); R(px, py, 16, 2, "#7d9bb8"); R(px + 7, py, 2, 16, "#3f5a75"); for (let i = 0; i < 3; i++) { R(px + 2, py + 3 + i * 2, 4, 1, "#3f5a75"); R(px + 10, py + 3 + i * 2, 4, 1, "#3f5a75"); } R(px + 5, py + 9, 1, 2, "#d9dee4"); R(px + 10, py + 9, 1, 2, "#d9dee4"); },
-    rack: (x, y, px, py, s) => { R(px, py, 16, 16, "#8a6a47"); R(px + 1, py + 1, 14, 14, "#a07c55"); if (!s.tongs) for (const dx of [4, 9]) { R(px + dx, py + 3, 1, 9, "#c9ced6"); R(px + dx + 2, py + 3, 1, 9, "#c9ced6"); R(px + dx, py + 3, 3, 1, "#c9ced6"); } },
-    info: (x, y, px, py, s, t) => ARTINFO[t.id](px, py),
-    shelf: (x, y, px, py, s, t) => { R(px, py, 16, 16, "#8a6a47"); R(px + 1, py + 1, 14, 14, "#6d5236"); const cols = t.group === "Liquids" ? ["#78b9eb", "#e6c27a", "#b5651d"] : t.group === "Known samples" ? ["#f4f4f0", "#e8e0c8", "#f0f0f0"] : ["#f4f4f0", "#f4f4f0", "#f4f4f0"]; for (let r = 0; r < 2; r++) { R(px + 1, py + 7 + r * 7, 14, 1, "#8a6a47"); for (let i = 0; i < 3; i++) { R(px + 2 + i * 4, py + 2 + r * 7, 3, 5, cols[(i + r) % 3]); R(px + 2 + i * 4, py + 1 + r * 7, 3, 1, "#5b6470"); } } if (t.group === "Unknown samples") T("?", px + 8, py + 13, "#ffd23f"); },
-    station: (x, y, px, py) => {
-      R(px, py + 4, 16, 12, "#b98b5e"); R(px, py + 4, 16, 2, "#c99c6d"); R(px, py + 13, 16, 3, "#97704a");
-      if (x === 5) { R(px + 2, py + 1, 12, 4, "#58606b"); R(px + 4, py, 8, 1, "#c9ced6"); }
-      if (x === 7 || x === 8) { R(px + 4, py - 3, 8, 7, "rgba(157,182,199,.85)"); R(px + 4, py + 2, 8, 2, "#78b9eb"); }
-      if (x === 10) { R(px + 2, py + 2, 12, 2, "#e0472c"); R(px + 1, py + 4, 14, 1, "#3a4049"); }
+    wall: (x, y) => box(x, y, 1, 1, y === room.doorRow && x !== 0 ? 6 : x === 0 || y === 0 ? 18 : 2, "#7d8b99"),
+    door: (x, y, s) => { box(x, y, 0.12, 1, 14, "#a3804c"); box(x + 0.88, y, 0.12, 1, 14, "#a3804c"); box(x + 0.88, y + 0.4, 0.12, 0.2, 3, s.ready ? "#3ecf6a" : "#e0472c", 14); },
+    locker: (x, y) => { box(x + 0.05, y + 0.05, 0.9, 0.9, 18, "#5f7f9f"); for (let i = 0; i < 3; i++) { fl(x + 0.05, y + 0.95, 0.12, 0.38, 12 + i * 2, 13 + i * 2, "#3f5a75"); fl(x + 0.05, y + 0.95, 0.55, 0.8, 12 + i * 2, 13 + i * 2, "#3f5a75"); } fl(x + 0.05, y + 0.95, 0.42, 0.46, 6, 9, "#d9dee4"); },
+    rack: (x, y, s) => { box(x + 0.1, y, 0.8, 0.2, 12, "#a07c55", 3); if (!s.tongs) for (const u of [0.25, 0.55]) { fl(x + 0.1, y + 0.2, u, u + 0.06, 5, 13, "#c9ced6"); fl(x + 0.1, y + 0.2, u + 0.12, u + 0.18, 5, 13, "#c9ced6"); } },
+    first_aid: (x, y) => { box(x + 0.2, y, 0.6, 0.15, 8, "#f4f4f0", 5); fl(x + 0.2, y + 0.15, 0.27, 0.33, 6, 12, "#c0392b"); fl(x + 0.2, y + 0.15, 0.18, 0.42, 8, 10, "#c0392b"); },
+    shelf: (x, y, s, t) => {
+      box(x + 0.05, y, 0.9, 0.6, 14, "#8a6a47");
+      const cols = t.group === "Liquids" ? ["#78b9eb", "#e6c27a", "#b5651d"] : t.group === "Known samples" ? ["#f4f4f0", "#e8e0c8", "#f0f0f0"] : ["#f4f4f0", "#f4f4f0", "#f4f4f0"];
+      for (let r = 0; r < 2; r++) for (let j = 0; j < 3; j++) { fl(x + 0.05, y + 0.6, 0.12 + j * 0.28, 0.12 + j * 0.28 + 0.16, 2 + r * 6, 6 + r * 6, cols[(j + r) % 3]); fl(x + 0.05, y + 0.6, 0.12 + j * 0.28, 0.12 + j * 0.28 + 0.16, 6 + r * 6, 7 + r * 6, "#5b6470"); }
     },
-    floor: (x, y, px, py) => { const lab = y < room.doorRow; R(px, py, 16, 16, ((x + y) & 1) ? (lab ? "#dfe6ea" : "#e6dfd0") : (lab ? "#d3dce2" : "#ddd5c3")); }
+    sink: (x, y) => { box(x, y, 1, 0.8, 8, "#9aa4ae"); poly([P(x + 0.15, y + 0.15, 8), P(x + 0.85, y + 0.15, 8), P(x + 0.85, y + 0.65, 8), P(x + 0.15, y + 0.65, 8)], "#58606b"); poly([P(x + 0.25, y + 0.25, 8), P(x + 0.75, y + 0.25, 8), P(x + 0.75, y + 0.55, 8), P(x + 0.25, y + 0.55, 8)], "#78b9eb"); box(x + 0.45, y + 0.05, 0.1, 0.1, 6, "#6b7480", 8); },
+    hood: (x, y) => { box(x, y, 1, 0.9, 18, "#a8b0b8"); fl(x, y + 0.9, 0.1, 0.9, 6, 14, "#9db6c7"); },
+    eyewash: (x, y) => { box(x + 0.35, y + 0.35, 0.3, 0.3, 8, "#c9ced6"); box(x + 0.15, y + 0.1, 0.7, 0.1, 8, "#2f9e5a", 8); fl(x + 0.15, y + 0.2, 0.4, 0.46, 9, 15, "#fff"); fl(x + 0.15, y + 0.2, 0.3, 0.56, 11, 13, "#fff"); },
+    waste: (x, y) => { box(x + 0.05, y + 0.2, 0.4, 0.6, 9, "#d9822b"); box(x + 0.5, y + 0.2, 0.45, 0.6, 9, "#2c5aa0"); },
+    extinguisher: (x, y) => { box(x + 0.3, y + 0.3, 0.4, 0.4, 10, "#c0392b"); box(x + 0.4, y + 0.4, 0.2, 0.2, 3, "#2b2f36", 10); },
+    station: (x, y) => {
+      box(x, y, 1, 1, 8, "#b98b5e");
+      let i = 0; while (tileAt(room, x - 1 - i, y)?.id === "bench") i++;
+      if (i === 0) { box(x + 0.1, y + 0.2, 0.8, 0.6, 2, "#58606b", 8); fl(x + 0.1, y + 0.8, 0.2, 0.7, 8.5, 9.5, "#27341f"); }
+      if (i === 2 || i === 3) box(x + 0.3, y + 0.3, 0.4, 0.4, 6, "#9db6c7", 8);
+      if (i === 5) { box(x + 0.1, y + 0.1, 0.8, 0.8, 2, "#3a4049", 8); poly([P(x + 0.2, y + 0.2, 10), P(x + 0.8, y + 0.2, 10), P(x + 0.8, y + 0.8, 10), P(x + 0.2, y + 0.8, 10)], "#e0472c"); }
+    }
   };
-  const ARTINFO = {
-    first_aid: (px, py) => { R(px + 2, py + 3, 12, 10, "#f4f4f0"); R(px + 7, py + 5, 2, 6, "#c0392b"); R(px + 5, py + 7, 6, 2, "#c0392b"); },
-    sink: (px, py) => { R(px, py + 5, 16, 11, "#9aa4ae"); R(px + 2, py + 7, 12, 6, "#58606b"); R(px + 2, py + 7, 12, 2, "#78b9eb"); R(px + 7, py + 1, 2, 5, "#6b7480"); R(px + 7, py + 1, 5, 1, "#6b7480"); },
-    hood: (px, py) => { R(px, py, 16, 16, "#a8b0b8"); R(px + 2, py + 3, 12, 8, "rgba(157,182,199,.9)"); R(px + 2, py + 3, 12, 1, "#58606b"); R(px + 2, py + 12, 12, 2, "#58606b"); },
-    eyewash: (px, py) => { R(px + 1, py + 1, 14, 8, "#2f9e5a"); R(px + 7, py + 2, 2, 6, "#fff"); R(px + 5, py + 4, 6, 2, "#fff"); R(px + 4, py + 9, 3, 6, "#c9ced6"); R(px + 9, py + 9, 3, 6, "#c9ced6"); },
-    waste: (px, py) => { R(px + 1, py + 3, 6, 12, "#d9822b"); R(px + 8, py + 3, 7, 12, "#2c5aa0"); R(px + 1, py + 3, 6, 2, "#f0a85a"); R(px + 8, py + 3, 7, 2, "#5f86c7"); },
-    extinguisher: (px, py) => { R(px + 5, py + 3, 6, 12, "#c0392b"); R(px + 6, py, 4, 3, "#2b2f36"); R(px + 10, py + 1, 3, 1, "#2b2f36"); R(px + 5, py + 8, 6, 2, "#f4f4f0"); }
-  };
+  const artKey = (t) => (t.type === "info" ? t.id : t.type);
 
-  function player(px, py, p, ppe) {
-    R(px + 4, py + 14, 8, 2, "rgba(0,0,0,.18)");
-    R(px + 5, py + 11, 2, 4, "#2b3a55"); R(px + 9, py + 11, 2, 4, "#2b3a55");
-    R(px + 4, py + 5, 8, 7, "#f4f4f0");                       // lab coat
-    if (ppe.apron) { R(px + 5, py + 6, 6, 6, "#e8d9a0"); R(px + 5, py + 6, 6, 1, "#b9a45c"); }
-    R(px + 3, py + 6, 1, 4, "#f4f4f0"); R(px + 12, py + 6, 1, 4, "#f4f4f0");
-    R(px + 5, py + 0, 6, 6, "#e2b48c");                       // head
-    if (p.face === "u") R(px + 5, py, 6, 4, "#4a3020"); else { R(px + 5, py, 6, 2, "#4a3020"); if (p.face === "d") { R(px + 6, py + 3, 1, 1, "#1e2630"); R(px + 9, py + 3, 1, 1, "#1e2630"); } else R(px + (p.face === "l" ? 6 : 9), py + 3, 1, 1, "#1e2630"); }
-    if (ppe.goggles && p.face !== "u") R(px + 5, py + 2, 6, 3, "rgba(120,200,255,.75)");
-    if (ppe.tongs) R(px + (p.face === "l" ? 1 : 13), py + 7, 1, 6, "#c9ced6");
+  let ax = room.start.x, ay = room.start.y, lastT = 0;
+  function player(p, ppe) {
+    const [cx, cy] = P(ax + 0.5, ay + 0.5), fr = p.face === "d" || p.face === "r", bx = 0, by = 0;
+    ctx.save(); ctx.translate(cx, cy); ctx.scale(1.25, 1.25);
+    R(bx - 4, by - 1, 8, 2, "rgba(0,0,0,.2)");
+    R(bx - 2, by - 4, 2, 4, "#2b3a55"); R(bx, by - 4, 2, 4, "#2b3a55");
+    R(bx - 3, by - 10, 6, 6, "#f4f4f0");
+    if (ppe.apron) { R(bx - 2, by - 9, 4, 5, "#e8d9a0"); R(bx - 2, by - 9, 4, 1, "#b9a45c"); }
+    R(bx - 2, by - 15, 4, 5, "#e2b48c");
+    R(bx - 2, by - 15, 4, fr ? 2 : 4, "#4a3020");
+    if (fr) { R(bx - 1, by - 12, 1, 1, "#1e2630"); R(bx + 1, by - 12, 1, 1, "#1e2630"); }
+    if (ppe.goggles && fr) R(bx - 2, by - 13, 4, 2, "rgba(120,200,255,.8)");
+    if (ppe.tongs) R(bx + (p.face === "l" || p.face === "u" ? -4 : 3), by - 9, 1, 6, "#c9ced6");
+    ctx.restore();
   }
 
   return {
@@ -54,22 +75,40 @@ export function createRoomRenderer(canvas, room) {
       const dt = Math.min(0.1, t - lastT); lastT = t;
       const k = Math.min(1, dt * 16); ax += (p.x - ax) * k; ay += (p.y - ay) * k;
       R(0, 0, 320, 180, "#2b3440");
-      const s = { ready, tongs: ppe.tongs };
       for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
-        const tile = tileAt(room, x, y), px = x * TILE, py = y * TILE + OY;
-        ART.floor(x, y, px, py);
-        if (tile.type !== "floor") ART[tile.type](x, y, px, py, s, tile);
+        const lab = y < room.doorRow, thresh = tileAt(room, x, y).type === "door";
+        poly([P(x, y), P(x + 1, y), P(x + 1, y + 1), P(x, y + 1)], thresh ? "#c9a066" : ((x + y) & 1) ? (lab ? "#dfe6ea" : "#e6dfd0") : (lab ? "#d3dce2" : "#ddd5c3"));
       }
+      const s = { ready, tongs: ppe.tongs }, pd = Math.round(ax + ay);
+      let drawn = false;
+      for (let d = 0; d <= room.w + room.h - 2; d++) {
+        for (let x = 0; x < room.w; x++) {
+          const y = d - x; if (y < 0 || y >= room.h) continue;
+          const tile = tileAt(room, x, y);
+          if (tile.type !== "floor") ART[tile.type === "info" ? artKey(tile) : tile.type](x, y, s, tile);
+        }
+        if (d === pd) { player(p, ppe); drawn = true; }
+      }
+      if (!drawn) player(p, ppe);
       for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
         const tile = tileAt(room, x, y);
-        if (tile.label && !(tile.type === "station" && tileAt(room, x - 1, y)?.id === tile.id)) T(tile.label, x * TILE + (tile.type === "station" ? 0 : 8), y * TILE + OY + (tile.type === "shelf" || tile.type === "info" && y === 1 ? -3 : tile.type === "station" ? 3 : -2), "#ffffff", tile.type === "station" ? "left" : "center");
+        if (!tile.label || (tile.type === "station" && tileAt(room, x - 1, y)?.id === tile.id)) continue;
+        const [lx, ly] = P(x + 0.5, y + 0.5, (HEIGHT[artKey(tile)] || 8) + 4);
+        T(tile.label, lx, ly);
       }
-      player(Math.round(ax * TILE), Math.round(ay * TILE) + OY - 2, p, ppe);
       if (facing && facing.tile && facing.tile.id) {
-        const bx = facing.x * TILE + 8, by = facing.y * TILE + OY + 2;
-        R(bx - 5, by - 12, 10, 9, "#ffd23f"); R(bx - 1, by - 3, 2, 2, "#ffd23f"); T("E", bx, by - 5, "#1e2630");
+        const [bx, by] = P(facing.x + 0.5, facing.y + 0.5, (HEIGHT[artKey(facing.tile)] || 8) + 12);
+        R(bx - 5, by - 9, 10, 9, "#ffd23f"); R(bx - 1, by, 2, 2, "#ffd23f"); T("E", bx, by - 2, "#1e2630");
       }
     },
-    tileFromPoint(px, py) { return { x: Math.floor(px / TILE), y: Math.floor((py - OY) / TILE) }; }
+    // Screen point (logical 320x180) -> grid tile. Tall objects are found by looking down from their height.
+    tileFromPoint(px, py) {
+      for (const z of [18, 12, 6, 0]) {
+        const u = (px - OX) / TX, v = (py + z * ZS - OY) / TY, x = Math.floor((u + v) / 2), y = Math.floor((v - u) / 2), t = tileAt(room, x, y);
+        if (t && t.id && (HEIGHT[artKey(t)] || 0) >= z) return { x, y };
+      }
+      const u = (px - OX) / TX, v = (py - OY) / TY;
+      return { x: Math.floor((u + v) / 2), y: Math.floor((v - u) / 2) };
+    }
   };
 }

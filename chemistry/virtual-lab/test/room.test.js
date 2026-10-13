@@ -38,9 +38,9 @@ test("shelves cover the three jar groups the bench uses", () => {
   assert.equal(objects.filter((o) => o.t.type === "station").length > 0, true);
 });
 test("walls block and facing finds the object", () => {
-  const p = { x: 1, y: 7, face: "l" };
+  const p = { x: 1, y: 9, face: "l" };
   assert.equal(step(room, p, -1, 0, geared).moved, false);
   assert.equal(facingTile(room, p).tile.type, "wall");
-  const q = { x: 1, y: 8, face: "u" };
+  const q = { x: 1, y: 9, face: "u" };
   assert.equal(facingTile(room, q).tile.id, "locker");
 });
