@@ -153,3 +153,49 @@ export function allPairs(world) {
   for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) out.push([ids[i], ids[j]]);
   return out;
 }
+
+// ---- Conductivity: what a conductivity tester bulb would show ----
+export function conductivity(world, c, electrolytes) {
+  const V = c.solution.mL / 1000; // L
+  if (!(V > 0)) return { kappa: 0, bulb: "off" };
+  let kappa = 0;
+  const term = (formula, grams) => {
+    const e = electrolytes[formula];
+    if (!e || !(grams > 0)) return;
+    const conc = grams / molarMass(formula) / V;
+    kappa += e.type === "strong" ? e.lambda * conc : e.lambdaIons * Math.sqrt(e.Ka * conc);
+  };
+  for (const id in c.solids) { const s = world.species.get(id); term(s.formula, dissolvedGrams(world, c, id)); }
+  for (const f in c.solution.comps) term(f, c.solution.comps[f]);
+  const b = electrolytes.bulb;
+  return { kappa, bulb: kappa > b.brightAbove_mS_per_cm ? "bright" : kappa > b.dimAbove_mS_per_cm ? "dim" : "off" };
+}
+
+// ---- Heating: temperature follows the hot plate; solids show what happens at each temperature ----
+export function heat(world, c, targetC, dt) {
+  const events = [];
+  const boiling = c.solution.mL > 0;
+  const target = boiling ? Math.min(targetC, 100) : targetC;
+  const tau = target > c.T ? 20 : 90; // heats quickly in the sim, cools slowly
+  c.T += (target - c.T) * (1 - Math.exp(-dt / tau));
+  for (const id in c.solids) {
+    if (!(c.solids[id] > 0)) continue;
+    for (const ev of world.species.get(id).heatEvents || []) {
+      const key = `${id}@${ev.aboveC}`;
+      if (c.T >= ev.aboveC && !c.seen[key]) { c.seen[key] = true; events.push({ type: "heat", id, aboveC: ev.aboveC, text: ev.text }); }
+    }
+  }
+  if (boiling && c.T >= 99.5 && !c.seen.boiling) { c.seen.boiling = true; events.push({ type: "heat", id: "liquid", aboveC: 100, text: "The liquid is boiling." }); }
+  return events;
+}
+
+// Qualitative description of what a student can see (never exact grams of what dissolved).
+export function describe(world, c) {
+  const out = { undissolvedG: 0, solidIds: [], liquidMl: c.solution.mL, tint: null };
+  for (const id in c.solids) {
+    const g = c.solids[id]; if (!(g > 0)) continue;
+    const und = Math.max(0, g - dissolvedGrams(world, c, id));
+    if (und > 0.02) { out.undissolvedG += und; out.solidIds.push(id); }
+  }
+  return out;
+}

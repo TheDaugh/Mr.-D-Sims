@@ -162,7 +162,7 @@ Every action appends one small JSON event. The log is the grading record, the te
 | # | Milestone | Done when |
 |---|---|---|
 | 0 | Data format + engine + Node tests, no UI | `npm test` passes; every substance, reaction and pair reviewed by you (`npm run gate` passes). **Status: code and tests done (13 passing); 9 substances, 5 reactions and 36 pairs await your review in `content/REVIEW.md`.** Lab 1 uses 9 substances, so 36 pairs, not 45. |
-| 1 | Bench view + one lab, no room yet | A student can complete Lab 1 at the bench; log is produced |
+| 1 | Bench view + one lab, no room yet | A student can complete Lab 1 at the bench; log is produced. **Status: built and browser-tested (17 tests passing). Needs http(s) to run, not a double-click.** |
 | 2 | Overworld + inventory + PPE gate | Student walks, suits up, finds reagents, reaches the bench |
 | 3 | Hazards + the three modes + incident report | Same mistake is blocked in Guided, punished in Consequences |
 | 4 | Save code, lab-record export, report, `teacher.html` | You can open a class's records and see who did what |

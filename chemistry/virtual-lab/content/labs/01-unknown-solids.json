@@ -1,0 +1,30 @@
+{
+  "id": "01-unknown-solids",
+  "title": "Lab 1: Identify the Unknown White Solids",
+  "intro": "Four jars hold unidentified white solids. Each is one of the six known samples on the shelf. You will run the same five tests on the unknowns and on the knowns, record what you observe, and decide which is which. Several of the solids look alike, so no single test is enough.",
+  "standard": {
+    "solubility":   { "g": 5, "mL": 20 },
+    "conductivity": { "g": 1, "mL": 50 },
+    "vinegar":      { "g": 1, "mL": 20, "seconds": 60 },
+    "iodine":       { "g": 1, "mL": 10 },
+    "heat":         { "g": 1, "plateC": 250, "seconds": 300 }
+  },
+  "tests": [
+    { "key": "solubility", "name": "Solubility", "how": "Weigh 5.0 g on the balance, add it to a beaker, move the beaker to the bench, add 20 mL of water, and stir. Does it all dissolve, some of it, or none of it?",
+      "options": [["full", "all dissolves"], ["partial", "some dissolves, some left"], ["none", "none dissolves"]] },
+    { "key": "conductivity", "name": "Conductivity", "how": "Dissolve 1.0 g in 50 mL of water, stir, and test with the conductivity tester. Use the same amounts every time so the readings can be compared.",
+      "options": [["bright", "bulb bright"], ["dim", "bulb dim"], ["off", "bulb off"]] },
+    { "key": "vinegar", "name": "Vinegar test", "how": "Add 1.0 g to 20 mL of vinegar and watch for a minute. Skip ahead if the reaction is slow.",
+      "options": [["fast", "fast fizzing"], ["slow", "slow bubbling"], ["none", "no bubbles"]] },
+    { "key": "iodine", "name": "Iodine test", "how": "Add 1.0 g to 10 mL of iodine solution.",
+      "options": [["blue-black", "turns blue-black"], ["no change", "stays amber"]] },
+    { "key": "heating", "name": "Heating", "how": "Put 1.0 g on the watch glass, set the hot plate to 250 °C, and watch as it heats. Use tongs to handle anything hot.",
+      "options": [["none", "no change"], ["melts", "melts to a clear liquid"], ["browns", "browns or chars"], ["bubbles", "gives off gas bubbles"]] }
+  ],
+  "steps": [
+    "Put on goggles and an apron before you touch anything.",
+    "Test each unknown with all five tests. Test the known samples too so you can compare.",
+    "Record what you see in the table below. Only record what you observed, not what you expect.",
+    "Choose an identity for each unknown, then press Check. Retest anything marked wrong."
+  ]
+}

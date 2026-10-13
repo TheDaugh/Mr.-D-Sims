@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab</title>
+<meta name="description" content="A virtual chemistry bench: weigh, mix, heat and test unknown samples.">
+<link rel="stylesheet" href="../shared/lab.css">
+<style>
+  #bench { width: 100%; max-width: 640px; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 10px; border: 2px solid var(--line); cursor: pointer; }
+  .vl { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+  @media (max-width: 980px) { .vl { grid-template-columns: minmax(0, 1fr); } }
+  #feed { list-style: none; margin: 0; padding: 0; max-height: 240px; overflow: auto; font-size: .93rem; }
+  #feed li { padding: 5px 0; border-bottom: 1px solid var(--line); }
+  #feed .f-stop { color: var(--bad); font-weight: 600; }
+  #feed .f-warn { color: var(--bad); }
+  #feed .f-obs { color: var(--ok); font-weight: 600; }
+  #ppe { display: flex; gap: 8px; flex-wrap: wrap; }
+  #sheet table select { max-width: 11.5em; min-height: 34px; font-size: .85rem; }
+  #sheet th { white-space: nowrap; }
+  #sheet select.ok { outline: 2px solid var(--ok); } #sheet select.bad { outline: 2px solid var(--bad); }
+  .scrollx { overflow-x: auto; }
+  ol.tests li, ol.steps li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="back" href="../">← Chemistry hub</a>
+    <span class="crumb">Virtual Lab · build preview</span>
+  </header>
+  <h1 id="title">Virtual Lab</h1>
+  <div id="boot" class="note">Loading the lab…</div>
+
+  <div id="app" hidden>
+    <p class="lead" id="intro"></p>
+    <div class="grid vl">
+      <div class="stack">
+        <section class="card" aria-label="Lab bench">
+          <canvas id="bench" aria-label="Lab bench with shelves, three containers, a balance, a hot plate and a conductivity tester. Click a jar to choose a substance or a container to select it."></canvas>
+          <p class="hint">Click a jar to choose it, or a container to select it.</p>
+        </section>
+        <section class="card" aria-label="Safety gear">
+          <h2>Safety gear</h2>
+          <div id="ppe"></div>
+          <p class="hint">Goggles and an apron are required before any other action. Tongs are required for hot containers.</p>
+          <label style="display:block;margin-top:8px;font-size:.8rem;color:var(--muted)">Your name <input id="student" type="text" autocomplete="name" style="display:block;width:16em"></label>
+        </section>
+      </div>
+      <div class="stack">
+        <section class="card" aria-label="Controls"><h2>Bench controls</h2><div id="controls"></div></section>
+        <section class="card" aria-label="What happened"><h2>What happened</h2><ul id="feed" aria-live="polite"></ul></section>
+      </div>
+    </div>
+
+    <section class="card" id="sheet" style="margin-top:16px" aria-label="Lab sheet">
+      <h2>Lab sheet</h2>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div><h3>Steps</h3><ol class="steps" id="steps"></ol></div>
+        <div><h3>The five tests</h3><ol class="tests" id="tests"></ol></div>
+      </div>
+      <h3 style="margin-top:14px">Record what you observed</h3>
+      <div class="scrollx"><table id="table"></table></div>
+      <div class="controls" style="margin-top:12px">
+        <button id="check" class="primary">Check</button>
+        <button id="download">Download lab record</button>
+      </div>
+      <div id="result" class="fb" role="status"></div>
+    </section>
+  </div>
+</div>
+<script type="module" src="src/ui/app.js"></script>
+</body>
+</html>
