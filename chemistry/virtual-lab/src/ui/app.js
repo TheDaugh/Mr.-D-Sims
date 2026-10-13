@@ -3,6 +3,8 @@ import { buildWorld, newContainer, add, advance, heat, conductivity, describe, d
 import { fingerprint } from "../engine/lab1.js";
 import { Log, downloadJSON } from "../log.js";
 import { createRenderer, SLOTS } from "./render.js";
+import { createRoomRenderer } from "./roomview.js";
+import { parseRoom, step, facingTile, hasPPE, tileAt } from "../engine/room.js";
 
 const $ = (s) => document.querySelector(s);
 function h(tag, props = {}, ...kids) {
@@ -21,15 +23,15 @@ const SHORT = { NaCl: "Salt", sucrose: "Sugar", NaHCO3: "B.Soda", CaCO3: "Chalk"
 
 async function boot() {
   try {
-    const urls = ["content/species.json", "content/reactions.json", "content/labs/01-unknown-solids.json"];
-    const [species, reactions, lab] = await Promise.all(urls.map((u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); })));
-    start(species, reactions, lab);
+    const urls = ["content/species.json", "content/reactions.json", "content/labs/01-unknown-solids.json", "content/rooms/main-lab.json"];
+    const [species, reactions, lab, roomDef] = await Promise.all(urls.map((u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); })));
+    start(species, reactions, lab, roomDef);
   } catch (e) {
     $("#boot").replaceChildren(h("p", {}, "This lab has to be opened from the web (GitHub Pages) or a local server. Double-clicking the file does not work because browsers block the files it loads."), h("p", { class: "hint" }, String(e.message || e)));
   }
 }
 
-function start(speciesData, reactionData, lab) {
+function start(speciesData, reactionData, lab, roomDef) {
   const world = buildWorld(speciesData, reactionData);
   const EL = speciesData.electrolytes;
   const solids = speciesData.species.filter((s) => s.phase === "s").map((s) => s.id);
@@ -54,7 +56,7 @@ function start(speciesData, reactionData, lab) {
   ];
   sources.forEach((s) => { s.color = speciesData.species.find((x) => x.id === s.id).color; });
 
-  const S = { sel: "b1", srcKey: sources[0].key, ppe: { goggles: false, apron: false, tongs: false }, plateOn: false, plateC: 150, bulb: null, bulbUntil: 0, feed: [], notebook: {}, student: "" };
+  const S = { sel: "b1", srcKey: sources[0].key, ppe: { goggles: false, apron: false, tongs: false }, inv: [], view: "room", panel: null, plateOn: false, plateC: 150, bulb: null, bulbUntil: 0, feed: [], notebook: {}, student: "" };
   const byKey = (k) => CONT.find((c) => c.key === k);
 
   // ---------- feedback and rules ----------
@@ -63,7 +65,7 @@ function start(speciesData, reactionData, lab) {
   function blocked(id, text) { log.add("procedure", { id, outcome: "blocked" }); say(text, "warn"); }
   function ppeOk() {
     if (S.ppe.goggles && S.ppe.apron) return true;
-    hazard("no_ppe", "Stop. Put on goggles and an apron before you touch anything in the lab.");
+    hazard("no_ppe", "Stop. Put on goggles and an apron before you touch anything in the lab. They are in the locker.");
     return false;
   }
   const cur = () => byKey(S.sel);
@@ -83,7 +85,8 @@ function start(speciesData, reactionData, lab) {
   }
   function addSubstance() {
     if (!ppeOk()) return;
-    const c = cur(), src = sources.find((s) => s.key === S.srcKey), amt = parseFloat($("#amt").value);
+    const c = cur(), src = sources.find((s) => s.key === S.srcKey && S.inv.includes(s.key)), amt = parseFloat($("#amt").value);
+    if (!src) return blocked("not_carrying", "You are not carrying that jar. Go back to the room and take it from its shelf.");
     if (!(amt > 0)) return say("Enter an amount first.", "warn");
     if (src.phase === "s") {
       if (c.loc !== "balance") return blocked("solid_off_balance", "Weigh solids on the balance. Move the container to the balance first.");
@@ -185,7 +188,7 @@ function start(speciesData, reactionData, lab) {
   function view() {
     const onBalance = CONT.find((c) => c.loc === "balance");
     return {
-      sources, selectedSource: S.srcKey, plateOn: S.plateOn, plateC: S.plateC,
+      sources: S.inv.map((k, i) => ({ ...sources.find((s) => s.key === k), shelf: 0, idx: i })), selectedSource: S.srcKey, plateOn: S.plateOn, plateC: S.plateC,
       bulb: performance.now() < S.bulbUntil ? S.bulb : null,
       balanceText: onBalance ? `${(rawMass(onBalance) - onBalance.tare).toFixed(1)} g` : "0.0 g",
       containers: CONT.map((c) => {
@@ -201,18 +204,22 @@ function start(speciesData, reactionData, lab) {
     const r = canvas.getBoundingClientRect();
     const hit = renderer.hit((ev.clientX - r.left) * (320 / r.width), (ev.clientY - r.top) * (180 / r.height));
     if (!hit) return;
-    if (hit.type === "container") { S.sel = hit.key; renderControls(); } else { S.srcKey = hit.key; $("#src").value = hit.key; syncUnit(); }
+    if (hit.type === "container") { S.sel = hit.key; renderControls(); } else { S.srcKey = hit.key; syncUnit(); }
   });
 
   const ppeBox = $("#ppe");
   function renderPPE() {
     ppeBox.replaceChildren(...[["goggles", "Goggles"], ["apron", "Apron"], ["tongs", "Tongs"]].map(([k, name]) =>
-      h("button", { "aria-pressed": S.ppe[k], class: S.ppe[k] ? "primary" : "", onclick: () => togglePPE(k) }, (S.ppe[k] ? "✓ " : "") + name)));
+      h("span", { class: "chip" + (S.ppe[k] ? " on" : "") }, (S.ppe[k] ? "✓ " : "") + name)));
   }
 
-  const srcSel = h("select", { id: "src", "aria-label": "Substance", onchange: (e) => { S.srcKey = e.target.value; syncUnit(); } },
-    ["Unknown samples", "Liquids", "Known samples"].map((g) => h("optgroup", { label: g }, sources.filter((s) => s.group === g).map((s) => h("option", { value: s.key }, s.label)))));
-  function syncUnit() { const s = sources.find((x) => x.key === S.srcKey); $("#unit").textContent = s.phase === "s" ? "g" : "mL"; srcSel.value = S.srcKey; }
+  const srcSel = h("select", { id: "src", "aria-label": "Substance", onchange: (e) => { S.srcKey = e.target.value; syncUnit(); } });
+  function syncUnit() {
+    if (!S.inv.includes(S.srcKey)) S.srcKey = S.inv[0] || null;
+    srcSel.replaceChildren(...(S.inv.length ? S.inv.map((k) => { const s = sources.find((x) => x.key === k); return h("option", { value: k }, s.label); }) : [h("option", { value: "" }, "(nothing carried)")]));
+    const s = sources.find((x) => x.key === S.srcKey);
+    $("#unit").textContent = s && s.phase === "l" ? "mL" : "g"; if (s) srcSel.value = S.srcKey;
+  }
 
   const ctl = $("#controls");
   ctl.append(
@@ -281,19 +288,84 @@ function start(speciesData, reactionData, lab) {
   });
 
   // ---------- go ----------
-  syncUnit(); renderPPE(); renderControls(); renderFeed();
-  say("Welcome. Start by putting on goggles and an apron.");
+  // ---------- the room ----------
+  const room = parseRoom(roomDef), P = { x: room.start.x, y: room.start.y, face: room.start.face || "u" };
+  const roomCanvas = $("#room"), roomR = createRoomRenderer(roomCanvas, room), visited = new Set();
+  let lastMove = 0, lastBlock = -1e9;
+  const GROUP_OF = (id) => sources.filter((s) => s.group === id);
+  function setView(v) {
+    S.view = v; closePanel();
+    roomCanvas.hidden = v !== "room"; canvas.hidden = v !== "bench"; $("#controlsCard").hidden = v !== "bench";
+    $("#viewHint").textContent = v === "room" ? "Walk with the arrow keys or WASD. Press E (or click something next to you) to use it." : "Click a jar to choose it, or a container to select it. Esc returns to the room.";
+    log.add("view", { to: v });
+  }
+  function closePanel() { S.panel = null; $("#panelCard").hidden = true; }
+  function renderInv() {
+    $("#invCount").textContent = `(${S.inv.length}/6)`;
+    $("#inv").replaceChildren(...Array.from({ length: 6 }, (_, i) => { const s = sources.find((x) => x.key === S.inv[i]); return s ? h("div", { class: "slot full" }, h("i", { style: `background:${s.color}` }), s.label.replace(" (known)", "")) : h("div", { class: "slot" }, ""); }));
+  }
+  function take(key) {
+    if (S.inv.length >= 6) return blocked("inventory_full", "Your hands are full (6 jars). Return one to a shelf first.");
+    S.inv.push(key); const s = sources.find((x) => x.key === key);
+    log.add("take", { jar: key, shown_as: s.label }); say(`You take ${s.label}.`); syncUnit(); renderInv(); renderPanel();
+  }
+  function putBack(key) {
+    S.inv = S.inv.filter((k) => k !== key); log.add("return", { jar: key }); say("You put the jar back on the shelf."); syncUnit(); renderInv(); renderPanel();
+  }
+  function renderPanel() {
+    const t = S.panel; if (!t) return;
+    $("#panelCard").hidden = false; $("#panelTitle").textContent = t.type === "shelf" ? t.group : t.type === "locker" ? "Locker" : "Tong rack";
+    if (t.type === "shelf") $("#panelBody").replaceChildren(...GROUP_OF(t.group).map((s) => { const has = S.inv.includes(s.key); return h("div", {}, h("span", {}, s.label.replace(" (known)", "")), h("button", { onclick: () => (has ? putBack(s.key) : take(s.key)) }, has ? "Put back" : "Take")); }));
+    else {
+      const NAME = { goggles: "Goggles", apron: "Apron", tongs: "Tongs" };
+      $("#panelBody").replaceChildren(...t.items.map((k) => h("div", {}, h("span", {}, NAME[k]), h("button", { onclick: () => { togglePPE(k); renderPanel(); } }, S.ppe[k] ? (k === "tongs" ? "Put back" : "Take off") : (k === "tongs" ? "Pick up" : "Put on")))));
+    }
+  }
+  function interact(f) {
+    const t = f.tile; if (!t || !t.id) return false;
+    if (!visited.has(t.id)) { visited.add(t.id); log.add("visit", { object: t.id }); }
+    if (t.type === "station") { setView("bench"); say("You stand at your bench."); }
+    else if (t.type === "shelf" || t.type === "locker" || t.type === "rack") { S.panel = t; renderPanel(); }
+    else { closePanel(); say(t.text); }
+    return true;
+  }
+  function walk(dx, dy) {
+    const now = performance.now(); if (now - lastMove < 110) return; lastMove = now;
+    const r = step(room, P, dx, dy, S.ppe);
+    if (r.blocked && now - lastBlock > 1500) { lastBlock = now; hazard("no_ppe_door", "Stop. The lab door will not open. You need goggles and an apron, and they are in the locker."); }
+    if (r.moved) { closePanel(); if (r.tile.type === "door" && !visited.has("entered_lab")) { visited.add("entered_lab"); log.add("door", { outcome: "entered" }); say("You step into the lab."); } }
+  }
+  const DIRS = { arrowup: [0, -1], w: [0, -1], arrowdown: [0, 1], s: [0, 1], arrowleft: [-1, 0], a: [-1, 0], arrowright: [1, 0], d: [1, 0] };
+  window.addEventListener("keydown", (e) => {
+    const k = e.key.toLowerCase();
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (k === "escape") { if (S.panel) closePanel(); else if (S.view === "bench") setView("room"); return; }
+    if (S.view !== "room" || /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(e.target.tagName)) return;
+    if (DIRS[k]) { e.preventDefault(); walk(...DIRS[k]); }
+    else if (k === "e" || k === "enter" || k === " ") { e.preventDefault(); interact(facingTile(room, P)); }
+  });
+  roomCanvas.addEventListener("click", (ev) => {
+    const r = roomCanvas.getBoundingClientRect(), p = roomR.tileFromPoint((ev.clientX - r.left) * (320 / r.width), (ev.clientY - r.top) * (180 / r.height));
+    const t = tileAt(room, p.x, p.y); if (!t || !t.id) return;
+    if (Math.abs(p.x - P.x) + Math.abs(p.y - P.y) !== 1) return say("Walk next to it first, then press E.", "warn");
+    P.face = p.x < P.x ? "l" : p.x > P.x ? "r" : p.y < P.y ? "u" : "d"; interact(facingTile(room, P));
+  });
+  $("#panelClose").addEventListener("click", closePanel);
+  $("#leaveBench").addEventListener("click", () => setView("room"));
+
+  syncUnit(); renderPPE(); renderControls(); renderFeed(); renderInv(); setView("room");
+  say("Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
   $("#boot").hidden = true; $("#app").hidden = false;
   let last = performance.now(), t0 = last, lastCtl = 0;
   function frame(now) {
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
     stepAll(dt);
-    renderer.draw(view(), (now - t0) / 1000);
+    if (S.view === "room") roomR.draw(P, S.ppe, hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
     if (now - lastCtl > 250) { renderControls(); lastCtl = now; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  window.__vl = { S, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE, check }, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
+  window.__vl = { S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE, check }, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
 }
 
 boot();

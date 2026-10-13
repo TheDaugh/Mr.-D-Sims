@@ -7,7 +7,8 @@
 <meta name="description" content="A virtual chemistry bench: weigh, mix, heat and test unknown samples.">
 <link rel="stylesheet" href="../shared/lab.css">
 <style>
-  #bench { width: 100%; max-width: 640px; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 10px; border: 2px solid var(--line); cursor: pointer; }
+  [hidden] { display: none !important; }
+  #bench, #room { width: 100%; max-width: 640px; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 10px; border: 2px solid var(--line); cursor: pointer; }
   .vl { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
   @media (max-width: 980px) { .vl { grid-template-columns: minmax(0, 1fr); } }
   #feed { list-style: none; margin: 0; padding: 0; max-height: 240px; overflow: auto; font-size: .93rem; }
@@ -20,6 +21,14 @@
   #sheet th { white-space: nowrap; }
   #sheet select.ok { outline: 2px solid var(--ok); } #sheet select.bad { outline: 2px solid var(--bad); }
   .scrollx { overflow-x: auto; }
+  .chip { padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: .85rem; color: var(--muted); }
+  .chip.on { background: var(--ok); color: #fff; border-color: var(--ok); }
+  #inv { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .slot { border: 2px dashed var(--line); border-radius: 8px; min-height: 40px; padding: 4px 6px; font-size: .85rem; display: flex; align-items: center; gap: 6px; }
+  .slot.full { border-style: solid; }
+  .slot i { width: 12px; height: 16px; border: 1px solid #555; display: inline-block; flex: none; }
+  #panelBody { display: grid; gap: 6px; margin: 8px 0; }
+  #panelBody > div { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   ol.tests li, ol.steps li { margin-bottom: 6px; }
 </style>
 </head>
@@ -37,18 +46,21 @@
     <div class="grid vl">
       <div class="stack">
         <section class="card" aria-label="Lab bench">
-          <canvas id="bench" aria-label="Lab bench with shelves, three containers, a balance, a hot plate and a conductivity tester. Click a jar to choose a substance or a container to select it."></canvas>
-          <p class="hint">Click a jar to choose it, or a container to select it.</p>
+          <canvas id="room" aria-label="Top-down view of the lab. Walk with the arrow keys or WASD and press E to use what you face."></canvas>
+          <canvas id="bench" hidden aria-label="Lab bench with the jars you carry, three containers, a balance, a hot plate and a conductivity tester."></canvas>
+          <p class="hint" id="viewHint"></p>
         </section>
         <section class="card" aria-label="Safety gear">
           <h2>Safety gear</h2>
           <div id="ppe"></div>
-          <p class="hint">Goggles and an apron are required before any other action. Tongs are required for hot containers.</p>
+          <p class="hint">Get goggles and an apron from the locker. Without them the lab door stays shut. Tongs hang on the rack; you need them for hot containers.</p>
           <label style="display:block;margin-top:8px;font-size:.8rem;color:var(--muted)">Your name <input id="student" type="text" autocomplete="name" style="display:block;width:16em"></label>
         </section>
       </div>
       <div class="stack">
-        <section class="card" aria-label="Controls"><h2>Bench controls</h2><div id="controls"></div></section>
+        <section class="card" aria-label="Inventory"><h2>Carrying <span id="invCount"></span></h2><div id="inv"></div><p class="hint">Six slots. The jars you carry appear on your bench shelf.</p></section>
+        <section class="card" id="panelCard" hidden><h2 id="panelTitle"></h2><div id="panelBody"></div><button id="panelClose">Close</button></section>
+        <section class="card" id="controlsCard" aria-label="Controls" hidden><h2>Bench controls</h2><button id="leaveBench" style="margin-bottom:10px">← Back to the room</button><div id="controls"></div></section>
         <section class="card" aria-label="What happened"><h2>What happened</h2><ul id="feed" aria-live="polite"></ul></section>
       </div>
     </div>
