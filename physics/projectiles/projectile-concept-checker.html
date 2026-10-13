@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Projectile Motion Concept Checker</title>
+<style>
+:root{--teal:#2AACAF;--deep:#17777A;--wash:#E6F6F6;--ink:#1A1A1A;--mute:#5a6b6b;--bg:#F4FAFA;--card:#fff;--line:#CFE6E6;--orange:#E8833A;--navy:#1B3A57;--good:#2E8B57;--bad:#C0392B;--gold:#F2B84B;--cream:#FFF6E2}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;background:var(--bg);color:var(--ink);font-size:18px;line-height:1.4}
+header{background:var(--teal);color:#fff;padding:10px 18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:21px}
+#chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.25);border-radius:999px;padding:3px 11px;font-size:14px;font-weight:bold;white-space:nowrap}
+.chip.on{background:#fff;color:var(--deep)}.chip.done{background:var(--deep)}
+#clock{font-size:14px;opacity:.95}
+main{max-width:980px;margin:0 auto;padding:16px 14px 90px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+h2{margin:6px 0 2px;font-size:28px;color:var(--deep)}
+.sub{color:var(--mute);margin:0 0 6px}
+.text{background:var(--wash);border-color:var(--teal)}
+.k{font-weight:bold;padding:0 5px;border-radius:5px}.k.x{background:#DCE6F2;color:var(--navy)}.k.y{background:#DDF1E5;color:#1c6b3f}.k.v{background:#FDE6D3;color:#A4510F}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--deep);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-weight:bold;font-size:18px}
+.btn:hover{background:#0f6366}.btn.ghost{background:#fff;color:var(--deep);border:2px solid var(--deep)}
+.btn.go{background:var(--orange)}.btn.go:hover{background:#cf6f27}
+.btn:disabled{background:#9bb;cursor:not-allowed;border-color:#9bb}
+.btn.big{padding:14px 28px;font-size:22px}
+ol.tasks{list-style:none;padding:0;margin:8px 0}
+ol.tasks li{border:2px solid var(--line);border-radius:10px;padding:8px 12px;margin:6px 0;display:flex;gap:10px;align-items:flex-start}
+ol.tasks li.cur{border-color:var(--orange);background:#FFF8F0}
+ol.tasks li.done{border-color:var(--good);background:#EFF9F3}
+ol.tasks li.wait{opacity:.5}
+.tk{font-size:22px;line-height:1}
+.hintbox{background:var(--cream);border:2px solid var(--gold);border-radius:8px;padding:5px 10px;margin-top:6px;font-size:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.q{font-size:20px;font-weight:bold;margin-bottom:8px}
+.tag{display:inline-block;background:var(--navy);color:#fff;font-size:13px;font-weight:bold;border-radius:6px;padding:2px 8px;margin-right:8px;vertical-align:3px}
+.opt{color:var(--ink);display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--line);border-radius:10px;padding:10px 14px;margin:7px 0;font-size:18px}
+.opt:disabled{color:var(--ink);cursor:default}.opt.no{color:#555}.opt:hover:not(:disabled){border-color:var(--teal);background:var(--wash)}
+.opt.ok{border-color:var(--good);background:#EFF9F3}.opt.no{border-color:var(--bad);background:#FDEBEB;opacity:.75}
+.fb{border-radius:8px;padding:6px 12px;margin-top:6px;font-size:17px}
+.fb.no{background:#FDEBEB;border:2px solid var(--bad)}.fb.ok{background:#EFF9F3;border:2px solid var(--good)}.fb.info{background:var(--wash);border:2px solid var(--teal)}
+.talk{background:var(--cream);border-color:var(--gold);font-size:17px}
+input[type=text],input[type=number]{font:inherit;font-size:20px;padding:8px 10px;border:2px solid var(--deep);border-radius:8px;width:150px}
+select{font:inherit;font-size:17px;padding:6px 8px;border:2px solid var(--deep);border-radius:8px;background:#fff}
+#start{max-width:620px;margin:40px auto}
+#start input{width:100%}
+.final{text-align:center}
+.stamp{border:5px solid var(--good);border-radius:16px;padding:12px 20px;margin:14px auto;max-width:640px;background:#EFF9F3}
+.stamp .big{font-size:34px;font-weight:bold;color:var(--good)}
+table.sum{margin:10px auto;border-collapse:collapse;font-size:17px}
+table.sum td,table.sum th{border:1.5px solid #999;padding:5px 12px;text-align:left}
+.skip{font-size:13px;opacity:.7;float:right}
+.leg{font-size:15px;color:var(--mute);margin-top:4px}
+.tier{display:inline-block;background:var(--orange);color:#fff;font-weight:bold;border-radius:8px;padding:2px 10px;font-size:15px;margin-left:8px;vertical-align:4px}
+/* simulator */
+.stage{background:#fff;border:2px solid var(--line);border-radius:12px;padding:0;overflow:hidden;touch-action:manipulation}
+.stage canvas{display:block;width:100%}
+.stage.pick canvas{cursor:crosshair}
+.gwrap{margin-top:8px}
+.range{display:flex;gap:12px;align-items:center;margin:8px 0}.range b{min-width:150px}
+.range input[type=range]{flex:1;height:36px;accent-color:var(--orange)}.range select{flex:1}
+.range .val{min-width:96px;font-size:22px;font-weight:bold;text-align:right;color:#A4510F}
+.range.lock{opacity:.55}.range.lock b::after{content:" 🔒"}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.pill{border-radius:10px;padding:4px 11px;font-weight:bold;font-size:16px;background:#eef8f8;color:#0b4f52;border:1.5px solid #bfe6e7}
+.pill.live{background:#fff;border-color:#ddd;color:#333;font-variant-numeric:tabular-nums}
+.pill small{font-weight:normal;font-size:13px}
+.pill.res{background:#DCE6F2;color:var(--navy);border-color:#b9cde3}
+.predrow{background:var(--cream);border:2px solid var(--gold);border-radius:10px;padding:6px 10px;margin:8px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.predrow input{width:110px}
+.opt svg{vertical-align:middle}
+.rowq{border-top:1.5px solid var(--line);padding:8px 0}
+.rowq:first-of-type{border-top:0}
+.rowq .opts{display:flex;gap:8px;flex-wrap:wrap}
+.rowq .opt{width:auto;margin:4px 0;padding:6px 12px;font-size:16px}
+.key h3{color:var(--deep);margin:22px 0 4px}.key .it{border-top:1px solid var(--line);padding:6px 0;font-size:16px}
+@media(max-width:640px){body{font-size:16px}h2{font-size:23px}.opt{font-size:16px}.range{flex-wrap:wrap}.range b{min-width:100%}}
+@media print{header{position:static}.skip{display:none}}
+</style></head>
+<body>
+<header><h1>Projectile Motion · Concept Checker</h1><div id="chips"></div><div id="clock"></div></header>
+<main id="app"></main>
+<script>
+const DATA={parts:[
+
+/* ============ CORE ============ */
+{tier:1,title:"Two Motions at Once",sub:"A launched ball does two separate things at the same time. Predict, then check.",blocks:[
+{type:"text",html:"<b>Projectile motion.</b> After a ball leaves your hand, only gravity acts on it (we ignore air for now). That gives two <b>separate</b> motions: <span class='k x'>sideways</span> with <b>no acceleration</b>, so a constant speed, and <span class='k y'>up and down</span> with an acceleration of <b>9.8 m/s² downward</b>. Neither motion knows about the other."},
+{type:"mcq",predict:true,shuffle:true,q:"Ball A is <b>dropped</b> from a cliff edge. At the same instant, ball B is <b>shot sideways</b> off the same edge at 20 m/s. Which ball hits the ground first?",why:"They land together. Sideways speed does nothing to the fall. Both balls start with zero vertical velocity and both fall with 9.8 m/s². Now check it in the sim below.",opts:[
+ {t:"Ball A, the one dropped",fb:"A and B both start with zero vertical velocity. The sideways speed of B does not change how fast it falls."},
+ {t:"Ball B, the one shot sideways",fb:"A faster sideways speed does not pull the ball down faster. Look at what B's vertical motion is at the start."},
+ {t:"They land at the same time",ok:true},
+ {t:"It depends on how fast B is shot",fb:"Try it in the sim: a slow shot and a fast shot. Does the landing time change?"}]},
+{type:"shot",cfg:{
+  controls:[{k:"v0",label:"Launch speed",unit:"m/s",min:0,max:40,step:1,init:10}],
+  fixed:{ang:0,h0:20,g:9.8,drag:0},ghost:"drop",strobe:0.25,graphs:true,vectors:true,
+  view:{x:[-4,90],y:[0,24]},
+  legend:"Orange is the launched ball. Gray is the dropped ball. The dotted lines join the two balls at equal time steps."},
+ tasks:[
+ {text:"Set the launch speed to <b>5 m/s</b> and press <b>Launch</b>. Watch the orange ball and the gray ball.",cond:{v0:5},hint:"Drag the slider to 5, then press Launch."},
+ {text:"Now launch at <b>30 m/s</b>. Is the orange ball ever higher or lower than the gray ball?",cond:{v0:30},hint:"Slider to 30, then Launch. Look at the dotted lines: they stay flat."},
+ {text:"Set the speed to <b>15 m/s</b>. <b>Before you launch</b>, type a guess for how far from the cliff it lands (or click the ground). Get within <b>4 m</b>.",predict:true,cond:{v0:15,predErr:[0,4]},hint:"The ball falls for the same time as in the earlier launches, about 2.0 s. Sideways speed × time = distance."}]},
+{type:"num",q:"Both balls fall <b>20 m</b>. Use h = ½gt² to find how long the fall takes.",ans:2.02,tol:0.05,unit:"s",why:"20 = ½(9.8)t², so t² = 40 ÷ 9.8 = 4.08, and t = 2.02 s. This matches the readout in the sim.",fb:{low:"Too short. Solve for t² first, then take the square root.",high:"Too long. Check that you took the square root."},fbIf:[{v:4.08,t:"4.08 is t². Take the square root."},{v:1.43,tol:0.03,t:"That skips the 2. h = ½gt² means t² = 2h ÷ g."}]},
+{type:"mcq",shuffle:true,q:"You launched at 5 m/s and then at 30 m/s. The landing time was the same, but the <b>landing distance</b> changed. Why?",why:"Time in the air depends only on the vertical motion (the 20 m fall). Distance is sideways speed × that same time, so a faster launch goes farther.",opts:[
+ {t:"Sideways speed × the same fall time gives a different distance.",ok:true},
+ {t:"The faster ball falls more slowly, so it stays up longer.",fb:"The sim shows equal landing times. A faster launch does not slow the fall."},
+ {t:"Gravity pulls less on a faster ball.",fb:"Gravity is 9.8 m/s² for every object, whatever its sideways speed."},
+ {t:"The faster ball starts higher.",fb:"Both start at the same 20 m height."}]},
+{type:"mcq",shuffle:true,q:"Which graph shows the <b>horizontal velocity vx</b> of the orange ball as time passes? (Look at the blue graph in the sim.)",why:"No force acts sideways, so there is no sideways acceleration. vx stays constant. A flat line.",opts:[
+ {t:"A flat line above zero",thumb:"flatPos",ok:true},
+ {t:"A line that rises",thumb:"upZero",fb:"That would mean it speeds up sideways. What force pushes it sideways after launch?"},
+ {t:"A line that falls to zero",thumb:"downCross",fb:"That would mean it slows down sideways. Nothing slows it (no air)."},
+ {t:"A curve that rises and falls",thumb:"arcUp",fb:"Check the blue graph: it never bends."}]},
+{type:"talk",html:"Tell your neighbor in one sentence why a dropped ball and a sideways-shot ball land together."}]},
+
+{tier:1,title:"Launch Angles",sub:"Split the launch velocity into sideways and up-and-down pieces.",blocks:[
+{type:"text",html:"A launch at angle θ and speed v has two pieces: <span class='k x'>vx = v cos θ</span> (sideways) and <span class='k y'>vy = v sin θ</span> (upward). The sim draws both. A bigger angle puts more speed into <i>up</i> and less into <i>sideways</i>."},
+{type:"mcq",predict:true,shuffle:true,q:"A ball is launched at 20 m/s from the ground. One launch is at <b>30°</b>. Another is at <b>60°</b>. Which lands <b>farther away</b>?",why:"Same range. 30° and 60° are a pair that add to 90°. The 60° shot goes higher and stays up longer, but the 30° shot moves sideways faster. The two effects cancel exactly.",opts:[
+ {t:"The 30° launch",fb:"30° has the faster sideways speed, but it spends less time in the air. Think about both."},
+ {t:"The 60° launch",fb:"60° spends longer in the air, but its sideways speed is smaller. Think about both."},
+ {t:"They land at the same distance",ok:true},
+ {t:"You cannot tell without the mass",fb:"Mass does not matter for projectile motion without air."}]},
+{type:"shot",cfg:{
+  controls:[{k:"v0",label:"Launch speed",unit:"m/s",min:5,max:30,step:1,init:20},{k:"ang",label:"Launch angle",unit:"°",min:0,max:90,step:1,init:45}],
+  fixed:{h0:0,g:9.8,drag:0},strobe:0.5,graphs:true,vectors:true,init:true,
+  view:{x:[-3,98],y:[0,50]},legend:"Dashed arrow: launch velocity. Blue: sideways part. Green: upward part. Old paths stay faint so you can compare."},
+ tasks:[
+ {text:"Launch at <b>20 m/s and 30°</b>.",cond:{v0:20,ang:30},hint:"Set the speed to 20 and the angle to 30, then press Launch."},
+ {text:"Now launch at <b>20 m/s and 60°</b>. Compare the two paths.",cond:{v0:20,ang:60},hint:"Change only the angle to 60."},
+ {text:"Now <b>45°</b>. Is its range more or less than the other two?",cond:{v0:20,ang:45},hint:"Change only the angle to 45."}]},
+{type:"rows",q:"At the <b>very top</b> of the flight, what is true? (Look at the live numbers in the sim.)",rows:[
+ {q:"Horizontal velocity vx at the top",opts:["Zero","Same as at launch","Largest of the flight","Pointing down"],ans:1,why:"Nothing changes vx. It is the same at every moment.",fb:{0:"The ball is still moving sideways at the top. It only stops moving <i>up</i> for an instant."}},
+ {q:"Vertical velocity vy at the top",opts:["Zero","Same as at launch","9.8 m/s","Largest of the flight"],ans:0,why:"It stopped rising and has not started falling yet. vy = 0 for an instant."},
+ {q:"Acceleration at the top",opts:["Zero","9.8 m/s² downward","9.8 m/s² forward","Smaller than at launch"],ans:1,why:"Gravity does not turn off. vy goes from + to − through zero because of this acceleration.",fb:{0:"If a = 0, the ball would stay at vy = 0 and hover. It does not."}},
+ {q:"Speed at the top",opts:["Zero","The smallest of the whole flight","The largest of the flight","Same as at launch"],ans:1,why:"At the top, speed = vx only, because vy = 0. Everywhere else vy adds to the speed.",fb:{0:"vx is not zero, so the speed is not zero."}}]},
+{type:"mcq",shuffle:true,q:"Which graph shows the <b>vertical velocity vy</b> of the 30° launch as time passes (up is positive)?",why:"vy starts positive, shrinks steadily to zero at the top, then goes negative. A straight line with slope −9.8 m/s². It crosses zero halfway through the flight.",opts:[
+ {t:"A straight line sloping down, crossing zero in the middle",thumb:"downCross",ok:true},
+ {t:"A flat line above zero",thumb:"flatPos",fb:"That is vx, not vy. Gravity changes vy."},
+ {t:"An arch that rises and falls",thumb:"arcUp",fb:"That looks like height. This graph is velocity."},
+ {t:"A line that starts at zero and slopes down",thumb:"downZero",fb:"The ball starts with an upward vy, so the line starts above zero."}]},
+{type:"num",q:"A ball is launched at <b>20 m/s and 30°</b>. What is its starting <b>vertical</b> speed vy?",ans:10,tol:0.1,unit:"m/s",why:"vy = 20 sin 30° = 20 × 0.5 = 10 m/s. The sim showed vy = 10.0.",fb:{low:"Check: sin 30° = 0.5.",high:"Check: sin 30° = 0.5."},fbIf:[{v:17.3,tol:0.2,t:"17.3 is the <i>sideways</i> speed (cos 30°). You want vy, which uses sin."}]},
+{type:"num",q:"How long is that ball in the air? (It rises and falls. Use the time to reach the top, then double it.)",ans:2.04,tol:0.05,unit:"s",why:"Time to the top: 10 ÷ 9.8 = 1.02 s. The trip down takes the same time, so the total is 2.04 s.",fb:{low:"The ball must also come back down.",high:"Time to the top is vy ÷ g."},fbIf:[{v:1.02,tol:0.03,t:"1.02 s is only the way up. Double it."}]},
+{type:"num",q:"How high does that ball go?",ans:5.1,tol:0.15,unit:"m",why:"Going up from vy = 10 to 0 with a = 9.8: h = vy² ÷ 2g = 100 ÷ 19.6 = 5.1 m.",fb:{low:"Use h = vy² ÷ (2g).",high:"Use h = vy² ÷ (2g), with vy = 10."}},
+{type:"num",q:"How far does it land from the launch point?",ans:35.3,tol:0.6,unit:"m",why:"vx = 20 cos 30° = 17.3 m/s. 17.3 × 2.04 s = 35.3 m. The sim says the same.",fb:{low:"Use vx × the whole flight time.",high:"Use vx (not v) × time."},fbIf:[{v:40.8,tol:0.3,t:"That would be 20 × 2.04. Use the <i>sideways</i> part of the velocity."}]}]},
+
+{tier:1,title:"Hit the Target",sub:"Use what you know to choose an angle. The speed is locked at 25 m/s.",blocks:[
+{type:"text",html:"The target is on the ground <b>50 m</b> away. Your cannon always fires at <b>25 m/s</b>. You choose the angle. The grid, the dots and the readouts are there to help."},
+{type:"shot",cfg:{
+  controls:[{k:"ang",label:"Launch angle",unit:"°",min:5,max:85,step:0.5,init:40}],
+  fixed:{v0:25,h0:0,g:9.8,drag:0},tgt:{x:50,w:2.5},strobe:0.5,vectors:false,graphs:false,keep:true,
+  view:{x:[-3,72],y:[0,34]},legend:"The red and white bar is the target. The purple flag is your guess."},
+ tasks:[
+ {text:"Set the angle to <b>40°</b>. <b>Predict first:</b> type or click where it lands. Get within <b>8 m</b>. (Use what the earlier launches taught you.)",predict:true,cond:{ang:40,predErr:[0,8]},hint:"A 20 m/s, 45° launch went about 41 m. A 25 m/s launch goes (25÷20)² = 1.56 times as far."},
+ {text:"Hit the target with a <b>low shot</b> (less than 45°).",cond:{hit:true,ang:[0,44.9]},hint:"Your 40° shot went too far. Try a flatter angle. Each degree moves the landing spot about 1 to 2 m."},
+ {text:"Now hit the <b>same target</b> with a <b>high shot</b> (more than 45°).",cond:{hit:true,ang:[45.1,90]},hint:"There is a second angle that works. Low and high angles that add to 90° land at the same spot."}]},
+{type:"mcq",shuffle:true,q:"Two angles hit the same target. Compare the two shots. Which statement is correct?",why:"The high shot goes up faster, so it climbs higher and takes longer to come down. The low shot gets there quickly. Both land at the same spot.",opts:[
+ {t:"The high shot is in the air longer and rises higher.",ok:true},
+ {t:"The low shot is in the air longer.",fb:"Check the time readouts. A faster upward start means more time in the air."},
+ {t:"Both take the same time because they land at the same spot.",fb:"Landing at the same spot does not mean the same time. The sideways speeds are different."},
+ {t:"The high shot lands harder because it starts faster.",fb:"Both start at 25 m/s."}]},
+{type:"num",q:"Check with an equation. The range at speed v and angle θ is <b>R = v² sin(2θ) ÷ g</b>. For R = 50 m and v = 25 m/s, what is <b>one</b> launch angle that works?",ans:[25.8,64.2],tol:1,unit:"°",why:"sin 2θ = (50 × 9.8) ÷ 625 = 0.784, so 2θ = 51.6° or 128.4°. That gives θ = 25.8° or 64.2°. These add to 90°, just like the sim showed.",fb:{low:"Solve for sin 2θ first, then take the inverse sine and divide by 2.",high:"Don't forget to divide by 2 at the end."},fbIf:[{v:51.6,tol:0.3,t:"51.6° is 2θ. Divide by 2."},{v:0.784,tol:0.01,t:"0.784 is sin 2θ. Now take the inverse sine."}]},
+{type:"mcq",shuffle:true,q:"The target is moved to <b>70 m</b>. The cannon still fires at 25 m/s. What happens?",why:"The greatest range is at 45°: R = 625 ÷ 9.8 = 63.8 m. Nothing reaches 70 m. At the longest range there is only one angle, 45°, instead of two.",opts:[
+ {t:"No angle can reach it.",ok:true},
+ {t:"Only 45° reaches it.",fb:"45° gives the longest range, but it is about 63.8 m, not 70."},
+ {t:"A very high angle like 80° reaches it.",fb:"Steep shots go high but not far. 80° lands near 22 m."},
+ {t:"Two angles, 20° and 70°, reach it.",fb:"Check R = v² sin 2θ ÷ g. The biggest sin 2θ can be is 1."}]}]},
+
+{tier:1,title:"Say It Right",sub:"Spot the mistakes and pick the best statements.",blocks:[
+{type:"mcq",shuffle:true,q:"A student says: “At the top of the flight the ball stops for a moment, so its acceleration is zero there.” What is the best reply?",why:"Velocity and acceleration are different. At the top vy = 0, but gravity still pulls down at 9.8 m/s². That is why vy changes sign.",opts:[
+ {t:"vy is zero for an instant, but the acceleration is still 9.8 m/s² downward.",ok:true},
+ {t:"Right. The ball stops, so a = 0.",fb:"If a = 0 at the top, the ball would hover there. It does not."},
+ {t:"The acceleration is zero because the forward force balances gravity.",fb:"There is no forward force after the launch. Only gravity."},
+ {t:"The acceleration is 9.8 m/s² up on the way up and down on the way down.",fb:"The direction is always down: 9.8 m/s² downward the whole time."}]},
+{type:"mcq",shuffle:true,q:"Which forces act on a thrown ball at the top of its flight? (No air.)",why:"Only gravity. The throw is over. A ball does not need a force to keep moving sideways, it needs a force only to <i>change</i> its motion.",opts:[
+ {t:"Only gravity, pulling down",ok:true},
+ {t:"Gravity, plus a forward force left over from the throw",fb:"The throw force ended when the ball left the hand. Nothing keeps pushing it forward."},
+ {t:"Gravity, plus an upward force that equals zero at the top",fb:"There is no upward force after the ball leaves the hand."},
+ {t:"No forces. It is at rest for a moment.",fb:"It is not at rest, it still has vx. And gravity acts the whole time."}]},
+{type:"mcq",shuffle:true,q:"Two balls, one 1 kg and one 2 kg, are rolled off the same table with the <b>same speed</b>. (No air.) Which statement is true?",why:"Mass does not matter. Both fall with 9.8 m/s² and both keep the same sideways speed. They land together at the same distance.",opts:[
+ {t:"They land at the same time and the same distance.",ok:true},
+ {t:"The heavy one lands first.",fb:"Heavy objects do not fall faster. Gravity gives every object the same acceleration."},
+ {t:"The heavy one lands farther because it has more momentum.",fb:"More mass means more gravity pulling, but also more inertia. They cancel."},
+ {t:"The light one lands farther because it is easier to push.",fb:"Both have the same launch speed. Mass does not change the path."}]},
+{type:"mcq",shuffle:true,q:"A cannon fires at 30°. You <b>double the launch speed</b>, with the same angle. The range becomes about:",why:"Four times. Doubling the speed doubles vx <i>and</i> doubles the time in the air (since vy doubles). Distance = vx × time, so 2 × 2 = 4.",opts:[
+ {t:"4 times as far",ok:true},
+ {t:"2 times as far",fb:"vx doubles, but the time in the air also doubles. Both change."},
+ {t:"1.5 times as far",fb:"Think about what happens to vx and to the flight time."},
+ {t:"The same, because the angle did not change",fb:"A faster ball goes farther at the same angle."}]},
+{type:"mcq",shuffle:true,q:"You ride a train moving at a steady 20 m/s. You toss a ball <b>straight up</b> (as you see it). Where does the ball land? (No air.)",why:"It lands back in your hand. The ball already has 20 m/s sideways, and nothing changes that. You and the ball move forward together while it goes up and down.",opts:[
+ {t:"Back in your hand",ok:true},
+ {t:"Behind you, because the train moves forward while the ball is in the air",fb:"The ball keeps the train's 20 m/s sideways. It moves forward with you."},
+ {t:"In front of you",fb:"Nothing speeds the ball up sideways. It only keeps what it had."},
+ {t:"It depends on how high you toss it",fb:"Height changes the time in the air, but the sideways motion matches yours the whole time."}]},
+{type:"talk",html:"Pick the mistake you almost made. Explain it to your neighbor in one sentence."}]},
+
+{tier:1,title:"Number Crunch",sub:"Solve first on paper. Then check your answer in the simulator.",blocks:[
+{type:"text",html:"<b>Problem A.</b> A ball rolls off the edge of a <b>44.1 m</b> cliff with a sideways speed of <b>12 m/s</b>. Sketch the path. Split the motion into sideways and vertical pieces. Use g = 9.8 m/s²."},
+{type:"num",q:"How long does the ball take to reach the ground?",ans:3.0,tol:0.05,unit:"s",why:"Vertical motion only: 44.1 = ½(9.8)t², so t² = 9, and t = 3.0 s.",fb:{low:"Use h = ½gt² and solve for t.",high:"Use h = ½gt² and solve for t."},fbIf:[{v:2.12,tol:0.03,t:"You forgot the 2. t² = 2h ÷ g."},{v:4.5,tol:0.05,t:"4.5 is h ÷ g. That is t² with the ½ missing, and you need a square root."}]},
+{type:"num",q:"How far from the base of the cliff does it land?",ans:36,tol:0.5,unit:"m",why:"Sideways: x = vx × t = 12 × 3.0 = 36 m.",fb:{low:"Distance = sideways speed × time in the air.",high:"Distance = sideways speed × time in the air."},fbIf:[{v:12,t:"12 is the speed. Multiply by the 3.0 s."}]},
+{type:"num",q:"How fast is the ball moving <b>just before</b> it lands? (Combine the two pieces.)",ans:31.75,tol:0.3,unit:"m/s",why:"vy = 9.8 × 3.0 = 29.4 m/s downward. The sideways piece is still 12 m/s. The pieces are at right angles: √(12² + 29.4²) = 31.75 m/s.",fb:{low:"You need both the sideways 12 and the downward 29.4.",high:"The pieces are at right angles, so use the Pythagorean theorem. Do not just add them."},fbIf:[{v:29.4,tol:0.2,t:"29.4 is only the downward part. Add the sideways 12 using the Pythagorean theorem."},{v:41.4,tol:0.2,t:"Do not add 12 + 29.4. The two velocities are at right angles."}]},
+{type:"shot",cfg:{
+  controls:[{k:"v0",label:"Sideways speed",unit:"m/s",min:4,max:20,step:1,init:8}],
+  fixed:{ang:0,h0:44.1,g:9.8,drag:0},strobe:0.5,graphs:true,vectors:true,
+  view:{x:[-4,70],y:[0,48]}},
+ tasks:[{text:"<b>Check Problem A.</b> Set the speed to <b>12 m/s</b> and launch. Do the time, range and impact speed match your answers?",cond:{v0:12},hint:"Slider to 12 m/s. Compare Time in the air, Range and Impact speed with your answers."}]},
+{type:"text",html:"<b>Problem B.</b> A soccer ball is kicked from the ground at <b>24.5 m/s and 30°</b>. Use g = 9.8 m/s²."},
+{type:"num",q:"How long is the ball in the air?",ans:2.5,tol:0.05,unit:"s",why:"vy = 24.5 sin 30° = 12.25 m/s. Time up = 12.25 ÷ 9.8 = 1.25 s. Total time = 2 × 1.25 = 2.50 s.",fb:{low:"Remember it has to come back down too.",high:"Time up = vy ÷ g, then double it."},fbIf:[{v:1.25,tol:0.03,t:"1.25 s is just the trip up. Double it."}]},
+{type:"num",q:"How far does it land from the kick?",ans:53,tol:0.7,unit:"m",why:"vx = 24.5 cos 30° = 21.2 m/s. Range = 21.2 × 2.5 s = 53.0 m.",fb:{low:"Range = vx × total time, with vx = v cos θ.",high:"Range = vx × total time, with vx = v cos θ."},fbIf:[{v:61.25,tol:0.5,t:"That used 24.5 as the sideways speed. Use 24.5 cos 30°."}]},
+{type:"num",q:"What is its <b>greatest height</b>?",ans:7.66,tol:0.12,unit:"m",why:"h = vy² ÷ 2g = 12.25² ÷ 19.6 = 7.66 m.",fb:{low:"Use h = vy² ÷ (2g).",high:"Use h = vy² ÷ (2g) with vy = 12.25."},fbIf:[{v:15.3,tol:0.3,t:"You forgot the 2 in the denominator: h = vy² ÷ 2g."}]},
+{type:"shot",cfg:{
+  controls:[{k:"v0",label:"Launch speed",unit:"m/s",min:5,max:30,step:0.5,init:20},{k:"ang",label:"Launch angle",unit:"°",min:0,max:90,step:1,init:45}],
+  fixed:{h0:0,g:9.8,drag:0},strobe:0.5,graphs:true,vectors:true,init:true,
+  view:{x:[-3,98],y:[0,50]}},
+ tasks:[{text:"<b>Check Problem B.</b> Set <b>24.5 m/s</b> and <b>30°</b>, then launch. Do the time, range and peak height match?",cond:{v0:24.5,ang:30},hint:"The speed slider moves in steps of 0.5. Set 24.5."}]},
+{type:"talk",html:"Which of your three Problem A answers did you trust least before the sim? Did it check out?"}]},
+
+/* ============ CHALLENGE ============ */
+{tier:2,title:"Cliff Shots",sub:"Same cliff, same speed, three different directions. Who hits hardest?",blocks:[
+{type:"text",html:"You stand on a <b>30 m cliff</b> and throw a ball at <b>20 m/s</b>. You try three throws: <b>30° above</b> horizontal, <b>straight out</b>, and <b>30° below</b> horizontal. Ignore air."},
+{type:"mcq",predict:true,shuffle:true,q:"Which throw hits the ground with the <b>greatest speed</b>?",why:"All three hit with the same speed, 31.4 m/s. They all start with the same kinetic energy at the same height and fall through the same 30 m, so they gain the same energy. Direction affects <i>where</i> and <i>when</i>, not the speed.",opts:[
+ {t:"All three the same",ok:true},
+ {t:"The throw 30° below, because it is aimed at the ground",fb:"It gets to the ground sooner, but sooner is not faster. The other throws are slowed on the way up but speed up again coming down."},
+ {t:"The throw 30° above, because it falls from the highest point",fb:"It does fall farther from its peak, but it also gives back the speed it lost climbing. Check it in the sim."},
+ {t:"The sideways throw, because nothing slows it",fb:"Compare with the others in the sim. Look at the impact speed."}]},
+{type:"shot",cfg:{
+  controls:[{k:"ang",label:"Launch angle",unit:"°",min:-60,max:60,step:1,init:0}],
+  fixed:{v0:20,h0:30,g:9.8,drag:0},strobe:0.5,graphs:true,vectors:true,init:true,
+  view:{x:[-4,70],y:[0,48]},legend:"Negative angles point below horizontal. Compare the Impact speed readout after each throw."},
+ tasks:[
+ {text:"Throw <b>30° above</b> horizontal.",cond:{ang:30},hint:"Set the angle to 30."},
+ {text:"Throw <b>straight out</b> (0°).",cond:{ang:0},hint:"Set the angle to 0."},
+ {text:"Throw <b>30° below</b> horizontal.",cond:{ang:-30},hint:"Set the angle to −30."}]},
+{type:"num",q:"Use energy or kinematics to find the impact speed. (v² = v₀² + 2gh for a drop of h.)",ans:31.4,tol:0.3,unit:"m/s",why:"v² = 20² + 2(9.8)(30) = 400 + 588 = 988, so v = 31.4 m/s. The direction of the throw does not appear in the equation.",fb:{low:"Add 2gh to v₀², then square-root.",high:"Add 2gh to v₀², then square-root."},fbIf:[{v:20,t:"20 m/s is the launch speed. The ball speeds up as it falls."},{v:988,tol:1,t:"That is v². Take the square root."}]},
+{type:"mcq",shuffle:true,q:"Which throw is <b>in the air for the shortest time</b>?",why:"The throw 30° below. It starts with a downward vy and covers the 30 m quickest. The upward throw spends the longest time.",opts:[
+ {t:"30° below horizontal",ok:true},
+ {t:"Straight out",fb:"It has no starting downward velocity. The downward throw beats it."},
+ {t:"30° above horizontal",fb:"It first goes up, so it takes the longest."},
+ {t:"All the same time",fb:"They have the same impact speed, not the same time. Check the time readouts."}]},
+{type:"shot",cfg:{
+  controls:[{k:"ang",label:"Launch angle",unit:"°",min:-10,max:60,step:0.5,init:0}],
+  fixed:{v0:20,h0:30,g:9.8,drag:0},strobe:0.5,graphs:false,vectors:false,keep:true,
+  view:{x:[-4,70],y:[0,48]},legend:"Same cliff, same speed. This time you are hunting for the greatest range."},
+ tasks:[{text:"<b>Longest throw.</b> Find an angle that lands at least <b>63.5 m</b> from the base. (The best possible is a bit more than that.)",cond:{R:[63.5,500]},hint:"On level ground the best angle is 45°. From a cliff the best angle is smaller. Try angles in the 30s."}]},
+{type:"mcq",shuffle:true,q:"From a cliff, the best angle for range is <b>less than 45°</b>. Why?",why:"The ball already gets extra time in the air from the fall below the launch height, so it does not need to climb as steeply to stay up. A flatter launch keeps more of the speed pointed sideways.",opts:[
+ {t:"The ball has extra time falling below the cliff edge, so it can afford more sideways speed.",ok:true},
+ {t:"Gravity is weaker at the top of a cliff.",fb:"The difference in g over 30 m is tiny. This is about geometry, not gravity."},
+ {t:"Air resistance is smaller up high.",fb:"We ignore air in this part."},
+ {t:"It is not true. The best angle is always 45°.",fb:"Try it in the sim: 45° gave a shorter range than 33°."}]}]},
+
+{tier:2,title:"The Monkey and the Hunter",sub:"A classic. Aim straight at the monkey. It lets go the instant you fire.",blocks:[
+{type:"text",html:"A monkey hangs from a branch <b>40 m</b> away and <b>30 m</b> up. A hunter aims <b>straight at it</b> and fires. The monkey lets go at the <b>same instant</b> and starts to fall. The dashed orange line is the sight line. The gray dot is where the bullet would be if there were <b>no gravity</b>."},
+{type:"mcq",predict:true,shuffle:true,q:"The hunter aims right at the monkey. The monkey falls the instant the gun fires. The bullet is fast enough to arrive before the monkey reaches the ground. What happens?",why:"It hits. Without gravity the bullet would stay on the sight line. With gravity, the bullet falls ½gt² below the sight line, and the monkey falls ½gt² below where it started. Same fall, same time. They meet.",opts:[
+ {t:"The bullet hits the monkey.",ok:true},
+ {t:"The bullet goes over the monkey's head.",fb:"The bullet drops below the sight line too. Compare how far each one falls in the same time."},
+ {t:"The bullet goes under the monkey, because the monkey dropped away.",fb:"The bullet also drops. Both fall by ½gt² in the same time."},
+ {t:"It depends on the bullet's speed, so no one can say.",fb:"Speed only needs to be enough to get there in time. The aim does the work."}]},
+{type:"shot",cfg:{
+  controls:[{k:"v0",label:"Bullet speed",unit:"m/s",min:10,max:40,step:1,init:30},{k:"ang",label:"Aim angle",unit:"°",min:0,max:90,step:0.5,init:20}],
+  fixed:{h0:0,g:9.8,drag:0},monkey:{x:40,y:30},ghost:"nograv",sight:true,strobe:0.25,graphs:false,vectors:false,
+  view:{x:[-3,60],y:[0,40]},legend:"Gray: where the bullet would be with no gravity. Dotted lines: how far the bullet and the monkey have each fallen."},
+ tasks:[
+ {text:"Aim the gun so the <b>sight line goes through the monkey</b>, then fire.",cond:{hit:true},hint:"The monkey is 40 m across and 30 m up. tan θ = 30 ÷ 40, so θ is about 37°."},
+ {text:"Hit it again with a <b>slower bullet</b> (26 m/s or less).",cond:{hit:true,v0:[10,26]},hint:"Keep the same aim. Lower the speed to 25 or so."},
+ {text:"Keep the aim and slow the bullet to <b>15 m/s or less</b>. Fire. What goes wrong?",cond:{hit:false,v0:[10,15],ang:[36,38]},hint:"Keep the aim at about 37° and drag the speed slider down to 15 or less."}]},
+{type:"num",q:"The bullet leaves at <b>30 m/s</b>, aimed at 36.9° (so vx = 24 and vy = 18). How high is the bullet when it passes the monkey's 40 m mark? (Use y = vy·t − ½gt².)",ans:16.4,tol:0.4,unit:"m",why:"t = 40 ÷ 24 = 1.667 s. y = 18(1.667) − ½(9.8)(1.667)² = 30.0 − 13.6 = 16.4 m. The monkey, falling for the same 1.667 s, is at 30 − 13.6 = 16.4 m. Same height.",fb:{low:"Find the time to travel 40 m sideways first.",high:"Subtract ½gt². Gravity pulls the bullet down."},fbIf:[{v:30,tol:0.3,t:"30 m is where the sight line crosses the monkey's start. The bullet has fallen below that."}]},
+{type:"mcq",shuffle:true,q:"At 15 m/s the bullet misses. Why?",why:"The bullet is slow. By the time it reaches the 40 m mark, the monkey has already hit the ground, or the bullet has dropped to the ground first. The aim was fine, but the bullet did not arrive in time.",opts:[
+ {t:"The bullet fell to the ground (or the monkey did) before they could meet.",ok:true},
+ {t:"A slow bullet is pulled down by more gravity.",fb:"Gravity is the same for every speed."},
+ {t:"The aim changes when the speed changes.",fb:"The aim stayed the same. Only the speed changed."},
+ {t:"The monkey falls faster than a slow bullet.",fb:"They fall at the same rate. The slow bullet just takes too long to get there."}]},
+{type:"mcq",shuffle:true,q:"Why does the aim-at-the-monkey trick work for <b>any</b> bullet speed that arrives in time?",why:"Gravity pulls the bullet and the monkey down by the same ½gt² in the same time. The bullet always falls exactly as far below the sight line as the monkey has fallen from its branch, so they are at the same spot when the bullet reaches the monkey's distance.",opts:[
+ {t:"Both fall the same amount ½gt² in the same time, so the gap along the sight line closes.",ok:true},
+ {t:"Faster bullets are not affected by gravity.",fb:"Every projectile has the same downward acceleration."},
+ {t:"The monkey stops falling when the bullet is close.",fb:"The monkey falls the whole time."},
+ {t:"It only works for one special speed.",fb:"You hit at 25 m/s and at 30 m/s. Both worked."}]}]},
+
+{tier:2,title:"Other Worlds",sub:"Same kick, different gravity.",blocks:[
+{type:"text",html:"You kick a ball at <b>20 m/s and 45°</b>. On Earth it goes about <b>40.8 m</b> and stays up for <b>2.9 s</b>. Now go to other worlds. Surface gravity: Earth 9.8, Mars 3.71, Moon 1.62, Jupiter 24.8 (all m/s²)."},
+{type:"mcq",predict:true,shuffle:true,q:"On the Moon, g is about <b>1/6</b> of Earth's. The same kick goes how much farther?",why:"About 6 times as far. The sideways speed is unchanged, but the vertical motion is 6 times slower, so the ball stays up 6 times as long. Range = vx × time.",opts:[
+ {t:"About 6 times as far",ok:true},
+ {t:"About 36 times as far",fb:"Time in the air goes up by 6, but vx stays the same. It is not 6 × 6."},
+ {t:"The same distance",fb:"Gravity sets how long the ball stays up. Less gravity, longer in the air."},
+ {t:"About 2.5 times as far",fb:"Think about how the time in the air changes when g divides by 6."}]},
+{type:"shot",cfg:{
+  controls:[{k:"g",label:"World",type:"select",init:9.8,opts:[["Earth (9.8)",9.8],["Mars (3.71)",3.71],["Moon (1.62)",1.62],["Jupiter (24.8)",24.8]]}],
+  fixed:{v0:20,ang:45,h0:0,drag:0},strobe:"auto",speed:2,graphs:true,vectors:true,
+  viewFn:p=>{const S=400/p.g;return{x:[-0.03*S,1.08*S],y:[0,0.56*S]}},
+  legend:"The picture rescales for each world. Read the numbers, not the size of the path."},
+ tasks:[
+ {text:"Kick on <b>Earth</b>.",cond:{g:9.8},hint:"Choose Earth in the list, then Launch."},
+ {text:"Kick on the <b>Moon</b>.",cond:{g:1.62},hint:"Choose Moon, then Launch. It takes a long time, so use Skip or the 4× speed."},
+ {text:"Kick on <b>Jupiter</b>.",cond:{g:24.8},hint:"Choose Jupiter, then Launch."}]},
+{type:"num",q:"Check the Moon with the equation R = v² sin 2θ ÷ g. How far does the 20 m/s, 45° kick go on the Moon (g = 1.62)?",ans:247,tol:3,unit:"m",why:"R = 400 × sin 90° ÷ 1.62 = 247 m. That is 6.05 times the Earth range of 40.8 m.",fb:{low:"Use R = v² sin(2θ) ÷ g with sin 90° = 1.",high:"Use R = v² sin(2θ) ÷ g with sin 90° = 1."}},
+{type:"num",q:"How high does the ball go on <b>Jupiter</b>? (g = 24.8; use vy = 20 sin 45° = 14.1 m/s.)",ans:4.03,tol:0.1,unit:"m",why:"h = vy² ÷ 2g = 200 ÷ 49.6 = 4.03 m.",fb:{low:"Use h = vy² ÷ (2g).",high:"Use h = vy² ÷ (2g)."}},
+{type:"mcq",shuffle:true,q:"On the Moon, astronauts dropped a hammer and a feather together. Both hit the ground at the same time. What does this tell you?",why:"With no air, all objects fall with the same acceleration, whatever their mass. The feather only lags on Earth because of air resistance.",opts:[
+ {t:"Without air, every object falls with the same acceleration.",ok:true},
+ {t:"The Moon has no gravity.",fb:"The Moon has gravity, 1.62 m/s². Things fall, just slowly."},
+ {t:"Feathers are secretly as heavy as hammers.",fb:"The masses are different. Acceleration does not depend on mass."},
+ {t:"The hammer was slowed down on purpose.",fb:"Both fall with g. Nothing was changed."}]}]},
+
+{tier:2,title:"Real World: Air Resistance",sub:"Now turn the air on. What breaks?",blocks:[
+{type:"text",html:"Until now we ignored air. Real air pushes <b>backward</b> on the ball, harder the faster it goes. The <b>Air resistance</b> dial adds that push. At 0 you have the ideal path. At 3 you have something like a light ball hit hard. The speed is locked at <b>30 m/s</b>."},
+{type:"mcq",predict:true,shuffle:true,q:"A ball is hit at 45° with strong air resistance. Compared with the no-air path, the real path:",why:"The real path is shorter, lower and steeper on the way down. Air takes speed away, so the ball goes less far, and it cannot hold its sideways speed for the whole flight.",opts:[
+ {t:"Is shorter, lower, and comes down more steeply.",ok:true},
+ {t:"Goes the same distance but is lower.",fb:"Air slows the sideways motion too, so the range drops."},
+ {t:"Goes farther because the air holds it up.",fb:"Air resistance always opposes the motion. It slows the ball."},
+ {t:"Is the same path, because gravity does not change.",fb:"Gravity is the same, but the air adds a second force."}]},
+{type:"shot",cfg:{
+  controls:[{k:"ang",label:"Launch angle",unit:"°",min:5,max:85,step:0.5,init:45},{k:"drag",label:"Air resistance",unit:"",min:0,max:5,step:0.5,init:0}],
+  fixed:{v0:30,h0:0,g:9.8},strobe:0.5,graphs:true,vectors:true,keep:true,
+  view:{x:[-3,98],y:[0,50]},legend:"Watch the blue vx graph and the dots. Old paths stay faint for comparison."},
+ tasks:[
+ {text:"Air resistance <b>0</b>, angle <b>45°</b>. Launch. Note the range.",cond:{drag:0,ang:45},hint:"Set the air resistance dial to 0 and the angle to 45°."},
+ {text:"Now air resistance <b>3</b>, same angle. Launch. Compare.",cond:{drag:3,ang:45},hint:"Set the air resistance to 3, leave the angle at 45°."},
+ {text:"With air resistance <b>3</b>, find an angle that beats your 45° shot: a range of at least <b>52.3 m</b>.",cond:{drag:3,R:[52.3,500]},hint:"Your 45° shot went about 52.1 m. Try something lower, in the high 30s or low 40s."}]},
+{type:"mcq",shuffle:true,q:"With air resistance, what happens to the <b>horizontal velocity vx</b> during the flight? (Check the blue graph at drag 3.)",why:"vx shrinks. Air pushes backward, so there is now a sideways acceleration. The flat vx line from Part 1 only works with no air.",opts:[
+ {t:"It decreases the whole way",ok:true},
+ {t:"It stays constant",fb:"That was the no-air rule. Look at the blue graph at drag 3."},
+ {t:"It increases as the ball falls",fb:"Air only opposes the motion."},
+ {t:"It becomes zero at the top",fb:"It decreases steadily, but the ball is still moving sideways at the top."}]},
+{type:"mcq",shuffle:true,q:"With air resistance, the best angle for the longest range is:",why:"Less than 45°. Air resistance punishes time spent up high at high speed, so a flatter shot does better. (With no air it is exactly 45°.)",opts:[
+ {t:"A bit less than 45°",ok:true},
+ {t:"Exactly 45°",fb:"That is the no-air result. You just found a better angle in the sim."},
+ {t:"A bit more than 45°",fb:"You found longer shots at angles below 45° in the sim."},
+ {t:"It depends only on the ball's mass",fb:"For a given ball, the best angle is a property of the motion, not just mass."}]},
+{type:"mcq",shuffle:true,q:"At drag 3 and 45°, compare the <b>time rising</b> to the <b>time falling</b>. (Use “Time to peak” and “Time in the air”.)",why:"Rising takes 1.7 s but falling takes 1.9 s. Going up, air and gravity both slow the ball (shorter climb). Coming down, air pushes against gravity (slower fall). With no air the two times are equal.",opts:[
+ {t:"Falling takes longer than rising.",ok:true},
+ {t:"Rising takes longer than falling.",fb:"Check the numbers: time to peak is shorter than the rest of the flight."},
+ {t:"They are equal, just like with no air.",fb:"They were equal only for drag 0. Compare the drag-3 numbers."},
+ {t:"Both are zero.",fb:"Check the readouts."}]},
+{type:"mcq",shuffle:true,q:"Air resistance barely matters for a <b>shot put</b> but matters a lot for a <b>badminton shuttle</b>. Why?",why:"For a small, dense, heavy ball the air force is tiny compared with its weight. A shuttle is light and has a big, feathery shape, so the air force is large compared with its weight.",opts:[
+ {t:"The air force is tiny compared with the shot's weight, but large compared with the shuttle's.",ok:true},
+ {t:"There is no air near a shot put.",fb:"The air is the same. What differs is how big the air force is compared with the weight."},
+ {t:"Gravity is stronger on the shot put.",fb:"g is the same for both."},
+ {t:"The shuttle is made of different atoms.",fb:"It is about weight and shape, not which atoms."}]}]}
+]};
+</script>
+<script>
+"use strict";
+const $=(s,r)=>(r||document).querySelector(s);
+function h(tag,attrs,...kids){const e=document.createElement(tag);for(const k in(attrs||{})){if(k==="class")e.className=attrs[k];else if(k==="html")e.innerHTML=attrs[k];else if(k.startsWith("on"))e.addEventListener(k.slice(2),attrs[k]);else e.setAttribute(k,attrs[k])}kids.flat().forEach(c=>{if(c==null)return;e.append(c.nodeType?c:document.createTextNode(c))});return e}
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const PREVIEW=/preview/.test(location.hash);
+const KEYVIEW=/key/.test(location.hash);
+
+/* ---------- global state ---------- */
+const ST={name:"",t0:0,q:0,qFirst:0,retries:0,tasks:0,tasksDone:0,partIdx:0,partsDone:[]};
+let inProgress=false;
+window.addEventListener("beforeunload",e=>{if(inProgress){e.preventDefault();e.returnValue=""}});
+function fmtT(s){s=Math.floor(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+setInterval(()=>{if(ST.t0)$("#clock").textContent="⏱ "+fmtT((Date.now()-ST.t0)/1000)},1000);
+
+/* ---------- physics ---------- */
+const DT=0.005;
+function simulate(p){
+  const k=(p.drag||0)*0.004,g=p.g,a=p.ang*Math.PI/180;
+  let x=0,y=p.h0,vx=p.v0*Math.cos(a),vy=p.v0*Math.sin(a);
+  const t=[0],X=[x],Y=[y],VX=[vx],VY=[vy];
+  const acc=(u,w)=>{const s=Math.hypot(u,w);return[-k*s*u,-g-k*s*w]};
+  for(let n=0;n<40000;n++){
+    const[a1x,a1y]=acc(vx,vy);
+    const v2x=vx+a1x*DT/2,v2y=vy+a1y*DT/2,[a2x,a2y]=acc(v2x,v2y);
+    const v3x=vx+a2x*DT/2,v3y=vy+a2y*DT/2,[a3x,a3y]=acc(v3x,v3y);
+    const v4x=vx+a3x*DT,v4y=vy+a3y*DT,[a4x,a4y]=acc(v4x,v4y);
+    const nx=x+DT/6*(vx+2*v2x+2*v3x+v4x),ny=y+DT/6*(vy+2*v2y+2*v3y+v4y);
+    const nvx=vx+DT/6*(a1x+2*a2x+2*a3x+a4x),nvy=vy+DT/6*(a1y+2*a2y+2*a3y+a4y);
+    if(ny<0){
+      const f=y>0?y/(y-ny):0;
+      t.push(t[t.length-1]+f*DT);X.push(x+f*(nx-x));Y.push(0);VX.push(vx+f*(nvx-vx));VY.push(vy+f*(nvy-vy));break;
+    }
+    x=nx;y=ny;vx=nvx;vy=nvy;t.push((n+1)*DT);X.push(x);Y.push(y);VX.push(vx);VY.push(vy);
+  }
+  return{t,x:X,y:Y,vx:VX,vy:VY};
+}
+const MONKEY_R=2;
+function analyse(p,tgt,monkey){
+  const s=simulate(p),n=s.t.length;
+  let H=0,ip=0;for(let i=0;i<n;i++)if(s.y[i]>H){H=s.y[i];ip=i}
+  const R=s.x[n-1];
+  const res={v0:p.v0,ang:p.ang,h0:p.h0,g:p.g,drag:p.drag,T:s.t[n-1],R,H,tpk:s.t[ip],vimp:Math.hypot(s.vx[n-1],s.vy[n-1]),hit:null,miss:null,hitIdx:-1,predErr:null};
+  if(tgt){res.hit=Math.abs(R-tgt.x)<=tgt.w;res.miss=Math.max(0,Math.abs(R-tgt.x)-tgt.w)}
+  if(monkey){
+    let best=1e9;res.hit=false;
+    for(let i=0;i<n;i++){
+      const ym=Math.max(0,monkey.y-0.5*p.g*s.t[i]*s.t[i]);
+      const d=Math.hypot(s.x[i]-monkey.x,s.y[i]-ym);
+      if(d<best)best=d;
+      if(d<=MONKEY_R){res.hit=true;res.hitIdx=i;break}
+    }
+    res.miss=res.hit?0:Math.max(0,best-MONKEY_R);
+  }
+  s.res=res;return s;
+}
+const metCond=(c,r)=>Object.keys(c).every(k=>{
+  const want=c[k],got=r[k];
+  if(got==null)return false;
+  if(Array.isArray(want))return got>=want[0]-1e-9&&got<=want[1]+1e-9;
+  if(typeof want==="boolean")return got===want;
+  return Math.abs(got-want)<1e-6;
+});
+
+/* ---------- little graph thumbnails for answer choices ---------- */
+const THUMB={flatPos:"M8,18 L92,18",flatZero:"M8,35 L92,35",downCross:"M8,12 L92,58",downZero:"M8,35 L92,62",upLine:"M8,58 L92,12",upZero:"M8,35 L92,8",arcUp:"M8,58 Q50,-12 92,58",arcDown:"M8,12 Q50,82 92,12"};
+const thumb=k=>`<svg viewBox="0 0 100 70" width="110" height="77" style="margin-right:12px;background:#fff;border:1px solid #ddd" aria-hidden="true"><line x1="8" y1="35" x2="94" y2="35" stroke="#999"/><line x1="8" y1="4" x2="8" y2="66" stroke="#999"/><path d="${THUMB[k]}" fill="none" stroke="#17777A" stroke-width="3"/></svg>`;
+
+/* ---------- blocks ---------- */
+const BLOCK={};
+BLOCK.text=(b,done)=>{done();return h("div",{class:"card text",html:b.html})};
+BLOCK.talk=(b,done)=>{done();return h("div",{class:"card talk",html:"💬 <b>30-second talk (optional).</b> "+b.html})};
+
+BLOCK.mcq=(b,done)=>{
+  const opts=b.shuffle===false?b.opts:shuffle(b.opts);let wrong=0,fin=false;
+  const fbox=h("div");const card=h("div",{class:"card"});
+  card.append(h("div",{class:"q",html:(b.predict?'<span class="tag">PREDICT</span>':"")+b.q}));
+  opts.forEach(o=>{
+    const btn=h("button",{class:"opt",html:(o.thumb?thumb(o.thumb):"")+(o.t||"")});
+    btn.addEventListener("click",()=>{
+      if(fin)return;
+      if(o.ok){fin=true;btn.classList.add("ok");card.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+        fbox.replaceChildren(h("div",{class:"fb ok",html:"✔ <b>Yes.</b> "+b.why}));
+        ST.q++;if(wrong===0)ST.qFirst++;done()}
+      else{wrong++;ST.retries++;btn.classList.add("no");btn.disabled=true;
+        fbox.replaceChildren(h("div",{class:"fb no",html:"✖ "+(o.fb||"Not quite. Try another.")}))}
+    });
+    card.append(btn);
+  });
+  card.append(fbox);
+  if(PREVIEW)card.append(h("button",{class:"skip",onclick:()=>{if(fin)return;fin=true;ST.q++;ST.qFirst++;card.querySelectorAll(".opt").forEach(x=>x.disabled=true);done()}},"skip (preview)"));
+  card._qa={solve:()=>{const i=opts.findIndex(o=>o.ok);card.querySelectorAll(".opt")[i].click()},wrongFirst:()=>{const i=opts.findIndex(o=>!o.ok);card.querySelectorAll(".opt")[i].click()}};
+  return card;
+};
+
+BLOCK.num=(b,done)=>{
+  let wrong=0,fin=false;const answers=[].concat(b.ans);
+  const inp=h("input",{type:"number",step:"any",inputmode:"decimal","aria-label":"answer"}),res=h("div");
+  const chk=h("button",{class:"btn"},"Check");
+  const go=()=>{
+    if(fin)return;const v=parseFloat(inp.value);if(isNaN(v)){inp.focus();return}
+    if(answers.some(a=>Math.abs(v-a)<=b.tol)){fin=true;inp.disabled=true;chk.disabled=true;res.replaceChildren(h("div",{class:"fb ok",html:"✔ <b>Yes.</b> "+b.why}));ST.q++;if(!wrong)ST.qFirst++;done()}
+    else{wrong++;ST.retries++;const f=(b.fb&&(v<answers[0]?b.fb.low:b.fb.high))||"Not yet. Check your sketch and try again.";
+      const extra=b.fbIf&&b.fbIf.find(x=>Math.abs(v-x.v)<=(x.tol||0.02*Math.abs(x.v)+0.01));res.replaceChildren(h("div",{class:"fb no",html:"✖ "+(extra?extra.t:f)}))}
+  };
+  chk.addEventListener("click",go);inp.addEventListener("keydown",e=>{if(e.key==="Enter")go()});
+  const card=h("div",{class:"card"},h("div",{class:"q",html:b.q}),h("div",{class:"row"},inp,h("span",{},b.unit||""),chk),res);
+  if(PREVIEW)card.append(h("button",{class:"skip",onclick:()=>{if(fin)return;fin=true;ST.q++;ST.qFirst++;done()}},"skip (preview)"));
+  card._qa={answer:v=>{inp.value=v;chk.click()},solve:()=>{inp.value=answers[0];chk.click()}};return card;
+};
+
+BLOCK.rows=(b,done)=>{
+  const card=h("div",{class:"card"});card.append(h("div",{class:"q",html:b.q}));
+  let left=b.rows.length;
+  const btns=[];
+  b.rows.forEach(r=>{
+    let wrong=0,fin=false;const fbox=h("div"),wrap=h("div",{class:"opts"});
+    r.opts.forEach((t,i)=>{
+      const btn=h("button",{class:"opt"},t);
+      btn.addEventListener("click",()=>{
+        if(fin)return;
+        if(i===r.ans){fin=true;btn.classList.add("ok");wrap.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+          fbox.replaceChildren(h("div",{class:"fb ok",html:"✔ "+r.why}));ST.q++;if(!wrong)ST.qFirst++;if(--left===0)done()}
+        else{wrong++;ST.retries++;btn.classList.add("no");btn.disabled=true;fbox.replaceChildren(h("div",{class:"fb no",html:"✖ "+((r.fb&&r.fb[i])||"Not quite. Try another.")}))}
+      });
+      wrap.append(btn);btns.push([btn,i===r.ans]);
+    });
+    card.append(h("div",{class:"rowq"},h("div",{html:"<b>"+r.q+"</b>"}),wrap,fbox));
+  });
+  if(PREVIEW)card.append(h("button",{class:"skip",onclick:()=>btns.filter(x=>x[1]).forEach(x=>x[0].click())},"skip (preview)"));
+  card._qa={solve:()=>btns.filter(x=>x[1]).forEach(x=>x[0].click())};
+  return card;
+};
+
+/* ---------- the launcher simulation ---------- */
+const niceStep=(range,maxN)=>{const raw=range/maxN,p=Math.pow(10,Math.floor(Math.log10(raw)));for(const m of[1,2,5,10])if(m*p>=raw)return m*p;return 10*p};
+const niceCeil=v=>{const p=Math.pow(10,Math.floor(Math.log10(v)));for(const m of[1,2,2.5,5,10])if(m*p>=v)return m*p;return 10*p};
+const TASKS=(b,ti)=>b.tasks.map((t,i)=>{const st=i<ti?"done":i===ti?"cur":"wait";return h("li",{class:st},h("span",{class:"tk"},st==="done"?"✅":st==="cur"?"👉":"🔒"),h("div",{html:t.text}))});
+function flashIn(box,msg){const f=h("div",{class:"fb ok"},msg);box.replaceChildren(f);setTimeout(()=>{if(f.parentNode)f.remove()},1800)}
+const C_X="#1B3A57",C_Y="#2E8B57",C_V="#E8833A";
+
+BLOCK.shot=(b,done)=>{
+  const C=b.cfg;let ti=0,anim=null,last=null,keep=[],pred=null,lastPred=null,msgState="";
+  const P=Object.assign({v0:20,ang:45,h0:0,g:9.8,drag:0},C.fixed||{});
+  C.controls.forEach(c=>P[c.k]=c.init);
+  const T=()=>b.tasks[Math.min(ti,b.tasks.length-1)];
+  const view=()=>{const t=T();if(t.view)return t.view;if(C.viewFn)return C.viewFn(P);return C.view};
+  const tgtC=()=>{const t=T();return t.tgt!==undefined?t.tgt:C.tgt};
+  const monC=()=>{const t=T();return t.monkey!==undefined?t.monkey:C.monkey};
+
+  const cv=h("canvas",{role:"img","aria-label":"Projectile simulation"}),stage=h("div",{class:"stage"},cv);
+  const gcv=C.graphs?h("canvas",{role:"img","aria-label":"Velocity graphs"}):null;
+  const gwrap=gcv?h("div",{class:"stage gwrap"},gcv):null;
+  const live=h("div",{class:"stats"}),resBox=h("div",{class:"stats"}),msgBox=h("div"),hintBox=h("div"),list=h("ol",{class:"tasks"});
+  const ctl={};const ctlRows=[];
+  C.controls.forEach(c=>{
+    const val=h("div",{class:"val"});let inp;
+    if(c.type==="select"){inp=h("select",{"aria-label":c.label});c.opts.forEach(([lab,v])=>inp.append(h("option",{value:v},lab)));inp.value=c.init}
+    else{inp=h("input",{type:"range",min:c.min,max:c.max,step:c.step,"aria-label":c.label});inp.value=c.init}
+    const row=h("div",{class:"range"},h("b",{},c.label),inp,val);
+    const show=()=>{val.textContent=c.type==="select"?"":(+inp.value)+" "+c.unit};
+    inp.addEventListener("input",()=>{P[c.k]=+inp.value;show();if(!anim){if(C.viewFn)layout();draw(last?last.res.T:0)}});
+    show();ctl[c.k]={inp,row,show};ctlRows.push(row);
+  });
+  const setP=(k,v)=>{P[k]=v;if(ctl[k]){ctl[k].inp.value=v;ctl[k].show()}};
+
+  const speedSel=h("select",{"aria-label":"playback speed"},...[["½×",.5],["1×",1],["2×",2],["4×",4]].map(([l,v])=>h("option",{value:v},l)));speedSel.value=C.speed||1;
+  const strobeCk=h("input",{type:"checkbox","aria-label":"strobe dots"}),keepCk=h("input",{type:"checkbox","aria-label":"keep old paths"});
+  strobeCk.checked=C.strobe!==0;keepCk.checked=C.keep!==false;
+  strobeCk.addEventListener("change",()=>draw(anim?anim.t:(last?last.res.T:0)));keepCk.addEventListener("change",()=>{if(!keepCk.checked)keep=[];draw(anim?anim.t:(last?last.res.T:0))});
+  const fireBtn=h("button",{class:"btn go",onclick:()=>fire()},"🚀 Launch"),skipBtn=h("button",{class:"btn ghost",disabled:"",onclick:()=>skip()},"Skip ⏭"),resetBtn=h("button",{class:"btn ghost",onclick:()=>reset()},"Clear");
+  const predInp=h("input",{type:"number",step:"any",inputmode:"decimal","aria-label":"predicted landing distance"});
+  const predRow=h("div",{class:"predrow",style:"display:none"},h("b",{},"🔮 Your guess: lands"),predInp,h("span",{},"m from the cannon"),h("span",{class:"leg"},"(type it, or click the ground in the picture)"));
+  predInp.addEventListener("input",()=>{const v=parseFloat(predInp.value);pred=isNaN(v)?null:v;draw(last?last.res.T:0)});
+
+  let L=null;
+  function layout(){
+    const dpr=window.devicePixelRatio||1,w=Math.max(280,stage.clientWidth||700),V=view();
+    const xr=V.x[1]-V.x[0],yr=V.y[1]-V.y[0],asp=Math.min(3.4,Math.max(1.8,xr/yr));
+    const hp=Math.max(200,Math.round(w/asp));cv.style.height=hp+"px";cv.width=Math.round(w*dpr);cv.height=Math.round(hp*dpr);
+    L={w,hp,dpr,ml:38,mb:26,mt:10,mr:12};L.pw=w-L.ml-L.mr;L.ph=hp-L.mt-L.mb;L.s=Math.min(L.pw/xr,L.ph/yr);L.V=V;
+    L.X=x=>L.ml+(x-V.x[0])*L.s;L.Y=y=>hp-L.mb-(y-V.y[0])*L.s;L.inv=px=>V.x[0]+(px-L.ml)/L.s;
+    if(gcv){const gw=Math.max(280,gwrap.clientWidth||700),gh=gw<520?260:150;gcv.style.height=gh+"px";gcv.width=Math.round(gw*dpr);gcv.height=Math.round(gh*dpr);L.gw=gw;L.gh=gh}
+  }
+  function arrow(c,x0,y0,dx,dy,col,label){
+    const len=Math.hypot(dx,dy);if(len<3)return;
+    c.strokeStyle=col;c.fillStyle=col;c.lineWidth=2.5;c.beginPath();c.moveTo(x0,y0);c.lineTo(x0+dx,y0+dy);c.stroke();
+    const a=Math.atan2(dy,dx),hs=Math.min(9,len/2);c.beginPath();c.moveTo(x0+dx,y0+dy);c.lineTo(x0+dx-hs*Math.cos(a-.45),y0+dy-hs*Math.sin(a-.45));c.lineTo(x0+dx-hs*Math.cos(a+.45),y0+dy-hs*Math.sin(a+.45));c.closePath();c.fill();
+    if(label){c.font="bold 13px Arial";c.fillText(label,x0+dx+(dx>=0?5:-5-c.measureText(label).width),y0+dy+(dy>0?14:-5))}
+  }
+  function monkeyDraw(c,px,py){
+    c.fillStyle="#8b5a2b";c.beginPath();c.arc(px,py,10,0,7);c.fill();
+    c.beginPath();c.arc(px-10,py-2,4,0,7);c.arc(px+10,py-2,4,0,7);c.fill();
+    c.fillStyle="#e8c9a0";c.beginPath();c.arc(px,py+2,6.5,0,7);c.fill();
+    c.fillStyle="#222";c.beginPath();c.arc(px-3,py-1,1.5,0,7);c.arc(px+3,py-1,1.5,0,7);c.fill();
+  }
+  const idx=(s,t)=>Math.min(s.t.length-1,Math.max(0,Math.floor(t/DT+1e-9)));
+  function draw(tNow){
+    if(!L)layout();
+    const c=cv.getContext("2d"),V=L.V,{X,Y}=L;
+    c.setTransform(L.dpr,0,0,L.dpr,0,0);c.clearRect(0,0,L.w,L.hp);
+    c.fillStyle="#F7FCFC";c.fillRect(0,0,L.w,L.hp);
+    const sx=niceStep(V.x[1]-V.x[0],9),sy=niceStep(V.y[1]-V.y[0],5);
+    c.font="12px Arial";c.fillStyle="#5a6b6b";c.strokeStyle="#e3eeee";c.lineWidth=1;c.textAlign="center";
+    for(let x=Math.ceil(V.x[0]/sx)*sx;x<=V.x[1]+1e-9;x+=sx){c.beginPath();c.moveTo(X(x),L.mt);c.lineTo(X(x),Y(0));c.stroke();c.fillText(String(Math.round(x*100)/100),X(x),L.hp-8)}
+    c.textAlign="right";
+    for(let y=Math.max(0,Math.ceil(V.y[0]/sy)*sy);y<=V.y[1]+1e-9;y+=sy){c.beginPath();c.moveTo(L.ml,Y(y));c.lineTo(L.w-L.mr,Y(y));c.stroke();c.fillText(String(Math.round(y*100)/100),L.ml-5,Y(y)+4)}
+    c.textAlign="left";c.fillText("m",L.w-L.mr-12,L.hp-8);
+    c.fillStyle="#d9e8d0";c.fillRect(L.ml,Y(0),L.pw,L.mb-14);c.strokeStyle="#6a8a5a";c.lineWidth=2;c.beginPath();c.moveTo(L.ml,Y(0));c.lineTo(L.w-L.mr,Y(0));c.stroke();
+    if(P.h0>0){c.fillStyle="#cfd8dc";c.strokeStyle="#78909c";c.lineWidth=2;c.fillRect(L.ml,Y(P.h0),X(0)-L.ml,Y(0)-Y(P.h0));c.strokeRect(L.ml,Y(P.h0),X(0)-L.ml,Y(0)-Y(P.h0))}
+    const tg=tgtC(),mk=monC();
+    if(tg){const x0=X(tg.x-tg.w),x1=X(tg.x+tg.w);c.fillStyle="#C0392B";c.fillRect(x0,Y(0)-7,x1-x0,7);c.fillStyle="#fff";c.fillRect(X(tg.x)-(x1-x0)/6,Y(0)-7,(x1-x0)/3,7);c.fillStyle="#C0392B";c.font="bold 12px Arial";c.textAlign="center";c.fillText("target",X(tg.x),Y(0)-12);c.textAlign="left"}
+    if(mk){c.strokeStyle="#6b4a2b";c.lineWidth=5;c.beginPath();c.moveTo(X(mk.x-3),Y(mk.y)-14);c.lineTo(X(mk.x+3),Y(mk.y)-14);c.stroke()}
+    if(C.sight){c.strokeStyle="rgba(232,131,58,.55)";c.lineWidth=1.5;c.setLineDash([6,5]);const a=P.ang*Math.PI/180,far=(V.x[1]-0)*2;c.beginPath();c.moveTo(X(0),Y(P.h0));c.lineTo(X(Math.cos(a)*far),Y(P.h0+Math.sin(a)*far));c.stroke();c.setLineDash([])}
+    keep.forEach((k,i)=>{c.strokeStyle="rgba(23,119,122,"+(.22+.06*i)+")";c.lineWidth=2;c.setLineDash([5,4]);c.beginPath();k.forEach((p,j)=>j?c.lineTo(X(p[0]),Y(p[1])):c.moveTo(X(p[0]),Y(p[1])));c.stroke();c.setLineDash([])});
+    const s=last,i=s?idx(s,tNow):0;
+    if(s){
+      const r=s.res,vx0=r.v0*Math.cos(r.ang*Math.PI/180),vy0=r.v0*Math.sin(r.ang*Math.PI/180);
+      if(strobeCk.checked){
+        const dtS=C.strobe==="auto"?r.T/12:(C.strobe||0.25);
+        for(let k=0;k*dtS<=tNow+1e-9;k++){
+          const tk=k*dtS,j=Math.min(s.t.length-1,Math.round(tk/DT));if(tk>s.t[s.t.length-1])break;
+          const px=X(s.x[j]),py=Y(s.y[j]);
+          if(C.ghost==="drop"){const gy=Math.max(0,r.h0-0.5*r.g*tk*tk);c.strokeStyle="rgba(120,120,120,.45)";c.lineWidth=1;c.setLineDash([3,3]);c.beginPath();c.moveTo(X(0),Y(gy));c.lineTo(px,py);c.stroke();c.setLineDash([]);c.strokeStyle="#777";c.lineWidth=2;c.beginPath();c.arc(X(0),Y(gy),5,0,7);c.stroke()}
+          if(C.ghost==="nograv"){const gx=vx0*tk,gy=r.h0+vy0*tk;c.strokeStyle="rgba(192,57,43,.5)";c.lineWidth=1.5;c.setLineDash([3,3]);c.beginPath();c.moveTo(X(gx),Y(gy));c.lineTo(px,py);c.stroke();c.setLineDash([]);c.strokeStyle="#777";c.lineWidth=2;c.beginPath();c.arc(X(gx),Y(gy),5,0,7);c.stroke()}
+          if(mk){const my=Math.max(0,mk.y-0.5*r.g*tk*tk);c.strokeStyle="rgba(107,74,43,.6)";c.lineWidth=1.5;c.setLineDash([3,3]);c.beginPath();c.moveTo(X(mk.x)+14,Y(mk.y));c.lineTo(X(mk.x)+14,Y(my));c.stroke();c.setLineDash([]);c.strokeStyle="#6b4a2b";c.beginPath();c.arc(X(mk.x),Y(my),4,0,7);c.stroke()}
+          c.strokeStyle=C_V;c.lineWidth=2;c.beginPath();c.arc(px,py,5,0,7);c.stroke();
+        }
+      }
+      c.strokeStyle="rgba(232,131,58,.85)";c.lineWidth=2.5;c.beginPath();for(let j=0;j<=i;j+=2){j?c.lineTo(X(s.x[j]),Y(s.y[j])):c.moveTo(X(s.x[j]),Y(s.y[j]))}c.lineTo(X(s.x[i]),Y(s.y[i]));c.stroke();
+      if(C.ghost==="drop"){const gy=Math.max(0,r.h0-0.5*r.g*tNow*tNow);c.fillStyle="#888";c.beginPath();c.arc(X(0),Y(gy),7,0,7);c.fill()}
+      if(C.ghost==="nograv"){c.fillStyle="rgba(120,120,120,.6)";c.beginPath();c.arc(X(vx0*tNow),Y(r.h0+vy0*tNow),6,0,7);c.fill()}
+      if(mk){const myT=mk.y-0.5*r.g*tNow*tNow;const hitEnd=r.hit&&r.hitIdx>=0&&i>=r.hitIdx;monkeyDraw(c,X(mk.x),Y(hitEnd?Math.max(0,mk.y-0.5*r.g*s.t[r.hitIdx]*s.t[r.hitIdx]):Math.max(0,myT)))}
+      c.fillStyle=C_V;c.beginPath();c.arc(X(s.x[i]),Y(s.y[i]),7,0,7);c.fill();c.strokeStyle="#fff";c.lineWidth=2;c.stroke();
+      if(C.vectors){const k=Math.min(L.pw,L.ph*2.2)*0.012;
+        c.lineWidth=2.5;arrow(c,X(s.x[i]),Y(s.y[i]),s.vx[i]*k,-s.vy[i]*k,C_V,"v");
+        c.fillStyle=C_X;arrow(c,X(s.x[i]),Y(s.y[i]),s.vx[i]*k,0,C_X,"vx");
+        c.fillStyle=C_Y;arrow(c,X(s.x[i]),Y(s.y[i]),0,-s.vy[i]*k,C_Y,"vy")}
+      if(r.hit&&tNow>=(r.hitIdx>=0?s.t[r.hitIdx]:s.t[s.t.length-1])-1e-9&&(r.hitIdx>=0||tg)){c.fillStyle="rgba(46,139,87,.9)";c.font="bold 18px Arial";c.textAlign="center";c.fillText("HIT!",X(s.x[i]),Y(s.y[i])-16);c.textAlign="left"}
+    }
+    if(C.init&&!anim&&(!last||!C.vectorsAfter)){
+      const a=P.ang*Math.PI/180,k=Math.min(L.pw,L.ph*2.2)*0.012,ox=X(0),oy=Y(P.h0),vx=P.v0*Math.cos(a),vy=P.v0*Math.sin(a);
+      c.setLineDash([4,3]);arrow(c,ox,oy,vx*k,-vy*k,C_V,"v₀");c.setLineDash([]);arrow(c,ox,oy,vx*k,0,C_X,"vx = "+vx.toFixed(1));arrow(c,ox,oy,0,-vy*k,C_Y,"vy = "+vy.toFixed(1));
+    }
+    {const a=P.ang*Math.PI/180;c.strokeStyle="#333";c.lineWidth=6;c.lineCap="round";c.beginPath();c.moveTo(X(0),Y(P.h0));c.lineTo(X(0)+Math.cos(a)*22,Y(P.h0)-Math.sin(a)*22);c.stroke();c.lineCap="butt";c.fillStyle="#555";c.beginPath();c.arc(X(0),Y(P.h0),6,0,7);c.fill()}
+    const pg=pred!=null?pred:(last&&lastPred!=null?lastPred:null);
+    if(pg!=null){c.fillStyle="#7B3FA0";c.beginPath();c.moveTo(X(pg),Y(0));c.lineTo(X(pg)-7,Y(0)-16);c.lineTo(X(pg)+7,Y(0)-16);c.closePath();c.fill();c.font="bold 12px Arial";c.textAlign="center";c.fillText("guess",X(pg),Y(0)-20);c.textAlign="left"}
+    liveUpdate(tNow);drawGraphs(tNow);
+  }
+  function drawGraphs(tNow){
+    if(!gcv)return;const c=gcv.getContext("2d"),dpr=L.dpr,w=L.gw,hh=L.gh;c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,hh);c.fillStyle="#fff";c.fillRect(0,0,w,hh);
+    const narrow=w<520,pw=narrow?w-70:(w-90)/2,ph=narrow?(hh-70)/2:hh-44;
+    const panels=[{t:"Horizontal velocity vx (m/s)",k:"vx",col:C_X,x0:44,y0:narrow?22:24},{t:"Vertical velocity vy (m/s)",k:"vy",col:C_Y,x0:narrow?44:44+pw+34,y0:narrow?22+ph+34:24}];
+    let vm=10,Tm=1;if(last){const r=last.res;vm=niceCeil(Math.max(...last.vx.map(Math.abs),...last.vy.map(Math.abs))*1.05);Tm=r.T}
+    panels.forEach(p=>{
+      c.fillStyle="#333";c.font="bold 13px Arial";c.textAlign="left";c.fillText(p.t,p.x0,p.y0-8);
+      c.strokeStyle="#ccc";c.lineWidth=1;c.strokeRect(p.x0,p.y0,pw,ph);c.strokeStyle="#999";c.beginPath();c.moveTo(p.x0,p.y0+ph/2);c.lineTo(p.x0+pw,p.y0+ph/2);c.stroke();
+      c.fillStyle="#666";c.font="11px Arial";c.textAlign="right";c.fillText("+"+vm,p.x0-4,p.y0+9);c.fillText("0",p.x0-4,p.y0+ph/2+4);c.fillText("−"+vm,p.x0-4,p.y0+ph);
+      c.textAlign="center";c.fillText("0",p.x0,p.y0+ph+13);c.fillText(last?Tm.toFixed(1)+" s":"time",p.x0+pw,p.y0+ph+13);
+      if(!last){c.fillStyle="#999";c.font="14px Arial";c.fillText("Launch to draw the graph",p.x0+pw/2,p.y0+ph/2-8);return}
+      const i=idx(last,tNow);c.strokeStyle=p.col;c.lineWidth=3;c.beginPath();
+      for(let j=0;j<=i;j+=2){const x=p.x0+last.t[j]/Tm*pw,y=p.y0+ph/2-last[p.k][j]/vm*ph/2;j?c.lineTo(x,y):c.moveTo(x,y)}
+      {const x=p.x0+last.t[i]/Tm*pw,y=p.y0+ph/2-last[p.k][i]/vm*ph/2;c.lineTo(x,y);c.stroke();c.fillStyle=p.col;c.beginPath();c.arc(x,y,4.5,0,7);c.fill()}
+    });
+  }
+  function liveUpdate(tNow){
+    if(!last){live.replaceChildren(h("span",{class:"pill live"},"Set up your launch, then press Launch."));return}
+    const i=idx(last,tNow),s=last,sp=Math.hypot(s.vx[i],s.vy[i]);
+    live.replaceChildren(...[["time",s.t[i].toFixed(2),"s"],["x",s.x[i].toFixed(1),"m"],["height",s.y[i].toFixed(1),"m"],["vx",s.vx[i].toFixed(1),"m/s"],["vy",s.vy[i].toFixed(1),"m/s"],["speed",sp.toFixed(1),"m/s"]].map(([a,v,u])=>h("span",{class:"pill live"},a+" = "+v+" ",h("small",{},u))));
+  }
+  function setLocks(){const t=T(),lk=t.lock||[];Object.keys(ctl).forEach(k=>{const l=lk.includes(k);ctl[k].inp.disabled=l||!!anim;ctl[k].row.classList.toggle("lock",l)})}
+  function activate(i,fresh){
+    ti=i;const t=b.tasks[i];hintBox.replaceChildren();
+    if(t.set)Object.keys(t.set).forEach(k=>setP(k,t.set[k]));
+    if(fresh||t.view||t.tgt!==undefined||t.monkey!==undefined){last=null;keep=[];resBox.replaceChildren();msgBox.replaceChildren()}
+    list.replaceChildren(...TASKS(b,ti));predRow.style.display=t.predict?"flex":"none";stage.classList.toggle("pick",!!t.predict);
+    pred=null;predInp.value="";setLocks();layout();draw(last?last.res.T:0);
+  }
+  function fire(opts){
+    if(anim)return;
+    const tg=tgtC(),mk=monC();
+    if(last&&keepCk.checked){keep.push(last.x.filter((_,j)=>j%6===0||j===last.x.length-1).map((x,j)=>[x,last.y[Math.min(last.y.length-1,j*6)]]));keep=keep.slice(-5)}
+    last=analyse(Object.assign({},P),tg,mk);
+    if(pred!=null){last.res.predErr=Math.abs(pred-last.res.R)}
+    lastPred=pred;resBox.replaceChildren();msgBox.replaceChildren();hintBox.replaceChildren();
+    const end=last.res.hitIdx>=0?last.t[last.res.hitIdx]:last.res.T;
+    anim={t:0,end,prev:0,id:0};skipBtn.disabled=false;fireBtn.disabled=true;setLocks();
+    if(opts&&opts.instant){skip();return}
+    const frame=ts=>{
+      if(!anim)return;if(!anim.prev)anim.prev=ts;
+      anim.t+=Math.min(0.1,(ts-anim.prev)/1000)*(+speedSel.value);anim.prev=ts;
+      if(anim.t>=anim.end){skip();return}
+      draw(anim.t);anim.id=requestAnimationFrame(frame);
+    };
+    anim.id=requestAnimationFrame(frame);draw(0);
+  }
+  function skip(){if(!anim)return;cancelAnimationFrame(anim.id);const e=anim.end;anim=null;draw(e);finish(e)}
+  function reset(){if(anim)return;last=null;keep=[];lastPred=null;resBox.replaceChildren();msgBox.replaceChildren();hintBox.replaceChildren();draw(0)}
+  function finish(){
+    skipBtn.disabled=true;fireBtn.disabled=false;setLocks();
+    const r=last.res,tg=tgtC(),mk=monC();
+    resBox.replaceChildren(...[["Time in the air",r.T.toFixed(2),"s"],["Range",r.R.toFixed(1),"m"],["Peak height",r.H.toFixed(1),"m above ground"],["Time to peak",r.tpk.toFixed(2),"s"],["Impact speed",r.vimp.toFixed(1),"m/s"]].map(([a,v,u])=>h("span",{class:"pill res"},a+": "+v+" ",h("small",{},u))));
+    const msgs=[];
+    if(tg||mk){msgs.push(r.hit?h("div",{class:"fb ok",html:"🎯 <b>Hit!</b>"}):h("div",{class:"fb no",html:"✖ <b>Missed</b> by about "+r.miss.toFixed(1)+" m."+(mk?" The monkey was already on the ground, or the ball passed it.":(r.R<tg.x?" It landed short.":" It landed long."))}))}
+    if(r.predErr!=null)msgs.push(h("div",{class:"fb info",html:"🔮 You guessed "+lastPred.toFixed(1)+" m. It landed at "+r.R.toFixed(1)+" m. <b>Off by "+r.predErr.toFixed(1)+" m.</b>"}));
+    msgBox.replaceChildren(...msgs);
+    pred=null;predInp.value="";
+    evaluate(r);
+  }
+  function evaluate(r){
+    if(ti>=b.tasks.length)return;
+    if(metCond(b.tasks[ti].cond,r)){
+      ST.tasksDone++;ti++;
+      if(ti>=b.tasks.length){list.replaceChildren(...TASKS(b,ti));predRow.style.display="none";stage.classList.remove("pick");setLocks();flashIn(hintBox,"✅ All tasks done! Keep playing if you like.");done()}
+      else{const keepMsg=msgBox.cloneNode(true);const nx=b.tasks[ti];const sameWorld=!(nx.view||nx.tgt!==undefined||nx.monkey!==undefined);
+        activate(ti,false);if(sameWorld){resBox.replaceChildren(...[["Time in the air",r.T.toFixed(2),"s"],["Range",r.R.toFixed(1),"m"],["Peak height",r.H.toFixed(1),"m above ground"],["Time to peak",r.tpk.toFixed(2),"s"],["Impact speed",r.vimp.toFixed(1),"m/s"]].map(([a,v,u])=>h("span",{class:"pill res"},a+": "+v+" ",h("small",{},u))));msgBox.replaceChildren(...keepMsg.childNodes)}
+        flashIn(hintBox,"✅ Task done!")}
+    }
+  }
+  cv.addEventListener("click",e=>{
+    if(anim||!T().predict||ti>=b.tasks.length)return;const rc=cv.getBoundingClientRect();const x=L.inv((e.clientX-rc.left)*(L.w/rc.width));
+    pred=Math.round(x*10)/10;predInp.value=pred;draw(last?last.res.T:0);
+  });
+  window.addEventListener("resize",()=>{if(!cv.isConnected)return;layout();draw(anim?anim.t:(last?last.res.T:0))});
+  ST.tasks+=b.tasks.length;
+  const hintBtn=h("button",{class:"btn ghost",onclick:()=>{const t=b.tasks[Math.min(ti,b.tasks.length-1)];if(ti<b.tasks.length)hintBox.replaceChildren(h("div",{class:"hintbox",html:"💡 "+t.hint}))}},"💡 Hint");
+  const opts=h("div",{class:"row"},h("label",{},strobeCk," strobe dots "),h("label",{},keepCk," keep old paths "),h("label",{},"speed ",speedSel));
+  const card=h("div",{class:"card"},stage,gwrap,live,resBox,msgBox,...ctlRows,predRow,h("div",{class:"row"},fireBtn,skipBtn,resetBtn,hintBtn),opts,h("div",{class:"leg"},C.legend||"Press Launch. Orange is the real ball. Dots show where it is at equal time steps."),list,hintBox);
+  if(PREVIEW)card.append(h("button",{class:"skip",onclick:()=>{ti=b.tasks.length;list.replaceChildren(...TASKS(b,ti));done()}},"skip (preview)"));
+  card._qa={
+    fireWith:(p,guess)=>{Object.keys(p).forEach(k=>setP(k,p[k]));pred=guess==null?null:guess;fire({instant:true})},
+    ti:()=>ti,n:()=>b.tasks.length,res:()=>last&&last.res,task:()=>b.tasks[ti],P:()=>Object.assign({},P),
+    analyse:p=>analyse(Object.assign({},P,p),tgtC(),monC()).res,controls:C.controls,locked:()=>(T().lock||[]),
+    P0:()=>Object.assign({},P)
+  };
+  setTimeout(()=>{activate(0,true)},0);
+  const ro=window.ResizeObserver?new ResizeObserver(()=>{if(cv.isConnected&&!anim){layout();draw(last?last.res.T:0)}}):null;if(ro)ro.observe(stage);
+  return card;
+};
+
+/* ---------- part runner (two tiers) ---------- */
+const app=$("#app"),chipsEl=$("#chips");
+const DONE_TYPES=["mcq","shot","num","rows"];
+let CORE=0;
+function chips(){chipsEl.replaceChildren(...DATA.parts.map((p,i)=>h("span",{class:"chip"+(ST.partsDone[i]?" done":i===ST.partIdx&&!ST.between?" on":"")},(ST.partsDone[i]?"✓ ":"")+(p.tier===2?"★":"")+(i+1))))}
+function showPart(i){
+  ST.between=false;ST.partIdx=i;chips();app.replaceChildren();window.scrollTo(0,0);
+  const P=DATA.parts[i];
+  app.append(h("h2",{},`Part ${i+1} of ${DATA.parts.length}: ${P.title}`,P.tier===2?h("span",{class:"tier"},"CHALLENGE"):null),h("p",{class:"sub"},P.sub));
+  const nextWrap=h("div",{class:"row",style:"justify-content:center;margin:20px 0"});
+  const last=i===DATA.parts.length-1,coreEnd=i===CORE-1;
+  const nextBtn=h("button",{class:"btn big",disabled:""},last?"Finish ✔":coreEnd?"Finish core ✔":"Next part →");
+  nextBtn.addEventListener("click",()=>{ST.partsDone[i]=true;if(last)showFinal();else if(coreEnd)showCore();else showPart(i+1)});
+  nextWrap.append(nextBtn);
+  const cards=[];let idx=0;
+  const needed=P.blocks.filter(b=>DONE_TYPES.includes(b.type)).length;let got=0;
+  const reveal=()=>{
+    while(idx<P.blocks.length){
+      const b=P.blocks[idx++];let finished=false;
+      const card=BLOCK[b.type](b,()=>{if(finished)return;finished=true;if(DONE_TYPES.includes(b.type)){got++;if(got===needed){nextBtn.disabled=false;nextBtn.removeAttribute("disabled")}reveal()}},{});
+      card._b=b;cards.push(card);app.insertBefore(card,nextWrap.parentNode===app?nextWrap:null);
+      if(DONE_TYPES.includes(b.type)&&!finished)break;
+    }
+    app.append(nextWrap);if(got===needed)nextBtn.disabled=false;
+  };
+  reveal();window.__cards=cards;
+}
+function summaryText(label){
+  const secs=(Date.now()-ST.t0)/1000,when=new Date();
+  return `${ST.name} · Projectile Concept Checker · ${label} · time ${fmtT(secs)} · questions right on the first try ${ST.qFirst}/${ST.q} · retries ${ST.retries} · sim tasks ${ST.tasksDone}/${ST.tasks} · ${when.toLocaleDateString()} ${when.toLocaleTimeString()}`;
+}
+function stampCard(title,label,extraBtns){
+  const secs=(Date.now()-ST.t0)/1000,when=new Date(),txt=summaryText(label);
+  const st=h("div",{class:"stamp"},h("div",{class:"big"},title),h("div",{style:"font-size:24px;margin:4px 0"},ST.name),h("div",{},`${when.toLocaleDateString()} · ${when.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}`));
+  const tbl=h("table",{class:"sum"},
+    h("tr",{},h("th",{},"Time"),h("td",{},fmtT(secs))),
+    h("tr",{},h("th",{},"Sim tasks finished"),h("td",{},`${ST.tasksDone} of ${ST.tasks}`)),
+    h("tr",{},h("th",{},"Questions right on the first try"),h("td",{},`${ST.qFirst} of ${ST.q}`)),
+    h("tr",{},h("th",{},"Times you fixed a wrong answer"),h("td",{},String(ST.retries))));
+  const copy=h("button",{class:"btn ghost",onclick:async()=>{try{await navigator.clipboard.writeText(txt);copy.textContent="Copied ✔"}catch(e){copy.textContent="Select and copy the line below"}}},"Copy summary");
+  return[st,tbl,h("div",{class:"row",style:"justify-content:center"},copy,...(extraBtns||[])),h("p",{style:"font-size:13px;color:#777;word-break:break-word"},txt)];
+}
+function showCore(){
+  ST.between=true;chips();app.replaceChildren();window.scrollTo(0,0);
+  const go=h("button",{class:"btn big",onclick:()=>showPart(CORE)},"★ Keep going: Challenge tier →");
+  app.append(h("div",{class:"card final"},h("h2",{},"Core complete! 🎉"),h("p",{},"Show this screen to Mr. D and write your core takeaways on your sheet. If you still have time, the Challenge tier has harder sims and puzzles."),
+    ...stampCard("✔ CORE COMPLETE","CORE COMPLETE (parts 1-"+CORE+")",[go])));
+}
+function showFinal(){
+  inProgress=false;chips();app.replaceChildren();window.scrollTo(0,0);
+  app.append(h("div",{class:"card final"},h("h2",{},"Challenge complete! 🏆"),h("p",{},"Show this screen to Mr. D. Then finish the Challenge takeaways on your sheet."),
+    ...stampCard("★ CHALLENGE COMPLETE","ALL "+DATA.parts.length+" PARTS COMPLETE (core + challenge)")));
+}
+function start(){inProgress=true;ST.t0=Date.now();showPart(0)}
+
+/* ---------- teacher key (open the page with #key) ---------- */
+const strip=s=>String(s).replace(/<[^>]+>/g,"");
+function showKey(){
+  chipsEl.replaceChildren();app.replaceChildren();
+  app.append(h("div",{class:"card text"},h("h2",{},"Teacher key"),h("p",{},"Every answer, with the reason the student sees. Open the page without #key for the student version. Add #preview to the address for skip buttons.")));
+  const key=h("div",{class:"key"});
+  DATA.parts.forEach((P,i)=>{
+    key.append(h("h3",{},`Part ${i+1}${P.tier===2?" ★ Challenge":""}: ${P.title}`));
+    P.blocks.forEach(b=>{
+      if(b.type==="mcq"){const ok=b.opts.find(o=>o.ok);key.append(h("div",{class:"it",html:`<b>${b.predict?"[Predict] ":""}${b.q}</b><br>✔ ${ok.t||"(graph choice)"}<br><i>${b.why}</i>`}))}
+      if(b.type==="num"){key.append(h("div",{class:"it",html:`<b>${b.q}</b><br>✔ ${[].concat(b.ans).join(" or ")} ${b.unit||""} (±${b.tol})<br><i>${b.why}</i>`}))}
+      if(b.type==="rows"){key.append(h("div",{class:"it",html:`<b>${b.q}</b>`+b.rows.map(r=>`<br>• ${r.q} → <b>${r.opts[r.ans]}</b>. <i>${r.why}</i>`).join("")}))}
+      if(b.type==="shot"){key.append(h("div",{class:"it",html:`<b>Simulator tasks</b>`+b.tasks.map((t,j)=>`<br>${j+1}. ${t.text}<br>&nbsp;&nbsp;&nbsp;<i>Hint: ${t.hint}</i>`).join("")}))}
+    });
+  });
+  app.append(key);
+}
+
+/* ---------- boot ---------- */
+CORE=DATA.parts.filter(p=>p.tier===1).length;
+if(KEYVIEW){showKey()}
+else{
+chips();
+app.append(h("div",{class:"card",id:"start"},h("h2",{},"Projectile Motion"),
+  h("p",{},"Concept Checker. Predict first, then run the simulation to see if you were right. A wrong answer gives you a hint, and you try again. Please don’t refresh the page."),
+  h("p",{},"Parts 1 to "+CORE+" are the core. Parts marked ★ are the Challenge tier, for when you finish early. We ignore air resistance until Part "+(DATA.parts.findIndex(p=>/Air/.test(p.title))+1)+"."),
+  h("p",{},h("b",{},"Your name:")),
+  (()=>{const i=h("input",{type:"text",id:"nm",placeholder:"First and last name",autocomplete:"off"});const b=h("button",{class:"btn big",style:"margin-top:12px",onclick:()=>{const v=i.value.trim();if(!v){i.focus();return}ST.name=v;start()}},"Start →");i.addEventListener("keydown",e=>{if(e.key==="Enter")b.click()});return h("div",{},i,h("div",{},b))})()));
+}
+window.__qa={ST,DATA,simulate,analyse,metCond,cards:()=>window.__cards||[],next:()=>{const b=[...document.querySelectorAll(".btn.big")].pop();b&&b.click()}};
+</script>
+</body></html>

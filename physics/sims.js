@@ -29,7 +29,8 @@ window.UNITS = [
     sims: [
       { title: "Projectiles", href: "projectiles/projectiles.html", blurb: "Launch at any speed, angle and height. Predict the landing spot and hit a target.", tags: ["range", "components"], from: "Projectiles.exe" },
       { title: "Falling Target", href: "projectiles/falling-target.html", blurb: "Aim at a target that drops the instant you fire. Where should you aim?", tags: ["free fall", "relative motion"], from: "Falling Target.exe" },
-      { title: "Ballistic Trolley", href: "projectiles/ballistic-trolley.html", blurb: "A trolley fires a ball straight up while moving. Where does it land?", tags: ["constant velocity", "drag"], from: "Ballistic Trolley.exe" }
+      { title: "Ballistic Trolley", href: "projectiles/ballistic-trolley.html", blurb: "A trolley fires a ball straight up while moving. Where does it land?", tags: ["constant velocity", "drag"], from: "Ballistic Trolley.exe" },
+      { title: "Projectile Motion Concept Checker", href: "projectiles/projectile-concept-checker.html", blurb: "A student worksheet in one page: predict, launch, answer. Five core parts, then four challenge parts (monkey and hunter, other planets, air resistance) for early finishers. Add #key to the address for the teacher key.", tags: ["concept checker", "challenge tier", "predict first"] }
     ]
   },
   {

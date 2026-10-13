@@ -12,9 +12,11 @@ The `physics/` folder has a hub at `physics/index.html` that lists sims by unit.
 |---|---|
 | `motion-and-graphs/` | `graphs`, `bouncing-graphs`, `ticker-timer`, `motion-graphs` |
 | `free-fall/` | `gravity`, `terminal-velocity`, `bounce-meter` |
-| `projectiles/` | `projectiles`, `falling-target`, `ballistic-trolley` |
+| `projectiles/` | `projectiles`, `falling-target`, `ballistic-trolley`, `projectile-concept-checker` |
 | `predict-first/` | `predict-first` (Two Carts, Hill Roll, Cut the String; each asks for a prediction before the run) |
 | `challenge-problems/` | `exploding-projectile`, `ball-and-bullet`, `rolling-disc` (solve on paper, enter the answer, the sim tests it) |
+
+`projectile-concept-checker` is a student-facing checker in the style of the statistics ones: name screen, gated questions, simulator tasks, hints on wrong answers, a core tier and a Challenge tier, and a completion stamp students show you. Add `#key` to its address for the teacher key, or `#preview` for skip buttons.
 
 The first ten rebuild the LabVIEW originals (Graphs.exe, Gravity.exe and so on). Instructions and theory text come from the originals wherever the executables contained it. Ticker Timer, Motion Graphs and Projectiles held little readable text, so those three follow their titles and may differ from the old programs.
 
