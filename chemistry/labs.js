@@ -19,6 +19,13 @@ window.UNITS = [
         href: "unit-2-properties-of-matter/specific-heat.html",
         blurb: "Drop a hot mystery metal into cool water, read the final temperature, and work out which metal it is.",
         tags: ["specific heat", "q = mcΔT", "calorimetry"]
+      },
+      {
+        title: "Virtual Lab: Unknown White Solids (BETA)",
+        icon: "🥽",
+        href: "virtual-lab/index.html",
+        blurb: "Walk the lab, suit up, carry jars to your bench, and run five tests to identify four unknown solids. Beta: keyboard and a laptop screen work best. Tell Mr. D what breaks.",
+        tags: ["beta", "lab safety", "properties of matter"]
       }
     ]
   }
