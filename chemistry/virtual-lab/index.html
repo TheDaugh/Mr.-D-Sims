@@ -53,11 +53,13 @@
         <section class="card" aria-label="Safety gear">
           <h2>Safety gear</h2>
           <div id="ppe"></div>
+          <p id="modeLine" class="note" style="margin:10px 0 0"></p>
           <p class="hint">Get goggles and an apron from the locker. Without them the lab door stays shut. Tongs hang on the rack; you need them for hot containers.</p>
           <label style="display:block;margin-top:8px;font-size:.8rem;color:var(--muted)">Your name <input id="student" type="text" autocomplete="name" style="display:block;width:16em"></label>
         </section>
       </div>
       <div class="stack">
+        <section class="card" id="incident" role="alert" hidden></section>
         <section class="card" aria-label="Inventory"><h2>Carrying <span id="invCount"></span></h2><div id="inv"></div><p class="hint">Six slots. The jars you carry appear on your bench shelf.</p></section>
         <section class="card" id="panelCard" hidden><h2 id="panelTitle"></h2><div id="panelBody"></div><button id="panelClose">Close</button></section>
         <section class="card" id="controlsCard" aria-label="Controls" hidden><h2>Bench controls</h2><button id="leaveBench" style="margin-bottom:10px">← Back to the room</button><div id="controls"></div></section>

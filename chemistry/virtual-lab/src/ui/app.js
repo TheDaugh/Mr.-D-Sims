@@ -4,6 +4,8 @@ import { fingerprint } from "../engine/lab1.js";
 import { Log, downloadJSON } from "../log.js";
 import { createRenderer, SLOTS } from "./render.js";
 import { createRoomRenderer } from "./roomview.js";
+import { resolveMode } from "../mode.js";
+import { indexHazards, losePoints } from "../engine/hazards.js";
 import { parseRoom, step, facingTile, hasPPE, tileAt } from "../engine/room.js";
 
 const $ = (s) => document.querySelector(s);
@@ -23,15 +25,16 @@ const SHORT = { NaCl: "Salt", sucrose: "Sugar", NaHCO3: "B.Soda", CaCO3: "Chalk"
 
 async function boot() {
   try {
-    const urls = ["content/species.json", "content/reactions.json", "content/labs/01-unknown-solids.json", "content/rooms/main-lab.json"];
-    const [species, reactions, lab, roomDef] = await Promise.all(urls.map((u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); })));
-    start(species, reactions, lab, roomDef);
+    const urls = ["content/species.json", "content/reactions.json", "content/labs/01-unknown-solids.json", "content/rooms/main-lab.json", "content/hazards.json", "content/config.json"];
+    const [species, reactions, lab, roomDef, hazardData, config] = await Promise.all(urls.map((u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); })));
+    const modeInfo = await resolveMode(new URLSearchParams(location.search), config);
+    start(species, reactions, lab, roomDef, hazardData, modeInfo);
   } catch (e) {
     $("#boot").replaceChildren(h("p", {}, "This lab has to be opened from the web (GitHub Pages) or a local server. Double-clicking the file does not work because browsers block the files it loads."), h("p", { class: "hint" }, String(e.message || e)));
   }
 }
 
-function start(speciesData, reactionData, lab, roomDef) {
+function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo) {
   const world = buildWorld(speciesData, reactionData);
   const EL = speciesData.electrolytes;
   const solids = speciesData.species.filter((s) => s.phase === "s").map((s) => s.id);
@@ -56,17 +59,83 @@ function start(speciesData, reactionData, lab, roomDef) {
   ];
   sources.forEach((s) => { s.color = speciesData.species.find((x) => x.id === s.id).color; });
 
-  const S = { sel: "b1", srcKey: sources[0].key, ppe: { goggles: false, apron: false, tongs: false }, inv: [], view: "room", panel: null, plateOn: false, plateC: 150, bulb: null, bulbUntil: 0, feed: [], notebook: {}, student: "" };
+  const S = { sel: "b1", srcKey: sources[0].key, ppe: { goggles: false, apron: false, tongs: false }, inv: [], view: "room", panel: null, mode: modeInfo.mode, incident: null, safety: { points: 100, incidents: [] }, plateOn: false, plateC: 150, bulb: null, bulbUntil: 0, feed: [], notebook: {}, student: "" };
   const byKey = (k) => CONT.find((c) => c.key === k);
 
   // ---------- feedback and rules ----------
   function say(text, kind = "info") { S.feed.unshift({ text, kind, t: log.events.length ? log.events[log.events.length - 1].t : 0 }); S.feed = S.feed.slice(0, 40); renderFeed(); }
-  function hazard(id, text) { log.add("hazard", { id, mode: "guided", outcome: "blocked" }); say(text, "stop"); }
+  const H = indexHazards(hazardData);
+  function hazard(id, text) { log.add("hazard", { id, mode: S.mode, outcome: "blocked" }); say(text, "stop"); }
   function blocked(id, text) { log.add("procedure", { id, outcome: "blocked" }); say(text, "warn"); }
-  function ppeOk() {
-    if (S.ppe.goggles && S.ppe.apron) return true;
-    hazard("no_ppe", "Stop. Put on goggles and an apron before you touch anything in the lab. They are in the locker.");
-    return false;
+  // Guided blocks the action. Consequences makes it happen and opens an incident. Sandbox lets it happen, no penalty.
+  function fire(id, ctx = {}) {
+    const hz = H[id];
+    if (S.mode === "guided") { log.add("hazard", { id, mode: "guided", outcome: "blocked" }); say(hz.guided, "stop"); return; }
+    if (S.mode === "sandbox") { log.add("hazard", { id, mode: "sandbox", outcome: "consequence" }); say(`${hz.title}. ${hz.happened}`, "stop"); applyEffect(hz, ctx); return; }
+    startIncident(hz, ctx);
+  }
+  function ppeOk(risky = false) {
+    if (S.incident) { say("Finish the incident first.", "warn"); return false; }
+    if (hasPPE(S.ppe)) return true;
+    if (S.mode === "guided") { hazard("no_ppe", "Stop. Put on goggles and an apron before you touch anything in the lab. They are in the locker."); return false; }
+    if (!risky || S.mode === "sandbox") return true;
+    fire(S.ppe.goggles ? "no_apron" : "no_goggles"); return false;
+  }
+  function applyEffect(hz, ctx) {
+    if (hz.effect === "drop_container" && ctx.container) {
+      const c = ctx.container; c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; c.loc = "bench";
+      c.slot = [0, 1, 2].find((n) => !CONT.some((o) => o !== c && o.loc === "bench" && o.slot === n)) ?? 0;
+      say(`${c.name} shattered. A fresh, empty one is on the bench.`);
+    }
+  }
+  const NEEDS_NAME = { eyewash: "eyewash station", sink: "sink" };
+  function startIncident(hz, ctx) {
+    S.incident = { hz, ctx, phase: hz.needs ? "treat" : "report", deadline: performance.now() + 30000, treated: false, escalated: false, correct: null, cooldownUntil: 0 };
+    S.safety.points = losePoints(S.safety.points, hz.points);
+    log.add("hazard", { id: hz.id, mode: S.mode, outcome: "incident", points: hz.points });
+    say(`${hz.title}. ${hz.happened}`, "stop");
+    if (hz.needs) setView("room");
+    renderIncident(); renderSafety();
+  }
+  function treat() {
+    const inc = S.incident; inc.treated = true; inc.phase = "report";
+    say(inc.hz.treat, "obs"); log.add("treated", { id: inc.hz.id, at: NEEDS_NAME[inc.hz.needs], seconds_left: Math.round((inc.deadline - performance.now()) / 1000) });
+    renderIncident();
+  }
+  function tickIncident(now) {
+    const inc = S.incident; if (!inc) return;
+    if (inc.phase === "treat") {
+      const left = Math.max(0, Math.ceil((inc.deadline - now) / 1000));
+      if (now > inc.deadline) { inc.escalated = true; inc.phase = "report"; S.safety.points = losePoints(S.safety.points, inc.hz.points); say("You took too long. The injury got worse.", "stop"); log.add("escalated", { id: inc.hz.id }); renderIncident(); renderSafety(); }
+      else { const e = $("#incLeft"); if (e) e.textContent = left; }
+    } else if (inc.phase === "cooldown") {
+      const left = Math.max(0, Math.ceil((inc.cooldownUntil - now) / 1000)), e = $("#incLeft"), b = $("#incResume");
+      if (e) e.textContent = left; if (b) b.disabled = left > 0;
+    }
+  }
+  function renderIncident() {
+    const inc = S.incident, box = $("#incident");
+    if (!inc) { box.hidden = true; return; }
+    box.hidden = false; const hz = inc.hz, kids = [h("h2", {}, "Incident: " + hz.title), h("p", {}, hz.happened)];
+    if (inc.phase === "treat") kids.push(h("p", { class: "f-stop" }, `Get to the ${NEEDS_NAME[hz.needs]} and press E on it. `, h("b", {}, h("span", { id: "incLeft" }, "30"), " s left.")), h("p", { class: "hint" }, "Walk there in the room. If you don't know where it is, look around."));
+    if (inc.phase === "report") {
+      kids.push(h("p", {}, h("b", {}, "What went wrong: "), hz.why), h("p", {}, hz.quiz.q));
+      kids.push(...hz.quiz.options.map(([text, ok], i) => h("div", {}, h("button", { onclick: () => answer(ok) }, text))));
+    }
+    if (inc.phase === "cooldown") kids.push(h("p", {}, inc.correct ? "Correct." : "Not quite. Re-read what went wrong above."), h("p", {}, "Resetting the bench… ", h("b", {}, h("span", { id: "incLeft" }, "8"), " s")), h("button", { id: "incResume", class: "primary", disabled: true, onclick: resume }, "Back to work"));
+    box.replaceChildren(...kids);
+  }
+  function answer(ok) {
+    const inc = S.incident; inc.correct = ok; inc.phase = "cooldown"; inc.cooldownUntil = performance.now() + 8000; renderIncident();
+  }
+  function resume() {
+    const inc = S.incident;
+    log.add("incident", { id: inc.hz.id, treated: inc.treated, escalated: inc.escalated, quiz_correct: inc.correct, points_lost: inc.hz.points * (inc.escalated ? 2 : 1) });
+    S.safety.incidents.push({ id: inc.hz.id, treated: inc.treated, escalated: inc.escalated, quiz_correct: inc.correct });
+    applyEffect(inc.hz, inc.ctx); S.incident = null; renderIncident(); renderSafety();
+  }
+  function renderSafety() {
+    $("#modeLine").textContent = S.mode === "guided" ? "Guided mode: unsafe actions are blocked and explained." : S.mode === "sandbox" ? "Sandbox mode: everything is allowed. Nothing is graded." : `Consequences mode: unsafe actions have real results. Safety points: ${S.safety.points} / 100.`;
   }
   const cur = () => byKey(S.sel);
   function rawMass(c) { return c.empty + massAccounting(world, c.c).inside; }
@@ -76,7 +145,7 @@ function start(speciesData, reactionData, lab, roomDef) {
     if (!ppeOk()) return;
     const c = cur();
     if (c.loc === loc) return;
-    if (c.c.T > 50 && !S.ppe.tongs) return hazard("hot_container", `Stop. ${c.name} is ${Math.round(c.c.T)} °C. Equip the tongs before you move it.`);
+    if (c.c.T > 50 && !S.ppe.tongs) return fire("hot_container", { container: c });
     if ((loc === "balance" || loc === "hotplate") && CONT.some((o) => o !== c && o.loc === loc)) return blocked("station_busy", `The ${loc === "balance" ? "balance" : "hot plate"} is in use. Move the other container off first.`);
     if (loc === "bench") { const used = CONT.filter((o) => o !== c && o.loc === "bench").map((o) => o.slot); c.slot = [0, 1, 2].find((s) => !used.includes(s)); }
     log.add("move", { container: c.key, from: c.loc, to: loc });
@@ -84,7 +153,7 @@ function start(speciesData, reactionData, lab, roomDef) {
     say(`${c.name} is on the ${loc === "hotplate" ? "hot plate" : loc}.`);
   }
   function addSubstance() {
-    if (!ppeOk()) return;
+    if (!ppeOk(true)) return;
     const c = cur(), src = sources.find((s) => s.key === S.srcKey && S.inv.includes(s.key)), amt = parseFloat($("#amt").value);
     if (!src) return blocked("not_carrying", "You are not carrying that jar. Go back to the room and take it from its shelf.");
     if (!(amt > 0)) return say("Enter an amount first.", "warn");
@@ -97,12 +166,12 @@ function start(speciesData, reactionData, lab, roomDef) {
       if (amt > 250) return blocked("too_much_liquid", "That is more than the graduated cylinder holds. Use 250 mL or less.");
     }
     try { add(world, c.c, src.id, amt); }
-    catch (e) { if (e.code === "OVERFLOW") { hazard("overflow", `Stop. That would overflow ${c.name} (${c.cap} mL). Nothing was added.`); return; } throw e; }
+    catch (e) { if (e.code === "OVERFLOW") { fire("overflow", { container: c }); return; } throw e; }
     log.add("add", { container: c.key, substance: src.id, shown_as: src.label, amount: amt, unit: src.phase === "s" ? "g" : "mL" });
     say(`Added ${amt} ${src.phase === "s" ? "g" : "mL"} of ${src.label} to ${c.name}.`);
   }
   function stir() {
-    if (!ppeOk()) return;
+    if (!ppeOk(true)) return;
     const c = cur();
     if (!(c.c.solution.mL > 0)) return say("There is no liquid to stir.", "warn");
     log.add("stir", { container: c.key });
@@ -128,9 +197,9 @@ function start(speciesData, reactionData, lab, roomDef) {
     say(r.bulb === "bright" ? "The bulb glows brightly." : r.bulb === "dim" ? "The bulb glows dimly." : "The bulb stays off.");
   }
   function empty() {
-    if (!ppeOk()) return;
+    if (!ppeOk(true)) return;
     const c = cur();
-    if (c.c.T > 50 && !S.ppe.tongs) return hazard("hot_container", `Stop. ${c.name} is ${Math.round(c.c.T)} °C. Equip the tongs first.`);
+    if (c.c.T > 50 && !S.ppe.tongs) return fire("hot_container", { container: c });
     c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0;
     log.add("empty", { container: c.key }); say(`${c.name} is emptied and rinsed.`);
   }
@@ -140,7 +209,7 @@ function start(speciesData, reactionData, lab, roomDef) {
     log.add("wait", { seconds }); say(`${seconds} seconds pass.`);
   }
   function setPlate(on, c) {
-    if (!ppeOk()) return;
+    if (!ppeOk(on === true || (on === undefined && S.plateOn))) return;
     if (on !== undefined) S.plateOn = on;
     if (c !== undefined) S.plateC = c;
     log.add("hotplate", { on: S.plateOn, setC: S.plateC });
@@ -284,7 +353,7 @@ function start(speciesData, reactionData, lab, roomDef) {
   $("#download").addEventListener("click", () => {
     S.student = $("#student").value.trim();
     S.notebook = {}; table.querySelectorAll("select").forEach((s) => { (S.notebook[s.dataset.u] ||= {})[s.dataset.t] = s.value; });
-    downloadJSON(`lab-record-${(S.student || "student").replace(/\W+/g, "-")}.json`, { version: 1, lab: lab.id, student: S.student, seed, started: log.started, unknowns, notebook: S.notebook, summary: { blocked_hazards: log.count("hazard"), blocked_procedures: log.count("procedure"), checks: log.count("check") }, events: log.events });
+    downloadJSON(`lab-record-${(S.student || "student").replace(/\W+/g, "-")}.json`, { version: 1, lab: lab.id, student: S.student, seed, started: log.started, unknowns, notebook: S.notebook, mode: S.mode, safety: S.safety, summary: { blocked_hazards: log.count("hazard"), blocked_procedures: log.count("procedure"), checks: log.count("check") }, events: log.events });
   });
 
   // ---------- go ----------
@@ -323,6 +392,8 @@ function start(speciesData, reactionData, lab, roomDef) {
   }
   function interact(f) {
     const t = f.tile; if (!t || !t.id) return false;
+    if (S.incident && t.type === "station") { say("Finish the incident first.", "warn"); return true; }
+    if (S.incident && S.incident.phase === "treat" && t.id === S.incident.hz.needs) { treat(); return true; }
     if (!visited.has(t.id)) { visited.add(t.id); log.add("visit", { object: t.id }); }
     if (t.type === "station") { setView("bench"); say("You stand at your bench."); }
     else if (t.type === "shelf" || t.type === "locker" || t.type === "rack") { S.panel = t; renderPanel(); }
@@ -331,9 +402,9 @@ function start(speciesData, reactionData, lab, roomDef) {
   }
   function walk(dx, dy) {
     const now = performance.now(); if (now - lastMove < 110) return; lastMove = now;
-    const r = step(room, P, dx, dy, S.ppe);
+    const r = step(room, P, dx, dy, S.mode === "guided" ? S.ppe : { goggles: true, apron: true });
     if (r.blocked && now - lastBlock > 1500) { lastBlock = now; hazard("no_ppe_door", "Stop. The lab door will not open. You need goggles and an apron, and they are in the locker."); }
-    if (r.moved) { closePanel(); if (r.tile.type === "door" && !visited.has("entered_lab")) { visited.add("entered_lab"); log.add("door", { outcome: "entered" }); say("You step into the lab."); } }
+    if (r.moved) { closePanel(); if (r.tile.type === "door" && !visited.has("entered_lab")) { visited.add("entered_lab"); log.add("door", { outcome: hasPPE(S.ppe) ? "entered" : "entered_without_ppe" }); say(hasPPE(S.ppe) ? "You step into the lab." : "You walk into the lab with no goggles or apron. That is a mistake.", hasPPE(S.ppe) ? "info" : "warn"); } }
   }
   const DIRS = { arrowup: [0, -1], w: [0, -1], arrowdown: [0, 1], s: [0, 1], arrowleft: [-1, 0], a: [-1, 0], arrowright: [1, 0], d: [1, 0] };
   window.addEventListener("keydown", (e) => {
@@ -353,19 +424,20 @@ function start(speciesData, reactionData, lab, roomDef) {
   $("#panelClose").addEventListener("click", closePanel);
   $("#leaveBench").addEventListener("click", () => setView("room"));
 
-  syncUnit(); renderPPE(); renderControls(); renderFeed(); renderInv(); setView("room");
+  syncUnit(); renderPPE(); renderControls(); renderFeed(); renderInv(); renderSafety(); setView("room");
+  if (modeInfo.rejected) { log.add("mode_rejected", { asked: modeInfo.rejected }); say("This link's mode could not be verified, so you are in Guided mode.", "warn"); }
   say("Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
   $("#boot").hidden = true; $("#app").hidden = false;
   let last = performance.now(), t0 = last, lastCtl = 0;
   function frame(now) {
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
-    stepAll(dt);
+    stepAll(dt); tickIncident(now);
     if (S.view === "room") roomR.draw(P, S.ppe, hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
     if (now - lastCtl > 250) { renderControls(); lastCtl = now; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  window.__vl = { S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE, check }, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
+  window.__vl = { H, S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE, check }, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
 }
 
 boot();

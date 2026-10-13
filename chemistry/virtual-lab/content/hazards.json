@@ -1,0 +1,38 @@
+{
+  "note": "Every hazard is a standard school-lab safety failure with a real cause. Review the wording and the quiz answers before use.",
+  "hazards": [
+    {
+      "id": "no_goggles", "title": "Chemical splash in the eye", "severity": "serious", "points": 25, "needs": "eyewash",
+      "guided": "Stop. Put goggles on before you work with any chemical. They are in the locker.",
+      "happened": "Liquid splashes up into your unprotected eyes. The work stops.",
+      "treat": "You hold your eyes open under the eyewash and flush them. The real time is 15 minutes, then medical help.",
+      "why": "Eyes absorb chemicals fast and damage can begin within seconds. Goggles are the only barrier, and flushing with the eyewash is the first response.",
+      "effect": "none",
+      "quiz": { "q": "What should you have done?", "options": [["Put goggles on before touching any chemical", true], ["Turn your head away while pouring", false], ["Work faster so there is less time to splash", false]] }
+    },
+    {
+      "id": "no_apron", "title": "Chemical on your skin and clothes", "severity": "moderate", "points": 10, "needs": "sink",
+      "guided": "Stop. Put an apron on before you work with chemicals. It is in the locker.",
+      "happened": "A drop lands on your sleeve and soaks through to your arm.",
+      "treat": "You flush your arm under running water for several minutes and take off the wet clothing.",
+      "why": "Splashes are normal in a lab. An apron stops them reaching your skin, and running water dilutes whatever does get through.",
+      "effect": "none",
+      "quiz": { "q": "What is the first thing to do when a chemical touches your skin?", "options": [["Rinse it under running water for several minutes", true], ["Wipe it off with a paper towel", false], ["Wait to see whether it hurts", false]] }
+    },
+    {
+      "id": "hot_container", "title": "Burn from hot glass", "severity": "moderate", "points": 15, "needs": "sink", "effect": "drop_container",
+      "guided": "Stop. That container is hot. Pick up the tongs from the rack before you move it.",
+      "happened": "You grab the hot beaker bare-handed, flinch, and drop it. It shatters.",
+      "treat": "You hold the burn under cool running water for several minutes.",
+      "why": "Hot glass looks exactly like cold glass. Anything near a hot plate or just heated should be handled with tongs, and a burn needs cool running water right away.",
+      "quiz": { "q": "How can you tell glass is too hot to touch?", "options": [["You can't by looking, so use tongs near any heat source", true], ["It will glow or look different", false], ["Hover a bare hand over it first", false]] }
+    },
+    {
+      "id": "overflow", "title": "Spill on the bench", "severity": "minor", "points": 5, "needs": null, "effect": "none",
+      "guided": "Stop. That would overflow the container. Nothing was added.",
+      "happened": "The liquid runs over the rim and across the bench. You stop and mop it up.",
+      "why": "A container should never be filled past about two thirds. Use a larger container or a smaller volume.",
+      "quiz": { "q": "What should you have checked first?", "options": [["The container's capacity against the volume you were adding", true], ["How fast you were pouring", false], ["Whether the liquid was clear", false]] }
+    }
+  ]
+}
