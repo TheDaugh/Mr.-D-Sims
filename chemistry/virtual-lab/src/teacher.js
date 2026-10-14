@@ -4,6 +4,9 @@ import { fingerprint } from "./engine/lab1.js";
 import { buildReport } from "./report.js";
 import { downloadJSON } from "./log.js";
 import { profile, stateAt, checkData } from "./engine/heating.js";
+import { checkCode } from "./engine/integrity.js";
+// Active minutes and whether the record's check code still matches its facts.
+const activeTag = (rec) => rec.code ? `${Math.round((rec.activeSec || 0) / 60)} min active ${checkCode({ student: rec.student, lab: rec.lab, seed: rec.seed, activeSec: rec.activeSec, events: rec.codeEvents, cerDone: !!rec.cer }) === rec.code ? "✔" : "✘ edited?"}` : "no timer";
 
 const $ = (s) => document.querySelector(s);
 function h(tag, props = {}, ...kids) {
@@ -58,12 +61,12 @@ function hStats(x, k) { const m = x.rec.samples[k]; if (!m) return null; const s
 function renderHeat() {
   $("#heatCard").hidden = !heat.length; heat.sort((a, b) => a.rec.student.localeCompare(b.rec.student));
   const ref = (id) => (lab2.reference.find((r) => r.id === id) || {}).name || "—";
-  $("#heatRoster").replaceChildren(h("thead", {}, h("tr", {}, ["Student", "Submitted", "Pre-lab", "X: rows / points / lines", "Y: rows / points / lines", "Data X (ok/bad)", "Data Y (ok/bad)", "CER answer", "Rubric /" + lab2.postlab.rubric.length * 3, ""].map((t) => h("th", {}, t)))),
+  $("#heatRoster").replaceChildren(h("thead", {}, h("tr", {}, ["Student", "Submitted", "Pre-lab", "X: rows / points / lines", "Y: rows / points / lines", "Data X (ok/bad)", "Data Y (ok/bad)", "CER answer", "Z (challenge)", "Active time", "Rubric /" + lab2.postlab.rubric.length * 3, ""].map((t) => h("th", {}, t)))),
     h("tbody", {}, heat.map((x) => {
       const r = x.rec, cnt = (k) => { const m = r.samples[k]; return m ? `${m.rows.filter((q) => q.t !== "" && q.T !== "").length} / ${m.items.filter((i) => i.k === "p").length} / ${m.items.filter((i) => i.k === "l").length}` : "—"; };
       const ds = (k) => { const s = hStats(x, k); return s ? `${s.good}/${s.bad}` : "—"; };
       const right = (k) => r.cer && r.cer[k] ? (r.cer[k] === (r.samples[k] || {}).substance ? "✔" : "✘ " + ref(r.cer[k])) : "—";
-      return h("tr", {}, h("td", {}, r.student), h("td", {}, r.submitted ? "yes" : "no"), h("td", {}, r.prelab ? `${r.prelab.correct}/${r.prelab.total}` : "—"), h("td", {}, cnt("X")), h("td", {}, cnt("Y")), h("td", {}, ds("X")), h("td", {}, ds("Y")), h("td", {}, `X ${right("X")}, Y ${right("Y")}`), h("td", {}, String(hTotal(x))), h("td", {}, h("button", { onclick: () => heatDetail(x) }, "Open")));
+      return h("tr", {}, h("td", {}, r.student), h("td", {}, r.submitted ? "yes" : "no"), h("td", {}, r.prelab ? `${r.prelab.correct}/${r.prelab.total}` : "—"), h("td", {}, cnt("X")), h("td", {}, cnt("Y")), h("td", {}, ds("X")), h("td", {}, ds("Y")), h("td", {}, `X ${right("X")}, Y ${right("Y")}`), h("td", {}, r.samples.Z && r.samples.Z.rows.length ? `${cnt("Z")} ${right("Z")}` : "—"), h("td", {}, activeTag(r)), h("td", {}, String(hTotal(x))), h("td", {}, h("button", { onclick: () => heatDetail(x) }, "Open")));
     })));
 }
 function heatDetail(x) {
@@ -92,7 +95,7 @@ function render() {
       return h("tr", {}, h("td", {}, r.student), h("td", {}, r.mode), h("td", {}, `${r.grade.identified} / ${r.grade.total}`), h("td", {}, String(r.grade.wrong)),
         h("td", {}, ok(g[0].ok)), h("td", {}, ok(g[1].ok)), h("td", {}, r.prelab ? `${r.prelab.correct}/${r.prelab.total}` : "—"), h("td", {}, r.cer ? String(cerTotal(x)) : h("span", { class: "dim" }, "—")),
         h("td", {}, r.incidents.length ? h("span", { class: "badc" }, String(r.incidents.length)) : "0"),
-        h("td", {}, r.mode === "consequences" && r.points !== null ? String(r.points) : "—"), h("td", {}, mmss(r.seconds)), h("td", {}, h("button", { onclick: () => detail(x) }, "Timeline")));
+        h("td", {}, r.mode === "consequences" && r.points !== null ? String(r.points) : "—"), h("td", {}, `${mmss(r.seconds)} · ${activeTag(x.rec)}`), h("td", {}, h("button", { onclick: () => detail(x) }, "Timeline")));
     })));
 }
 function detail(x) {
