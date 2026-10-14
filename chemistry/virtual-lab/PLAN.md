@@ -201,3 +201,13 @@ Every action appends one small JSON event. The log is the grading record, the te
 - Record holds table, graph image, CER and event log. `teacher.html` shows graphs, data accuracy (within 3 °C), CER and a 4-part rubric (claim, evidence, reasoning, graph).
 - Needs Ian's review: substance constants (approximate), theory, pre-lab questions, quests, rubric.
 - Next: specific-heat lab (scaffolded, second), single-file bundle.
+
+## M6: one-screen stage, hand-in, teacher key
+- **Stage**: fixed 1280x720 `#stage` scaled to fit (`fit.js`), so zoom re-fits instead of enlarging icons. Dialogs live inside the stage. HUD on top, world plus side drawer in the middle, hotbar and log below. Task panel toggles with J.
+- **Carry 10**, with Take all on every shelf.
+- **Samples**: lab 1 has A, B, C required and D as a challenge. Heating has X, Y required and Z as a challenge. Challenge quests carry `optional:true`. The tutorial sample is fixed per lab (`lab.tutorial`: A = NaCl, X = lauric acid).
+- **Tutorial**: quests flagged `tutorial:true` get a yellow arrow (`guide.js`, `guideFor` in app.js) until done. Students can switch arrows off in How to play.
+- **Time**: 4-question prelabs, prediction of 20 words, demo about a third of the old length. `minActiveMin` (20) in the lab JSON gates the CER submit on active time (`engine/active.js`: counts only while the tab is visible and the student acted in the last 45 s, or a heating run is going).
+- **Hand-in**: badge drawn in code (gold when the challenge is done), Print / Save as PDF, or record JSON for the teacher page. The record carries `activeSec` and a check code (`engine/integrity.js`, FNV over student, lab, seed, active seconds, event count). It deters casual edits. It is not security.
+- **Teacher key**: `node tools/bundle.mjs` writes `dist/teacher-key.html` (git-ignored, one file, runs from file://). It skips intro, prelab, timer and gate, and adds a Key button with the answers and a lab and seed switcher. `--student` builds the same file without the teacher flag. Do not publish the teacher file.
+- **Later**: teacher page should verify the check code and show minutes; specific-heat lab.

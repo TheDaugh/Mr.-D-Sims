@@ -62,3 +62,16 @@ test("heating lab quests validate and every quest has text and a hint", async ()
   assert.deepEqual(validateQuests(lab2.quests), []);
   assert.ok(lab2.prelab.questions.length === 4);
 });
+
+test("labs: challenge samples, tutorial sample and tutorial quests are consistent", async () => {
+  const { readFileSync } = await import("node:fs");
+  const lab2 = JSON.parse(readFileSync(new URL("../content/labs/02-heating-curves.json", import.meta.url)));
+  const ids = (l) => new Set(l.quests.map((q) => q.id));
+  for (const l of [lab, lab2]) {
+    assert.ok(l.minActiveMin >= 15 && l.badgeTitle, l.id);
+    assert.ok(l.tutorial && l.challenge.length === 1 && l.challenge[0] !== l.tutorial.unknown, l.id);
+    assert.ok(l.quests.some((q) => q.optional) && l.quests.filter((q) => q.tutorial).every((q) => ids(l).has(q.id)), l.id);
+  }
+  assert.equal(lab2.tubes.join(), "X,Y,Z");
+  assert.ok(lab2.substances.some((s) => s.id === lab2.tutorial.id));
+});

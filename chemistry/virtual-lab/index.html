@@ -18,6 +18,7 @@
       <div id="coach"><b>Next:</b><span id="coachText"></span></div>
       <div id="timer" title="Active lab time. It only counts while you are working in the lab." hidden></div>
       <div class="hud">
+        <button class="hudbtn" id="btnKey" hidden title="Teacher answer key">🔑 Key</button>
         <button class="hudbtn" id="btnTasks" title="Tasks (J)">✔ Tasks</button>
         <button class="hudbtn" id="btnTheory" title="Theory (T)">📖 Theory</button>
         <button class="hudbtn" id="btnNotebook" title="Notebook (N)">📓 Notebook<i class="dot" id="nbDot" hidden></i></button>
@@ -45,6 +46,7 @@
             <tr><td><kbd>← ↑ → ↓</kbd></td><td>Walk (or W A S D)</td></tr><tr><td><kbd>E</kbd></td><td>Use what you face</td></tr>
             <tr><td><kbd>J</kbd></td><td>Show or hide tasks</td></tr><tr><td><kbd>N</kbd> <kbd>T</kbd> <kbd>M</kbd></td><td>Notebook, theory, microscope</td></tr>
             <tr><td><kbd>Esc</kbd></td><td>Back, or close a window</td></tr></tbody></table>
+          <label class="hint"><input type="checkbox" id="guideOn" checked> Show tutorial arrows</label>
           <p class="hint" style="margin:6px 0 0">Hover over anything to see its name. The yellow arrow shows the next thing to use.</p></section>
       </div>
     </div>
@@ -80,6 +82,7 @@
   <p id="doneInfo" class="hint" style="text-align:center"></p>
   <p>Turn in <b>one</b> of these: the printed report (choose Save as PDF), or the record file for your teacher's data page.</p>
   <div class="controls"><button class="primary" id="donePrint">Print / Save as PDF</button><button id="doneDl">Download record (.json)</button><button data-close>Close</button></div></div></dialog>
+<dialog class="dlg" id="dlgKey"><div class="body"><button class="x" data-close>Close ✕</button><h2>Teacher key</h2><div id="keyBody"></div></div></dialog>
 <dialog class="dlg small" id="dlgGate"><div class="body"><h2>Not enough lab time yet</h2><p id="gateMsg"></p><div class="controls"><button class="primary" data-close>Back to the lab</button></div></div></dialog>
 
 </div>

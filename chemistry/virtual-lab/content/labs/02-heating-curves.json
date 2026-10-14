@@ -301,7 +301,8 @@
       "where": {
         "item": "tongs",
         "on": true
-      }
+      },
+      "tutorial": true
     },
     {
       "id": "bench",
@@ -310,7 +311,8 @@
       "event": "view",
       "where": {
         "to": "bench"
-      }
+      },
+      "tutorial": true
     },
     {
       "id": "weighX",
@@ -319,7 +321,8 @@
       "event": "add",
       "where": {
         "sample": "X"
-      }
+      },
+      "tutorial": true
     },
     {
       "id": "runX",
@@ -328,7 +331,8 @@
       "event": "heat_end",
       "where": {
         "sample": "X"
-      }
+      },
+      "tutorial": true
     },
     {
       "id": "rowsX",
@@ -336,7 +340,8 @@
       "hint": "Open the notebook (N). Pause, then type the time, temperature and state into the table.",
       "state": "heat_rows",
       "sample": "X",
-      "count": 12
+      "count": 12,
+      "tutorial": true
     },
     {
       "id": "plotX",
@@ -344,7 +349,8 @@
       "hint": "Notebook, Graph tab: click where each reading belongs.",
       "state": "heat_plot",
       "sample": "X",
-      "count": 12
+      "count": 12,
+      "tutorial": true
     },
     {
       "id": "lineX",
@@ -352,7 +358,8 @@
       "hint": "Switch to Line, then click the two ends of each straight piece.",
       "state": "heat_lines",
       "sample": "X",
-      "count": 3
+      "count": 3,
+      "tutorial": true
     },
     {
       "id": "weighY",
@@ -415,12 +422,11 @@
   "kind": "heating",
   "standardMass": 10,
   "introSteps": [
-    "Watch the demo to see the controls (about a minute).",
-    "Do the pre-lab: read the theory, answer six questions, write a prediction. The lab door stays locked until you finish.",
-    "Suit up at the locker, go through the door, and take both sample tubes from the UNKNOWNS shelf. Fetch tongs: hot glass burns.",
-    "At your bench, weigh 10.0 g of Sample X into a beaker on the balance, move it to the hot plate and turn the plate on.",
-    "Open the notebook. Pause to read the clock and thermometer, then type the time, temperature and state into the table. Look at the beaker and the microscope to decide the state.",
-    "Plot your readings on the blank graph yourself: dots first, then straight lines through each piece. Repeat for Sample Y, then write your Claim, Evidence, Reasoning."
+    "Watch the 30-second demo, or skip it.",
+    "Do the pre-lab: four questions and a short prediction. The lab door stays locked until you finish.",
+    "Suit up and run Sample X with yellow arrows guiding every step: weigh 10 g, heat it, record readings, plot and draw the lines.",
+    "Repeat for Sample Y on your own. Sample Z is a challenge for the gold badge.",
+    "Write a Claim, Evidence, Reasoning, then hand in. Hand-in opens after the minimum active lab time."
   ],
   "introKeys": [
     [

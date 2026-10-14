@@ -14,6 +14,7 @@ import { runDemo } from "./demo.js";
 import { questDone, questProgress } from "../engine/quests.js";
 import { drawIcon } from "./icons.js";
 import { fitStage } from "./fit.js";
+import { createGuide } from "./guide.js";
 import { createActive } from "../engine/active.js";
 import { checkCode } from "../engine/integrity.js";
 import { drawBadge } from "./badge.js";
@@ -31,8 +32,9 @@ const SHORT = { NaCl: "Salt", sucrose: "Sugar", NaHCO3: "B.Soda", CaCO3: "Chalk"
 async function boot() {
   try {
     const params = new URLSearchParams(location.search), labFile = LABS[params.get("lab")] || LABS["unknown-solids"];
+    const getJSON = (u) => (window.__CONTENT__ && window.__CONTENT__[u] ? Promise.resolve(structuredClone(window.__CONTENT__[u])) : fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); }));
     const urls = ["content/species.json", "content/reactions.json", "content/labs/" + labFile, "content/rooms/main-lab.json", "content/hazards.json", "content/config.json"];
-    const [species, reactions, lab, roomDef, hazardData, config] = await Promise.all(urls.map((u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); })));
+    const [species, reactions, lab, roomDef, hazardData, config] = await Promise.all(urls.map(getJSON));
     const modeInfo = await resolveMode(params, config), key = "vlab:" + lab.id;
     let saved = null; try { saved = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) { saved = null; }
     if (saved && (saved.lab !== lab.id || saved.version !== 1)) saved = null;
@@ -367,7 +369,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   ctl.append(movers, h("p", { id: "where", class: "note", style: "margin:10px 0" }), adder,
     ...(HEAT ? [h("div", { class: "controls", style: "margin-top:10px" }, h("button", { id: "btnTare", onclick: tare }, "Tare"), h("button", { onclick: empty }, "Empty & rinse"))] : [
       h("div", { class: "controls", style: "margin-top:10px" },
-        h("button", { id: "btnTare", onclick: tare }, "Tare"), h("button", { onclick: stir }, "Stir"), h("button", { onclick: conduct }, "Test conductivity"),
+        h("button", { id: "btnTare", onclick: tare }, "Tare"), h("button", { onclick: stir }, "Stir"), h("button", { id: "btnCond", onclick: conduct }, "Test conductivity"),
         h("button", { onclick: () => skip(60) }, "Skip ahead 60 s"), h("button", { onclick: empty }, "Empty & rinse")),
       h("div", { class: "controls", style: "margin-top:10px" },
         h("label", {}, "Hot plate setting", h("span", { style: "display:flex;gap:8px;align-items:center" }, h("input", { id: "plate", type: "range", min: "50", max: "250", step: "10", value: "150", oninput: (e) => setPlate(undefined, +e.target.value) }), h("b", { id: "plateTxt" }, "150 °C"))),
@@ -496,7 +498,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   $("#leaveBench").addEventListener("click", () => setView("room"));
 
   function collectNotebook() {
-    S.student = $("#student").value.trim();
+    const stEl = $("#student"); if (stEl && stEl.value.trim()) S.student = stEl.value.trim();
     S.notebook = {}; table.querySelectorAll("select").forEach((x) => { (S.notebook[x.dataset.u] ||= {})[x.dataset.t] = x.value; });
   }
   function heatRecord() {
@@ -531,7 +533,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     for (const r of sn.cont) { const c = byKey(r.key); c.loc = r.loc; c.slot = r.slot; c.tare = r.tare; c.c = r.c; c.heat = r.heat || null; }
     Object.assign(P, sn.P); sn.visited.forEach((v) => visited.add(v));
     ACT.set(sn.activeSec || 0); log.events = sn.events; log.started = sn.started; log.t0 = performance.now() - sn.elapsed * 1000;
-    $("#student").value = sn.student || "";
+    { const stEl = $("#student"); if (stEl) stEl.value = sn.student || ""; }
     table.querySelectorAll("select").forEach((x) => { const v = (sn.notebook[x.dataset.u] || {})[x.dataset.t]; if (v) x.value = v; });
     if (!HEAT) $("#plate").value = S.plateC; if (book) book.refresh(); syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
     lockTable(); if (!quiet) { log.add("resume", { savedAt: sn.savedAt }); say("Welcome back. Your saved lab is restored."); }
@@ -660,6 +662,44 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     $("#doneInfo").textContent = r.challenge ? "You finished the required samples and the challenge." : "You finished the required samples. The challenge sample is still open if you want the gold badge.";
     openDlg("dlgDone");
   }
+  // ---------- tutorial arrows: one fixed sample, guided step by step ----------
+  const guide = createGuide($("#stage")); let guideOn = true, tutAnnounced = false;
+  $("#guideOn").addEventListener("change", (e) => { guideOn = e.target.checked; if (!guideOn) guide.hide(); });
+  const findTile = (id) => { for (let y = 0; y < 16; y++) for (let x = 0; x < 20; x++) { const t = tileAt(room, x, y); if (t && t.id === id) return { x, y }; } return null; };
+  const btnText = (txt) => [...document.querySelectorAll("#stage button")].find((b) => b.offsetParent && b.textContent.trim().startsWith(txt));
+  const TS = TUT ? (HEAT ? "s" : "u") + TUT.unknown : "";
+  function guideFor(id) {
+    const c = cur(), inRoom = S.view === "room", T = (t, x) => ["tile", t, x], E = (e, x) => (e ? ["el", e, x] : null), panelBtn = () => $("#panelBody button:not([disabled])");
+    const toBench = () => T("bench", "Go to the bench: face it and press E");
+    const take = (tile) => (S.panel ? E(btnText("Take all") || panelBtn(), "Take all, so you do not make extra trips") : T(tile, "Walk here and press E"));
+    const weigh = (src) => (inRoom ? toBench() : c.loc !== "balance" ? E($("#mvBalance"), "Move the container to the balance") : !c.tare ? E($("#btnTare"), "Tare: set the balance to zero") : S.srcKey !== src ? E($("#src"), "Choose this sample from the list") : E($("#btnAdd"), "Add it"));
+    switch (id) {
+      case "gear": return S.panel ? E(panelBtn(), "Put on goggles and apron") : T("locker", "Walk to the locker and press E");
+      case "tongs": return S.panel ? E(panelBtn(), "Take the tongs") : T("tongs_rack", "Walk to the rack and press E");
+      case "door": return T("door", "Walk through the door");
+      case "jars": return take("shelf_unknown");
+      case "liquids": return take("shelf_liquids");
+      case "bench": return toBench();
+      case "weigh": return weigh(TS);
+      case "weighX": return weigh(TS);
+      case "sol": return inRoom ? toBench() : c.loc !== "bench" ? E($("#mvBench"), "Move the container back to the bench") : S.srcKey !== "water" ? E($("#src"), "Choose water") : E($("#btnAdd"), "Add 20 mL, then press Stir");
+      case "cond": return inRoom ? toBench() : E($("#btnCond"), "Test the solution and watch the bulb");
+      case "runX": { if (inRoom) return toBench(); const hc = c.heat; if (c.loc !== "hotplate") return E($("#mvHot"), "Move the beaker to the hot plate"); if (!S.plateOn) return E($("#plateBtn"), "Turn the plate on"); if (!hc) return null; const need = Math.floor(hc.E / hsub(c).power / S.interval); return (S.heat[TUT.unknown].rows.length < need) ? E(document.querySelector("#dlgNotebook[open]") ? btnText("Add row") : $("#btnNotebook"), "Record the time and temperature") : E($("#advBtn"), "Advance one step, then record a row. Repeat."); }
+      case "rowsX": return E(document.querySelector("#dlgNotebook[open]") ? btnText("Add row") : $("#btnNotebook"), "Record a row for each step");
+      case "plotX": case "lineX": return E(document.querySelector("#dlgNotebook[open]") ? btnText("Graph") : $("#btnNotebook"), "Graph tab: click to plot, then Line to draw");
+    }
+    return null;
+  }
+  function updateGuide(items) {
+    if (!TUT || !guideOn || S.demo || S.stage !== "lab") return guide.hide();
+    const it = items.find((i) => i.q.tutorial && !(i.done || (i.prog || 0) >= 1 && i.q.count <= 3 && !["rowsX", "plotX", "lineX"].includes(i.q.id)));
+    if (!it) { guide.hide(); if (!tutAnnounced && items.some((i) => i.q.tutorial)) { tutAnnounced = true; say(`Tutorial done. Repeat these steps for the other samples; the arrows are off from here.`, "obs"); } return; }
+    const open = document.querySelector("#stage dialog[open]"); if (open && open.id !== "dlgNotebook") return guide.hide();
+    if (open && !["rowsX", "plotX", "lineX", "runX"].includes(it.q.id)) return guide.hide();
+    let g; try { g = guideFor(it.q.id); } catch (e) { g = null; }
+    if (!g) return guide.hide();
+    if (g[0] === "tile") { const t = findTile(g[1]); if (!t) return guide.hide(); S.view === "room" ? guide.onTile(roomCanvas, roomR.screen(t.x + 0.5, t.y + 0.5, 30), g[2]) : guide.onEl($("#leaveBench"), "Back to the room first"); } else guide.onEl(g[1], g[2]);
+  }
   let qsig = "";
   function renderTimer(now) {
     const t = $("#timer"); if (TEACHER || !lab.minActiveMin) { t.hidden = true; return; }
@@ -674,6 +714,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function renderQuests() {
     const st = qstate();
     const items = lab.quests.map((q) => ({ q, done: questDone(q, log.events, st), prog: questProgress(q, log.events, st) }));
+    updateGuide(items);
     const ai = items.findIndex((i) => !i.done && !i.q.optional), stage = S.stage, obs = log.events.filter((e) => e.type === "conductivity" || e.type === "observe").length;
     const sig = stage + "|" + items.map((i) => (i.done ? 1 : 0) + ":" + (i.prog ?? "")).join("|") + "|" + (obs > S.nbSeen);
     $("#nbDot").hidden = HEAT || !(obs > S.nbSeen) || S.submitted; $("#btnCER").hidden = stage !== "postlab" && stage !== "done"; $("#btnCER").textContent = stage === "done" ? "🏅 Hand in" : "✍ Write CER";
@@ -733,6 +774,20 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     await runDemo(demoApi);
     if (S.stage === "intro") { renderIntro($("#introBody"), stageCtx); openDlg("dlgIntro"); }
   }
+  function renderKey() {
+    const rows = [];
+    if (HEAT) {
+      for (const u of unknowns) { const b = lab.substances.find((x) => x.id === u.id), ref = lab.reference.find((x) => x.id === u.id), pr = profile(b, lab.standardMass);
+        rows.push(h("tr", {}, h("th", {}, `Sample ${u.label}${CH.includes(u.label) ? " (challenge)" : ""}`), h("td", {}, (ref || {}).name || u.id), h("td", {}, pr.segs.map((g) => g.kind === "melt" || g.kind === "boil" ? `${g.kind} plateau ${g.from} °C, ${Math.round(g.J / b.power)} s` : `${g.kind} ${g.from}→${g.to} °C, ${Math.round(g.J / b.power)} s`).join("; ")))); }
+    } else {
+      for (const u of unknowns) { const sp = speciesData.species.find((x) => x.id === u.id), t = truth[u.id];
+        rows.push(h("tr", {}, h("th", {}, `Unknown ${u.label}${CH.includes(u.label) ? " (challenge)" : ""}`), h("td", {}, sp.name), h("td", {}, lab.tests.map((x) => `${x.name}: ${optLabel(x, t[x.key])}`).join("; ")))); }
+    }
+    const labSel = h("select", {}, Object.keys(LABS).map((k) => h("option", { value: k, selected: k === (params.get("lab") || "unknown-solids") ? "" : null }, k))), seedIn = h("input", { type: "number", value: seed, style: "width:130px" });
+    $("#keyBody").replaceChildren(h("table", { class: "keys" }, h("tbody", {}, rows)), h("p", { class: "hint" }, `Seed ${seed}. The same seed gives the same unknowns, so you can match a student's record.`),
+      h("div", { class: "controls" }, labSel, seedIn, h("button", { onclick: () => { location.search = `?lab=${labSel.value}&seed=${seedIn.value}`; } }, "Load lab and seed"), h("button", { onclick: () => { location.search = `?lab=${labSel.value}&seed=${Math.floor(Math.random() * 1e9)}`; } }, "New random samples")));
+  }
+  $("#btnKey").addEventListener("click", () => { renderKey(); openDlg("dlgKey"); });
   const intro = () => { renderIntro($("#introBody"), stageCtx); openDlg("dlgIntro"); };
 
   ready = true;
@@ -741,6 +796,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   say("Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
   if (resume) restore(resume);
   renderQuests();
+  if (TEACHER) { $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
   if (S.stage === "intro") intro(); else if (S.stage === "prelab") { renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); }
   setInterval(autosave, 5000);
   $("#boot").hidden = true; $("#app").hidden = false; 

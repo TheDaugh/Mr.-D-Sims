@@ -71,6 +71,7 @@ export function createRoomRenderer(canvas, room) {
   }
 
   return {
+    screen: (gx, gy, z = 0) => P(gx, gy, z),
     draw(p, ppe, ready, facing, t) {
       const dt = Math.min(0.1, t - lastT); lastT = t;
       const k = Math.min(1, dt * 16); ax += (p.x - ax) * k; ay += (p.y - ay) * k;

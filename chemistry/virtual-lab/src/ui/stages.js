@@ -5,7 +5,7 @@ export function theoryNodes(lab) {
   return lab.theory.map((s, i) => h("details", { open: i === 0 }, h("summary", {}, h("b", {}, s.title)), s.body.map((p) => h("p", {}, p))));
 }
 
-const DEFAULT_STEPS = ["Watch the demo to see the controls in action (about a minute).", "Do the pre-lab: read the theory, answer six questions, and write a prediction. The lab door stays locked until you finish.", "Suit up, collect your jars, and run the five tests at your bench.", "Record only what you observe in your notebook, then submit.", "Write a Claim, Evidence, Reasoning to finish."];
+const DEFAULT_STEPS = ["Watch the 30-second demo, or skip it.", "Do the pre-lab: four questions and a short prediction. The lab door stays locked until you finish.", "Suit up and run your first sample (Unknown A) with yellow arrows guiding you.", "Repeat the tests on B and C yourself. Unknown D is a challenge for the gold badge.", "Record what you observe, write a Claim, Evidence, Reasoning, then hand in. Hand-in opens after the minimum active lab time."];
 
 export function renderIntro(box, ctx) {
   const { lab } = ctx;
