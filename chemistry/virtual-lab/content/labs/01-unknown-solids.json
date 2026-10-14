@@ -1,7 +1,7 @@
 {
   "id": "01-unknown-solids",
   "title": "Lab 1: Identify the Unknown White Solids",
-  "intro": "Four jars hold unidentified white solids. Each is one of the six known samples on the shelf. You will run the same five tests on the unknowns and on the knowns, record what you observe, and decide which is which. Several of the solids look alike, so no single test is enough.",
+  "intro": "Four jars hold unidentified white solids; A, B and C are required and D is a challenge. Each is one of the six known samples on the shelf. You will run the same five tests on the unknowns and on the knowns, record what you observe, and decide which is which. Several of the solids look alike, so no single test is enough.",
   "standard": {
     "solubility": {
       "g": 5,
@@ -186,18 +186,6 @@
   "prelab": {
     "questions": [
       {
-        "id": "p1",
-        "q": "Which of these is a physical property you can measure without changing the substance into something else?",
-        "options": [
-          "How much of it dissolves in water",
-          "Whether it fizzes with vinegar",
-          "Whether it turns brown when burned",
-          "Whether it forms a gas when mixed with acid"
-        ],
-        "correct": 0,
-        "explain": "Dissolving does not make a new substance; the particles are still there. Fizzing, browning and gas formation all produce new substances."
-      },
-      {
         "id": "p2",
         "q": "A solid dissolves in water and the conductivity bulb glows brightly. What does this tell you?",
         "options": [
@@ -208,18 +196,6 @@
         ],
         "correct": 0,
         "explain": "Current needs mobile charges. A bright bulb means many ions, which points to an ionic compound."
-      },
-      {
-        "id": "p3",
-        "q": "Sugar dissolves completely in water, but the bulb stays off. The best explanation is:",
-        "options": [
-          "Sugar dissolves as whole molecules, so there are no ions to carry current",
-          "Sugar did not really dissolve",
-          "Sugar makes the water too thick for current",
-          "Sugar ions are too large to move"
-        ],
-        "correct": 0,
-        "explain": "Sugar is molecular. It spreads out as intact molecules with no charge, so it dissolves without making ions."
       },
       {
         "id": "p4",
@@ -260,11 +236,11 @@
     ],
     "prediction": {
       "prompt": "Choose one known sample from the list: salt, sugar, baking soda, chalk, cornstarch, citric acid. Predict what you will see when you (1) stir it in water, (2) test the solution's conductivity, and (3) add vinegar. Explain each prediction using what you know about particles.",
-      "minWords": 30
+      "minWords": 20
     }
   },
   "postlab": {
-    "prompt": "Choose one of your four unknowns. What substance is it, and how do you know?",
+    "prompt": "Choose one of your unknowns. What substance is it, and how do you know?",
     "minWords": {
       "claim": 5,
       "evidence": 10,
@@ -350,14 +326,14 @@
     },
     {
       "id": "jars",
-      "text": "Take the four unknown jars",
+      "text": "Take the unknown jars",
       "hint": "Walk to the UNKNOWNS shelf at the back wall, face it and press E, then choose Take on each jar.",
       "event": "take",
       "where": {
         "jar": "^u"
       },
       "distinct": "jar",
-      "count": 4
+      "count": 3
     },
     {
       "id": "liquids",
@@ -396,14 +372,14 @@
       "where": {
         "substance": "water"
       },
-      "count": 4
+      "count": 3
     },
     {
       "id": "cond",
       "text": "Conductivity: test each unknown solution",
       "hint": "With the solution on the bench press Test conductivity and watch the bulb.",
       "event": "conductivity",
-      "count": 4
+      "count": 3
     },
     {
       "id": "vin",
@@ -413,7 +389,7 @@
       "where": {
         "substance": "vinegar"
       },
-      "count": 4
+      "count": 3
     },
     {
       "id": "iod",
@@ -423,7 +399,7 @@
       "where": {
         "substance": "iodine"
       },
-      "count": 4
+      "count": 3
     },
     {
       "id": "heat",
@@ -446,10 +422,10 @@
     },
     {
       "id": "notebook",
-      "text": "Fill in the whole notebook",
+      "text": "Fill in the notebook for A, B and C",
       "hint": "Open the notebook (the book icon at the top, or press N) and fill every box.",
       "state": "notebook",
-      "count": 24
+      "count": 18
     },
     {
       "id": "submit",
@@ -462,6 +438,23 @@
       "text": "Write your Claim, Evidence, Reasoning",
       "hint": "The CER form opens after you submit. Use your own data as evidence.",
       "state": "cer_done"
+    },
+    {
+      "id": "challenge",
+      "text": "Challenge: identify Unknown D too",
+      "hint": "Run the same tests on D and fill its row in the notebook. Optional, and it earns the Challenge badge.",
+      "state": "challenge",
+      "count": 6,
+      "optional": true
     }
-  ]
+  ],
+  "minActiveMin": 20,
+  "challenge": [
+    "D"
+  ],
+  "tutorial": {
+    "unknown": "A",
+    "id": "NaCl"
+  },
+  "badgeTitle": "Unknown White Solids"
 }

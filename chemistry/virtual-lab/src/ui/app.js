@@ -13,11 +13,17 @@ import { profile, stateAt, reading, assign } from "../engine/heating.js";
 import { runDemo } from "./demo.js";
 import { questDone, questProgress } from "../engine/quests.js";
 import { drawIcon } from "./icons.js";
+import { fitStage } from "./fit.js";
+import { createActive } from "../engine/active.js";
+import { checkCode } from "../engine/integrity.js";
+import { drawBadge } from "./badge.js";
 import { buildReport } from "../report.js";
 import { resolveMode } from "../mode.js";
 import { indexHazards, losePoints } from "../engine/hazards.js";
 import { parseRoom, step, facingTile, hasPPE, tileAt } from "../engine/room.js";
 
+fitStage($("#stage"));
+const CAP = 10;
 const LABS = { "unknown-solids": "01-unknown-solids.json", heating: "02-heating-curves.json" };
 const PRACTICE = { id: "practice", mass: 10, power: 100, T0: 20, mp: 50, bp: 150, Tend: 90, cs: 2, cl: 2.5, cg: 2, Lf: 200, Lv: 1000 };
 const SHORT = { NaCl: "Salt", sucrose: "Sugar", NaHCO3: "B.Soda", CaCO3: "Chalk", starch: "Starch", citric: "Citric", water: "Water", vinegar: "Vinegar", iodine: "Iodine" };
@@ -54,10 +60,17 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const seed = resume ? resume.seed : params.get("seed") ? parseInt(params.get("seed"), 10) : Math.floor(Math.random() * 1e9);
   const rng = mulberry32(seed);
   const order = solids.slice().sort(() => rng() - 0.5);
+  const TUT = lab.tutorial || null, CH = lab.challenge || [];
+  if (TUT && !HEAT) { order.splice(order.indexOf(TUT.id), 1); order.unshift(TUT.id); }
   const hsubs = HEAT ? assign(lab.substances.map((x) => x.id), seed, lab.tubes.length) : [];
+  if (HEAT && TUT) { const at = hsubs.indexOf(TUT.id), ti = lab.tubes.indexOf(TUT.unknown); if (at >= 0 && ti >= 0) [hsubs[at], hsubs[ti]] = [hsubs[ti], hsubs[at]]; }
   const unknowns = HEAT ? lab.tubes.map((L, i) => ({ label: L, id: hsubs[i] })) : order.slice(0, 4).map((id, i) => ({ label: "ABCD"[i], id }));
   const truth = {}; if (!HEAT) for (const id of solids) truth[id] = fingerprint(world, EL, id, lab.standard);
+  const TEACHER = window.__TEACHER__ === true;
+  const ACT = createActive();
   const log = new Log();
+  { const add0 = log.add.bind(log); log.add = (t, d) => { ACT.poke(performance.now() / 1000); return add0(t, d); }; }
+  for (const ev of ["keydown", "input", "change"]) $("#stage").addEventListener(ev, () => ACT.poke(performance.now() / 1000), true);
 
   const CONT = [
     { key: "b1", label: "B1", name: "Beaker 1", kind: "beaker", cap: 250, empty: 105.0, loc: "bench", slot: 0 },
@@ -137,8 +150,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   function renderIncident() {
     const inc = S.incident, box = $("#incident");
-    if (!inc) { box.hidden = true; return; }
-    box.hidden = false; const hz = inc.hz, kids = [h("h2", {}, "Incident: " + hz.title), h("p", {}, hz.happened)];
+    if (!inc) { box.hidden = true; syncSide(); return; }
+    box.hidden = false; syncSide(); const hz = inc.hz, kids = [h("h2", {}, "Incident: " + hz.title), h("p", {}, hz.happened)];
     if (inc.phase === "treat") kids.push(h("p", { class: "f-stop" }, `Get to the ${NEEDS_NAME[hz.needs]} and press E on it. `, h("b", {}, h("span", { id: "incLeft" }, "30"), " s left.")), h("p", { class: "hint" }, "Walk there in the room. If you don't know where it is, look around."));
     if (inc.phase === "report") {
       kids.push(h("p", {}, h("b", {}, "What went wrong: "), hz.why), h("p", {}, hz.quiz.q));
@@ -337,25 +350,24 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
 
   const ctl = $("#controls");
   const movers = h("div", { class: "controls" },
-    h("label", {}, "Container", h("select", { id: "cont", onchange: (e) => { S.sel = e.target.value; renderControls(); } }, CONT.map((c) => h("option", { value: c.key }, c.name)))),
-    h("div", {}, h("div", { class: "hint" }, "Move it to"), h("div", { class: "controls", style: "gap:6px" },
-      h("button", { onclick: () => moveTo("bench") }, "Bench"), h("button", { onclick: () => moveTo("balance") }, "Balance"), h("button", { onclick: () => moveTo("hotplate") }, "Hot plate"))));
+    h("label", {}, h("select", { id: "cont", onchange: (e) => { S.sel = e.target.value; renderControls(); } }, CONT.map((c) => h("option", { value: c.key }, c.name)))),
+    h("span", { class: "hint" }, "→"), h("button", { id: "mvBench", onclick: () => moveTo("bench") }, "Bench"), h("button", { id: "mvBalance", onclick: () => moveTo("balance") }, "Balance"), h("button", { id: "mvHot", onclick: () => moveTo("hotplate") }, "Hot plate"));
   const adder = h("div", { class: "controls" },
-    h("label", {}, "Take from", srcSel),
-    h("label", {}, "Amount", h("span", { style: "display:flex;gap:6px;align-items:center" }, h("input", { id: "amt", type: "number", min: "0.1", step: "0.1", value: HEAT ? "10.0" : "1.0", style: "width:90px" }), h("span", { id: "unit" }, "g"))),
-    h("button", { class: "primary", onclick: addSubstance }, "Add"));
+    h("label", {}, srcSel),
+    h("label", {}, h("span", { style: "display:flex;gap:4px;align-items:center" }, h("input", { id: "amt", type: "number", min: "0.1", step: "0.1", value: HEAT ? "10.0" : "1.0", style: "width:90px" }), h("span", { id: "unit" }, "g"))),
+    h("button", { id: "btnAdd", class: "primary", onclick: addSubstance }, "Add"));
   const timeCtl = () => {
     const seg = h("span", { class: "seg", id: "speedSeg" }, [1, 5, 20].map((n) => h("button", { "data-s": n, onclick: () => { S.speed = n; log.add("speed", { speed: n }); renderControls(); } }, "×" + n)));
     const iv = h("select", { id: "ivSel", "aria-label": "Step size", onchange: (e) => { S.interval = +e.target.value; } }, [10, 15].map((n) => h("option", { value: n }, n + " s")));
-    return [h("div", { class: "controls", style: "margin:6px 0 12px" }, h("button", { id: "plateBtn", class: "primary", onclick: () => setPlate(!S.plateOn) }, "Turn plate on"), h("button", { id: "pauseBtn", onclick: () => togglePause() }, "⏸ Pause"), seg, h("label", {}, "Step ", iv), h("button", { id: "advBtn", onclick: advance1 }, "Advance one step")),
+    return [h("div", { class: "controls", style: "margin:6px 0 12px" }, h("button", { id: "plateBtn", class: "primary", onclick: () => setPlate(!S.plateOn) }, "Turn plate on"), h("button", { id: "pauseBtn", onclick: () => togglePause() }, "⏸ Pause"), seg, h("label", {}, iv), h("button", { id: "advBtn", onclick: advance1 }, "Advance one step")),
       h("div", { class: "read", style: "margin:0" }, h("div", {}, h("b", { id: "rTime" }, "0:00"), h("span", {}, "Time heated (min:s)")), h("div", {}, h("b", { id: "rTemp" }, "--"), h("span", {}, "Thermometer (°C)")))];
   };
   const [timeRow, timeRead] = HEAT ? timeCtl() : [];
   if (HEAT) ctl.append(timeRead, timeRow);
   ctl.append(movers, h("p", { id: "where", class: "note", style: "margin:10px 0" }), adder,
-    ...(HEAT ? [h("div", { class: "controls", style: "margin-top:10px" }, h("button", { onclick: tare }, "Tare balance"), h("button", { onclick: empty }, "Empty & rinse"))] : [
+    ...(HEAT ? [h("div", { class: "controls", style: "margin-top:10px" }, h("button", { id: "btnTare", onclick: tare }, "Tare"), h("button", { onclick: empty }, "Empty & rinse"))] : [
       h("div", { class: "controls", style: "margin-top:10px" },
-        h("button", { onclick: tare }, "Tare balance"), h("button", { onclick: stir }, "Stir"), h("button", { onclick: conduct }, "Test conductivity"),
+        h("button", { id: "btnTare", onclick: tare }, "Tare"), h("button", { onclick: stir }, "Stir"), h("button", { onclick: conduct }, "Test conductivity"),
         h("button", { onclick: () => skip(60) }, "Skip ahead 60 s"), h("button", { onclick: empty }, "Empty & rinse")),
       h("div", { class: "controls", style: "margin-top:10px" },
         h("label", {}, "Hot plate setting", h("span", { style: "display:flex;gap:8px;align-items:center" }, h("input", { id: "plate", type: "range", min: "50", max: "250", step: "10", value: "150", oninput: (e) => setPlate(undefined, +e.target.value) }), h("b", { id: "plateTxt" }, "150 °C"))),
@@ -394,8 +406,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   if (!HEAT) { $("#steps").replaceChildren(...lab.steps.map((s) => h("li", {}, s))); $("#tests").replaceChildren(...lab.tests.map((t) => h("li", {}, h("b", {}, t.name + ". "), t.how))); }
   if (!HEAT) table.replaceChildren(
     h("thead", {}, h("tr", {}, h("th", {}, "Sample"), lab.tests.map((t) => h("th", {}, t.name)), h("th", {}, "I think it is"))),
-    h("tbody", {}, unknowns.map((u) => h("tr", { "data-u": u.label },
-      h("th", { scope: "row" }, "Unknown " + u.label),
+    h("tbody", {}, unknowns.map((u) => h("tr", { "data-u": u.label, ...(CH.includes(u.label) ? { "data-ch": "1", class: "challenge" } : {}) },
+      h("th", { scope: "row" }, "Unknown " + u.label + (CH.includes(u.label) ? " (challenge)" : "")),
       lab.tests.map((t) => h("td", {}, h("select", { "data-u": u.label, "data-t": t.key, "aria-label": `${t.name} of unknown ${u.label}` }, h("option", { value: "" }, "—"), t.options.map(([v, l]) => h("option", { value: v }, l))))),
       h("td", {}, h("select", { "data-u": u.label, "data-t": "id", "aria-label": `Identity of unknown ${u.label}` }, h("option", { value: "" }, "—"), solids.map((id) => h("option", { value: id }, speciesData.species.find((s) => s.id === id).name))))))));
   let ready = false;
@@ -411,28 +423,31 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function setView(v) {
     S.view = v; closePanel();
     roomCanvas.hidden = v !== "room"; canvas.hidden = v !== "bench"; $("#controlsCard").hidden = v !== "bench";
-    { const cc = $("#controlsCard"), st = cc.parentNode; if (v === "bench") st.insertBefore(cc, $("#panelCard").nextSibling); else st.appendChild(cc); }
+    syncSide(); $("#leaveBench").hidden = v !== "bench";
     $("#viewHint").textContent = v === "room" ? "Arrow keys or WASD move you along the floor tiles (diagonally on screen). Press E, or click an object next to you, to use it." : "Click a jar to choose it, or a container to select it. Esc returns to the room.";
     log.add("view", { to: v });
   }
-  function closePanel() { S.panel = null; $("#panelCard").hidden = true; }
+  function closePanel() { S.panel = null; $("#panelCard").hidden = true; syncSide(); }
+  function syncSide() { $("#helpCard").hidden = !(S.view === "room" && !S.panel && !S.incident); }
+  function toggleTasks() { const p = $("#taskPanel"); p.hidden = !p.hidden; $("#btnTasks").classList.toggle("on", !p.hidden); }
   function renderInv() {
-    $("#invCount").textContent = `(${S.inv.length}/6)`;
-    $("#inv").replaceChildren(...Array.from({ length: 6 }, (_, i) => { const s = sources.find((x) => x.key === S.inv[i]); return s ? h("div", { class: "slot full" }, h("i", { style: `background:${s.color}` }), s.label.replace(" (known)", "")) : h("div", { class: "slot" }, ""); }));
+    $("#invCount").textContent = `(${S.inv.length}/${CAP})`;
+    $("#inv").replaceChildren(...Array.from({ length: CAP }, (_, i) => { const s = sources.find((x) => x.key === S.inv[i]); return s ? h("div", { class: "slot full" }, h("i", { style: `background:${s.color}` }), s.label.replace(" (known)", "")) : h("div", { class: "slot" }, ""); }));
   }
   function take(key) {
-    if (S.inv.length >= 6) return blocked("inventory_full", "Your hands are full (6 jars). Return one to a shelf first.");
+    if (S.inv.length >= CAP) return blocked("inventory_full", `Your hands are full (${CAP} jars). Put one back on a shelf first.`);
     S.inv.push(key); const s = sources.find((x) => x.key === key);
     log.add("take", { jar: key, shown_as: s.label }); say(`You take ${s.label}.`); syncUnit(); renderInv(); renderPanel();
   }
+  function takeAll(group) { for (const s of GROUP_OF(group)) if (!S.inv.includes(s.key) && S.inv.length < CAP) take(s.key); }
   function putBack(key) {
     S.inv = S.inv.filter((k) => k !== key); log.add("return", { jar: key }); say("You put the jar back on the shelf."); syncUnit(); renderInv(); renderPanel();
   }
   function renderPanel() {
     const t = S.panel; if (!t) return;
-    $("#panelCard").hidden = false; $("#panelTitle").textContent = t.type === "shelf" ? t.group : t.type === "locker" ? "Locker" : "Tong rack";
+    $("#panelCard").hidden = false; syncSide(); $("#panelTitle").textContent = t.type === "shelf" ? t.group : t.type === "locker" ? "Locker" : "Tong rack";
     if (t.type === "shelf" && !GROUP_OF(t.group).length) $("#panelBody").replaceChildren(h("p", { class: "hint" }, "Nothing on this shelf is needed for today's lab."));
-    else if (t.type === "shelf") $("#panelBody").replaceChildren(...GROUP_OF(t.group).map((s) => { const has = S.inv.includes(s.key); return h("div", {}, h("span", {}, s.label.replace(" (known)", "")), h("button", { onclick: () => (has ? putBack(s.key) : take(s.key)) }, has ? "Put back" : "Take")); }));
+    else if (t.type === "shelf") $("#panelBody").replaceChildren(h("div", {}, h("span", { class: "hint" }, "Everything on this shelf"), h("button", { class: "primary", onclick: () => takeAll(t.group) }, "Take all")), ...GROUP_OF(t.group).map((s) => { const has = S.inv.includes(s.key); return h("div", {}, h("span", {}, s.label.replace(" (known)", "")), h("button", { onclick: () => (has ? putBack(s.key) : take(s.key)) }, has ? "Put back" : "Take")); }));
     else {
       const NAME = { goggles: "Goggles", apron: "Apron", tongs: "Tongs" };
       $("#panelBody").replaceChildren(...t.items.map((k) => h("div", {}, h("span", {}, NAME[k]), h("button", { onclick: () => { togglePPE(k); renderPanel(); } }, S.ppe[k] ? (k === "tongs" ? "Put back" : "Take off") : (k === "tongs" ? "Pick up" : "Put on")))));
@@ -460,9 +475,11 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const k = e.key.toLowerCase();
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (S.demo) { if (k === "escape") demoApi.demo.stop(); return; }
+    if (k === "escape" && document.querySelector("#stage dialog[open]")) { const d = [...document.querySelectorAll("#stage dialog[open]")].pop(); if (!d.hasAttribute("data-gate") && d.id !== "dlgIntro" && d.id !== "dlgDone") { d.close(); syncVeil(); } return; }
     if (document.querySelector("dialog[open]") || /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
     if (k === "escape") { if (S.panel) closePanel(); else if (S.view === "bench") setView("room"); return; }
     if (!["lab", "postlab", "done"].includes(S.stage)) return;
+    if (k === "j") return toggleTasks();
     if (k === "n") return openNotebook(); if (k === "t") return openDlg("dlgTheory"); if (k === "m") return openMicro();
     if (HEAT && S.view === "bench" && k === " ") { e.preventDefault(); togglePause(); return; }
     if (S.view !== "room" || e.target.tagName === "BUTTON") return;
@@ -489,6 +506,9 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     return { version: 2, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, stage: S.stage, submitted: S.cerDone, prelab: { correct, total: qs.length, prediction: S.prelab.prediction, answers: S.prelab.answers }, samples, cer: S.cerDone ? S.cer : null, safety: S.safety, events: log.events };
   }
   function record() {
+    const r = baseRecord(); r.activeSec = Math.round(ACT.sec); r.minActive = lab.minActiveMin || 0; r.challenge = challengeDone(); r.code = checkCode({ student: r.student, lab: lab.id, seed, activeSec: r.activeSec, events: log.events.length, cerDone: S.cerDone }); r.codeEvents = log.events.length; return r;
+  }
+  function baseRecord() {
     if (HEAT) return heatRecord();
     collectNotebook();
     return { version: 2, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, unknowns, notebook: S.notebook, stage: S.stage, submitted: S.submitted, prelab: S.prelab, cer: S.cerDone ? S.cer : null, safety: S.safety, summary: { blocked_hazards: log.count("hazard"), blocked_procedures: log.count("procedure"), checks: log.count("check") }, events: log.events };
@@ -500,7 +520,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const SAVE_KEY = "vlab:" + lab.id;
   function snapshot() {
     collectNotebook();
-    return { version: 1, lab: lab.id, seed, student: S.student, savedAt: new Date().toISOString(), started: log.started, elapsed: (performance.now() - log.t0) / 1000, events: log.events,
+    return { version: 1, lab: lab.id, seed, student: S.student, savedAt: new Date().toISOString(), started: log.started, activeSec: ACT.sec, elapsed: (performance.now() - log.t0) / 1000, events: log.events,
       S: { ppe: S.ppe, inv: S.inv, srcKey: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, safety: S.safety, sel: S.sel, stage: S.stage, prelab: S.prelab, cer: S.cer, submitted: S.submitted, cerDone: S.cerDone, touched: S.touched, nbSeen: S.nbSeen, heat: S.heat, speed: S.speed, paused: S.paused, interval: S.interval }, P, visited: [...visited], notebook: S.notebook,
       cont: CONT.map((c) => ({ key: c.key, loc: c.loc, slot: c.slot, tare: c.tare, c: c.c, heat: c.heat || null })) };
   }
@@ -510,7 +530,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     for (const k of ["stage", "prelab", "cer", "submitted", "cerDone", "touched", "nbSeen", "heat", "speed", "paused", "interval"]) if (sn.S[k] !== undefined) S[k] = sn.S[k];
     for (const r of sn.cont) { const c = byKey(r.key); c.loc = r.loc; c.slot = r.slot; c.tare = r.tare; c.c = r.c; c.heat = r.heat || null; }
     Object.assign(P, sn.P); sn.visited.forEach((v) => visited.add(v));
-    log.events = sn.events; log.started = sn.started; log.t0 = performance.now() - sn.elapsed * 1000;
+    ACT.set(sn.activeSec || 0); log.events = sn.events; log.started = sn.started; log.t0 = performance.now() - sn.elapsed * 1000;
     $("#student").value = sn.student || "";
     table.querySelectorAll("select").forEach((x) => { const v = (sn.notebook[x.dataset.u] || {})[x.dataset.t]; if (v) x.value = v; });
     if (!HEAT) $("#plate").value = S.plateC; if (book) book.refresh(); syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
@@ -527,11 +547,24 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
 
   // ---------- printable report ----------
   const optLabel = (t, v) => ((t.options.find((o) => o[0] === v) || [])[1]) || v;
+  function badgeImg(rec) { const cv = document.createElement("canvas"); cv.width = 480; cv.height = 360; drawBadge(cv, { title: lab.badgeTitle || lab.title, student: S.student, gold: rec.challenge, minutes: Math.round(rec.activeSec / 60), code: rec.code, date: new Date().toLocaleDateString() }); return h("img", { src: cv.toDataURL("image/png"), style: "width:3.2in;float:right;margin:0 0 8px 12px" }); }
+  function printHeat() {
+    const rec = record(), nm = (id) => (lab.reference.find((x) => x.id === id) || {}).name || "(not chosen)";
+    $("#report").replaceChildren(
+      badgeImg(rec), h("h1", {}, lab.title), h("p", {}, `${S.student || "Student"} · ${new Date(log.started).toLocaleString()} · active lab time ${Math.round(rec.activeSec / 60)} min · code ${rec.code}`),
+      h("h2", {}, "Pre-lab"), h("p", {}, `Questions correct: ${rec.prelab.correct} of ${rec.prelab.total}.`), h("p", {}, h("b", {}, "Prediction: "), S.prelab.prediction || "(none)"),
+      ...unknowns.flatMap((u) => { const d = rec.samples[u.label], rows = goodRows(S.heat[u.label]); return rows.length || !CH.includes(u.label) ? [h("h2", {}, `Sample ${u.label}${CH.includes(u.label) ? " (challenge)" : ""}`),
+        h("table", {}, h("thead", {}, h("tr", {}, ["Time (s)", "Temp (°C)", "State"].map((x) => h("th", {}, x)))), h("tbody", {}, rows.map((r) => h("tr", {}, h("td", {}, r.t), h("td", {}, r.T), h("td", {}, r.s || ""))))),
+        h("img", { src: d.plotPng, style: "width:5.2in;max-width:100%" })] : []; }),
+      S.cerDone ? h("div", {}, h("h2", {}, "Claim, Evidence, Reasoning"), h("p", {}, `Sample X is ${nm(S.cer.X)}. Sample Y is ${nm(S.cer.Y)}.${S.cer.Z ? " Sample Z is " + nm(S.cer.Z) + "." : ""}`), h("p", {}, h("b", {}, "Claim: "), S.cer.claim), h("p", {}, h("b", {}, "Evidence:")), h("ul", {}, (S.cer.evidence || []).map((x) => h("li", {}, x)), S.cer.note ? h("li", {}, S.cer.note) : null), h("p", {}, h("b", {}, "Reasoning: "), S.cer.reasoning)) : h("p", {}, "CER not submitted.")
+    ); window.print();
+  }
   $("#print").addEventListener("click", () => {
+    if (HEAT) return printHeat();
     const rec = record(), r = buildReport(rec, truth, H), mm = (sec) => `${Math.floor(sec / 60)} min ${sec % 60} s`, mark = (ok) => (ok === null ? "—" : ok ? "✔" : "✘");
     const right = Object.entries(S.prelab.answers).filter(([id, i]) => lab.prelab.questions.find((q) => q.id === id).correct === i).length;
     $("#report").replaceChildren(...[
-      h("h1", {}, lab.title), h("p", {}, `${r.student} · ${new Date(r.started).toLocaleString()} · ${r.mode} mode · time in lab ${mm(r.seconds)}`),
+      badgeImg(rec), h("h1", {}, lab.title), h("p", {}, `code ${rec.code} · active ${Math.round(rec.activeSec / 60)} min · ${r.student} · ${new Date(r.started).toLocaleString()} · ${r.mode} mode · time in lab ${mm(r.seconds)}`),
       h("h2", {}, "Pre-lab"), h("p", {}, `Concept questions correct on the first attempt: ${right} of ${lab.prelab.questions.length}.`), h("p", {}, h("b", {}, "Prediction: "), S.prelab.prediction || "(none)"),
       h("h2", {}, "Setup and safety"), h("ul", {}, r.setup.map((x) => h("li", {}, `${mark(x.ok)} ${x.label}`)), r.points !== null && r.mode === "consequences" ? h("li", {}, `Safety points: ${r.points} / 100`) : null),
       h("p", {}, `Unsafe actions blocked: ${r.blocked.hazards}. Procedure errors blocked: ${r.blocked.procedures}.`),
@@ -567,11 +600,15 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   for (const cv of [canvas, roomCanvas]) cv.addEventListener("mouseleave", () => { tip.hidden = true; });
 
   // ---------- dialogs, stages, quests, microscope, demo ----------
-  const dlg = (id) => document.getElementById(id), openDlg = (id) => { if (!dlg(id).open) dlg(id).showModal(); }, closeDlg = (id) => { if (dlg(id).open) dlg(id).close(); };
+  const dlg = (id) => document.getElementById(id), syncVeil = () => { $("#veil").hidden = !document.querySelector("#stage dialog[open]"); };
+  const openDlg = (id) => { if (!dlg(id).open) { dlg(id).show(); syncVeil(); } }, closeDlg = (id) => { if (dlg(id).open) { dlg(id).close(); syncVeil(); } };
+  document.querySelectorAll("#stage dialog").forEach((d) => { if (d.hasAttribute("data-wide")) d.classList.add("wide"); d.addEventListener("close", syncVeil); });
   for (const id of ["dlgIntro", "dlgPrelab"]) dlg(id).addEventListener("cancel", (e) => e.preventDefault());
   document.querySelectorAll("dialog [data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
   const nbCells = () => [...table.querySelectorAll("select")];
-  const nbFilled = () => nbCells().filter((x) => x.value).length;
+  const nbReq = () => nbCells().filter((x) => !x.closest("tr[data-ch]"));
+  const nbFilled = () => nbReq().filter((x) => x.value).length;
+  const chFilled = () => nbCells().filter((x) => x.closest("tr[data-ch]") && x.value).length;
   function lockTable() { if (HEAT) return; nbCells().forEach((x) => { x.disabled = S.submitted; }); const b = $("#nbSubmit"); if (b) b.hidden = S.submitted; $("#nbDone").hidden = !S.submitted; }
   function finishData() {
     if (S.stage === "lab") { S.stage = "postlab"; log.add("data_done", {}); }
@@ -584,7 +621,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   let confirmSubmit = false;
   function updateNb() {
-    const n = nbFilled(), tot = nbCells().length, b = $("#nbSubmit"); if (!b) return;
+    const n = nbFilled(), tot = nbReq().length, b = $("#nbSubmit"); if (!b) return;
     b.disabled = n < tot; b.textContent = confirmSubmit ? "Really submit? You cannot change answers after." : "Submit answers";
     $("#nbCount").textContent = S.submitted ? "Submitted." : `${n} of ${tot} boxes filled. No answer check: retest anything you doubt before you submit.`;
   }
@@ -603,26 +640,46 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     onIntroDone: (name) => { S.student = name; S.stage = "prelab"; log.add("stage", { to: "prelab", name }); closeDlg("dlgIntro"); renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); },
     onAnswer: (id, choice, correct) => log.add("prelab_answer", { q: id, choice, correct }),
     onPrelabDone: () => { S.stage = "lab"; log.add("prelab_done", { prediction: S.prelab.prediction }); closeDlg("dlgPrelab"); renderQuests(); say("Pre-lab done. The lab door will open once you have goggles and an apron."); },
-    onCerDone: (c) => { S.cer = c; S.cerDone = true; S.stage = "done"; log.add("cer", c); closeDlg("dlgCER"); openDlg("dlgDone"); },
+    onCerDone: (c) => { if (!gateOk()) return showGate(); S.cer = c; S.cerDone = true; S.stage = "done"; log.add("cer", c); closeDlg("dlgCER"); openDone(); },
     onCerClose: () => closeDlg("dlgCER")
   };
   $("#theoryBody").replaceChildren(...theoryNodes(lab));
-  $("#btnTheory").addEventListener("click", () => openDlg("dlgTheory")); $("#btnNotebook").addEventListener("click", openNotebook);
+  $("#btnTheory").addEventListener("click", () => openDlg("dlgTheory")); $("#btnTasks").addEventListener("click", toggleTasks); $("#btnTasks").classList.add("on"); $("#btnNotebook").addEventListener("click", openNotebook);
   $("#btnMicro").addEventListener("click", () => openMicro()); $("#btnDemo").addEventListener("click", () => demoStart());
-  $("#btnMenu").addEventListener("click", () => openDlg("dlgMenu")); $("#btnCER").addEventListener("click", openCER);
-  $("#doneMenu").addEventListener("click", () => { closeDlg("dlgDone"); openDlg("dlgMenu"); });
+  $("#btnMenu").addEventListener("click", () => openDlg("dlgMenu")); $("#btnCER").addEventListener("click", () => (S.stage === "done" ? openDone() : openCER()));
+  $("#donePrint").addEventListener("click", () => $("#print").click());
+  $("#doneDl").addEventListener("click", () => $("#download").click());
 
   // quest list and coach bar
+  const needSec = () => (lab.minActiveMin || 0) * 60, gateOk = () => TEACHER || ACT.sec >= needSec();
+  const minTxt = () => `${Math.floor(ACT.sec / 60)} of ${lab.minActiveMin || 0} active minutes`;
+  function showGate() { $("#gateMsg").textContent = `You have ${minTxt()}. Your answers are kept. Use the rest of the time to recheck a reading, retest a sample, or try the Challenge, then submit again.`; closeDlg("dlgCER"); openDlg("dlgGate"); }
+  function openDone() {
+    const r = record(), mins = Math.round(r.activeSec / 60);
+    drawBadge($("#badge"), { title: lab.badgeTitle || lab.title, student: S.student, gold: r.challenge, minutes: mins, code: r.code, date: new Date().toLocaleDateString() });
+    $("#doneInfo").textContent = r.challenge ? "You finished the required samples and the challenge." : "You finished the required samples. The challenge sample is still open if you want the gold badge.";
+    openDlg("dlgDone");
+  }
   let qsig = "";
+  function renderTimer(now) {
+    const t = $("#timer"); if (TEACHER || !lab.minActiveMin) { t.hidden = true; return; }
+    t.hidden = S.stage === "intro" || S.stage === "prelab"; const m = Math.floor(ACT.sec / 60), s2 = Math.floor(ACT.sec % 60), ok = ACT.sec >= needSec();
+    t.textContent = `⏱ ${m}:${String(s2).padStart(2, "0")} / ${lab.minActiveMin}:00`; t.className = ok ? "ok" : now - lastPoke() > 40 ? "idle" : "";
+  }
+  const lastPoke = () => ACT.last();
+  function qstate() {
+    const hk = Object.keys(S.heat); return { ppe: S.ppe, notebookFilled: nbFilled(), challengeFilled: chFilled(), submitted: S.submitted, cerDone: S.cerDone, heat: { rows: Object.fromEntries(hk.map((k) => [k, goodRows(S.heat[k]).length])), plot: Object.fromEntries(hk.map((k) => [k, S.heat[k].items.filter((i) => i.k === "p").length])), lines: Object.fromEntries(hk.map((k) => [k, S.heat[k].items.filter((i) => i.k === "l").length])) } };
+  }
+  const challengeDone = () => { const st = qstate(); return lab.quests.filter((q) => q.optional).every((q) => questDone(q, log.events, st)); };
   function renderQuests() {
-    const hk = Object.keys(S.heat), st = { ppe: S.ppe, notebookFilled: nbFilled(), submitted: S.submitted, cerDone: S.cerDone, heat: { rows: Object.fromEntries(hk.map((k) => [k, goodRows(S.heat[k]).length])), plot: Object.fromEntries(hk.map((k) => [k, S.heat[k].items.filter((i) => i.k === "p").length])), lines: Object.fromEntries(hk.map((k) => [k, S.heat[k].items.filter((i) => i.k === "l").length])) } };
+    const st = qstate();
     const items = lab.quests.map((q) => ({ q, done: questDone(q, log.events, st), prog: questProgress(q, log.events, st) }));
-    const ai = items.findIndex((i) => !i.done), stage = S.stage, obs = log.events.filter((e) => e.type === "conductivity" || e.type === "observe").length;
+    const ai = items.findIndex((i) => !i.done && !i.q.optional), stage = S.stage, obs = log.events.filter((e) => e.type === "conductivity" || e.type === "observe").length;
     const sig = stage + "|" + items.map((i) => (i.done ? 1 : 0) + ":" + (i.prog ?? "")).join("|") + "|" + (obs > S.nbSeen);
-    $("#nbDot").hidden = HEAT || !(obs > S.nbSeen) || S.submitted; $("#btnCER").hidden = stage !== "postlab";
+    $("#nbDot").hidden = HEAT || !(obs > S.nbSeen) || S.submitted; $("#btnCER").hidden = stage !== "postlab" && stage !== "done"; $("#btnCER").textContent = stage === "done" ? "🏅 Hand in" : "✍ Write CER";
     if (sig === qsig) return; qsig = sig;
-    const doneN = items.filter((i) => i.done).length, from = Math.max(0, (ai < 0 ? items.length : ai) - 1), shown = items.slice(from, from + 5);
-    $("#questHead").textContent = `Tasks (${doneN} of ${items.length})`;
+    const reqI = items.filter((i) => !i.q.optional), doneN = reqI.filter((i) => i.done).length, from = Math.max(0, (ai < 0 ? items.length : ai) - 1), shown = items.slice(from, from + 5);
+    $("#questHead").textContent = `Tasks (${doneN} of ${reqI.length})`;
     $("#quests").replaceChildren(...shown.map((i) => h("li", { class: i.done ? "done" : i === items[ai] ? "active" : "" }, h("span", { class: "tick" }, i.done ? "✔" : i === items[ai] ? "▶" : "○"), " ", i.q.text, i.q.count > 1 && i.prog !== null && !i.done ? ` (${i.prog}/${i.q.count})` : "")), ...(items.length - from - 5 > 0 ? [h("li", { class: "more" }, `+ ${items.length - from - 5} more`)] : []));
     $("#coachText").textContent = stage === "intro" || stage === "prelab" ? "Finish the pre-lab. The lab door stays locked until you do." : stage === "done" ? "Lab complete. Open Save / Print to hand in your record." : stage === "postlab" && ai < 0 ? "Write your CER with the button at the top." : ai >= 0 ? items[ai].q.hint : "All tasks done.";
   }
@@ -686,7 +743,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   renderQuests();
   if (S.stage === "intro") intro(); else if (S.stage === "prelab") { renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); }
   setInterval(autosave, 5000);
-  $("#boot").hidden = true; $("#app").hidden = false; if (HEAT) $("#print").hidden = true;
+  $("#boot").hidden = true; $("#app").hidden = false; 
   let last = performance.now(), t0 = last, lastCtl = 0;
   function frame(now) {
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
@@ -698,11 +755,12 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     stepAll(sdt); tickIncident(now);
     if (HEAT && S.stepTo != null) { const c = cur(); if (!c.heat || c.loc !== "hotplate" || !S.plateOn) S.stepTo = null; else if (c.heat.E / hsub(c).power >= S.stepTo - 1e-6) { S.stepTo = null; S.paused = true; say(`Paused at ${mmss(c.heat.E / hsub(c).power)}. Write the reading down.`); } }
     if (S.view === "room") roomR.draw(P, S.ppe, hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
-    if (now - lastCtl > 250) { renderControls(); renderQuests(); lastCtl = now; }
+    ACT.tick(now / 1000, !document.hidden, (S.stage === "lab" || S.stage === "postlab") && !S.demo && !TEACHER, HEAT && S.plateOn && !S.paused);
+    if (now - lastCtl > 250) { renderControls(); renderQuests(); renderTimer(now / 1000); lastCtl = now; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  window.__vl = { H, S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE }, stageCtx, demoApi, openMicro, openNotebook, openCER, quests: () => lab.quests, nbCells, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
+  window.__vl = { ACT, H, S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE }, stageCtx, demoApi, openMicro, openNotebook, openCER, quests: () => lab.quests, nbCells, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
 }
 
 boot();

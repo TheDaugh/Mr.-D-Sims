@@ -60,5 +60,5 @@ test("heating lab quests validate and every quest has text and a hint", async ()
   const { validateQuests } = await import("../src/engine/quests.js");
   const lab2 = JSON.parse(readFileSync(new URL("../content/labs/02-heating-curves.json", import.meta.url)));
   assert.deepEqual(validateQuests(lab2.quests), []);
-  assert.ok(lab2.prelab.questions.length >= 6 && lab2.tubes.length === 2);
+  assert.ok(lab2.prelab.questions.length === 4);
 });

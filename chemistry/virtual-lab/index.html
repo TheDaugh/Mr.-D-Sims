@@ -6,128 +6,58 @@
 <title>Virtual Lab</title>
 <meta name="description" content="A virtual chemistry bench: weigh, mix, heat and test unknown samples.">
 <link rel="stylesheet" href="../shared/lab.css">
-<style>
-  [hidden] { display: none !important; }
-  body { padding-bottom: 145px; }
-  .wrap { max-width: 1280px; }
-  #bench, #room { width: 100%; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 10px; border: 2px solid var(--line); cursor: pointer; display: block; }
-  .vl { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: start; }
-  @media (max-width: 980px) { .vl { grid-template-columns: minmax(0, 1fr); } }
-  .hudbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 4px 0 10px; }
-  .hudbar h1 { margin: 0; font-size: 1.35rem; }
-  .hud { display: flex; gap: 6px; flex-wrap: wrap; }
-  .hudbtn { position: relative; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); cursor: pointer; font: inherit; font-size: .9rem; }
-  .hudbtn:hover { border-color: var(--accent); }
-  .dot { position: absolute; top: 4px; right: 4px; width: 10px; height: 10px; border-radius: 50%; background: #e0472c; }
-  .coach { display: flex; gap: 10px; align-items: center; padding: 10px 14px; margin-bottom: 12px; border-radius: 10px; background: var(--note-bg); border: 1px solid var(--line); font-size: .98rem; }
-  .coach b { color: var(--accent); white-space: nowrap; }
-  #demoBar { display: flex; gap: 12px; align-items: center; padding: 10px 14px; margin-bottom: 10px; border-radius: 10px; background: #1d2a36; color: #fff; }
-  #demoBar span { flex: 1; }
-  #quests { list-style: none; margin: 0; padding: 0; }
-  #quests li { padding: 6px 8px; border-radius: 8px; font-size: .93rem; color: var(--muted); }
-  #quests li.done { text-decoration: line-through; opacity: .65; }
-  #quests li.active { background: var(--note-bg); color: var(--ink); font-weight: 600; border: 1px solid var(--line); }
-  #quests .tick { display: inline-block; width: 1.2em; }
-  #quests li.more { font-size: .8rem; }
-  .chip { padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: .85rem; color: var(--muted); background: transparent; font-family: inherit; }
-  .chip.on { background: var(--ok); color: #fff; border-color: var(--ok); }
-  button.chip { cursor: pointer; color: var(--ink); } button.chip:hover { border-color: var(--accent); }
-  #ppe { display: flex; gap: 8px; flex-wrap: wrap; }
-  #inv { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-  .slot { border: 2px dashed var(--line); border-radius: 8px; min-height: 36px; padding: 4px 6px; font-size: .8rem; display: flex; align-items: center; gap: 6px; }
-  .slot.full { border-style: solid; }
-  .slot i { width: 12px; height: 16px; border: 1px solid #555; display: inline-block; flex: none; }
-  #panelBody { display: grid; gap: 6px; margin: 8px 0; }
-  #panelBody > div { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  #tip { position: fixed; z-index: 2000; display: flex; gap: 10px; align-items: center; max-width: 280px; padding: 8px 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); pointer-events: none; }
-  #tip canvas { width: 48px; height: 48px; image-rendering: pixelated; flex: none; background: var(--note-bg); border-radius: 6px; }
-  #tip b { display: block; } #tip span { color: var(--muted); font-size: .85rem; }
-  .btnlike { display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; background: var(--panel); }
-  /* the log along the bottom */
-  #logbar { position: fixed; left: 0; right: 0; bottom: 0; height: 130px; z-index: 50; background: #161c24; color: #e8edf2; border-top: 3px solid #6a5a3c; box-shadow: 0 -4px 14px rgba(0,0,0,.35); }
-  #logbar .inner { max-width: 1280px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; padding: 6px 16px 8px; }
-  #logbar h2 { margin: 0 0 4px; font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: #c9b48a; }
-  #feed { flex: 1; overflow-y: auto; font-size: .95rem; line-height: 1.45; }
-  #feed div { padding: 1px 0; } #feed .f-stop { color: #ff9c8a; font-weight: 600; } #feed .f-warn { color: #ffd27a; } #feed .f-obs { color: #8fe0a8; font-weight: 600; }
-  /* windows */
-  dialog.dlg { border: 1px solid var(--line); border-radius: 14px; padding: 0; width: min(920px, 94vw); background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
-  dialog.dlg::backdrop { background: rgba(8, 12, 18, .62); }
-  .dlg .body { padding: 18px 24px 22px; max-height: 82vh; overflow: auto; }
-  .dlg .x { position: sticky; top: 0; float: right; }
-  .dlg details { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; margin: 8px 0; }
-  .dlg summary { cursor: pointer; }
-  table.keys td { padding: 3px 12px 3px 0; vertical-align: top; } kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; font-size: .85rem; background: var(--note-bg); }
-  .pq { margin: 14px 0; } .opts { display: grid; gap: 6px; margin: 6px 0; } .opts button { text-align: left; }
-  .opts button.right { border-color: var(--ok); background: var(--ok-bg); } .opts button.wrong { border-color: var(--bad); background: var(--bad-bg); }
-  .ck { display: flex; gap: 8px; align-items: flex-start; margin: 4px 0; } .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
-  #microWrap { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 14px; align-items: start; }
-  @media (max-width: 800px) { #microWrap { grid-template-columns: 1fr; } }
-  #microCanvas { width: 100%; height: auto; border-radius: 10px; image-rendering: auto; }
-  #microLegend { list-style: none; margin: 0; padding: 0; font-size: .9rem; } #microLegend li { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
-  #microLegend i { flex: none; width: 14px; height: 14px; border-radius: 50%; margin-top: 3px; }
-  #sheet select { max-width: 11.5em; min-height: 34px; font-size: .85rem; } #sheet th { white-space: nowrap; } .scrollx { overflow-x: auto; }
-  .foot { position: sticky; bottom: -22px; background: var(--panel); padding: 10px 0; margin-top: 8px; border-top: 1px solid var(--line); }
-  #report { display: none; }
-  @media print { .wrap, #tip, #logbar, dialog { display: none !important; } body { padding: 0; } #report { display: block !important; color: #000; background: #fff; font: 12pt/1.4 Georgia, serif; } #report table { border-collapse: collapse; width: 100%; } #report th, #report td { border: 1px solid #888; padding: 4px 6px; font-size: 10pt; text-align: left; } body { background: #fff !important; } }
-  .read { display: flex; gap: 24px; align-items: baseline; margin: 10px 0 0; }
-  .read b { font: 700 1.8rem ui-monospace, Menlo, monospace; } .read span { color: var(--muted); font-size: .85rem; display: block; }
-  .tabs { display: flex; gap: 6px; margin: 4px 0 8px; }
-  .tabs button { min-height: 38px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px 10px 0 0; background: var(--panel); color: var(--ink); cursor: pointer; font: inherit; font-weight: 600; }
-  .tabs button.on, .seg button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-  .seg { display: inline-flex; } .seg button { border-radius: 0; } .seg button:first-child { border-radius: 8px 0 0 8px; } .seg button:last-child { border-radius: 0 8px 8px 0; }
-  #graph { width: 100%; height: auto; border: 2px solid var(--line); border-radius: 10px; background: #fff; cursor: crosshair; display: block; }
-  .gtools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; } .gtools input[type=text] { width: 14em; }
-  #rows input[type=number] { width: 7em; } #rows td, #rows th { padding: 3px 6px; text-align: left; }
-</style>
+<link rel="stylesheet" href="src/ui/stage.css">
 </head>
 <body>
-<div class="wrap">
-  <header class="top"><a class="back" href="../">← Chemistry hub</a><span class="crumb">Virtual Lab · beta</span></header>
-  <div class="hudbar">
-    <h1 id="title">Virtual Lab</h1>
-    <div class="hud">
-      <button class="hudbtn" id="btnTheory" title="Theory (T)">📖 Theory</button>
-      <button class="hudbtn" id="btnNotebook" title="Notebook (N)">📓 Notebook<i class="dot" id="nbDot" hidden></i></button>
-      <button class="hudbtn" id="btnMicro" title="Microscope (M)">🔬 Microscope</button>
-      <button class="hudbtn" id="btnCER" hidden>✍ Write CER</button>
-      <button class="hudbtn" id="btnDemo" title="Watch the demo">▶ Demo</button>
-      <button class="hudbtn" id="btnMenu">💾 Save / Print</button>
-    </div>
-  </div>
+<div id="stage">
   <div id="boot" class="note">Loading the lab…</div>
-
   <div id="app" hidden>
-    <div id="demoBar" hidden><span id="demoText"></span><button id="demoStop">Stop demo</button></div>
-    <div class="coach"><b>Next:</b><span id="coachText"></span></div>
-    <div class="grid vl">
-      <div class="stack">
-        <section class="card" aria-label="Lab view">
-          <canvas id="room" aria-label="Isometric view of the lab. Walk with the arrow keys or WASD and press E to use what you face."></canvas>
-          <canvas id="bench" hidden aria-label="Lab bench with the jars you carry, three containers, a balance, a hot plate and a conductivity tester."></canvas>
-          <p class="hint" id="viewHint"></p>
-        </section>
-        <section class="card" aria-label="Safety gear">
-          <h2>Safety gear</h2><div id="ppe"></div>
-          <p id="modeLine" class="note" style="margin:10px 0 0"></p>
-        </section>
+    <div id="hud">
+      <a class="back" href="../" title="Back to the chemistry hub">←</a>
+      <h1 id="title">Virtual Lab</h1>
+      <div id="coach"><b>Next:</b><span id="coachText"></span></div>
+      <div id="timer" title="Active lab time. It only counts while you are working in the lab." hidden></div>
+      <div class="hud">
+        <button class="hudbtn" id="btnTasks" title="Tasks (J)">✔ Tasks</button>
+        <button class="hudbtn" id="btnTheory" title="Theory (T)">📖 Theory</button>
+        <button class="hudbtn" id="btnNotebook" title="Notebook (N)">📓 Notebook<i class="dot" id="nbDot" hidden></i></button>
+        <button class="hudbtn" id="btnMicro" title="Microscope (M)">🔬 Scope</button>
+        <button class="hudbtn" id="btnCER" hidden>✍ CER</button>
+        <button class="hudbtn" id="btnDemo" title="Watch the demo">▶ Demo</button>
+        <button class="hudbtn" id="btnMenu" title="Save, print, hand in">💾 Menu</button>
       </div>
-      <div class="stack">
+    </div>
+    <div id="main">
+      <div id="world">
+        <canvas id="room" aria-label="Isometric view of the lab. Walk with the arrow keys or WASD and press E to use what you face."></canvas>
+        <canvas id="bench" hidden aria-label="Lab bench with the jars you carry, containers, a balance, a hot plate and a tester."></canvas>
+        <div id="demoBar" hidden><span id="demoText"></span><button id="demoStop">Stop demo</button></div>
+        <button id="leaveBench" class="worldbtn" hidden>← Back to the room (Esc)</button>
+        <section id="taskPanel" aria-label="Tasks"><h2><span id="questHead">Tasks</span><span class="hint" style="text-transform:none;letter-spacing:0;color:#93a1b0">J hides</span></h2><ul id="quests"></ul></section>
+        <p id="viewHint"></p>
+      </div>
+      <div id="side">
         <section class="card" id="incident" role="alert" hidden></section>
         <section class="card" id="panelCard" hidden><h2 id="panelTitle"></h2><div id="panelBody"></div><button id="panelClose">Close</button></section>
-        <section class="card" id="tasksCard" aria-label="Tasks"><h2 id="questHead">Tasks</h2><ul id="quests"></ul></section>
-        <section class="card" aria-label="Inventory"><h2>Carrying <span id="invCount"></span></h2><div id="inv"></div></section>
-        <section class="card" id="controlsCard" aria-label="Controls" hidden><h2>Bench controls</h2><button id="leaveBench" style="margin-bottom:10px">← Back to the room</button><div id="controls"></div><p class="hint">Click a container, then click it again to zoom in on its particles.</p></section>
+        <section class="card" id="controlsCard" aria-label="Controls" hidden><div id="controls"></div><p class="hint" style="margin:6px 0 0">Click a container, then click it again to zoom in on its particles.</p></section>
+        <section class="card" id="helpCard"><h2>How to play</h2>
+          <table class="keys"><tbody>
+            <tr><td><kbd>← ↑ → ↓</kbd></td><td>Walk (or W A S D)</td></tr><tr><td><kbd>E</kbd></td><td>Use what you face</td></tr>
+            <tr><td><kbd>J</kbd></td><td>Show or hide tasks</td></tr><tr><td><kbd>N</kbd> <kbd>T</kbd> <kbd>M</kbd></td><td>Notebook, theory, microscope</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Back, or close a window</td></tr></tbody></table>
+          <p class="hint" style="margin:6px 0 0">Hover over anything to see its name. The yellow arrow shows the next thing to use.</p></section>
       </div>
     </div>
+    <div id="bottom">
+      <div id="hotbar"><h2>Carrying <span id="invCount"></span></h2><div id="inv"></div><div id="ppe"></div><p id="modeLine"></p></div>
+      <div id="logwrap" role="log" aria-live="polite"><h2>What happened</h2><div id="feed"></div></div>
+    </div>
   </div>
-</div>
-
-<div id="logbar" role="log" aria-live="polite"><div class="inner"><h2>What happened</h2><div id="feed"></div></div></div>
-
+  <div id="veil" hidden></div>
 <dialog class="dlg" id="dlgIntro"><div class="body" id="introBody"></div></dialog>
-<dialog class="dlg" id="dlgPrelab"><div class="body" id="prelabBody"></div></dialog>
+<dialog class="dlg" id="dlgPrelab" data-gate><div class="body" id="prelabBody"></div></dialog>
 <dialog class="dlg" id="dlgTheory"><div class="body"><button class="x" data-close>Close ✕</button><h2>Theory</h2><div id="theoryBody"></div></div></dialog>
-<dialog class="dlg" id="dlgNotebook"><div class="body" id="sheet">
+<dialog class="dlg" id="dlgNotebook" data-wide><div class="body" id="sheet">
   <button class="x" data-close>Close ✕</button><h2>Notebook</h2>
   <details><summary><b>Steps</b></summary><ol id="steps"></ol></details>
   <details><summary><b>The five tests</b></summary><ol id="tests"></ol></details>
@@ -136,7 +66,7 @@
   <p class="hint" id="nbCount" role="status"></p>
   <div class="controls"><button id="nbSubmit" class="primary" disabled>Submit answers</button><span id="nbDone" hidden>✔ Submitted. Open ✍ Write CER to finish.</span></div>
 </div></dialog>
-<dialog class="dlg" id="dlgCER"><div class="body" id="cerBody"></div></dialog>
+<dialog class="dlg" id="dlgCER" data-wide><div class="body" id="cerBody"></div></dialog>
 <dialog class="dlg" id="dlgMicro"><div class="body"><button class="x" data-close>Close ✕</button><h2 id="microTitle">Microscope</h2><p class="hint" id="microNote"></p>
   <div id="microWrap"><canvas id="microCanvas"></canvas><div><h3>Key</h3><ul id="microLegend"></ul></div></div></div></dialog>
 <dialog class="dlg" id="dlgMenu"><div class="body"><button class="x" data-close>Close ✕</button><h2>Save, print, hand in</h2>
@@ -146,9 +76,13 @@
     <button id="print">Print report</button>
     <button id="download" class="primary">Download lab record (hand this in)</button></div>
   <p class="hint">Your progress also saves automatically in this browser. The lab record is the file you turn in.</p></div></dialog>
-<dialog class="dlg" id="dlgDone"><div class="body"><h2>Lab complete</h2><p>Your answers and your CER are saved. Download your lab record and turn it in, and print your report if your teacher asked for one.</p>
-  <div class="controls"><button class="primary" id="doneMenu">Save / Print…</button><button data-close>Close</button></div></div></dialog>
+<dialog class="dlg small" id="dlgDone"><div class="body"><h2>Hand in your lab</h2><canvas id="badge" width="480" height="360" style="width:300px;height:225px;display:block;margin:0 auto"></canvas>
+  <p id="doneInfo" class="hint" style="text-align:center"></p>
+  <p>Turn in <b>one</b> of these: the printed report (choose Save as PDF), or the record file for your teacher's data page.</p>
+  <div class="controls"><button class="primary" id="donePrint">Print / Save as PDF</button><button id="doneDl">Download record (.json)</button><button data-close>Close</button></div></div></dialog>
+<dialog class="dlg small" id="dlgGate"><div class="body"><h2>Not enough lab time yet</h2><p id="gateMsg"></p><div class="controls"><button class="primary" data-close>Back to the lab</button></div></div></dialog>
 
+</div>
 <div id="tip" role="tooltip" hidden><canvas id="tipIcon" width="48" height="48"></canvas><div><b id="tipName"></b><span id="tipBlurb"></span></div></div>
 <div id="report"></div>
 <script type="module" src="src/ui/app.js"></script>
