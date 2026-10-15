@@ -3,6 +3,10 @@
 export function profile(s, mass) {
   const m = mass, segs = [];
   const add = (kind, J, from, to) => segs.push({ kind, J, from, to });
+  if (s.sub) { // sublimes: solid straight to gas at one temperature, no liquid stage
+    add("solid", m * s.cs * (s.sub - s.T0), s.T0, s.sub); add("sublime", m * s.Ls, s.sub, s.sub); add("gas", m * s.cg * (s.Tend - s.sub), s.sub, s.Tend);
+    return { segs, total: segs.reduce((a, g) => a + g.J, 0) };
+  }
   add("solid", m * s.cs * (s.mp - s.T0), s.T0, s.mp);
   add("melt", m * s.Lf, s.mp, s.mp);
   if (s.Tend <= s.bp) add("liquid", m * s.cl * (s.Tend - s.mp), s.mp, s.Tend);
@@ -16,6 +20,7 @@ export function stateAt(prof, E) {
   for (const g of prof.segs) {
     const use = Math.min(rest, g.J), f = g.J > 0 ? use / g.J : 1;
     T = g.from + (g.to - g.from) * f;
+    if (g.kind === "sublime") { fv = f; phase = f > 0 && f < 1 ? "subliming" : f >= 1 ? "gas" : phase; }
     if (g.kind === "melt") { fm = f; phase = f > 0 && f < 1 ? "melting" : f >= 1 ? "liquid" : phase; }
     if (g.kind === "boil") { fv = f; fm = 1; phase = f > 0 && f < 1 ? "boiling" : f >= 1 ? "gas" : phase; }
     if (g.kind === "liquid" && f > 0) { fm = 1; phase = "liquid"; }

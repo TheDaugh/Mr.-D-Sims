@@ -105,7 +105,8 @@ export function createRenderer(canvas) {
         R(bx, by, 1, 1, "#ffffff"); if (i % 3 === 0) R(bx + 1, by, 1, 1, "#ffffff");
       }
     }
-    if (c.steam) for (let i = 0; i < 5; i++) R(x0 + 4 + i * 4, top - 3 - ((t * 10 + i * 5) % 8), 2, 2, "rgba(255,255,255,.8)");
+    if (c.steam) for (let i = 0; i < 5; i++) R(x0 + 4 + i * 4, top - 3 - ((t * 10 + i * 5) % 8), 2, 2, c.steamColor || "rgba(255,255,255,.8)");
+    if (c.cold) { R(x0 - 4, top - 13, 34, 2, "#d6eeff"); R(x0 - 1, top - 11, 28, 1, "#8ec5ee"); for (let i = 0, n = Math.min(14, c.dep > 0 ? 2 + Math.floor(c.dep * 10) : 0); i < n; i++) R(x0 + ((i * 7) % 24), top - 10 + (i % 2), 2, 2, "#5b2a86"); }
     return { x: x0 - 2, y: top - 8, w: 30, h: 42 };
   }
 

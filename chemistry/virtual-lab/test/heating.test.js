@@ -5,7 +5,7 @@ import { profile, stateAt, reading, assign, checkData } from "../src/engine/heat
 const lab = JSON.parse(readFileSync(new URL("../content/labs/02-heating-curves.json", import.meta.url)));
 const sub = (id) => lab.substances.find((s) => s.id === id);
 test("every substance plateaus at its melting point and (if reached) boiling point", () => {
-  for (const s of lab.substances) {
+  for (const s of lab.substances.filter((x) => !x.sub)) {
     const p = profile(s, s.mass), melt = p.segs.find((g) => g.kind === "melt"), before = p.segs[0].J;
     for (const f of [0.2, 0.5, 0.8]) { const st = stateAt(p, before + melt.J * f); assert.equal(st.T, s.mp); assert.equal(st.phase, "melting"); }
     const boil = p.segs.find((g) => g.kind === "boil");
@@ -14,7 +14,7 @@ test("every substance plateaus at its melting point and (if reached) boiling poi
   }
 });
 test("run lengths suit a class period and give enough rows", () => {
-  for (const s of lab.substances) { const sec = profile(s, s.mass).total / s.power; assert.ok(sec > 180 && sec < 420, s.id + " " + sec); }
+  for (const s of lab.substances) { const sec = profile(s, s.mass).total / s.power; assert.ok(sec > (s.sub ? 100 : 180) && sec < 420, s.id + " " + sec); }
 });
 test("q = mcΔT: naphthalene liquid piece takes m·c·ΔT", () => {
   const n = sub("naphthalene"), p = profile(n, n.mass); assert.ok(Math.abs(p.segs[2].J - 10 * 1.7 * (218 - 80)) < 1);
@@ -33,4 +33,14 @@ test("reference table never contains a duplicate melting and boiling pair", () =
 test("checkData flags a wrong temperature", () => {
   const w = sub("lauric"), t = 100; const truth = stateAt(profile(w, w.mass), t * w.power).T;
   const r = checkData(w, w.mass, w.power, [{ t, T: truth }, { t, T: truth + 20 }]); assert.deepEqual(r, { good: 1, bad: 1 });
+});
+
+test("sublimation: one plateau, no liquid, vapor fraction rises while temperature holds", async () => {
+  const { profile, stateAt } = await import("../src/engine/heating.js");
+  const s = { id: "i", T0: 20, sub: 114, mp: 114, bp: 184, Tend: 140, cs: 0.214, cg: 0.145, Ls: 130, power: 12 };
+  const p = profile(s, 10);
+  assert.deepEqual(p.segs.map((g) => g.kind), ["solid", "sublime", "gas"]);
+  const mid = stateAt(p, p.segs[0].J + p.segs[1].J / 2);
+  assert.equal(mid.T, 114); assert.equal(mid.phase, "subliming"); assert.equal(mid.fm, 0); assert.ok(Math.abs(mid.fv - 0.5) < 1e-9);
+  assert.equal(stateAt(p, p.total).phase, "gas");
 });

@@ -1,8 +1,10 @@
 /* One fixed 1280x720 stage that scales to fit the window. Browser zoom only changes the window,
    so the stage (and every icon in it) keeps its proportions. Nothing scrolls except inside panels. */
 [hidden] { display: none !important; }
-html, body { height: 100%; margin: 0; overflow: hidden; background: #0d1117; }
-#stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px; transform-origin: center; background: var(--bg); overflow: hidden; font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); }
+html, body { height: 100%; margin: 0; background: #0d1117; }
+body { display: flex; overflow: auto; }
+#stagebox { position: relative; flex: none; margin: auto; }
+#stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; background: var(--bg); overflow: hidden; font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); }
 #stage button, #stage select, #stage input, #stage textarea { font-size: 14px; }
 #stage button { min-height: 32px; padding: 0 10px; }
 #stage .card { margin: 0 0 8px; padding: 10px 12px; box-shadow: none; }
@@ -85,7 +87,7 @@ table.keys td { padding: 3px 12px 3px 0; vertical-align: top; } kbd { border: 1p
 #tip canvas { width: 48px; height: 48px; image-rendering: pixelated; flex: none; background: var(--note-bg); border-radius: 6px; } #tip b { display: block; } #tip span { color: var(--muted); font-size: .85rem; }
 #report { display: none; }
 @media print {
-  html, body { height: auto; overflow: visible; background: #fff; } #stage, #tip { display: none !important; }
+  html, body { height: auto; overflow: visible; background: #fff; display: block; } #stagebox, #stage, #tip { display: none !important; }
   #report { display: block !important; color: #000; background: #fff; font: 11pt/1.4 Georgia, serif; padding: 0; } #report table { border-collapse: collapse; width: 100%; } #report th, #report td { border: 1px solid #888; padding: 3px 6px; text-align: left; } #report h1 { font-size: 17pt; } #report h2 { font-size: 12.5pt; margin-top: 12px; } #report img { max-width: 48%; }
 }
 
@@ -98,3 +100,16 @@ table.keys td { padding: 3px 12px 3px 0; vertical-align: top; } kbd { border: 1p
 #guide .gtext { position: absolute; bottom: 30px; left: 0; transform: translateX(-50%); width: max-content; max-width: 230px; background: #ffd23f; color: #1e2630; font: 700 13px system-ui, sans-serif; padding: 5px 9px; border-radius: 8px; box-shadow: 0 2px 8px #0006; text-align: center; }
 #guide .garrow { position: absolute; bottom: -6px; left: -12px; width: 24px; font-size: 26px; line-height: 24px; text-align: center; color: #ffd23f; text-shadow: 0 0 3px #000, 0 0 3px #000; animation: gbounce .7s ease-in-out infinite alternate; }
 @keyframes gbounce { from { transform: translateY(-10px); } to { transform: translateY(2px); } }
+/* chest screen */
+dialog.dlg.chest { left: 50%; top: 50%; right: auto; bottom: auto; width: 560px; transform: translate(-50%, -50%); background: #3a2a1a; border: 4px solid #8a6a3a; color: #f3e7cf; }
+dialog.chest h2 { color: #ffd98a; font-family: Georgia, serif; }
+dialog.chest .hint { color: #d8c9a8; }
+dialog.chest .grid { display: grid; gap: 8px; justify-content: center; margin: 10px 0; }
+dialog.chest .slot { position: relative; width: 84px; height: 92px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px; padding: 6px 2px; background: #5b432a; border: 3px solid #2a1c10; border-radius: 6px; color: #f3e7cf; cursor: pointer; font-size: 12px; line-height: 1.15; }
+dialog.chest .slot canvas { width: 52px; height: 52px; image-rendering: pixelated; }
+dialog.chest .slot.cur { border-color: #ffd23f; box-shadow: 0 0 0 2px #ffd23f66; }
+dialog.chest .slot.has { background: #3f5a3a; } dialog.chest .slot .ck { position: absolute; right: 4px; top: 2px; color: #8ff08f; font-style: normal; font-weight: 700; }
+dialog.chest .controls { justify-content: center; }
+#inv .slot canvas { width: 26px; height: 26px; flex: none; image-rendering: pixelated; } #inv .slot { position: relative; cursor: pointer; }
+#inv .slot.sel { border-color: #ffd23f; box-shadow: 0 0 0 1px #ffd23f; } #inv .slot .n { margin-left: auto; font-size: 10px; color: #8a97a6; }
+#inv .slot span { overflow: hidden; text-overflow: ellipsis; }

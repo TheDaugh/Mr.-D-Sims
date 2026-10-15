@@ -18,3 +18,12 @@ test("check code depends on the facts it covers", () => {
   assert.notEqual(checkCode(r), checkCode({ ...r, activeSec: 1200 }));
   assert.match(checkCode(r), /^VL-[0-9A-F]{8}$/);
 });
+import { stageScale } from "../src/ui/fit.js";
+test("browser zoom changes the stage size instead of cancelling out", () => {
+  const at100 = stageScale(1280, 720, 1, 1) * 1 * 1;      // fits exactly
+  const at200 = stageScale(640, 360, 2, 1);                // window in CSS px halves when zoomed to 200%
+  const at50 = stageScale(2560, 1440, 0.5, 1);
+  assert.ok(Math.abs(at100 - 1) < 1e-9 && Math.abs(at200 - 1) < 1e-9, "CSS scale x dpr doubles");
+  assert.ok(at200 * 2 > at100 * 1 * 1.9, "physical size doubles at 200%");
+  assert.ok(at50 * 0.5 < at100 * 0.6, "physical size halves at 50%");
+});

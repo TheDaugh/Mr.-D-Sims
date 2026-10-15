@@ -47,6 +47,20 @@
       "cg": 1,
       "Lf": 122,
       "Lv": 272
+    },
+    {
+      "id": "iodine",
+      "name": "Iodine",
+      "mass": 10,
+      "power": 12,
+      "T0": 20,
+      "sub": 114,
+      "mp": 114,
+      "bp": 184,
+      "Tend": 140,
+      "cs": 0.214,
+      "cg": 0.145,
+      "Ls": 130
     }
   ],
   "reference": [
@@ -85,6 +99,13 @@
       "name": "Stearic acid",
       "mp": 69,
       "bp": 361
+    },
+    {
+      "id": "iodine",
+      "name": "Iodine, I₂",
+      "mp": 114,
+      "bp": 184,
+      "note": "in an open beaker it does not stay a liquid"
     }
   ],
   "theory": [
@@ -129,6 +150,13 @@
       "body": [
         "Pick axes that use most of the graph. Label each axis with a name and its unit. Number the gridlines evenly.",
         "Mark each data point as its own dot. Do not connect them one by one. Draw straight lines through the slanted pieces and the plateaus, so a flat piece is flat and the corners show where each change starts and stops."
+      ]
+    },
+    {
+      "title": "Sublimation and deposition",
+      "body": [
+        "Some solids skip the liquid. When heated, the particles leave the solid and go straight into the gas. That change is sublimation, and its curve has one flat piece where the energy pulls particles out of the solid, not two.",
+        "Cool vapor can do the opposite and go straight back to solid. That is deposition. A cold surface above a subliming solid collects a crust of tiny crystals."
       ]
     }
   ],
@@ -417,6 +445,13 @@
       "sample": "Z",
       "count": 12,
       "optional": true
+    },
+    {
+      "id": "depZ",
+      "text": "Challenge: catch Z's vapor on the cold glass",
+      "hint": "While Z is on the hot plate and giving off vapor, press Cold glass and hold it over the beaker. Watch what forms on it.",
+      "event": "deposit",
+      "optional": true
     }
   ],
   "kind": "heating",
@@ -460,5 +495,8 @@
     "unknown": "X",
     "id": "lauric"
   },
-  "badgeTitle": "Heating Curves"
+  "badgeTitle": "Heating Curves",
+  "fixed": {
+    "Z": "iodine"
+  }
 }

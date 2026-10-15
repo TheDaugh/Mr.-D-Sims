@@ -211,3 +211,11 @@ Every action appends one small JSON event. The log is the grading record, the te
 - **Hand-in**: badge drawn in code (gold when the challenge is done), Print / Save as PDF, or record JSON for the teacher page. The record carries `activeSec` and a check code (`engine/integrity.js`, FNV over student, lab, seed, active seconds, event count). It deters casual edits. It is not security.
 - **Teacher key**: `node tools/bundle.mjs` writes `dist/teacher-key.html` (git-ignored, one file, runs from file://). It skips intro, prelab, timer and gate, and adds a Key button with the answers and a lab and seed switcher. `--student` builds the same file without the teacher flag. Do not publish the teacher file.
 - **Later**: teacher page should verify the check code and show minutes; specific-heat lab.
+
+## M7: chest screen, click-to-run, zoom, sublimation challenge
+- **Zoom**: `fit.js` fits the stage to the window, then multiplies by browser zoom relative to the first zoom the device loaded at (`vlab:dpr0`), so Ctrl +/- resizes the whole stage and the page scrolls when it overflows. Menu: Full screen, and "Use this browser zoom as normal size".
+- **Chest screen** (`chest.js`): shelves, locker and tong rack open a centered grid of picture slots. Arrows or WASD move, Enter or click uses, Q takes all, Esc or E closes. Contents come from the lab JSON, so new labs need no UI work.
+- **Click to run**: clicking floor sends the character there (BFS); clicking a shelf, bench, door or other station runs to it and uses it on arrival. Any key press cancels.
+- **Inventory keys**: 1-9 and 0 pick the carried item in that hotbar slot; slots show pictures and can be clicked.
+- **Heating challenge Z (iodine)**: `profile()` supports `sub` substances (solid, sublime plateau, gas; no liquid). `lab.fixed` pins Z to iodine; X and Y come from the other three. A Cold glass button over the hot plate collects crystals while Z sublimes (deposition) and logs a `deposit` event. CER has an optional Z note. Challenge needs both the plot and the deposit for the gold badge.
+- Lab 1 unchanged.

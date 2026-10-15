@@ -105,6 +105,7 @@ export function renderCERHeat(box, ctx) {
   const { lab, S } = ctx, post = lab.postlab, C = S.cer, rowsOf = ctx.getRows();
   const opts = () => [h("option", { value: "" }, "— choose —"), ...lab.reference.map((r) => h("option", { value: r.id }, r.name))];
   const selX = h("select", {}, ...opts()), selY = h("select", {}, ...opts()); selX.value = C.X || ""; selY.value = C.Y || "";
+  const zNote = h("textarea", { rows: 2, style: "width:100%", "aria-label": "Challenge note", placeholder: "Challenge (optional): what is odd about Z's curve, and what did the cold glass show?" }); zNote.value = C.zNote || "";
   const selZ = h("select", {}, ...opts()); selZ.value = C.Z || ""; const zOn = (lab.challenge || []).includes("Z") && (rowsOf.Z || []).length > 0;
   const claim = h("textarea", { rows: 2, style: "width:100%", "aria-label": "Claim" }), reasoning = h("textarea", { rows: 6, style: "width:100%", "aria-label": "Reasoning" }), note = h("textarea", { rows: 2, style: "width:100%", placeholder: "Anything else from your data (optional)" });
   claim.value = C.claim || ""; reasoning.value = C.reasoning || ""; note.value = C.note || "";
@@ -116,14 +117,14 @@ export function renderCERHeat(box, ctx) {
     const nc = wordCount(claim.value), nr = wordCount(reasoning.value), ne = picks.size + (wordCount(note.value) >= post.minWords.evidence ? 1 : 0), all = [...checks.querySelectorAll("input")].every((i) => i.checked);
     const ok = selX.value && selY.value && nc >= post.minWords.claim && ne >= 2 && nr >= post.minWords.reasoning && all; submit.disabled = !ok;
     st.textContent = ok ? "Ready to submit." : `Needed: both substances chosen, a claim (${post.minWords.claim} words), two pieces of evidence, ${post.minWords.reasoning} words of reasoning (you have ${nr}), and every box ticked.`;
-    Object.assign(C, { X: selX.value, Y: selY.value, Z: zOn ? selZ.value : "", claim: claim.value, reasoning: reasoning.value, note: note.value, evidence: [...picks] });
+    Object.assign(C, { X: selX.value, Y: selY.value, Z: zOn ? selZ.value : "", zNote: zOn ? zNote.value : "", claim: claim.value, reasoning: reasoning.value, note: note.value, evidence: [...picks] });
   }
-  for (const el of [claim, reasoning, note, selX, selY, selZ]) el.addEventListener("input", update);
+  for (const el of [claim, reasoning, note, selX, selY, selZ, zNote]) el.addEventListener("input", update);
   checks.replaceChildren(...post.checklist.map((t) => h("label", { class: "ck" }, h("input", { type: "checkbox", onchange: update }), t)));
   const chips = (list, ta) => h("div", { class: "chips" }, list.map((t) => h("button", { class: "chip", type: "button", onclick: () => { insertAt(ta, t); update(); } }, t)));
   box.replaceChildren(h("h2", {}, "Claim, Evidence, Reasoning"), h("p", {}, post.prompt),
-    h("h3", {}, "Reference table"), h("table", { class: "keys" }, h("tbody", {}, lab.reference.map((r) => h("tr", {}, h("td", {}, r.name), h("td", {}, `melts ${r.mp} °C`), h("td", {}, `boils ${r.bp} °C`))))),
-    h("p", {}, "Sample X is ", selX, "  Sample Y is ", selY, zOn ? [h("span", {}, "  Challenge: Sample Z is "), selZ] : null),
+    h("h3", {}, "Reference table"), h("table", { class: "keys" }, h("tbody", {}, lab.reference.map((r) => h("tr", {}, h("td", {}, r.name), h("td", {}, `melts ${r.mp} °C`), h("td", {}, `boils ${r.bp} °C`), h("td", {}, r.note || ""))))),
+    h("p", {}, "Sample X is ", selX, "  Sample Y is ", selY, zOn ? [h("span", {}, "  Challenge: Sample Z is "), selZ] : null), zOn ? zNote : null,
     h("h3", {}, "Claim"), h("p", { class: "hint" }, "One or two sentences that answer the question."), chips(post.starters.claim, claim), claim,
     h("h3", {}, "Evidence"), h("p", { class: "hint" }, "Tick readings from your own table that support the claim. Plateau readings are the strongest."), evBox, note,
     h("h3", {}, "Reasoning"), h("p", { class: "hint" }, "Explain why that evidence points to that substance. Say where the energy goes during a plateau. Evidence says what happened; reasoning says why it matters."), chips(post.starters.reasoning, reasoning), h("div", { class: "chips" }, post.wordBank.map((t) => h("button", { class: "chip", type: "button", onclick: () => { insertAt(reasoning, t + " "); update(); } }, t))), reasoning,

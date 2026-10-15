@@ -15,6 +15,7 @@ import { questDone, questProgress } from "../engine/quests.js";
 import { drawIcon } from "./icons.js";
 import { fitStage } from "./fit.js";
 import { createGuide } from "./guide.js";
+import { createChest } from "./chest.js";
 import { createActive } from "../engine/active.js";
 import { checkCode } from "../engine/integrity.js";
 import { drawBadge } from "./badge.js";
@@ -23,7 +24,7 @@ import { resolveMode } from "../mode.js";
 import { indexHazards, losePoints } from "../engine/hazards.js";
 import { parseRoom, step, facingTile, hasPPE, tileAt } from "../engine/room.js";
 
-fitStage($("#stage"));
+const FIT = fitStage($("#stage"));
 const CAP = 10;
 const LABS = { "unknown-solids": "01-unknown-solids.json", heating: "02-heating-curves.json" };
 const PRACTICE = { id: "practice", mass: 10, power: 100, T0: 20, mp: 50, bp: 150, Tend: 90, cs: 2, cl: 2.5, cg: 2, Lf: 200, Lv: 1000 };
@@ -64,7 +65,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const order = solids.slice().sort(() => rng() - 0.5);
   const TUT = lab.tutorial || null, CH = lab.challenge || [];
   if (TUT && !HEAT) { order.splice(order.indexOf(TUT.id), 1); order.unshift(TUT.id); }
-  const hsubs = HEAT ? assign(lab.substances.map((x) => x.id), seed, lab.tubes.length) : [];
+  const FX = lab.fixed || {}, hpool = HEAT ? lab.substances.map((x) => x.id).filter((id) => !Object.values(FX).includes(id)) : [], hrest = HEAT ? assign(hpool, seed, lab.tubes.filter((t) => !FX[t]).length) : [];
+  let hri = 0; const hsubs = HEAT ? lab.tubes.map((t) => FX[t] || hrest[hri++]) : [];
   if (HEAT && TUT) { const at = hsubs.indexOf(TUT.id), ti = lab.tubes.indexOf(TUT.unknown); if (at >= 0 && ti >= 0) [hsubs[at], hsubs[ti]] = [hsubs[ti], hsubs[at]]; }
   const unknowns = HEAT ? lab.tubes.map((L, i) => ({ label: L, id: hsubs[i] })) : order.slice(0, 4).map((id, i) => ({ label: "ABCD"[i], id }));
   const truth = {}; if (!HEAT) for (const id of solids) truth[id] = fingerprint(world, EL, id, lab.standard);
@@ -265,7 +267,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   function togglePPE(k) {
     S.ppe[k] = !S.ppe[k]; log.add("ppe", { item: k, on: S.ppe[k] });
-    renderPPE();
+    renderPPE(); renderPanel();
   }
 
   // ---------- time ----------
@@ -277,7 +279,16 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       c.heat.E = Math.min(total, c.heat.E + sub.power * dt);
       if (c.heat.E >= total) { c.heat.ended = true; if (!S.demo) log.add("heat_end", { container: c.key, sample: c.heat.sample }); say(`${c.name}: the run is finished. The heater has reached the end of its range.`, "obs"); if (S.stepTo != null) { S.stepTo = null; S.paused = true; } }
     }
-    c.c.T = hstate(c).T;
+    const st = hstate(c); if (c.loc !== "hotplate") c.heat.cold = false;
+    if (c.heat.cold && c.loc === "hotplate" && st.phase === "subliming") {
+      c.heat.dep = Math.min((c.heat.dep || 0) + 0.06 * dt, st.fv * c.heat.mass * 0.9);
+      if (!c.heat.depLogged && c.heat.dep >= 0.4) { c.heat.depLogged = true; if (!S.demo) log.add("deposit", { container: c.key, sample: c.heat.sample, grams: Math.round(c.heat.dep * 100) / 100 }); say("Crystals are forming on the cold glass. The vapor went straight back to a solid.", "obs"); }
+    }
+    c.c.T = st.T;
+  }
+  function toggleCold() {
+    const c = cur(); if (!c.heat || c.loc !== "hotplate") return say("Put a sample on the hot plate first, then hold the cold glass over it.", "warn");
+    c.heat.cold = !c.heat.cold; log.add("cold_glass", { container: c.key, on: c.heat.cold }); say(c.heat.cold ? "You hold a cold watch glass over the beaker." : "You take the cold glass away.");
   }
   function stepAll(dt) {
     for (const c of CONT) {
@@ -321,7 +332,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       balanceText: onBalance ? `${(rawMass(onBalance) - onBalance.tare).toFixed(1)} g` : "0.0 g",
       containers: CONT.map((c) => {
         const pos = c.loc === "balance" ? SLOTS.balance : c.loc === "hotplate" ? SLOTS.hotplate : SLOTS.bench[c.slot];
-        if (c.heat) { const st = hstate(c); return { key: c.key, label: c.label, kind: c.kind, cap: c.cap, x: pos.x, y: pos.y, liquidMl: 60 * (st.fm - st.fv), liquidColor: "rgba(120,185,235,.78)", pile: st.fm < 1 ? { h: 1 + Math.round(8 * (1 - st.fm)), color: "#ece8da" } : null, fizz: st.phase === "boiling" ? 0.6 : 0, T: st.T, steam: st.phase === "boiling" || st.phase === "gas", selected: c.key === S.sel }; }
+        if (c.heat) { const st = hstate(c); return { key: c.key, label: c.label, kind: c.kind, cap: c.cap, x: pos.x, y: pos.y, liquidMl: 60 * (st.fm - st.fv), liquidColor: "rgba(120,185,235,.78)", pile: (hsub(c).sub ? st.fv : st.fm) < 1 ? { h: 1 + Math.round(8 * (1 - (hsub(c).sub ? st.fv : st.fm))), color: hsub(c).sub ? "#4a3a5c" : "#ece8da" } : null, fizz: st.phase === "boiling" ? 0.6 : 0, T: st.T, steam: st.phase === "boiling" || st.phase === "gas" || st.phase === "subliming", steamColor: hsub(c).sub ? "rgba(150,70,210,.85)" : null, cold: !!c.heat.cold, dep: c.heat.dep || 0, selected: c.key === S.sel }; }
         return { key: c.key, label: c.label, kind: c.kind, cap: c.cap, x: pos.x, y: pos.y, liquidMl: c.c.solution.mL, liquidColor: liquidColor(c.c), pile: pileOf(c.c), fizz: c.fizz, T: c.c.T, steam: c.c.T > 95 && c.c.solution.mL > 0, selected: c.key === S.sel };
       })
     };
@@ -361,7 +372,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const timeCtl = () => {
     const seg = h("span", { class: "seg", id: "speedSeg" }, [1, 5, 20].map((n) => h("button", { "data-s": n, onclick: () => { S.speed = n; log.add("speed", { speed: n }); renderControls(); } }, "×" + n)));
     const iv = h("select", { id: "ivSel", "aria-label": "Step size", onchange: (e) => { S.interval = +e.target.value; } }, [10, 15].map((n) => h("option", { value: n }, n + " s")));
-    return [h("div", { class: "controls", style: "margin:6px 0 12px" }, h("button", { id: "plateBtn", class: "primary", onclick: () => setPlate(!S.plateOn) }, "Turn plate on"), h("button", { id: "pauseBtn", onclick: () => togglePause() }, "⏸ Pause"), seg, h("label", {}, iv), h("button", { id: "advBtn", onclick: advance1 }, "Advance one step")),
+    return [h("div", { class: "controls", style: "margin:6px 0 12px" }, h("button", { id: "plateBtn", class: "primary", onclick: () => setPlate(!S.plateOn) }, "Turn plate on"), h("button", { id: "pauseBtn", onclick: () => togglePause() }, "⏸ Pause"), seg, h("label", {}, iv), h("button", { id: "advBtn", onclick: advance1 }, "Advance one step"), h("button", { id: "btnCold", onclick: toggleCold }, "Cold glass: off")),
       h("div", { class: "read", style: "margin:0" }, h("div", {}, h("b", { id: "rTime" }, "0:00"), h("span", {}, "Time heated (min:s)")), h("div", {}, h("b", { id: "rTemp" }, "--"), h("span", {}, "Thermometer (°C)")))];
   };
   const [timeRow, timeRead] = HEAT ? timeCtl() : [];
@@ -387,7 +398,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       const st = c.heat ? hstate(c) : null, t = c.heat ? c.heat.E / hsub(c).power : 0;
       $("#where").textContent = `${c.name} is on the ${c.loc === "hotplate" ? "hot plate" : c.loc}. ` + (c.heat ? `Sample ${c.heat.sample}, ${c.heat.mass.toFixed(1)} g. Hot plate is ${S.plateOn ? "on" : "off"}.` : "It is empty.");
       $("#rTime").textContent = mmss(t); $("#rTemp").textContent = c.heat ? hread(c).toFixed(1) : "--";
-      $("#plateBtn").textContent = S.plateOn ? "Turn plate off" : "Turn plate on"; $("#pauseBtn").textContent = S.paused ? "▶ Play" : "⏸ Pause";
+      $("#plateBtn").textContent = S.plateOn ? "Turn plate off" : "Turn plate on"; $("#pauseBtn").textContent = S.paused ? "▶ Play" : "⏸ Pause"; { const cc = cur(); $("#btnCold").textContent = "Cold glass: " + (cc.heat && cc.heat.cold ? "on" : "off"); }
       $("#speedSeg").querySelectorAll("button").forEach((b) => b.classList.toggle("on", +b.dataset.s === S.speed)); $("#ivSel").value = String(S.interval);
       return;
     }
@@ -419,6 +430,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     h("div", { class: "controls foot" }, h("button", { id: "nbToCer", class: "primary", onclick: () => finishData() }, "I'm done with the data → write the CER")));
   // ---------- the room ----------
   const room = parseRoom(roomDef), P = { x: room.start.x, y: room.start.y, face: room.start.face || "u" };
+  const chest = createChest({ dlg: $("#dlgChest"), onClose: () => syncVeil() });
+  $("#dlgChest").addEventListener("close", () => { S.panel = null; syncSide(); });
   const roomCanvas = $("#room"), roomR = createRoomRenderer(roomCanvas, room), visited = new Set();
   let lastMove = 0, lastBlock = -1e9;
   const GROUP_OF = (id) => sources.filter((s) => s.group === id);
@@ -429,12 +442,13 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     $("#viewHint").textContent = v === "room" ? "Arrow keys or WASD move you along the floor tiles (diagonally on screen). Press E, or click an object next to you, to use it." : "Click a jar to choose it, or a container to select it. Esc returns to the room.";
     log.add("view", { to: v });
   }
-  function closePanel() { S.panel = null; $("#panelCard").hidden = true; syncSide(); }
+  function closePanel() { S.panel = null; chest.close(); syncSide(); }
   function syncSide() { $("#helpCard").hidden = !(S.view === "room" && !S.panel && !S.incident); }
   function toggleTasks() { const p = $("#taskPanel"); p.hidden = !p.hidden; $("#btnTasks").classList.toggle("on", !p.hidden); }
+  function selectInv(i) { const k = S.inv[i]; if (!k) return; S.srcKey = k; syncUnit(); renderInv(); const sc = sources.find((x) => x.key === k); say(`${sc.label} is ready to use (key ${(i + 1) % 10}).`, "info"); }
   function renderInv() {
     $("#invCount").textContent = `(${S.inv.length}/${CAP})`;
-    $("#inv").replaceChildren(...Array.from({ length: CAP }, (_, i) => { const s = sources.find((x) => x.key === S.inv[i]); return s ? h("div", { class: "slot full" }, h("i", { style: `background:${s.color}` }), s.label.replace(" (known)", "")) : h("div", { class: "slot" }, ""); }));
+    $("#inv").replaceChildren(...Array.from({ length: CAP }, (_, i) => { const s = sources.find((x) => x.key === S.inv[i]); if (!s) return h("div", { class: "slot" }, h("b", { class: "n" }, (i + 1) % 10)); const cv = h("canvas", { width: 48, height: 48 }); drawIcon(cv, "jar", s.color); return h("div", { class: "slot full" + (s.key === S.srcKey ? " sel" : ""), title: s.label, onclick: () => selectInv(i) }, cv, h("span", {}, s.short || s.label.replace(" (known)", "")), h("b", { class: "n" }, (i + 1) % 10)); }));
   }
   function take(key) {
     if (S.inv.length >= CAP) return blocked("inventory_full", `Your hands are full (${CAP} jars). Put one back on a shelf first.`);
@@ -447,13 +461,15 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   function renderPanel() {
     const t = S.panel; if (!t) return;
-    $("#panelCard").hidden = false; syncSide(); $("#panelTitle").textContent = t.type === "shelf" ? t.group : t.type === "locker" ? "Locker" : "Tong rack";
-    if (t.type === "shelf" && !GROUP_OF(t.group).length) $("#panelBody").replaceChildren(h("p", { class: "hint" }, "Nothing on this shelf is needed for today's lab."));
-    else if (t.type === "shelf") $("#panelBody").replaceChildren(h("div", {}, h("span", { class: "hint" }, "Everything on this shelf"), h("button", { class: "primary", onclick: () => takeAll(t.group) }, "Take all")), ...GROUP_OF(t.group).map((s) => { const has = S.inv.includes(s.key); return h("div", {}, h("span", {}, s.label.replace(" (known)", "")), h("button", { onclick: () => (has ? putBack(s.key) : take(s.key)) }, has ? "Put back" : "Take")); }));
+    syncSide(); let st;
+    if (t.type === "shelf") st = { title: t.group, verb: "take", onAll: () => takeAll(t.group), keep: true, onUse: (it) => (it.has ? putBack(it.key) : take(it.key)),
+      items: GROUP_OF(t.group).map((x) => ({ key: x.key, label: x.label.replace(" (known)", ""), short: x.short || x.label, icon: "jar", color: x.color, has: S.inv.includes(x.key) })) };
     else {
-      const NAME = { goggles: "Goggles", apron: "Apron", tongs: "Tongs" };
-      $("#panelBody").replaceChildren(...t.items.map((k) => h("div", {}, h("span", {}, NAME[k]), h("button", { onclick: () => { togglePPE(k); renderPanel(); } }, S.ppe[k] ? (k === "tongs" ? "Put back" : "Take off") : (k === "tongs" ? "Pick up" : "Put on")))));
+      const NAME = { goggles: "Goggles", apron: "Apron", tongs: "Tongs" }, BLURB = { goggles: "Protect your eyes.", apron: "Protect your skin and clothes.", tongs: "Move hot glass safely." };
+      st = { title: t.type === "locker" ? "Locker" : "Tong rack", verb: "put on", keep: true, onAll: t.items.length > 1 ? () => t.items.forEach((k) => { if (!S.ppe[k]) togglePPE(k); }) : null,
+        onUse: (it) => togglePPE(it.key), items: t.items.map((k) => ({ key: k, label: NAME[k], icon: k, blurb: BLURB[k], has: !!S.ppe[k] })) };
     }
+    chest.isOpen ? chest.refresh(st) : chest.open(st);
   }
   function interact(f) {
     const t = f.tile; if (!t || !t.id) return false;
@@ -467,32 +483,67 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   function walk(dx, dy) {
     if (!S.demo && !["lab", "postlab", "done"].includes(S.stage)) return;
-    const now = performance.now(); if (now - lastMove < 110) return; lastMove = now;
+    const now = performance.now(); if (now - lastMove < 110) return false; lastMove = now;
     const r = step(room, P, dx, dy, S.mode === "guided" ? S.ppe : { goggles: true, apron: true });
     if (r.blocked && now - lastBlock > 1500) { lastBlock = now; hazard("no_ppe_door", "Stop. The lab door will not open. You need goggles and an apron, and they are in the locker."); }
     if (r.moved) { closePanel(); if (r.tile.type === "door" && !visited.has("entered_lab")) { visited.add("entered_lab"); log.add("door", { outcome: hasPPE(S.ppe) ? "entered" : "entered_without_ppe" }); say(hasPPE(S.ppe) ? "You step into the lab." : "You walk into the lab with no goggles or apron. That is a mistake.", hasPPE(S.ppe) ? "info" : "warn"); } }
+    return !!r.moved;
   }
   const DIRS = { arrowup: [0, -1], w: [0, -1], arrowdown: [0, 1], s: [0, 1], arrowleft: [-1, 0], a: [-1, 0], arrowright: [1, 0], d: [1, 0] };
   window.addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (S.demo) { if (k === "escape") demoApi.demo.stop(); return; }
+    if (DIRS[k] || k === "escape") cancelRoute();
     if (k === "escape" && document.querySelector("#stage dialog[open]")) { const d = [...document.querySelectorAll("#stage dialog[open]")].pop(); if (!d.hasAttribute("data-gate") && d.id !== "dlgIntro" && d.id !== "dlgDone") { d.close(); syncVeil(); } return; }
     if (document.querySelector("dialog[open]") || /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
     if (k === "escape") { if (S.panel) closePanel(); else if (S.view === "bench") setView("room"); return; }
     if (!["lab", "postlab", "done"].includes(S.stage)) return;
     if (k === "j") return toggleTasks();
+    if (/^[0-9]$/.test(k)) return selectInv(k === "0" ? 9 : +k - 1);
     if (k === "n") return openNotebook(); if (k === "t") return openDlg("dlgTheory"); if (k === "m") return openMicro();
     if (HEAT && S.view === "bench" && k === " ") { e.preventDefault(); togglePause(); return; }
     if (S.view !== "room" || e.target.tagName === "BUTTON") return;
     if (DIRS[k]) { e.preventDefault(); walk(...DIRS[k]); }
     else if (k === "e" || k === "enter" || k === " ") { e.preventDefault(); interact(facingTile(room, P)); }
   });
+  // click to run: floor tiles walk there; a cabinet, bench or door is walked to and used on arrival
+  const route = { steps: [], then: null, next: 0 };
+  const canPass = () => (S.mode === "guided" ? S.ppe : { goggles: true, apron: true });
+  const walkable = (x, y) => { const t = tileAt(room, x, y); return t && !t.solid && !(t.type === "door" && !hasPPE(canPass())); };
+  function findRoute(goal) { // BFS over tiles; goal(x,y) says where to stop
+    const key = (x, y) => x + "," + y, prev = new Map([[key(P.x, P.y), null]]), q = [[P.x, P.y]];
+    while (q.length) {
+      const [x, y] = q.shift();
+      if (goal(x, y)) { const out = []; let k = key(x, y), cur = [x, y]; while (prev.get(k)) { const [pk, d] = prev.get(k); out.unshift(d); k = pk; } return out; }
+      for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) { const nx = x + dx, ny = y + dy, nk = key(nx, ny); if (!prev.has(nk) && walkable(nx, ny)) { prev.set(nk, [key(x, y), [dx, dy]]); q.push([nx, ny]); } }
+    }
+    return null;
+  }
+  function cancelRoute() { route.steps = []; route.then = null; }
+  function tickRoute(now) {
+    if (!route.steps.length || now < route.next || document.querySelector("#stage dialog[open]") || S.view !== "room") { if (!route.steps.length && route.then && S.view === "room") { const t = route.then; route.then = null; P.face = t.face; interact(facingTile(room, P)); } return; }
+    route.next = now + 120; const [dx, dy] = route.steps.shift();
+    if (!walk(dx, dy)) { cancelRoute(); return; }
+    if (!route.steps.length && route.then) { const t = route.then; route.then = null; P.face = t.face; interact(facingTile(room, P)); }
+  }
   roomCanvas.addEventListener("click", (ev) => {
+    if (S.demo || !["lab", "postlab", "done"].includes(S.stage)) return;
     const r = roomCanvas.getBoundingClientRect(), p = roomR.tileFromPoint((ev.clientX - r.left) * (320 / r.width), (ev.clientY - r.top) * (180 / r.height));
-    const t = tileAt(room, p.x, p.y); if (!t || !t.id) return;
-    if (Math.abs(p.x - P.x) + Math.abs(p.y - P.y) !== 1) return say("Walk next to it first, then press E.", "warn");
-    P.face = p.x < P.x ? "l" : p.x > P.x ? "r" : p.y < P.y ? "u" : "d"; interact(facingTile(room, P));
+    const t = tileAt(room, p.x, p.y); if (!t) return;
+    cancelRoute(); closePanel();
+    const faceOf = (x, y) => (x < p.x ? "r" : x > p.x ? "l" : y < p.y ? "d" : "u");
+    if (t.id && (t.solid || t.type === "station")) {
+      if (Math.abs(p.x - P.x) + Math.abs(p.y - P.y) === 1) { P.face = p.x < P.x ? "l" : p.x > P.x ? "r" : p.y < P.y ? "u" : "d"; interact(facingTile(room, P)); return; }
+      const steps = findRoute((x, y) => Math.abs(x - p.x) + Math.abs(y - p.y) === 1);
+      if (!steps) return say("There is no way to get next to that right now.", "warn");
+      let ex = P.x, ey = P.y; for (const [dx, dy] of steps) { ex += dx; ey += dy; }
+      route.steps = steps; route.then = { face: faceOf(ex, ey) === "r" ? "r" : faceOf(ex, ey) };
+      if (!steps.length) { route.then = null; }
+    } else if (!t.solid) {
+      if (t.type === "door" && !hasPPE(canPass())) return hazard("no_ppe_door", "Stop. The lab door will not open. You need goggles and an apron, and they are in the locker.");
+      const steps = findRoute((x, y) => x === p.x && y === p.y); if (steps) { route.steps = steps; route.then = null; }
+    }
   });
   $("#panelClose").addEventListener("click", closePanel);
   $("#leaveBench").addEventListener("click", () => setView("room"));
@@ -538,6 +589,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (!HEAT) $("#plate").value = S.plateC; if (book) book.refresh(); syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
     lockTable(); if (!quiet) { log.add("resume", { savedAt: sn.savedAt }); say("Welcome back. Your saved lab is restored."); }
   }
+  $("#fullscreen").addEventListener("click", () => { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch (e) { /* ignore */ } });
+  $("#zoomBase").addEventListener("click", () => { FIT.rebase(); say("Normal size set. Zoom in or out with Ctrl and + or -.", "obs"); });
   $("#save").addEventListener("click", () => { autosave(); downloadJSON(fileName("lab-save"), snapshot()); say("Progress saved to your Downloads folder, and kept in this browser.", "obs"); });
   $("#load").addEventListener("change", (e) => {
     const f = e.target.files[0]; if (!f) return;
@@ -669,12 +722,12 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const btnText = (txt) => [...document.querySelectorAll("#stage button")].find((b) => b.offsetParent && b.textContent.trim().startsWith(txt));
   const TS = TUT ? (HEAT ? "s" : "u") + TUT.unknown : "";
   function guideFor(id) {
-    const c = cur(), inRoom = S.view === "room", T = (t, x) => ["tile", t, x], E = (e, x) => (e ? ["el", e, x] : null), panelBtn = () => $("#panelBody button:not([disabled])");
+    const c = cur(), inRoom = S.view === "room", T = (t, x) => ["tile", t, x], E = (e, x) => (e ? ["el", e, x] : null), panelBtn = () => document.querySelector("#chestBody .slot:not(.has)") || document.querySelector("#chestBody .slot");
     const toBench = () => T("bench", "Go to the bench: face it and press E");
-    const take = (tile) => (S.panel ? E(btnText("Take all") || panelBtn(), "Take all, so you do not make extra trips") : T(tile, "Walk here and press E"));
+    const take = (tile) => (S.panel ? E($("#chestAll") || panelBtn(), "Take all (Q), so you do not make extra trips") : T(tile, "Walk here and press E"));
     const weigh = (src) => (inRoom ? toBench() : c.loc !== "balance" ? E($("#mvBalance"), "Move the container to the balance") : !c.tare ? E($("#btnTare"), "Tare: set the balance to zero") : S.srcKey !== src ? E($("#src"), "Choose this sample from the list") : E($("#btnAdd"), "Add it"));
     switch (id) {
-      case "gear": return S.panel ? E(panelBtn(), "Put on goggles and apron") : T("locker", "Walk to the locker and press E");
+      case "gear": return S.panel ? E($("#chestAll") || panelBtn(), "Put on goggles and apron (Q)") : T("locker", "Walk to the locker and press E");
       case "tongs": return S.panel ? E(panelBtn(), "Take the tongs") : T("tongs_rack", "Walk to the rack and press E");
       case "door": return T("door", "Walk through the door");
       case "jars": return take("shelf_unknown");
@@ -694,8 +747,9 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (!TUT || !guideOn || S.demo || S.stage !== "lab") return guide.hide();
     const it = items.find((i) => i.q.tutorial && !(i.done || (i.prog || 0) >= 1 && i.q.count <= 3 && !["rowsX", "plotX", "lineX"].includes(i.q.id)));
     if (!it) { guide.hide(); if (!tutAnnounced && items.some((i) => i.q.tutorial)) { tutAnnounced = true; say(`Tutorial done. Repeat these steps for the other samples; the arrows are off from here.`, "obs"); } return; }
-    const open = document.querySelector("#stage dialog[open]"); if (open && open.id !== "dlgNotebook") return guide.hide();
-    if (open && !["rowsX", "plotX", "lineX", "runX"].includes(it.q.id)) return guide.hide();
+    const open = document.querySelector("#stage dialog[open]"); if (open && open.id !== "dlgNotebook" && open.id !== "dlgChest") return guide.hide();
+    if (open && open.id === "dlgNotebook" && !["rowsX", "plotX", "lineX", "runX"].includes(it.q.id)) return guide.hide();
+    if (open && open.id === "dlgChest" && !["gear", "tongs", "jars", "liquids"].includes(it.q.id)) return guide.hide();
     let g; try { g = guideFor(it.q.id); } catch (e) { g = null; }
     if (!g) return guide.hide();
     if (g[0] === "tile") { const t = findTile(g[1]); if (!t) return guide.hide(); S.view === "room" ? guide.onTile(roomCanvas, roomR.screen(t.x + 0.5, t.y + 0.5, 30), g[2]) : guide.onEl($("#leaveBench"), "Back to the room first"); } else guide.onEl(g[1], g[2]);
@@ -778,7 +832,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const rows = [];
     if (HEAT) {
       for (const u of unknowns) { const b = lab.substances.find((x) => x.id === u.id), ref = lab.reference.find((x) => x.id === u.id), pr = profile(b, lab.standardMass);
-        rows.push(h("tr", {}, h("th", {}, `Sample ${u.label}${CH.includes(u.label) ? " (challenge)" : ""}`), h("td", {}, (ref || {}).name || u.id), h("td", {}, pr.segs.map((g) => g.kind === "melt" || g.kind === "boil" ? `${g.kind} plateau ${g.from} °C, ${Math.round(g.J / b.power)} s` : `${g.kind} ${g.from}→${g.to} °C, ${Math.round(g.J / b.power)} s`).join("; ")))); }
+        rows.push(h("tr", {}, h("th", {}, `Sample ${u.label}${CH.includes(u.label) ? " (challenge)" : ""}`), h("td", {}, (ref || {}).name || u.id), h("td", {}, pr.segs.map((g) => g.kind === "melt" || g.kind === "boil" || g.kind === "sublime" ? `${g.kind} plateau ${g.from} °C, ${Math.round(g.J / b.power)} s` : `${g.kind} ${g.from}→${g.to} °C, ${Math.round(g.J / b.power)} s`).join("; ")))); }
     } else {
       for (const u of unknowns) { const sp = speciesData.species.find((x) => x.id === u.id), t = truth[u.id];
         rows.push(h("tr", {}, h("th", {}, `Unknown ${u.label}${CH.includes(u.label) ? " (challenge)" : ""}`), h("td", {}, sp.name), h("td", {}, lab.tests.map((x) => `${x.name}: ${optLabel(x, t[x.key])}`).join("; ")))); }
@@ -812,11 +866,12 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (HEAT && S.stepTo != null) { const c = cur(); if (!c.heat || c.loc !== "hotplate" || !S.plateOn) S.stepTo = null; else if (c.heat.E / hsub(c).power >= S.stepTo - 1e-6) { S.stepTo = null; S.paused = true; say(`Paused at ${mmss(c.heat.E / hsub(c).power)}. Write the reading down.`); } }
     if (S.view === "room") roomR.draw(P, S.ppe, hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
     ACT.tick(now / 1000, !document.hidden, (S.stage === "lab" || S.stage === "postlab") && !S.demo && !TEACHER, HEAT && S.plateOn && !S.paused);
+    tickRoute(now);
     if (now - lastCtl > 250) { renderControls(); renderQuests(); renderTimer(now / 1000); lastCtl = now; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  window.__vl = { ACT, H, S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE }, stageCtx, demoApi, openMicro, openNotebook, openCER, quests: () => lab.quests, nbCells, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
+  window.__vl = { walk, tickRoute, route, findRoute, walkable, roomR, ACT, H, S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE }, stageCtx, demoApi, openMicro, openNotebook, openCER, quests: () => lab.quests, nbCells, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
 }
 
 boot();

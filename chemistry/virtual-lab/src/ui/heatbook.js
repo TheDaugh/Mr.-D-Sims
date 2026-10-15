@@ -2,7 +2,7 @@
 // The computer never draws the curve. It only keeps the dots and lines the student places.
 import { h } from "./dom.js";
 
-const STATES = ["", "solid", "solid + liquid", "liquid", "liquid + gas", "gas"];
+const STATES = ["", "solid", "solid + liquid", "liquid", "liquid + gas", "solid + gas", "gas"];
 const M = { l: 66, r: 16, t: 34, b: 56 };
 const num = (v) => v !== "" && v != null && Number.isFinite(+v);
 export const goodRows = (d) => d.rows.filter((r) => num(r.t) && num(r.T));

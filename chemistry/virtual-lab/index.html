@@ -74,6 +74,8 @@
 <dialog class="dlg" id="dlgMenu"><div class="body"><button class="x" data-close>Close ✕</button><h2>Save, print, hand in</h2>
   <div class="controls" style="flex-direction:column;align-items:stretch;max-width:340px">
     <button id="save">Save progress (download file)</button>
+    <button id="fullscreen">Full screen (toggle)</button>
+    <button id="zoomBase">Use this browser zoom as normal size</button>
     <label class="btnlike">Load a saved lab <input id="load" type="file" accept=".json,application/json" hidden></label>
     <button id="print">Print report</button>
     <button id="download" class="primary">Download lab record (hand this in)</button></div>
@@ -83,6 +85,7 @@
   <p>Turn in <b>one</b> of these: the printed report (choose Save as PDF), or the record file for your teacher's data page.</p>
   <div class="controls"><button class="primary" id="donePrint">Print / Save as PDF</button><button id="doneDl">Download record (.json)</button><button data-close>Close</button></div></div></dialog>
 <dialog class="dlg" id="dlgKey"><div class="body"><button class="x" data-close>Close ✕</button><h2>Teacher key</h2><div id="keyBody"></div></div></dialog>
+<dialog class="dlg chest" id="dlgChest"><div class="body" id="chestBody"></div></dialog>
 <dialog class="dlg small" id="dlgGate"><div class="body"><h2>Not enough lab time yet</h2><p id="gateMsg"></p><div class="controls"><button class="primary" data-close>Back to the lab</button></div></div></dialog>
 
 </div>
