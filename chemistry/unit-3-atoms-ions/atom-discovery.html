@@ -33,6 +33,11 @@
   input[type=range]{width:100%}
   .sl{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);flex:1 1 200px}
   .sl b{color:var(--ink)}
+  .figs{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  figure.pix{margin:0;flex:1 1 200px;max-width:260px;text-align:center}
+  figure.pix canvas{width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;border:2px solid var(--line);border-radius:6px;background:#111;cursor:pointer}
+  figure.pix figcaption{font-size:.82rem;color:var(--muted);margin-top:6px;text-align:left}
+  figure.pix .cr{font-size:.72rem;opacity:.8}
   .scene text{font-family:system-ui,sans-serif}
 </style>
 </head>
@@ -53,13 +58,16 @@
 const DATA={parts:[
 {title:"Cut It Forever",tier:1,sub:"Democritus claimed you would eventually reach a piece that cannot be cut. He never tried it. You will.",blocks:[
  {type:"info",html:"Around 400 BCE, <b>Democritus</b> argued: cut a piece of matter in half, then half again. Either you can do this forever, or you reach a piece too small to cut. He called that piece <b>atomos</b> (“uncuttable”). He reasoned his way there. He never measured anything."},
+ {type:"figure",items:[{"src": "img/democritus.png", "cap": "Democritus, painted by Hendrick ter Brugghen (1628). Called “the laughing philosopher.” He argued for atoms with logic alone.", "alt": "Painting of Democritus", "credit": "Public domain · Wikimedia Commons"}]},
  {type:"mcq",predict:true,q:"A 1 cm cube of gold. About how many times could you cut a piece in half before you reach <b>one single atom</b>?",opts:[{t:"About 5 times"},{t:"About 25 times"},{t:"About 1,000 times"},{t:"Forever. You can always cut it again."}],note:"Write it in the Cold Open box on your sheet."},
  {type:"widget",id:"halve",tasks:["Keep cutting until the piece is one gold atom wide."]},
+ {type:"figure",items:[{"src": "img/goldstm.png", "cap": "A gold surface imaged with a scanning tunneling microscope. The ridges are rows of gold atoms, so these are real atoms in a real picture.", "alt": "Scanning tunneling microscope image of gold atoms in rows", "credit": "Public domain · Wikimedia Commons"}]},
  {type:"num",q:"How many cuts did it take to get from 1 cm down to one atom?",ans:25,tol:1,unit:"cuts",why:"Each cut halves the size, so after n cuts the size is 1 cm ÷ 2ⁿ. At n = 25 that is about 0.3 nm, the width of one gold atom.",hint:"Look at the “cuts so far” number when the readout says about 1 atom."},
  {type:"mcq",q:"You are holding one gold atom. Your tools cannot cut it. Does that <b>prove</b> Democritus was right that atoms can’t be divided?",opts:[{t:"Yes. If no tool can cut it, it can’t be cut."},{t:"No. It shows our tools stop here. A better tool might still split it.",ok:1},{t:"Yes. Gold atoms are solid all the way through."}],why:"Failing to cut something is not proof it can’t be cut. Democritus had a good argument but no evidence. Getting evidence is what Dalton did.",hint:"Think about the difference between “we can’t” and “it can’t be done.”"}
 ]},
 {title:"Make Water",tier:1,sub:"Burn hydrogen in oxygen and weigh everything before and after. Look for a pattern in the masses.",blocks:[
  {type:"info",html:"In 1799 <b>Joseph Proust</b> weighed the elements in compounds from many sources and found something odd: a given compound always had the same recipe by mass. Test that with water."},
+ {type:"figure",items:[{"src": "img/proust.png", "cap": "Joseph Proust (1754–1826), in a bronze medallion by David d'Angers. He showed that a compound always has the same recipe by mass.", "alt": "Bronze medallion portrait of Joseph Proust", "credit": "CC0 · Wikimedia Commons"}, {"src": "img/lavoisier.png", "cap": "Antoine and Marie-Anne Lavoisier, painted by Jacques-Louis David (1788). He weighed everything. She drew his lab apparatus and kept his notes.", "alt": "Painting of Antoine Lavoisier and his wife Marie-Anne", "credit": "Public domain · Wikimedia Commons"}]},
  {type:"mcq",predict:true,q:"You will spark different amounts of hydrogen and oxygen. What will happen?",opts:[{t:"Any amounts can combine completely into water."},{t:"Hydrogen and oxygen only combine in one fixed mass ratio. Extra of either is left over."},{t:"The ratio changes depending on how much you start with."}],note:"Now test it below."},
  {type:"widget",id:"water",tasks:["Run a trial where nothing is left over.","Run a trial where oxygen is left over.","Run a trial where hydrogen is left over."]},
  {type:"num",q:"In your trials, how many grams of oxygen were used for every 1 g of hydrogen used?",ans:8,tol:0.01,unit:"g O per 1 g H",why:"Every trial that used both up gave O used ÷ H used = 8. Water is 8 parts oxygen to 1 part hydrogen by mass, every time.",hint:"Pick a trial. Divide the oxygen used by the hydrogen used. Do the same for a second trial."},
@@ -70,12 +78,14 @@ const DATA={parts:[
 ]},
 {title:"Two Compounds, One Pair of Elements",tier:1,sub:"Hydrogen and oxygen can make more than one substance. Do their recipes have anything in common?",blocks:[
  {type:"info",html:"Besides water, hydrogen and oxygen can make a second compound, <b>hydrogen peroxide</b>. It is the bubbly stuff in the brown bottle. It has completely different properties from water, so it must be a different recipe."},
+ {type:"figure",items:[{"src": "img/h2o2.png", "cap": "Hydrogen peroxide from a pharmacy (label in Russian). The bottle is brown because light makes H₂O₂ slowly break down into water and oxygen.", "alt": "Brown bottle of hydrogen peroxide", "credit": "Public domain · Wikimedia Commons"}]},
  {type:"mcq",predict:true,q:"For 1 g of hydrogen, how much oxygen do you expect peroxide to use? (Water uses 8 g.)",opts:[{t:"8 g, the same as water"},{t:"16 g"},{t:"About 11 g, somewhere in between"},{t:"No way to predict it"}],note:"Now measure it below."},
  {type:"widget",id:"two",tasks:["Combine hydrogen with oxygen to make Compound A (water).","Combine hydrogen with oxygen to make Compound B (peroxide)."]},
  {type:"num",q:"Peroxide uses how many times as much oxygen as water does, for the <b>same mass of hydrogen</b>?",ans:2,tol:0.01,unit:"times",why:"Peroxide: 16 g O per 1 g H. Water: 8 g O per 1 g H. 16 ÷ 8 = 2.",hint:"Divide the oxygen per 1 g H in B by the oxygen per 1 g H in A."},
  {type:"mcq",q:"Why is the answer a clean whole number like 2, and not something like 1.37?",opts:[{t:"Peroxide’s molecule has one whole extra oxygen atom for each one that water has. Atoms come in whole units, so the masses differ by whole-number steps.",ok:1},{t:"Peroxide is just a more concentrated form of water."},{t:"It is a coincidence. It could have been any number."}],why:"This pattern is the Law of Multiple Proportions. You can’t add 0.37 of an atom, so the extra mass from one compound to the next comes in whole-atom jumps.",hint:"Can you add part of an atom to a molecule?"}
 ]},
 {title:"Say It Right",tier:1,sub:"Sort out who said what, and what each of them actually had to back it up.",blocks:[
+ {type:"figure",items:[{"src": "img/dalton.png", "cap": "John Dalton, painted by Thomas Phillips (1835). A teacher, like you are, who kept weather records for 57 years.", "alt": "Portrait of John Dalton", "credit": "Public domain · Wikimedia Commons"}]},
  {type:"rows",q:"For each statement, decide who it describes.",choices:["Democritus only","Dalton only","Both"],rows:[
   {q:"Everything is made of tiny pieces that can’t be cut.",ans:2,why:"The shared idea. Democritus proposed it; Dalton revived it."},
   {q:"The idea came from reasoning alone, with no measurements.",ans:0,why:"Democritus argued from logic. He had no balance and no data."},
@@ -308,6 +318,26 @@ BLOCK.widget=(b,done)=>{
   const tick=i=>{if(marks[i])return;marks[i]=true;ST.tasksDone++;els[i].classList.add("ok");els[i].querySelector(".bx").textContent="✓";if(marks.every(Boolean))done()};
   const w=WIDGET[b.id](tick);
   return h("div",{class:"card"},h("div",{style:"margin-bottom:8px"},h("b",{},"Sim tasks"),els),w);
+};
+
+
+BLOCK.figure=(b)=>{
+  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const wrap=h("div",{class:"figs"});
+  b.items.forEach(it=>{
+    const img=new Image(),cv=h("canvas",{role:"img","aria-label":it.alt||it.cap,title:"Click to replay"}),ctx=cv.getContext("2d");
+    let run=0;
+    function frame(step){ // step = block size in source pixels; 1 = sharp
+      const W=cv.width,H=cv.height,sw=Math.max(1,Math.round(W/step)),sh=Math.max(1,Math.round(H/step));
+      const t=document.createElement("canvas");t.width=sw;t.height=sh;const tc=t.getContext("2d");tc.imageSmoothingEnabled=true;tc.drawImage(img,0,0,sw,sh);
+      ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,W,H);ctx.drawImage(t,0,0,sw,sh,0,0,W,H)}
+    function play(){const id=++run;if(reduce){frame(1);return}[32,16,8,4,2,1].forEach((st,i)=>setTimeout(()=>{if(id===run)frame(st)},i*170))}
+    img.onload=()=>{cv.width=img.width;cv.height=img.height;frame(1);
+      if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();play()}},{threshold:.4});frame(32);io.observe(cv)}else play()};
+    img.src=it.src;cv.addEventListener("click",play);
+    wrap.append(h("figure",{class:"pix"},cv,h("figcaption",{},it.cap,h("div",{class:"cr"},it.credit||""))));
+  });
+  return h("div",{class:"card"},wrap);
 };
 
 BLOCK.open=(b,done)=>{
