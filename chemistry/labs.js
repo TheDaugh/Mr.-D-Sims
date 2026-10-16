@@ -1,5 +1,8 @@
-// The hub reads this list. To add a lab: build the page in its unit folder,
+// The hub reads this list. To add something: build the page in its unit folder,
 // then add one entry below. Nothing else needs to change.
+//   type:  "lesson" (a daily lesson sim with a student sheet) or "lab" (a virtual lab)
+//   day:   lesson number inside the unit (lessons only)
+//   sheet: optional path to the student sheet PDF, shown as a link under the card
 window.UNITS = [
   {
     id: "unit-2",
@@ -8,6 +11,7 @@ window.UNITS = [
     labs: [
       {
         title: "Heating Curve of Water",
+        type: "lab",
         icon: "🧊",
         href: "unit-2-properties-of-matter/heating-curve.html",
         blurb: "Heat ice at a steady rate and watch the temperature, the particles, and the energy at the same time. Find out why the thermometer stops moving.",
@@ -15,6 +19,7 @@ window.UNITS = [
       },
       {
         title: "Specific Heat Calorimetry",
+        type: "lab",
         icon: "🔩",
         href: "unit-2-properties-of-matter/specific-heat.html",
         blurb: "Drop a hot mystery metal into cool water, read the final temperature, and work out which metal it is.",
@@ -22,6 +27,7 @@ window.UNITS = [
       },
       {
         title: "Virtual Lab: Unknown White Solids (BETA)",
+        type: "lab",
         icon: "🥽",
         href: "virtual-lab/index.html",
         blurb: "Walk the lab, suit up, carry jars to your bench, and run five tests to identify four unknown solids. Beta: keyboard and a laptop screen work best. Tell Mr. D what breaks.",
@@ -29,10 +35,28 @@ window.UNITS = [
       },
       {
         title: "Virtual Lab: Heating Curves of Unknown Solids (BETA)",
+        type: "lab",
         icon: "🌡️",
         href: "virtual-lab/index.html?lab=heating",
         blurb: "Heat two unknown samples, pause to record readings, plot the curves by hand, and use the plateaus to name each substance. Pre-lab and a written CER are required.",
         tags: ["beta", "phase changes", "CER"]
+      }
+    ]
+  },
+  {
+    id: "unit-3",
+    title: "Unit 3 · Atoms and Ions",
+    blurb: "How we know atoms exist, and what is inside them.",
+    labs: [
+      {
+        title: "Atom Discovery: Democritus to Dalton",
+        type: "lesson",
+        day: 1,
+        sheet: "unit-3-atoms-ions/atom-discovery-sheet.pdf",
+        icon: "⚛️",
+        href: "unit-3-atoms-ions/atom-discovery.html",
+        blurb: "Cut gold in half until you run out of room, burn hydrogen in oxygen, and weigh your way to Dalton's atomic theory. Core and challenge tiers.",
+        tags: ["atomic theory", "Dalton", "conservation of mass", "definite proportions"]
       }
     ]
   }

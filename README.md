@@ -32,7 +32,7 @@ Every page is plain HTML with its styles and script inside the file. The physics
 
 ## Chemistry
 
-The `chemistry/` folder holds virtual labs, with a hub page at `chemistry/index.html` that lists them by unit. Each lab opens with the glassware already set up and the instructions on the page.
+The `chemistry/` folder holds daily lesson sims (each with a student sheet PDF) and virtual labs, with a hub page at `chemistry/index.html` that lists them by unit. Each entry in `labs.js` has a `type` of `lesson` or `lab`. Each lab opens with the glassware already set up and the instructions on the page.
 
 | Unit | Lab |
 |---|---|
