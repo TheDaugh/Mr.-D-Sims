@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Derivatives of Sine and Cosine · Guided Lesson</title>
+<meta name="description" content="AP Calculus 2.5, derivatives of sine and cosine. A guided lesson that adjusts to your work, with online notes you can print as a PDF.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/katex/katex.min.css">
+<link rel="stylesheet" href="../shared/lesson.css">
+<style>
+.mission-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;align-items:baseline;margin-bottom:6px}
+.setupbox{padding:10px 14px;border:1px dashed var(--accent);border-radius:8px;background:var(--soft);margin-bottom:10px}
+.rule-box{font-size:1.25rem;text-align:center;padding:14px;border:2px solid var(--good);border-radius:8px;background:var(--stage);margin:12px 0}
+.pred-choices label{display:block;margin:8px 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.pred-choices label.sel{border-color:var(--accent);background:var(--soft)}
+.huddle{text-align:center;padding:10px 0}
+.warn-box{padding:8px 12px;border-left:4px solid var(--gold);background:var(--stage);margin:10px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="back" href="../index.html">← Calculus</a>
+    <div class="links"><button type="button" id="open-notes">My notes</button><button type="button" id="reset">Start over</button></div>
+  </div>
+  <h1>Derivatives of Sine and Cosine</h1>
+  <p class="sub">AP Calculus 2.5 · a guided lesson that adjusts to your work</p>
+  <div class="teacherbar" id="pvbar" hidden></div>
+  <nav class="chips" id="chips" aria-label="Lesson steps"></nav>
+
+  <section class="card" id="step-start" hidden></section>
+  <section class="card" id="step-warm" hidden></section>
+  <section class="card" id="step-predict" hidden></section>
+  <section id="step-sim" hidden></section>
+  <section class="card" id="step-huddle" hidden></section>
+  <section class="card" id="step-build" hidden></section>
+  <section class="card" id="step-practice" hidden></section>
+  <section class="card" id="step-mastery" hidden></section>
+  <section class="card" id="step-wrap" hidden></section>
+
+  <footer>Your work is saved on this device. Mr. D’s Sims · calculus</footer>
+</div>
+
+<div class="drawer" id="drawer" hidden role="dialog" aria-label="My notes">
+  <div class="panel">
+    <button class="btn small close" type="button" id="close-notes">Close</button>
+    <h2>My notes</h2>
+    <p class="hint">These notes fill in as you work. The boxes under “Edit” can be changed any time. When you finish the lesson, they print as a PDF.</p>
+    <div id="notes-body"></div>
+  </div>
+</div>
+<div id="print-root" aria-hidden="true"></div>
+
+<script src="../shared/katex/katex.min.js"></script>
+<script src="../shared/mathcheck.js"></script>
+<script src="../shared/qkit.js"></script>
+<script src="../shared/lessoncore.js"></script>
+<script src="2-5-sine-cosine.content.js"></script>
+<script>
+(function () {
+  'use strict';
+  var C = SC, Q = QKIT, STORE = 'mrd.calc.sc.v1';
+  var STEPS = ['start', 'warm', 'predict', 'sim', 'huddle', 'build', 'practice', 'mastery', 'wrap'];
+  var LABELS = { start: 'Start', warm: 'Warm-up', predict: 'Predict', sim: 'Explore', huddle: 'Huddle', build: 'Build', practice: 'Practice', mastery: 'Check', wrap: 'Wrap-up' };
+  if (/(^|[#&])key\b/.test(location.hash)) { location.replace('2-5-sine-cosine-teacher.html'); return; }
+  var DEBUG = /debug/.test(location.hash), PREVIEW = /preview/.test(location.hash), LAST = null;
+  var PI = Math.PI;
+
+  function $(id) { return document.getElementById(id); }
+  var el = Q.el, rich = Q.rich;
+  function fmt(n, d) { return (Math.round(n * Math.pow(10, d)) / Math.pow(10, d)).toString(); }
+
+  /* ---------- state ---------- */
+  function fresh() {
+    return { first: '', period: '', step: 'start', level: 2, startLevel: 2, peak: 2, up: 0, down: 0, lastTick: 0, active: 0,
+      ready: { done: false, i: 0, score: 0, mask: 0, missed: [] }, pred: '', predTest: null, surprise: '',
+      sim: { m: 1, b: 0, done: false, lvl: 0, dots: { 1: [], 2: [] }, rev: {}, exp: [], x: 0 }, huddleOK: false, solo: false,
+      build: { i: 0, done: false, log: [], cur: null }, practice: { i: 0, done: false, log: [], used: [], cur: null },
+      mastery: { form: '', attempt: 0, i: 0, results: [], recovery: false, done: false, passed: false, correct: 0, concept: false },
+      notes: { why: '', words: '', summary: '', questions: '' }, traps: [], stats: { items: 0, clean: 0, assisted: 0, hints: 0 }, doneAt: '', flagged: false };
+  }
+  var S = fresh();
+  function load() { try { var r = localStorage.getItem(STORE); if (r) { var o = JSON.parse(r); if (o && o.sim && o.mastery) S = Object.assign(fresh(), o); } } catch (e) {} }
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+  function tick() { var n = Date.now(); if (S.lastTick && n - S.lastTick < 180000) S.active += n - S.lastTick; S.lastTick = n; }
+  document.addEventListener('click', function () { tick(); save(); }, true);
+  document.addEventListener('keydown', function () { tick(); }, true);
+  load();
+
+  /* ---------- adaptive level (hidden from the student) ---------- */
+  function stat(res) {
+    S.stats.items++; if (res.clean) S.stats.clean++; if (res.assisted) S.stats.assisted++; S.stats.hints += res.hints || 0;
+    (res.traps || []).forEach(function (t) { if (S.traps.indexOf(t) < 0) S.traps.push(t); });
+  }
+  function adapt(res) {
+    if (res.clean) { S.up++; S.down = 0; if (S.up >= 2 && S.level < 4) { S.level++; S.up = 0; } }
+    else if (res.assisted || res.misses >= 3) { S.down++; S.up = 0; if (S.down >= 2 && S.level > 1) { S.level--; S.down = 0; } }
+    else { S.up = 0; S.down = 0; }
+    if (S.level > S.peak) S.peak = S.level;
+  }
+
+  /* ---------- navigation ---------- */
+  function canLeave(step) {
+    switch (step) {
+      case 'start': return !!S.first.trim() && !!S.period.trim();
+      case 'warm': return S.ready.done;
+      case 'predict': return !!S.predTest && S.surprise.trim().length >= 10;
+      case 'sim': return S.sim.done;
+      case 'huddle': return S.huddleOK && S.notes.words.trim().length >= 20;
+      case 'build': return S.build.done;
+      case 'practice': return S.practice.done;
+      case 'mastery': return S.mastery.done;
+      case 'wrap': return !!S.doneAt;
+    }
+    return false;
+  }
+  function reachable() { if (PREVIEW) return STEPS.length - 1; var r = 0; for (var i = 0; i < STEPS.length - 1; i++) { if (canLeave(STEPS[i])) r = i + 1; else break; } return r; }
+  function cur() { return STEPS.indexOf(S.step) < 0 ? 'start' : S.step; }
+  function goto(step) {
+    if (STEPS.indexOf(step) > reachable()) return;
+    S.step = step; save(); renderAll(); window.scrollTo(0, 0);
+  }
+  function advance(from) { var i = STEPS.indexOf(from); if (i + 1 < STEPS.length) goto(STEPS[i + 1]); }
+  function renderNav() {
+    var nav = $('chips'); nav.innerHTML = ''; var r = reachable();
+    STEPS.forEach(function (s, i) {
+      var b = el('button', null, (i + 1) + ' ' + LABELS[s]); b.type = 'button';
+      if (s === cur()) b.setAttribute('aria-current', 'step');
+      b.disabled = i > r; b.onclick = function () { goto(s); }; nav.appendChild(b);
+    });
+  }
+  function nextBtn(host, label, fn, disabled) {
+    var row = el('div', 'row'), b = el('button', 'btn primary', label); b.type = 'button'; b.disabled = !!disabled; b.onclick = fn; row.appendChild(b); host.appendChild(row); return b;
+  }
+  function pills(host, n, i) {
+    var p = el('div', 'progress');
+    for (var k = 0; k < n; k++) p.appendChild(el('span', k < i ? 'done' : k === i ? 'now' : '', String(k + 1)));
+    host.appendChild(p);
+  }
+  function runSeq(host, start, total, getItem, onResult, onFinish) {
+    var i = start;
+    function show() {
+      host.innerHTML = ''; pills(host, total, i);
+      var item = getItem(i), qh = el('div');
+      host.appendChild(qh);
+      var opt = Object.assign({}, item.opt || {});
+      opt.seed = (item.q.id || 'q') + '|' + S.first + '|' + S.period;
+      opt.onDone = function (res) {
+        onResult(i, res, item); save();
+        nextBtn(qh, i + 1 < total ? 'Next' : 'Finish', function () { i++; if (i < total) show(); else onFinish(); });
+      };
+      LAST = Q.render(qh, item.q, opt);
+    }
+    show();
+  }
+
+  /* ---------- step 1: start ---------- */
+  function renderStart() {
+    var h = $('step-start'); h.innerHTML = '';
+    h.appendChild(el('h2', null, 'Before you start'));
+    h.appendChild(el('div', 'bigq', '<b>The question for today.</b> Trace the slope of the sine curve at every point. What curve do you get?'));
+    h.appendChild(el('p', null, 'This lesson has two parts of about half an hour each. Part A: a warm-up, a prediction, and a hands-on experiment where you slide a tangent line along sine and cosine and watch the slopes draw a new curve. Part B: you turn the two rules into a skill, then show you own them. You write your own notes as you go and print them as a PDF at the end.'));
+    h.appendChild(el('p', null, 'Keep your calculator in <b>radian</b> mode for the whole lesson. The questions adjust to your work: fast, accurate answers lead to harder problems; a stumble brings a closer look at the idea. Every route ends at the same understanding.'));
+    var row = el('div', 'row');
+    row.innerHTML = '<label>First name <input type="text" id="who-first" autocomplete="given-name"></label> <label>Period <input type="text" id="who-period" maxlength="6"></label>';
+    h.appendChild(row);
+    var b = nextBtn(h, 'Begin the warm-up', function () { S.first = $('who-first').value.trim(); S.period = $('who-period').value.trim(); advance('start'); }, !canLeave('start'));
+    function upd() { S.first = $('who-first').value; S.period = $('who-period').value; b.disabled = !canLeave('start'); save(); renderNav(); }
+    $('who-first').value = S.first; $('who-period').value = S.period;
+    $('who-first').oninput = upd; $('who-period').oninput = upd;
+  }
+
+  /* ---------- step 2: warm-up ---------- */
+  function renderWarm() {
+    var h = $('step-warm'); h.innerHTML = '';
+    h.appendChild(el('h2', null, 'Warm-up'));
+    h.appendChild(el('p', 'hint', 'Six quick ones on things you already know. Two tries each, no hints. This tells the lesson where to start you, so answer honestly.'));
+    if (S.ready.done) { renderWarmDone(h); return; }
+    var box = el('div'); h.appendChild(box);
+    runSeq(box, S.ready.i, C.READY.length, function (i) { return { q: C.READY[i], opt: { noHints: true, maxTries: 2 } }; },
+      function (i, res) {
+        S.ready.i = i + 1;
+        if (!res.assisted) S.ready.score++; else { S.ready.mask |= (1 << i); S.ready.missed.push(i); }
+      },
+      function () {
+        var sc = S.ready.score;
+        S.startLevel = sc <= 2 ? 1 : sc <= 5 ? 2 : (S.ready.missed.length === 0 ? 3 : 2);
+        S.level = S.startLevel; S.peak = S.level; S.ready.done = true; save(); renderAll();
+      });
+  }
+  function renderWarmDone(h) {
+    h.appendChild(el('div', 'fb ok', '<p>Warm-up done: <b>' + S.ready.score + ' of 6</b>.</p>'));
+    if (S.ready.missed.length) {
+      var d = el('details', 'toolbox'); d.open = true;
+      d.appendChild(el('summary', null, 'Quick refreshers for the ones that slipped'));
+      var inner = el('div', 'inner');
+      S.ready.missed.forEach(function (i) { var q = C.READY[i]; inner.appendChild(el('div', null, '<p class="qlabel">' + Q.esc(q.skill) + '</p>' + rich(q.worked))); });
+      d.appendChild(inner); h.appendChild(d);
+    }
+    nextBtn(h, 'On to the prediction', function () { advance('warm'); });
+  }
+
+  /* ---------- step 3: predict ---------- */
+  function renderPredict() {
+    var h = $('step-predict'); h.innerHTML = '';
+    h.appendChild(el('h2', null, 'Predict first'));
+    h.appendChild(el('div', null, rich('Imagine the graph of $y=\\sin x$. At every point, measure the slope of the tangent line, and plot that slope as a new graph. Before any calculation: what will the slope graph look like?')));
+    var wrap = el('div', 'pred-choices'), lockBtn;
+    C.PREDICT.choices.forEach(function (c, i) {
+      var id = ['A', 'B', 'C'][i], lab = el('label', S.pred === id ? 'sel' : ''), r = document.createElement('input');
+      r.type = 'radio'; r.name = 'pred'; r.value = id; r.checked = S.pred === id; r.disabled = !!S.pred;
+      r.onchange = function () { lockBtn.disabled = false; Array.prototype.forEach.call(wrap.children, function (x) { x.classList.remove('sel'); }); lab.classList.add('sel'); };
+      lab.appendChild(r); lab.appendChild(el('span', null, ' ' + Q.inline(c)));
+      wrap.appendChild(lab);
+    });
+    h.appendChild(wrap);
+    lockBtn = nextBtn(h, S.pred ? 'Locked in' : 'Lock in my prediction', function () {
+      var sel = wrap.querySelector('input:checked'); if (!sel) return; S.pred = sel.value; save(); renderAll();
+    }, true);
+    if (S.pred) { var tbox = el('div'); h.appendChild(tbox); renderPredictTest(tbox); }
+  }
+  function renderPredictTest(tbox) {
+    tbox.appendChild(el('div', 'job', '<b>Now test it.</b> A guess becomes useful when something can contradict it.'));
+    if (S.predTest) {
+      tbox.appendChild(el('div', 'fb ok', rich('You tested it: at $x=\\pi/2$ the sine curve is at its highest point (height 1) but its slope is 0, so the slope graph is not the sine curve itself. Near $x=0$ the slope is about 1.')));
+      var q2 = el('div'); tbox.appendChild(q2);
+      q2.appendChild(el('label', null, 'In one line: does this change your guess, and why?'));
+      var ta = document.createElement('textarea'); ta.value = S.surprise; ta.rows = 2; q2.appendChild(ta);
+      var b = nextBtn(q2, 'Continue to the experiment', function () { advance('predict'); }, S.surprise.trim().length < 10);
+      ta.oninput = function () { S.surprise = ta.value; b.disabled = S.surprise.trim().length < 10; save(); renderNav(); };
+      return;
+    }
+    LAST = Q.render(tbox, C.PREDICT.test, { seed: 'pt|' + S.first, onDone: function (res) { stat(res); S.predTest = { clean: res.clean }; save(); renderAll(); } });
+  }
+
+  /* ---------- step 4: the slope tracer ---------- */
+  var cv1, cx1, cv2, cx2, zoomView = false;
+  function F(fn, x) { return fn === 'sin' ? Math.sin(x) : Math.cos(x); }
+  function SL(fn, x) { return fn === 'sin' ? Math.cos(x) : -Math.sin(x); }
+  function piText(k) {
+    if (k === 0) return '0';
+    function g(a, b) { return b ? g(b, a % b) : a; }
+    var d = g(k, 12), n = k / d, q = 12 / d;
+    return (n === 1 ? '' : n) + 'π' + (q === 1 ? '' : '/' + q);
+  }
+  var VIEW = { x0: -0.4, x1: 6.7, y0: -1.5, y1: 1.5 };
+  function mapper(cv, v) {
+    var L = 40, R = 12, T = 12, B = 22, w = cv.width - L - R, h = cv.height - T - B;
+    return { X: function (x) { return L + (x - v.x0) / (v.x1 - v.x0) * w; }, Y: function (y) { return T + (v.y1 - y) / (v.y1 - v.y0) * h; }, L: L, R: cv.width - R, T: T, B: cv.height - B };
+  }
+  function grid(cx, M, v, ink, ystep, xTicks) {
+    cx.lineWidth = 1; cx.font = '11px sans-serif'; cx.fillStyle = ink;
+    for (var y = Math.ceil(v.y0 / ystep) * ystep; y <= v.y1 + 1e-9; y += ystep) {
+      var major = Math.abs(y - Math.round(y)) < 1e-9;
+      cx.strokeStyle = major ? 'rgba(120,130,140,.45)' : 'rgba(120,130,140,.2)'; cx.beginPath(); cx.moveTo(M.L, M.Y(y)); cx.lineTo(M.R, M.Y(y)); cx.stroke();
+      if (major) cx.fillText(String(Math.round(y)), 8, M.Y(y) + 4);
+    }
+    cx.strokeStyle = 'rgba(120,130,140,.9)'; cx.beginPath(); cx.moveTo(M.L, M.Y(0)); cx.lineTo(M.R, M.Y(0)); cx.stroke();
+    xTicks.forEach(function (t) { cx.fillText(t[1], M.X(t[0]) - 8, M.B + 15); cx.strokeStyle = 'rgba(120,130,140,.5)'; cx.beginPath(); cx.moveTo(M.X(t[0]), M.Y(0) - 3); cx.lineTo(M.X(t[0]), M.Y(0) + 3); cx.stroke(); });
+  }
+  function plotFn(cx, M, v, f, color, wd) {
+    cx.strokeStyle = color; cx.lineWidth = wd; cx.beginPath();
+    for (var i = 0; i <= 240; i++) { var x = v.x0 + (v.x1 - v.x0) * i / 240, X = M.X(x), Y = M.Y(f(x)); if (i) cx.lineTo(X, Y); else cx.moveTo(X, Y); }
+    cx.stroke();
+  }
+  var simBeat = null;
+  function draw() {
+    if (!cv1 || !cv1.isConnected) return;
+    var ink = getComputedStyle(document.body).color, fn = (simBeat && simBeat.fn) || 'sin', x = S.sim.x * PI / 12, m = S.sim.m;
+    var v = zoomView ? { x0: x - 0.5, x1: x + 0.5, y0: F(fn, x) - 0.45, y1: F(fn, x) + 0.45 } : VIEW;
+    var M = mapper(cv1, v), ticks = [];
+    cx1.clearRect(0, 0, cv1.width, cv1.height);
+    if (!zoomView) { for (var k = 0; k <= 4; k++) ticks.push([k * PI / 2, k ? piText(k * 6) : '0']); }
+    grid(cx1, M, v, ink, zoomView ? 0.1 : 0.25, ticks);
+    plotFn(cx1, M, v, function (t) { return F(fn, t); }, '#2b4fd9', 2.5);
+    var y0 = F(fn, x), s = SL(fn, x);
+    if (simBeat && simBeat.secant) {
+      var h = simBeat.secant, y1 = F(fn, x + h), ms = (y1 - y0) / h;
+      cx1.strokeStyle = '#b3412e'; cx1.lineWidth = 2; cx1.beginPath(); cx1.moveTo(M.X(v.x0), M.Y(y0 + ms * (v.x0 - x))); cx1.lineTo(M.X(v.x1), M.Y(y0 + ms * (v.x1 - x))); cx1.stroke();
+      cx1.strokeStyle = '#1c7d4a'; cx1.setLineDash([6, 4]); cx1.beginPath(); cx1.moveTo(M.X(v.x0), M.Y(y0 + s * (v.x0 - x))); cx1.lineTo(M.X(v.x1), M.Y(y0 + s * (v.x1 - x))); cx1.stroke(); cx1.setLineDash([]);
+      [[x, y0], [x + h, y1]].forEach(function (p) { cx1.fillStyle = '#b3412e'; cx1.beginPath(); cx1.arc(M.X(p[0]), M.Y(p[1]), 5, 0, 7); cx1.fill(); });
+      cx1.fillStyle = ink; cx1.font = '12px sans-serif'; cx1.fillText('red: secant through x and x + ' + h + '    green dashed: true tangent', M.L + 6, M.T + 12);
+    } else {
+      var span = zoomView ? 0.5 : 1.3;
+      cx1.strokeStyle = '#1c7d4a'; cx1.lineWidth = 2.5; cx1.beginPath(); cx1.moveTo(M.X(x - span), M.Y(y0 - s * span)); cx1.lineTo(M.X(x + span), M.Y(y0 + s * span)); cx1.stroke();
+      if (simBeat && (simBeat.at !== undefined || simBeat.kind === 'explore')) {
+        cx1.strokeStyle = 'rgba(28,125,74,.9)'; cx1.lineWidth = 1.5; cx1.setLineDash([4, 3]); cx1.beginPath();
+        cx1.moveTo(M.X(x), M.Y(y0)); cx1.lineTo(M.X(x + 1), M.Y(y0)); cx1.lineTo(M.X(x + 1), M.Y(y0 + s)); cx1.stroke(); cx1.setLineDash([]);
+        cx1.fillStyle = ink; cx1.font = '12px sans-serif'; cx1.fillText('run = 1', M.X(x + 0.45) - 18, M.Y(y0) + (s >= 0 ? 14 : -6));
+      }
+      cx1.fillStyle = '#1c7d4a'; cx1.beginPath(); cx1.arc(M.X(x), M.Y(y0), 5.5, 0, 7); cx1.fill();
+    }
+    cx1.fillStyle = ink; cx1.font = '12px sans-serif'; cx1.fillText('y = ' + fn + ' x', M.R - 70, M.T + 12);
+    /* slope graph */
+    if (zoomView) { cv2.hidden = true; $('lab2').hidden = true; return; }
+    cv2.hidden = false; $('lab2').hidden = false;
+    var M2 = mapper(cv2, VIEW); cx2.clearRect(0, 0, cv2.width, cv2.height);
+    grid(cx2, M2, VIEW, ink, 0.25, ticks);
+    var rv = S.sim.rev[m];
+    if (rv) plotFn(cx2, M2, VIEW, function (t) { return rv === 'cos' ? Math.cos(t) : -Math.sin(t); }, 'rgba(179,65,46,.4)', 5);
+    (S.sim.dots[m] || []).forEach(function (k) { var xx = k * PI / 12; cx2.fillStyle = '#b3412e'; cx2.beginPath(); cx2.arc(M2.X(xx), M2.Y(SL(fn, xx)), 5, 0, 7); cx2.fill(); });
+    if (simBeat && simBeat.kind === 'explore') { cx2.strokeStyle = '#1c7d4a'; cx2.lineWidth = 2; cx2.beginPath(); cx2.arc(M2.X(x), M2.Y(s), 7, 0, 7); cx2.stroke(); }
+    cx2.fillStyle = ink; cx2.font = '12px sans-serif'; cx2.fillText('slope of y = ' + fn + ' x', M2.R - 130, M2.T + 12);
+  }
+  function simBuild(host) {
+    var card = el('div', 'card');
+    card.innerHTML = '<div class="sim"><div><canvas class="simcv" id="cv1" width="640" height="250" aria-label="The curve with a tangent line"></canvas>' +
+      '<p class="hint" id="lab2" style="margin:6px 0 2px">Slope graph: each dot is the slope you measured, plotted at the same x.</p>' +
+      '<canvas class="simcv" id="cv2" width="640" height="190" aria-label="The slope graph"></canvas>' +
+      '<div class="readout" id="readout"></div></div>' +
+      '<div class="controls"><label>Position x = <span class="val" id="xval"></span><input type="range" id="xs" min="0" max="24" step="1" aria-label="Position of the tangent line"></label>' +
+      '<p class="hint" id="slhint"></p></div></div>';
+    host.appendChild(card);
+    cv1 = $('cv1'); cx1 = cv1.getContext('2d'); cv2 = $('cv2'); cx2 = cv2.getContext('2d');
+  }
+  function setX(k) { S.sim.x = k; $('xs').value = k; $('xval').textContent = piText(k); draw(); }
+
+  var MTITLES = { 1: ['Mission 1 · Trace the sine curve', 'Slide a tangent along sine, measure its slope, and let the dots draw a curve.'],
+    2: ['Mission 2 · Trace the cosine curve', 'Same experiment, new curve.'],
+    3: ['Mission 3 · Why it works', 'Zoom in on one point and watch secant lines turn into the tangent.'],
+    4: ['Mission 4 · Name the rules', 'Write down what you found.'] };
+  function missionBeats(m) {
+    var M = C.MISSIONS;
+    if (m === 4) return [{ kind: 'q', q: M.m4.rules, nosim: true }].concat(S.sim.lvl >= 3 ? [{ kind: 'q', q: M.m4.cycle, nosim: true }] : []);
+    return M['m' + m];
+  }
+  function renderSim() {
+    var host = $('step-sim'); host.innerHTML = '';
+    if (!S.sim.lvl) S.sim.lvl = S.level;
+    var m = S.sim.m, beats = missionBeats(m);
+    var head = el('div', 'card');
+    head.innerHTML = '<div class="mission-head"><h2>' + MTITLES[m][0] + '</h2><span class="pill">Part ' + m + ' of 4</span></div><p class="sub">' + MTITLES[m][1] + '</p>';
+    host.appendChild(head);
+    var beat = S.sim.b < beats.length ? beats[S.sim.b] : null;
+    var showSim = m !== 4;
+    simBeat = beat || beats[beats.length - 1];
+    if (showSim) {
+      simBuild(host);
+      zoomView = !!(simBeat && simBeat.secant);
+      var xs = $('xs');
+      xs.oninput = function () {
+        var k = +xs.value; S.sim.x = k; $('xval').textContent = piText(k);
+        if (beat && beat.kind === 'explore') {
+          if (S.sim.exp.indexOf(k) < 0) S.sim.exp.push(k);
+          if ((S.sim.dots[m] || []).indexOf(k) < 0) S.sim.dots[m].push(k);
+          exploreUI();
+        }
+        $('readout').innerHTML = beat && beat.kind === 'explore' ? '<span>slope ≈ <b>' + fmt(SL(simBeat.fn, k * PI / 12), 3) + '</b></span>' : '';
+        save(); draw();
+      };
+      if (beat && beat.at !== undefined) { S.sim.x = Math.round(beat.at * 12); xs.disabled = true; $('slhint').textContent = 'The position is set for this step.'; }
+      else { xs.disabled = false; $('slhint').textContent = beat && beat.kind === 'explore' ? 'Slide it. Each position leaves a dot on the slope graph.' : 'You can slide the tangent while you think.'; }
+      if (zoomView) { xs.disabled = true; $('slhint').textContent = 'Zoomed in at x = π/3.'; }
+      $('xs').value = S.sim.x; $('xval').textContent = piText(S.sim.x);
+    }
+    var bx = el('div', 'card'); host.appendChild(bx);
+    if (!beat) { missionDone(bx, m); if (showSim) draw(); return; }
+    bx.appendChild(el('p', 'qlabel', 'Step ' + (S.sim.b + 1) + ' of ' + beats.length));
+    var next = function () { S.sim.b++; save(); renderSim(); };
+    var exploreUI = function () {};
+    if (beat.kind === 'q') {
+      var opt = { seed: beat.q.id + '|' + S.first, onDone: function (res) {
+        stat(res);
+        if (beat.plot && (S.sim.dots[m].indexOf(S.sim.x) < 0)) S.sim.dots[m].push(S.sim.x);
+        if (beat.reveal) S.sim.rev[m] = beat.reveal;
+        save(); if (showSim) draw(); nextBtn(bx, 'Continue', next);
+      } };
+      if (beat.note === 'why') { opt.onText = function (id, v) { S.notes.why = v; save(); }; opt.initial = { a: S.notes.why }; }
+      LAST = Q.render(bx, beat.q, opt);
+    } else {
+      var info = el('div', 'setupbox', '<p>' + beat.text + '</p>'), cnt = el('p', 'hint'), holder = el('div');
+      bx.appendChild(info); bx.appendChild(cnt); bx.appendChild(holder);
+      exploreUI = function () {
+        var n = S.sim.exp.length;
+        cnt.textContent = n + ' of ' + beat.min + ' positions visited.';
+        if (n >= beat.min && !holder.firstChild) nextBtn(holder, 'Continue', next);
+      };
+      exploreUI();
+    }
+    if (showSim) draw();
+  }
+  function missionDone(bx, m) {
+    if (m < 4) {
+      bx.appendChild(el('div', 'fb ok', '<p>Mission ' + m + ' complete.</p>'));
+      nextBtn(bx, 'Mission ' + (m + 1), function () { S.sim.m++; S.sim.b = 0; save(); renderSim(); });
+    } else {
+      bx.appendChild(el('div', 'rule-box', rich('$\\dfrac{d}{dx}\\sin x=\\cos x \\qquad \\dfrac{d}{dx}\\cos x=-\\sin x$')));
+      bx.appendChild(el('p', null, 'Those are the two rules. Notice that only the cosine rule carries a minus sign: cosine starts at a peak and falls, so its slopes start negative. Next comes a short huddle.'));
+      S.sim.done = true; save(); renderNav();
+      nextBtn(bx, 'To the huddle', function () { advance('sim'); });
+    }
+  }
+
+  /* ---------- step 5: huddle ---------- */
+  function renderHuddle() {
+    var h = $('step-huddle'); h.innerHTML = '';
+    h.appendChild(el('h2', null, 'Huddle'));
+    h.appendChild(el('div', 'huddle', '<p><b>Stop here.</b> Mr. D leads a two-minute huddle: why does the cosine rule carry a minus sign, and where would you look on the picture to check it?</p>'));
+    var codeRow = el('div', 'row');
+    codeRow.innerHTML = '<label>Class code <input type="text" id="code-huddle" inputmode="numeric" maxlength="4" autocomplete="off"></label>';
+    var cb = el('button', 'btn', 'Enter code'); cb.type = 'button'; codeRow.appendChild(cb);
+    var msg = el('p', 'hint'); h.appendChild(codeRow); h.appendChild(msg);
+    cb.onclick = function () {
+      if ($('code-huddle').value.trim() === C.codeFor('huddle')) { S.huddleOK = true; S.solo = false; save(); renderAll(); }
+      else msg.textContent = 'That code is not right. Ask Mr. D.';
+    };
+    var solo = el('details'); solo.innerHTML = '<summary class="hint">Working on your own, without a class code?</summary><p class="hint">You can continue without the huddle. Your hand-in code will show that you worked solo.</p>';
+    var sb = el('button', 'btn small', 'Continue on my own'); sb.type = 'button'; sb.onclick = function () { S.huddleOK = true; S.solo = true; save(); renderAll(); }; solo.appendChild(sb); h.appendChild(solo);
+    if (S.huddleOK) {
+      msg.textContent = S.solo ? 'Continuing solo.' : 'Code accepted.';
+      var w = el('div'); w.innerHTML = '<p>Now say the two rules in your own words, in a full sentence. It goes into your notes.</p>';
+      var ta = document.createElement('textarea'); ta.value = S.notes.words; ta.rows = 3; ta.placeholder = 'The derivative of sine is ... and of cosine is ... because ...'; w.appendChild(ta); h.appendChild(w);
+      var nb = nextBtn(h, 'Start building', function () { advance('huddle'); }, S.notes.words.trim().length < 20);
+      ta.oninput = function () { S.notes.words = ta.value; nb.disabled = S.notes.words.trim().length < 20; save(); renderNav(); };
+    }
+  }
+
+  /* ---------- step 6: build ---------- */
+  function pickFrom(pool, usedIds, level) {
+    var order = [level, level + 1, level - 1, level + 2, level - 2, level + 3, level - 3].filter(function (l) { return l >= 1 && l <= 4; });
+    for (var k = 0; k < order.length; k++) {
+      var arr = pool[order[k]] || [];
+      for (var i = 0; i < arr.length; i++) { var e = arr[i], id = (e.spec || e.q || e).id; if (usedIds.indexOf(id) < 0) return { entry: e, id: id, from: order[k] }; }
+    }
+    return null;
+  }
+  function usedIds() { return S.build.log.map(function (l) { return l.id; }).concat(S.practice.used); }
+  function toolbox() {
+    var d = el('details', 'toolbox');
+    d.appendChild(el('summary', null, 'Toolbox: unit circle values and the two rules'));
+    d.appendChild(el('div', 'inner', rich('$\\dfrac{d}{dx}\\sin x=\\cos x,\\quad \\dfrac{d}{dx}\\cos x=-\\sin x$') +
+      '<table class="data"><thead><tr><th>$x$</th><th>$\\pi/6$</th><th>$\\pi/4$</th><th>$\\pi/3$</th><th>$\\pi/2$</th><th>$2\\pi/3$</th><th>$3\\pi/4$</th><th>$5\\pi/6$</th><th>$\\pi$</th></tr></thead><tbody>' +
+      '<tr><td>$\\sin x$</td><td>$\\tfrac12$</td><td>$\\tfrac{\\sqrt2}{2}$</td><td>$\\tfrac{\\sqrt3}{2}$</td><td>$1$</td><td>$\\tfrac{\\sqrt3}{2}$</td><td>$\\tfrac{\\sqrt2}{2}$</td><td>$\\tfrac12$</td><td>$0$</td></tr>' +
+      '<tr><td>$\\cos x$</td><td>$\\tfrac{\\sqrt3}{2}$</td><td>$\\tfrac{\\sqrt2}{2}$</td><td>$\\tfrac12$</td><td>$0$</td><td>$-\\tfrac12$</td><td>$-\\tfrac{\\sqrt2}{2}$</td><td>$-\\tfrac{\\sqrt3}{2}$</td><td>$-1$</td></tr></tbody></table>'));
+    return d;
+  }
+  function renderBuild() {
+    var h = $('step-build'); h.innerHTML = '';
+    h.appendChild(el('h2', null, 'Build it'));
+    h.appendChild(el('div', 'routine', '<p class="qlabel">The routine</p><ol><li>Differentiate term by term: <b>sin \u2192 cos</b>, <b>cos \u2192 \u2212sin</b>, and keep any coefficient.</li><li>Substitute the $x$-value and read the exact sine or cosine from the unit circle.</li><li>Check the sign once more: cosine terms flip.</li></ol>'.replace(/\$x\$/g, 'x')));
+    h.appendChild(toolbox());
+    if (S.build.done) { h.appendChild(el('div', 'fb ok', '<p>Build complete.</p>')); nextBtn(h, 'On to practice', function () { advance('build'); }); return; }
+    var box = el('div'); h.appendChild(box);
+    runSeq(box, S.build.i, 2, function () {
+      var pick = pickFrom(C.BUILD, usedIds(), S.level), lvl = S.level;
+      S.build.cur = { id: pick.id, level: lvl };
+      return { q: C.buildQ(pick.entry, lvl), opt: {} };
+    }, function (i, res, item) {
+      stat(res); adapt(res);
+      S.build.log.push({ id: S.build.cur.id, level: S.build.cur.level, clean: res.clean, done: item.q.done });
+      S.build.i = i + 1;
+    }, function () { S.build.done = true; save(); renderAll(); });
+  }
+
+  /* ---------- step 7: practice ---------- */
+  var PRACTICE_N = 8;
+  function renderPractice() {
+    var h = $('step-practice'); h.innerHTML = '';
+    h.appendChild(el('h2', null, 'Practice'));
+    h.appendChild(el('p', 'hint', 'Eight problems. They move with you: clean work earns harder ones, and a rough patch brings a closer look.'));
+    h.appendChild(toolbox());
+    if (S.practice.done) { h.appendChild(el('div', 'fb ok', '<p>Practice complete.</p>')); nextBtn(h, 'On to the check', function () { advance('practice'); }); return; }
+    var box = el('div'); h.appendChild(box);
+    runSeq(box, S.practice.i, PRACTICE_N, function () {
+      var pick = pickFrom(C.PRACTICE, usedIds(), S.level);
+      if (!pick) pick = pickFrom(C.BUILD, usedIds(), S.level);
+      S.practice.cur = { id: pick.id };
+      return { q: C.make(pick.entry, pick.from), opt: {} };
+    }, function (i, res) {
+      stat(res); adapt(res); S.practice.used.push(S.practice.cur.id); S.practice.log.push({ id: S.practice.cur.id, clean: res.clean }); S.practice.i = i + 1;
+    }, function () { S.practice.done = true; save(); renderAll(); });
+  }
+
+  /* ---------- step 8: the check ---------- */
+  function pickForm() { return Q.mix(S.first.toLowerCase() + '|' + S.period) % 2 ? 'A' : 'B'; }
+  function renderMastery() {
+    var h = $('step-mastery'); h.innerHTML = '';
+    var m = S.mastery;
+    h.appendChild(el('h2', null, 'Check: do you own it?'));
+    if (m.done) { renderMasteryDone(h); return; }
+    if (!m.form) { m.form = pickForm(); m.attempt = 1; m.i = 0; m.results = []; save(); }
+    if (m.recovery) { renderRecovery(h); return; }
+    h.appendChild(el('p', 'hint', 'Four problems, no hints, two tries each. You need three right, including the first (the idea question). Attempt ' + m.attempt + ' of 2.'));
+    var items = C.MASTERY[m.form], box = el('div'); h.appendChild(box);
+    runSeq(box, m.i, 4, function (i) {
+      var e = items[i], q = e.spec ? C.buildQ(e.spec, 4) : (e.q || e);
+      return { q: q, opt: { noHints: true, maxTries: 2, noWorked: true } };
+    }, function (i, res) {
+      stat(res); m.results.push({ ok: !res.assisted }); m.i = i + 1;
+    }, function () {
+      var ok = m.results.filter(function (r) { return r.ok; }).length, concept = !!(m.results[0] && m.results[0].ok);
+      m.correct = ok; m.concept = concept;
+      if (ok >= 3 && concept) { m.passed = true; m.done = true; }
+      else if (m.attempt === 1) { m.recovery = true; }
+      else { m.done = true; S.flagged = true; }
+      save(); renderAll();
+    });
+  }
+  function renderRecovery(h) {
+    var m = S.mastery;
+    h.appendChild(el('div', 'warn-box', '<p><b>Not yet, and that is useful information.</b> Three guided problems tighten the foundation, then you try the other version of the check.</p>'));
+    var box = el('div'); h.appendChild(box);
+    runSeq(box, 0, 3, function (i) { var e = C.RECOVERY[i]; return { q: e.spec ? C.buildQ(e.spec, 1) : e.q, opt: {} }; },
+      function (i, res) { stat(res); },
+      function () { m.recovery = false; m.attempt = 2; m.form = m.form === 'A' ? 'B' : 'A'; m.i = 0; m.results = []; save(); renderAll(); });
+  }
+  function renderMasteryDone(h) {
+    var m = S.mastery;
+    if (m.passed) h.appendChild(el('div', 'fb ok', '<p><b>Passed.</b> ' + m.correct + ' of 4 right. You own the derivatives of sine and cosine.</p>'));
+    else h.appendChild(el('div', 'warn-box', '<p><b>Mr. D will talk with you.</b> Two tries did not land yet, which is common with these rules. Finish your notes anyway; your hand-in code tells Mr. D exactly where to start.</p>'));
+    nextBtn(h, 'Wrap up and finish your notes', function () { advance('mastery'); });
+  }
+
+  /* ---------- notes: preview/print HTML ---------- */
+  function curveSVG() {
+    function path(f, oy, amp) { var p = []; for (var i = 0; i <= 60; i++) { var x = i / 60 * 2 * PI; p.push((i ? 'L' : 'M') + (20 + x * 34).toFixed(1) + ' ' + (oy - f(x) * amp).toFixed(1)); } return p.join(' '); }
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 170" width="250" role="img" aria-label="Sine curve above its slope graph, the cosine curve">' +
+      '<line x1="20" y1="45" x2="240" y2="45" stroke="#999"/><line x1="20" y1="125" x2="240" y2="125" stroke="#999"/>' +
+      '<path d="' + path(Math.sin, 45, 30) + '" fill="none" stroke="#2b4fd9" stroke-width="2"/>' +
+      '<path d="' + path(Math.cos, 125, 30) + '" fill="none" stroke="#b3412e" stroke-width="2"/>' +
+      '<text x="24" y="12" font-size="10">y = sin x</text><text x="24" y="92" font-size="10">its slope graph: y = cos x</text></svg>';
+  }
+  function notesData() {
+    var idx = ['A', 'B', 'C'].indexOf(S.pred), first = S.build.log[0];
+    return { example: first && first.done, pred: idx >= 0 ? C.PREDICT.choices[idx] : '' };
+  }
+  function cornellRow(cue, body) { return '<tr><td class="cue">' + cue + '</td><td>' + body + '</td></tr>'; }
+  function mineHTML(t, hint) { return t && t.trim() ? Q.esc(t).replace(/\n/g, '<br>') : '<span class="blank">' + hint + '</span>'; }
+  function notesHTML() {
+    var D = notesData(), ex = D.example, traps = S.traps.slice(0, 3);
+    return '<div class="notes-doc"><div class="meta"><span><b>' + (Q.esc(S.first) || 'Name') + '</b> \u00b7 Period ' + (Q.esc(S.period) || '__') + '</span><span>' + C.today() + '</span></div>' +
+      '<h1>2.5 Derivatives of Sine and Cosine</h1><table>' +
+      cornellRow('Big question', rich('If you trace the slope of $y=\\sin x$ at every point, what curve do you get?')) +
+      cornellRow('My prediction', (D.pred ? Q.inline(D.pred) : '<span class="blank">(not yet)</span>') + '<p class="small">' + (S.predTest ? rich('Test: at $x=\\pi/2$ the height is 1 but the slope is 0, so the slope graph is not $\\sin x$ itself.') : '') + '</p><p>' + mineHTML(S.surprise, 'What changed in my thinking') + '</p>') +
+      cornellRow('The picture', curveSVG() + '<p class="small">Peaks and valleys of sine have slope 0. Sine is steepest where it crosses the axis. The slope dots trace cosine.</p>') +
+      cornellRow('Why a limit gives the slope', '<p>' + mineHTML(S.notes.why, 'As h shrinks, the secant line ...') + '</p>') +
+      cornellRow('The rules', '<div class="box">' + rich('$\\dfrac{d}{dx}\\sin x=\\cos x$') + rich('$\\dfrac{d}{dx}\\cos x=-\\sin x$') + '</div><p>' + mineHTML(S.notes.words, 'The rules in my words') + '</p>') +
+      cornellRow('Worked example (mine)', ex ? rich('$' + ex.name + '(x)=' + ex.fn + '$') + rich('$' + ex.name + '\'(x)=' + ex.d + '$') + rich('$' + ex.name + '\'(' + ex.a + ')=' + (ex.exact ? ex.exact + '\\approx' : '') + ex.val + '$') : '<span class="blank">(appears after the Build step)</span>') +
+      cornellRow('Watch out', rich('Only the cosine rule has a minus sign: $\\dfrac{d}{dx}\\cos x=-\\sin x$. Keep your calculator in radians. Check a sign by asking whether the curve is rising or falling there.') + (traps.length ? '<p class="small"><b>Traps I hit:</b></p>' + traps.map(function (t) { return '<p class="small">\u2022 ' + Q.inline(t) + '</p>'; }).join('') : '')) +
+      cornellRow('Check yourself', S.mastery.done ? 'Check result: <b>' + S.mastery.correct + ' of 4</b>' + (S.mastery.passed ? ' \u2713' : ' (see Mr. D)') : '<span class="blank">(after the Check step)</span>') +
+      '</table><h2>Summary in my own words</h2><div class="box">' + mineHTML(S.notes.summary, 'Summary') + '</div>' +
+      '<h2>Questions I still have</h2><div class="box">' + mineHTML(S.notes.questions, 'Optional') + '</div>' +
+      (S.doneAt ? '<p class="small">Hand-in code: <b>' + handIn() + '</b></p>' : '') + '</div>';
+  }
+
+  /* ---------- hand-in code ---------- */
+  function handIn() {
+    var m = S.mastery, flags = (S.solo ? 1 : 0) + (S.flagged ? 2 : 0);
+    return C.encodeHandIn(S.first, [1, S.startLevel, S.peak, S.ready.mask, m.correct, m.concept ? 1 : 0, m.attempt, S.stats.assisted, S.stats.hints, Math.round(S.active / 60000), flags, S.stats.clean, S.stats.items]);
+  }
+
+  /* ---------- LaTeX export ---------- */
+  function texRich(s) {
+    s = String(s == null ? '' : s).replace(/\\\$/g, '\u0001');
+    var out = '', last = 0, re = /\$\$([\s\S]+?)\$\$|\$([^$]+?)\$/g, m;
+    function t(x) { return MC.texEscape(x.replace(/\u0001/g, '$').replace(/\*\*/g, '')).replace(/\n\n/g, '\\par ').replace(/\n/g, '\\\\ '); }
+    while ((m = re.exec(s))) { out += t(s.slice(last, m.index)) + '$' + (m[1] || m[2]) + '$'; last = re.lastIndex; }
+    return out + t(s.slice(last));
+  }
+  function buildTex() {
+    var D = notesData(), ex = D.example, traps = S.traps.slice(0, 3);
+    function mine(t, h) { return t && t.trim() ? MC.texEscape(t).replace(/\n/g, '\\\\ ') : '\\textit{' + h + '}'; }
+    var tikz = '\\begin{tikzpicture}[scale=0.62]\n\\draw[gray] (0,1.2) -- (6.4,1.2); \\draw[gray] (0,-1.4) -- (6.4,-1.4);\n' +
+      '\\draw[blue!70!black,thick,domain=0:6.283,samples=60,smooth] plot (\\x,{1.2+sin(\\x r)});\n\\draw[red!70!black,thick,domain=0:6.283,samples=60,smooth] plot (\\x,{-1.4+cos(\\x r)});\n' +
+      '\\node[right] at (0.1,2.5) {\\scriptsize $y=\\sin x$}; \\node[right] at (0.1,-2.7) {\\scriptsize slope graph: $y=\\cos x$};\n\\end{tikzpicture}';
+    function row(cue, body) { return '\\textbf{' + cue + '} & ' + body + ' \\\\ \\hline\n'; }
+    var exTex = ex ? '$' + ex.name + '(x)=' + ex.fn + '$\\par $' + ex.name + '\'(x)=' + ex.d + '$\\par $' + ex.name + '\'(' + ex.a + ')=' + (ex.exact ? ex.exact + '\\approx ' : '') + ex.val + '$' : '\\textit{(none yet)}';
+    return '% 2.5 Derivatives of Sine and Cosine, guided notes. Compile with pdflatex (or paste into Overleaf).\n' +
+      '\\documentclass[11pt]{article}\n\\usepackage[margin=0.8in]{geometry}\n\\usepackage{amsmath,amssymb,tikz,array,xcolor}\n\\setlength{\\parindent}{0pt}\n\\renewcommand{\\arraystretch}{1.25}\n\\begin{document}\n' +
+      '{\\large\\textbf{2.5 Derivatives of Sine and Cosine}}\\hfill ' + MC.texEscape(S.first + ', Period ' + S.period) + ' \\hfill ' + C.today() + '\\par\\medskip\n' +
+      '\\begin{tabular}{|>{\\raggedright\\arraybackslash}p{1.35in}|>{\\raggedright\\arraybackslash}p{5.2in}|}\\hline\n' +
+      row('Big question', 'If you trace the slope of $y=\\sin x$ at every point, what curve do you get?') +
+      row('My prediction', texRich(D.pred || '') + '\\par ' + (S.predTest ? 'Test: at $x=\\pi/2$ the height is 1 but the slope is 0, so the slope graph is not $\\sin x$ itself.' : '') + '\\par ' + mine(S.surprise, 'What changed in my thinking')) +
+      row('The picture', tikz) +
+      row('Why a limit gives the slope', mine(S.notes.why, 'As h shrinks, the secant line ...')) +
+      row('The rules', '\\fbox{$\\dfrac{d}{dx}\\sin x=\\cos x$}\\quad\\fbox{$\\dfrac{d}{dx}\\cos x=-\\sin x$}\\par ' + mine(S.notes.words, 'The rules in my words')) +
+      row('Worked example (mine)', exTex) +
+      row('Watch out', 'Only the cosine rule has a minus sign. Keep your calculator in radians.' + (traps.length ? '\\par ' + traps.map(function (t) { return '$\\bullet$ ' + texRich(t); }).join('\\par ') : '')) +
+      row('Check yourself', S.mastery.done ? 'Check result: ' + S.mastery.correct + ' of 4' + (S.mastery.passed ? ' (passed)' : ' (see Mr.\\ D)') : '\\textit{(after the Check step)}') +
+      '\\end{tabular}\n\\par\\bigskip\\textbf{Summary in my own words}\\par\\fbox{\\parbox{6.4in}{' + mine(S.notes.summary, 'Summary') + '}}\n' +
+      '\\par\\bigskip\\textbf{Questions I still have}\\par\\fbox{\\parbox{6.4in}{' + mine(S.notes.questions, 'Optional') + '}}\n' +
+      (S.doneAt ? '\\par\\bigskip{\\small Hand-in code: \\texttt{' + handIn() + '}}\n' : '') + '\\end{document}\n';
+  }
+  function download(name, text, type) {
+    var blob = new Blob([text], { type: type || 'text/plain' }), a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  function printNotes() {
+    $('print-root').innerHTML = notesHTML();
+    var go = function () { setTimeout(function () { window.print(); }, 150); };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
+  }
+  if (DEBUG) { window.__tex = buildTex; window.__notes = notesHTML; }
+
+  /* ---------- notes drawer ---------- */
+  function renderDrawer() {
+    var b = $('notes-body'); b.innerHTML = '';
+    function field(label, key, rows) {
+      var d = el('div'); d.innerHTML = '<p class="qlabel">' + label + '</p>'; var ta = document.createElement('textarea'); ta.rows = rows || 3; ta.value = S.notes[key] || '';
+      ta.oninput = function () { S.notes[key] = ta.value; save(); }; d.appendChild(ta); b.appendChild(d);
+    }
+    var sec = el('div'); sec.innerHTML = notesHTML(); b.appendChild(sec);
+    b.appendChild(el('h3', null, 'Edit'));
+    field('Why a limit gives the slope', 'why', 3); field('The rules in my words', 'words', 3); field('Summary in my own words', 'summary', 4); field('Questions I still have', 'questions', 3);
+    var row = el('div', 'row'), upd = el('button', 'btn', 'Refresh preview'); upd.type = 'button'; upd.onclick = renderDrawer; row.appendChild(upd); b.appendChild(row);
+  }
+  $('open-notes').onclick = function () { renderDrawer(); $('drawer').hidden = false; };
+  $('close-notes').onclick = function () { $('drawer').hidden = true; };
+  $('reset').onclick = function () { if (confirm('Erase your progress and notes on this device and start over?')) { try { localStorage.removeItem(STORE); } catch (e) {} S = fresh(); renderAll(); } };
+
+  /* ---------- step 9: wrap-up ---------- */
+  function renderWrap() {
+    var h = $('step-wrap'); h.innerHTML = '';
+    h.appendChild(el('h2', null, 'Wrap-up'));
+    if (S.mastery.passed) h.appendChild(el('p', null, 'You showed you can do it. Finish your notes and print them for your binder.'));
+    else h.appendChild(el('div', 'warn-box', '<p>Finish your notes. Mr. D will check in with you about the sine and cosine rules.</p>'));
+    var d = el('div'); d.innerHTML = '<p class="qlabel">Summary in my own words (required)</p><p class="hint">What are the two rules, how did the slope dots show them, and what is the one mistake to avoid?</p>';
+    var ta = document.createElement('textarea'); ta.rows = 4; ta.value = S.notes.summary; d.appendChild(ta);
+    var d2 = el('div'); d2.innerHTML = '<p class="qlabel">Questions I still have (optional)</p>'; var tb = document.createElement('textarea'); tb.rows = 2; tb.value = S.notes.questions; d2.appendChild(tb);
+    h.appendChild(d); h.appendChild(d2);
+    var fin = nextBtn(h, S.doneAt ? 'Finished' : 'Finish and get my code', function () { S.doneAt = new Date().toISOString(); save(); renderAll(); }, S.notes.summary.trim().length < 30 || !!S.doneAt);
+    ta.oninput = function () { S.notes.summary = ta.value; fin.disabled = S.notes.summary.trim().length < 30 || !!S.doneAt; save(); };
+    tb.oninput = function () { S.notes.questions = tb.value; save(); };
+    if (S.doneAt) {
+      var out = el('div', 'card flat');
+      out.innerHTML = '<p><span class="stamp">SINE & COSINE ' + (S.mastery.passed ? '\u2713' : '\u2022') + '</span></p><p>Show Mr. D this code:</p><p class="code" id="hcode">' + handIn() + '</p>';
+      var r = el('div', 'row');
+      var pb = el('button', 'btn primary', 'Print / save notes as PDF'); pb.type = 'button'; pb.onclick = printNotes;
+      var tb2 = el('button', 'btn', 'Download notes as LaTeX (.tex)'); tb2.type = 'button';
+      tb2.onclick = function () { download('sine-cosine-notes-' + (S.first || 'student').toLowerCase().replace(/[^a-z0-9]/g, '') + '.tex', buildTex(), 'application/x-tex'); };
+      r.appendChild(pb); r.appendChild(tb2); out.appendChild(r);
+      out.appendChild(el('p', 'hint', 'In the print window, choose \u201cSave as PDF\u201d as the destination. The .tex file compiles in Overleaf or any LaTeX install if you want to keep editing.'));
+      h.appendChild(out);
+    }
+  }
+
+  /* ---------- teacher preview (#preview) ---------- */
+  function resetStep(step) {
+    var f = fresh();
+    switch (step) {
+      case 'warm': S.ready = f.ready; break;
+      case 'predict': S.pred = ''; S.predTest = null; S.surprise = ''; break;
+      case 'sim': S.sim = { m: 1, b: 0, done: false, lvl: S.level, dots: { 1: [], 2: [] }, rev: {}, exp: [], x: 0 }; break;
+      case 'huddle': S.huddleOK = false; S.notes.words = ''; break;
+      case 'build': S.build = f.build; S.practice = f.practice; break;
+      case 'practice': S.practice = f.practice; break;
+      case 'mastery': S.mastery = f.mastery; S.flagged = false; break;
+      case 'wrap': S.doneAt = ''; break;
+    }
+    save();
+  }
+  function renderPreviewBar() {
+    var bar = $('pvbar'); if (!bar) return;
+    bar.hidden = !PREVIEW; if (!PREVIEW) return;
+    bar.innerHTML = '<b>Teacher preview.</b> Every step is open. Path: ';
+    [['1', 'Build'], ['2', 'Apply'], ['3', 'Stretch'], ['4', 'Extend']].forEach(function (l) {
+      var b = el('button', 'btn small' + (S.level === +l[0] ? ' primary' : ''), l[0] + ' ' + l[1]); b.type = 'button';
+      b.onclick = function () { S.level = S.startLevel = S.peak = +l[0]; S.sim.lvl = +l[0]; resetStep(cur()); renderAll(); }; bar.appendChild(b);
+    });
+    var rs = el('button', 'btn small', 'Restart this step'); rs.type = 'button'; rs.onclick = function () { resetStep(cur()); renderAll(); }; bar.appendChild(rs);
+    if (cur() === 'sim') [1, 2, 3, 4].forEach(function (m) { var b = el('button', 'btn small', 'Mission ' + m); b.type = 'button'; b.onclick = function () { S.sim.m = m; S.sim.b = 0; S.sim.done = false; save(); renderAll(); }; bar.appendChild(b); });
+    bar.appendChild(el('span', 'muted', ' Class code today: <b>' + C.codeFor('huddle') + '</b>'));
+  }
+
+  /* ---------- router ---------- */
+  var RENDER = { start: renderStart, warm: renderWarm, predict: renderPredict, sim: renderSim, huddle: renderHuddle, build: renderBuild, practice: renderPractice, mastery: renderMastery, wrap: renderWrap };
+  function renderAll() {
+    var c = cur();
+    STEPS.forEach(function (s) { $('step-' + s).hidden = s !== c; });
+    renderNav(); renderPreviewBar();
+    RENDER[c]();
+  }
+  if (PREVIEW && !S.first) { S.first = 'Preview'; S.period = '0'; }
+  if (DEBUG) window.__pr = { S: function () { return S; }, goto: goto, last: function () { return LAST; }, solve: function (ok) { if (LAST) { LAST.autofill(ok); LAST.check(); } },
+    reachable: reachable, render: renderAll, level: function () { return S.level; },
+    explore: function () { var xs = $('xs'); if (!xs) return; for (var k = 1; k <= 10; k++) { xs.value = k; xs.dispatchEvent(new Event('input')); } } };
+  renderAll();
+})();
+</script>
+</body>
+</html>

@@ -7,6 +7,17 @@ window.UNITS = [
     blurb: "Guided online lessons. Each one opens with a prediction, a sim with a job, and questions that adjust to your work.",
     sims: [
       {
+        title: "2.5 Derivatives of Sine and Cosine",
+        href: "unit-2-differentiation/2-5-sine-cosine.html",
+        blurb: "A guided lesson that adjusts to each student. Slide a tangent along sine and cosine, let the measured slopes draw a new curve, zoom in on secants to see why, then build the two rules and show you own them. Notes print as a PDF.",
+        tags: ["sine and cosine", "adaptive", "online notes + PDF", "~60 min, two parts"],
+        teacher: [
+          { label: "Teacher page + key", href: "unit-2-differentiation/2-5-sine-cosine-teacher.html" },
+          { label: "Preview as student", href: "unit-2-differentiation/2-5-sine-cosine.html#preview" },
+          { label: "Outline", href: "unit-2-differentiation/2-5-sine-cosine-outline.md" }
+        ]
+      },
+      {
         title: "2.7 The Product Rule",
         href: "unit-2-differentiation/2-7-product-rule.html",
         blurb: "A guided lesson that adjusts to each student. Predict, run a rectangle experiment where you compute first and the sim reveals second, build the rule, then show you own it. Notes print as a PDF.",

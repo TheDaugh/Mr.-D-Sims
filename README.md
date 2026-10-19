@@ -65,7 +65,7 @@ The `calculus/` folder holds AP Calculus AB sims, with a hub at `calculus/index.
 
 | Unit | Page |
 |---|---|
-| 2 · Differentiation | `2-7-product-rule.html` (guided lesson that adjusts to each student: warm-up placement, prediction test, four sim missions, huddle, adaptive build and practice, mastery check, online notes that print as a PDF and export as `.tex`). Also `2-7-product-rule-teacher.html` (class code, facilitation notes, full key, hand-in decoder) and `2-7-product-rule-outline.md`. |
+| 2 · Differentiation | `2-5-sine-cosine.html` (same guided design for the derivatives of sine and cosine, with a slope-tracing sim: tangent toothpick on the curve, a slope graph that fills with measured dots, and a zoomed secant mission), `2-5-sine-cosine-teacher.html`, `2-5-sine-cosine-outline.md`. Also `2-7-product-rule.html` (guided lesson that adjusts to each student: warm-up placement, prediction test, four sim missions, huddle, adaptive build and practice, mastery check, online notes that print as a PDF and export as `.tex`). Also `2-7-product-rule-teacher.html` (class code, facilitation notes, full key, hand-in decoder) and `2-7-product-rule-outline.md`. |
 | 6 · Integration and Accumulation of Change | `accumulation-lab.html` (two tabs: the accumulation machine, where g(x) = ∫f builds up as you drag x, and Riemann sums with left, right, midpoint and trapezoid rules and an error-vs-n plot) |
 
 Most calculus pages are one self-contained file, so the same rules as the physics sims apply: constants and function lists sit at the top of the `<script>` block.
