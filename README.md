@@ -43,6 +43,8 @@ To add a lab, put the page in its unit folder and add one entry to `chemistry/la
 
 A chemistry lesson with a teacher key keeps the key on its own page, `<lesson>-key.html`, not behind `#key`. Build it with `node chemistry/tools/make-key.mjs <lesson>.html` and re-run that after every edit to the lesson. The key page also shows the day's gate codes.
 
+`chemistry/shared/lock.js` is the locked mode a lesson can opt into: fullscreen, every exit logged on the stamp, a lock from the second exit that needs a per-student code from the key page, and a code after closing the page. It deters. It cannot stop a Chromebook from opening a tab, so real enforcement stays with the school's Chromebook management.
+
 ## Calculus
 
 The `calculus/` folder holds AP Calculus AB sims, with a hub at `calculus/index.html` that lists them by unit. The list lives in `calculus/sims.js`; add one entry there to add a card.

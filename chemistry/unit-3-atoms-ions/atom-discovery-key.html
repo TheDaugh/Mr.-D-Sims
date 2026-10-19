@@ -55,6 +55,7 @@
   <main id="app"></main>
 </div>
 
+<script src="../shared/lock.js"></script>
 <script>
 /* ============ DATA ============ */
 const DATA={parts:[
@@ -138,6 +139,11 @@ const DONE_TYPES=["mcq","num","rows","widget","open","gate"];
 const LESSON_ID="atom-discovery";
 const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const gateCode=id=>{let x=2166136261;const s=LESSON_ID+"|"+id+"|"+today();for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619)>>>0}return String(1000+x%9000)};
+/* Locked mode (see ../shared/lock.js). Off for #preview, the key page, or #nolock=<code> from the key page. */
+LessonLock.init({id:LESSON_ID,root:document.querySelector(".wrap"),onChange:()=>chips()});
+const LOCK_ON=!(PREVIEW||KEYVIEW||(/nolock=(\d+)/.exec(location.hash)||[])[1]===LessonLock.offCode());
+const lockSnap=()=>JSON.parse(JSON.stringify(ST));
+const lockTxt=()=>{if(!LOCK_ON)return"";const L=LessonLock.stats();return` · left the lesson ${L.total}× · away ${fmtT(L.awaySec)}`};
 const g=n=>(Math.round(n*100)/100).toString();
 
 /* ---------- widgets ---------- */
@@ -458,9 +464,9 @@ BLOCK.open=(b,done)=>{
 };
 
 /* ---------- part runner ---------- */
-function chips(){chipsEl.replaceChildren(...DATA.parts.map((p,i)=>h("span",{class:"chip"+(ST.partsDone[i]?" done":i===ST.partIdx&&!ST.between?" on":"")},(ST.partsDone[i]?"✓ ":"")+(p.tier===2?"★":"")+(i+1))))}
+function chips(){chipsEl.replaceChildren(...[...DATA.parts.map((p,i)=>h("span",{class:"chip"+(ST.partsDone[i]?" done":i===ST.partIdx&&!ST.between?" on":"")},(ST.partsDone[i]?"✓ ":"")+(p.tier===2?"★":"")+(i+1))),(LOCK_ON&&inProgress)?h("span",{class:"chip",style:"margin-left:auto"},"🔒 exits "+LessonLock.stats().total):null].filter(Boolean))}
 function showPart(i){
-  ST.between=false;ST.partIdx=i;chips();app.replaceChildren();window.scrollTo(0,0);
+  ST.between=false;ST.partIdx=i;if(LOCK_ON)LessonLock.save(i,false,lockSnap());chips();app.replaceChildren();window.scrollTo(0,0);
   const P=DATA.parts[i];
   app.append(h("h2",{},`Part ${i+1} of ${DATA.parts.length}: ${P.title}`,P.tier===2?h("span",{class:"tier"},"CHALLENGE"):null),h("p",{class:"sub"},P.sub));
   const last=i===DATA.parts.length-1,coreEnd=i===CORE-1;
@@ -483,7 +489,7 @@ function showPart(i){
 }
 function summaryText(label){
   const secs=(Date.now()-ST.t0)/1000,when=new Date();
-  let t=`${ST.name} · Atom Discovery (Unit 3 Day 1) · ${label} · time ${fmtT(secs)} · questions right on the first try ${ST.qFirst}/${ST.q} · retries ${ST.retries} · sim tasks ${ST.tasksDone}/${ST.tasks} · ${when.toLocaleDateString()} ${when.toLocaleTimeString()}`;
+  let t=`${ST.name} · Atom Discovery (Unit 3 Day 1) · ${label} · time ${fmtT(secs)} · questions right on the first try ${ST.qFirst}/${ST.q} · retries ${ST.retries} · sim tasks ${ST.tasksDone}/${ST.tasks}${lockTxt()} · ${when.toLocaleDateString()} ${when.toLocaleTimeString()}`;
   if(ST.open)t+=` · Beyond Dalton: "${ST.open.slice(0,400)}"`;
   return t;
 }
@@ -494,20 +500,34 @@ function stampCard(title,label,extra){
     h("tr",{},h("th",{},"Time"),h("td",{},fmtT(secs))),
     h("tr",{},h("th",{},"Sim tasks finished"),h("td",{},`${ST.tasksDone} of ${ST.tasks}`)),
     h("tr",{},h("th",{},"Questions right on the first try"),h("td",{},`${ST.qFirst} of ${ST.q}`)),
-    h("tr",{},h("th",{},"Times you fixed a wrong answer"),h("td",{},String(ST.retries))));
+    h("tr",{},h("th",{},"Times you fixed a wrong answer"),h("td",{},String(ST.retries))),
+    LOCK_ON?h("tr",{},h("th",{},"Times you left the lesson"),h("td",{},String(LessonLock.stats().total))):null,
+    LOCK_ON?h("tr",{},h("th",{},"Time away"),h("td",{},fmtT(LessonLock.stats().awaySec))):null);
   const copy=h("button",{class:"ghost",onclick:async()=>{try{await navigator.clipboard.writeText(txt);copy.textContent="Copied ✔"}catch(e){copy.textContent="Select and copy the line below"}}},"Copy summary");
   return[st,tbl,h("div",{class:"row",style:"justify-content:center"},copy,...(extra||[])),h("p",{class:"hint",style:"word-break:break-word"},txt)];
 }
 function showCore(){
-  ST.between=true;chips();app.replaceChildren();window.scrollTo(0,0);
-  const go=h("button",{class:"btn big",onclick:()=>showPart(CORE)},"★ Keep going: Challenge tier →");
+  ST.between=true;if(LOCK_ON){LessonLock.save(CORE,true,lockSnap());LessonLock.finish()}chips();app.replaceChildren();window.scrollTo(0,0);
+  const go=h("button",{class:"btn big",onclick:async()=>{if(LOCK_ON&&!(await LessonLock.enter(ST.name,true)))return;showPart(CORE)}},"★ Keep going: Challenge tier →");
   app.append(h("div",{class:"card final"},h("h2",{},"Core complete! 🎉"),h("p",{},"Show this screen to Mr. D, then finish your core takeaways on your sheet. If you still have time, the Challenge tier is harder and different."),...stampCard("✔ CORE COMPLETE","CORE COMPLETE (parts 1-"+CORE+")",[go])));
 }
 function showFinal(){
-  inProgress=false;chips();app.replaceChildren();window.scrollTo(0,0);
+  inProgress=false;if(LOCK_ON)LessonLock.finish();chips();app.replaceChildren();window.scrollTo(0,0);
   app.append(h("div",{class:"card final"},h("h2",{},"Challenge complete! 🏆"),h("p",{},"Show this screen to Mr. D. Then finish the Challenge takeaways on your sheet."),...stampCard("★ CHALLENGE COMPLETE","ALL "+DATA.parts.length+" PARTS COMPLETE (core + challenge)")));
 }
 function start(){inProgress=true;ST.t0=Date.now();showPart(0)}
+function showResume(rec){
+  chips();const fb=feedback(),n=LessonLock.lockNo();
+  const inp=h("input",{type:"text",inputmode:"numeric",maxlength:4,autocomplete:"off","aria-label":"Unlock code from Mr. D",style:"width:130px;font-size:1.4rem;text-align:center"});
+  const btn=h("button",{class:"btn big",onclick:async()=>{const r=await LessonLock.resume(inp.value);
+    if(r==="ok"){Object.assign(ST,rec.snap||{},{name:rec.name});if(!rec.snap)ST.t0=Date.now();inProgress=true;rec.between?showCore():showPart(rec.part||0)}
+    else if(r==="wrong")show(fb,false,"Not the code. Hand up and wait for Mr. D.");
+    else show(fb,false,"Fullscreen did not start. Click again.")}},"Unlock");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  app.append(h("div",{class:"card",style:"border:3px solid var(--hot);text-align:center"},h("h2",{},"🔒 Locked. Hand up, eyes forward."),
+    h("p",{},"You closed this lesson before you finished. Your work is saved up to the start of the part you were on. Mr. D needs to see you and give you a code."),
+    h("p",{},h("b",{},"Name: "),rec.name,"   ",h("b",{},"Lock number: "),String(n)),h("div",{class:"row",style:"justify-content:center"},inp,btn),fb));
+}
 
 /* ---------- teacher key (#key) ---------- */
 const WIDGET_KEY={
@@ -523,6 +543,13 @@ function showKey(){
   const gates=DATA.parts.flatMap(P=>P.blocks.filter(b=>b.type==="gate"));
   app.append(h("div",{class:"card"},h("h2",{},"Teacher key"),h("p",{},"Every answer with the reason the student sees. The student page is atom-discovery.html. Add #preview to its address for skip buttons."),
     h("p",{html:`<b>Gate codes for ${today()}:</b> `+gates.map(b=>`Gate ${b.id} <b style="font-size:1.2rem">${gateCode(b.id)}</b>`).join(" · ")+". Codes change at midnight."})));
+  const nm=h("input",{type:"text","aria-label":"Student name",placeholder:"Name as the student typed it",style:"width:240px"}),no=h("input",{type:"number",min:1,value:2,"aria-label":"Lock number",style:"width:80px"}),res=h("b",{style:"font-size:1.4rem;margin-left:10px"});
+  const calc=()=>{res.textContent=nm.value.trim()?LessonLock.unlockCode(nm.value,no.value):""};nm.addEventListener("input",calc);no.addEventListener("input",calc);
+  const stu=location.pathname.split("/").pop().replace("-key","")||"atom-discovery.html";
+  app.append(h("div",{class:"card"},h("h3",{},"🔒 Locked mode"),
+    h("p",{},"A locked student’s screen shows a name and a lock number. Type them here to get that student’s code. The code works for that student, that lock number and today only. Exit 1 only warns. From exit 2 on, the screen locks. Closing the page counts as an exit."),
+    h("div",{class:"row"},nm,no,res),
+    h("p",{class:"hint"},"Student link with locked mode off (an accommodation, or a device without fullscreen): ",h("a",{href:stu+"#nolock="+LessonLock.offCode()},stu+"#nolock="+LessonLock.offCode()))));
   const key=h("div",{class:"key"});
   DATA.parts.forEach((P,i)=>{
     key.append(h("h3",{},`Part ${i+1}${P.tier===2?" ★ Challenge":""}: ${P.title}`));
@@ -540,16 +567,20 @@ function showKey(){
 
 /* ---------- boot ---------- */
 CORE=DATA.parts.filter(p=>p.tier===1).length;
+const REC=(!KEYVIEW&&LOCK_ON)?LessonLock.pending():null;
 if(KEYVIEW){showKey()}
+else if(REC){showResume(REC)}
 else{
   chips();
   const i=h("input",{type:"text",id:"nm",placeholder:"First and last name",autocomplete:"off"});
-  const b=h("button",{class:"btn big",style:"margin-top:12px",onclick:()=>{const v=i.value.trim();if(!v){i.focus();return}ST.name=v;start()}},"Start →");
+  const fsMsg=h("p",{class:"hint",style:"color:var(--bad)"});
+  const b=h("button",{class:"btn big",style:"margin-top:12px",onclick:async()=>{const v=i.value.trim();if(!v){i.focus();return}ST.name=v;if(LOCK_ON&&!(await LessonLock.enter(v))){fsMsg.textContent="Fullscreen did not start. This lesson needs Chrome on your Chromebook. Tell Mr. D.";return}start()}},"Start →");
   i.addEventListener("keydown",e=>{if(e.key==="Enter")b.click()});
   app.append(h("div",{class:"card",id:"start"},h("h2",{},"Atom Discovery"),
     h("p",{},"Predict first, then run the sim to see if you were right. A wrong answer gives a hint and you try again. Please don’t refresh the page."),
     h("p",{},`Parts 1 to ${CORE} are the core. Parts marked ★ are the Challenge tier: harder, and different in kind. Do the Cold Open on your sheet before you start.`),
-    h("p",{},h("b",{},"Your name:")),i,h("div",{},b)));
+    LOCK_ON?h("p",{class:"note"},"🔒 Locked mode. This lesson runs in fullscreen. Leaving it (Esc, a new tab, another window, closing the page) is recorded on your stamp. The second time, your screen locks until Mr. D gives you a code."):null,
+    h("p",{},h("b",{},"Your name:")),i,h("div",{},b),fsMsg));
 }
 window.__qa={ST,DATA,WIDGET,BLOCK,cards:()=>window.__cards||[]};
 </script>

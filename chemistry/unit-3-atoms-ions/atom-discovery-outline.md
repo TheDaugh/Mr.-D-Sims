@@ -27,6 +27,6 @@ Day 2 (not built): static-charge stations with tape and balloons, picking up whe
 Core and challenge tiers. Challenge is optional. No adaptive difficulty yet.
 
 ## Key features
-- Predict locks before each sim.
-- Wrong answers return a hint. The stamp counts first tries and retries.
+- Predict locks first. Wrong answers return hints.
 - Gate codes change daily. The key page shows them.
+- Locked mode: fullscreen only. Exit 1 warns, exit 2 on locks until you give that student a code from the key page. Exits show on the stamp.
