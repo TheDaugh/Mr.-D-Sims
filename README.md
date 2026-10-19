@@ -20,6 +20,20 @@ The `physics/` folder has a hub at `physics/index.html` that lists sims by unit.
 
 The first ten rebuild the LabVIEW originals (Graphs.exe, Gravity.exe and so on). Instructions and theory text come from the originals wherever the executables contained it. Ticker Timer, Motion Graphs and Projectiles held little readable text, so those three follow their titles and may differ from the old programs.
 
+## Lessons
+
+`physics/lessons/` holds online lessons built on a shared engine (`engine/lesson.js`, `engine/lesson.css`, `engine/ice-sim.js`). A lesson is a page plus content files in `content/`.
+
+| File | What it is |
+|---|---|
+| `newtons-first-law.html` | Student page. Add `#key` to the address for the teacher key on every screen. |
+| `teacher.html` | Today's huddle codes, answer key, stamp checker, and a reader for student report codes. |
+| `newtons-first-law-outline.md` | One-page outline of the lesson. |
+| `content/nfl-items.js` | Question bank: warm-up, predictions, explanations in three registers, and six skills with four difficulty bands each. |
+| `content/nfl-invest.js` | The four investigation parts. |
+
+Students build their own notes as they work. At the end they can print the notes as a PDF or download a `.tex` file (compiles with pdflatex or on Overleaf).
+
 ## Using them
 
 - **Locally:** double-click `index.html`, or any sim file.

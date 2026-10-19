@@ -4,9 +4,10 @@ window.UNITS = [
   {
     id: "lessons",
     title: "Lessons",
-    blurb: "Online lessons: predict, play with a job, name the rule, then try it. Add #key to a lesson’s address for the teacher key.",
+    blurb: "Online lessons: predict, investigate with a job, name the rule, then try questions that adjust to each student. Students build their own notes and print them at the end.",
     sims: [
-      { title: "Puck on Ice", href: "lessons/puck-on-ice.html", blurb: "Newton’s First Law. Predict whether the puck stops on its own, run the sim with a job, then name the rule.", tags: ["Newton’s First Law", "Day 1 online"] }
+      { title: "Newton’s First Law", href: "lessons/newtons-first-law.html", blurb: "Day 1 online lesson. Six surfaces, a mass test, a cruising challenge and a force-balancing task, with four hidden difficulty levels from middle school to first-year college.", tags: ["Newton’s First Law", "Day 1 online", "adaptive"] },
+      { title: "Teacher page: codes, key, report reader", href: "lessons/teacher.html", blurb: "For Mr. D. Today’s huddle codes, the answer key, a stamp checker, and a table reader for student report codes. Add #key to any lesson’s address for the key on every screen.", tags: ["teacher use"] }
     ]
   },
   {
