@@ -2,6 +2,14 @@
 // then add one entry below. Nothing else needs to change.
 window.UNITS = [
   {
+    id: "lessons",
+    title: "Lessons",
+    blurb: "Online lessons: predict, play with a job, name the rule, then try it. Add #key to a lesson’s address for the teacher key.",
+    sims: [
+      { title: "Puck on Ice", href: "lessons/puck-on-ice.html", blurb: "Newton’s First Law. Predict whether the puck stops on its own, run the sim with a job, then name the rule.", tags: ["Newton’s First Law", "Day 1 online"] }
+    ]
+  },
+  {
     id: "motion-and-graphs",
     title: "Motion and graphs",
     blurb: "Position, velocity and acceleration, read from tapes, graphs and a car on a hill.",
