@@ -1,28 +1,32 @@
-# 2.7 The Product Rule: Area Grows Two Ways (Outline)
+# 2.7 The Product Rule: outline
 
-**Day 1, online, about 42 minutes. Day 2, Math Medic 2.7 practice and a short quiz.**
-**Teacher key:** open `2-7-product-rule.html#key`
+**Big question.** When two changing quantities multiply, how fast does the product change?
 
-## Big idea
-When two changing quantities multiply, the product grows through two strips, not one: (fg)′ = f′g + fg′. The corner piece vanishes in the limit.
+**Goal.** Every student leaves able to differentiate a product and say why the rule has two terms, at their own level of challenge.
 
-## Misconceptions targeted
-"Multiply the rates" (f′g′) and "add the rates" (f′ + g′). Both are wrong answers on the predict screen.
+## Flow (about 60 min, two parts)
+**Part A**
+1. **Warm-up (4 min).** Six derivative skills, typed answers. Silently places each student on one of four paths.
+2. **Predict (4 min).** Lock a guess, then test it: $x^2\cdot x^3$ gives 5, not 6.
+3. **Explore (15–20 min).** Rectangle sim, four missions. Students compute strips first; the sim reveals second. Shrinking Δt ties limits to derivatives.
+4. **Huddle (3 min).** Class code unlocks the rest. Students state the rule in words.
 
-## Sequence
+**Part B**
+5. **Build (8 min).** The routine: name f, g; find f′, g′; assemble f′g + fg′. Scaffolds fade by path.
+6. **Practice (12 min).** Eight adaptive problems.
+7. **Check (7 min).** Four items, no hints. Pass is 3 of 4 including the idea question. A miss routes to recovery and a second form.
+8. **Wrap-up (5 min).** Summary, hand-in code, printable notes.
 
-| Step | Min | Students |
+## Paths (hidden)
+| Path | Support | Stretch |
 |---|---|---|
-| 1 Predict | 0–4 | Lock one answer for a 3 by 3 rectangle growing on both sides |
-| 2 Play | 4–14 | Grow four rectangles at six values of Δt; log the rate and the corner share |
-| 3 Huddle | 14–18 | Enter the class code; write the rule in their own words |
-| 4 Name it | 18–21 | Copy the formal statement beside the strip diagram |
-| 5 Build it | 21–29 | Two derivatives, four slots each |
-| 6 Try it | 29–37 | Three adjusting questions |
-| 7 Check | 37–42 | One diagnostic, then reflection |
+| Build | all pieces scaffolded, multiply-out check | small polynomials, revenue table |
+| Apply | name pieces, assemble | trig, exp, tangent lines |
+| Stretch | derivatives and result | logs, radicals, units argument |
+| Extend | result only | three factors, (fg)″, quotient rule, proof |
 
-## Differentiation (hidden)
-Four rungs per question: 0 foundation (rectangles, arithmetic), 1 core, 2 transfer (tangent lines, eˣ, ln x), 3 extension (limit proof, edge cases). Students start at core. A clean first try moves up, one miss holds, two misses move down with the reasoning shown. Everyone takes the same Check.
+## Notes
+Students type in notes as they go (Cornell layout). They print a PDF and can download a .tex file.
 
-## For the student who sees the idea but loses the steps
-Build it fixes one routine: name f and g, differentiate each alone, assemble f′g + fg′, tidy only if asked. Each finished slot stays on screen as a worked line.
+## Teacher tools
+Teacher page: class code, facilitation notes, full key, hand-in decoder. Preview mode opens every step.
