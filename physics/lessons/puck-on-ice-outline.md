@@ -4,7 +4,7 @@
 **Teacher key:** open `puck-on-ice.html#key`
 
 ## Big idea
-Without a net external force, velocity does not change. Friction is the force that usually stops a moving object, so the rule shows up most clearly when friction shrinks.
+Without a net external force, velocity does not change. Friction usually stops moving objects, so the rule shows when friction shrinks.
 
 ## Misconception targeted
 "A moving object needs a push to keep moving." Option A on the predict screen.
@@ -28,10 +28,4 @@ Each question has three rungs: A core, B transfer, C extension. A clean first tr
 ## Key features
 - Predict locks before the sim runs.
 - Huddle code changes daily.
-- Logs show rung, misses, seconds, and a guessing flag. This device only; a live class view is not built yet.
-- Stamp code at the end for the student to show.
-
-## Open items for Mr. D
-- Confirm the huddle code and the 40-minute timing.
-- Replace the poll with a live tally if you want one.
-- Add the Day 2 fan-cart page as its own file.
+- Teacher key logs rung, misses, and seconds for this device only.
