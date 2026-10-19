@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Newton’s First Law · Mr. D</title>
+<meta name="description" content="Newton’s First Law. Day 1 online lesson with questions that adjust to each student. Add #key to the address for the teacher key.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="engine/lesson.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <a class="back" href="../index.html">&larr; Physics sims</a>
+      <h1 id="title">Newton’s First Law</h1>
+      <p class="sub" id="subtitle"></p>
+    </div>
+    <div class="row"><button id="btn-notes" class="btn" type="button">My notes</button></div>
+  </div>
+  <div id="keybar" class="keybar" hidden></div>
+  <nav id="steps" aria-label="Lesson steps"></nav>
+  <div id="stage"></div>
+  <div id="notes-print-root" hidden></div>
+  <footer>Mr. D’s physics · progress saves in this browser · g = 9.8 m/s²</footer>
+</div>
+<script src="engine/lesson.js"></script>
+<script src="engine/ice-sim.js"></script>
+<script src="content/nfl-items.js"></script>
+<script src="content/nfl-invest.js"></script>
+<script src="content/newtons-first-law.js"></script>
+<script>LE.start(window.LESSONS_REG['newtons-first-law']);</script>
+</body>
+</html>
