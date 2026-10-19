@@ -1,0 +1,9 @@
+/* Concept key drawer, warm-up countdown, end banner, key-mode answer line. Shared by calculus guided lessons. */
+#drawer2 .panel{width:min(720px,100%)}
+#drawer2 h3{margin:16px 0 6px}
+.warmclock{position:sticky;top:0;z-index:8;display:inline-block;font:800 1.5rem var(--mono,ui-monospace,monospace);letter-spacing:.06em;padding:4px 14px;margin:0 0 10px;border:2px solid var(--line,#ccd);border-radius:8px;background:var(--surface,#fff)}
+.warmclock.low{border-color:#b3261e;color:#b3261e}
+.endbar{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:center;padding:10px 14px;margin:0 0 12px;background:#fff4d6;border:2px solid #d9a400;border-radius:8px;color:#3a2c00}
+.endbar[hidden]{display:none}
+.keyline{margin-top:4px;font:600 .9rem var(--mono,ui-monospace,monospace);color:#1b6e3a}
+.morebox{margin-top:10px}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teacher · Mr. D's Sims</title>
+<style>
+:root{--bg:#f5f3ee;--panel:#fff;--ink:#1c2530;--muted:#566170;--line:#d8d3c6;--accent:#17607c;--ok:#23703f;--bad:#b83b24;--warn:#d99a00;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#12181f;--panel:#1b232c;--ink:#e8edf2;--muted:#9aa7b5;--line:#2f3a46;--accent:#4fb0d3;--ok:#6fd093;--bad:#ff9c8a;--warn:#f0c040}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+.wrap{padding:16px clamp(12px,3vw,40px) 48px}
+h1{margin:6px 0 0}h2{margin:0 0 8px;font-size:1.15rem}a{color:var(--accent)}
+.sub{color:var(--muted);margin:4px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.code{font:800 1.6rem ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em}
+.hint{color:var(--muted);font-size:.88rem}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;font-size:.92rem}
+input,select,button{font:inherit;padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+button{cursor:pointer}button.p{background:var(--accent);color:#fff;border-color:var(--accent)}
+.on{color:var(--ok);font-weight:700}.off{color:var(--muted)}
+tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done td{background:rgba(35,112,63,.13)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+#fs{position:fixed;inset:0;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:50}
+#fs[hidden]{display:none}#fsc{font:800 20vw ui-monospace,monospace;letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="../index.html">← Mr. D's Sims</a>
+  <h1>Teacher</h1>
+  <p class="sub" id="now"></p>
+
+  <div class="grid">
+    <section class="card" id="status"><h2>Right now</h2><div id="status-body"></div></section>
+    <section class="card"><h2>Unlock any locked student</h2><div class="code" id="ov"></div>
+      <p class="hint">One code that frees any student on any lock, in any lesson that uses locked mode. It changes at 7:00 AM each school day, and you can read it from 7:00 AM on.</p></section>
+    <section class="card"><h2>Lock desk (one student's own code)</h2>
+      <div class="row"><select id="ll" aria-label="Lesson"></select></div>
+      <div class="row"><input id="ln" type="text" placeholder="Name as typed" aria-label="Student name" style="width:200px"><input id="lk" type="number" min="1" value="2" aria-label="Lock number" style="width:70px"><b class="code" id="lc"></b></div>
+      <p class="hint">The locked screen shows a name and a lock number. Only chemistry's Atom Discovery uses locked mode today; the others have no lock to open.</p></section>
+  </div>
+
+  <section class="card" style="margin-bottom:14px"><h2>Today's huddle codes</h2>
+    <p class="hint" id="gate-note"></p>
+    <table id="codes"></table>
+  </section>
+
+  <section class="card" style="margin-bottom:14px"><h2>Live view</h2>
+    <p class="hint">Shows where each student is in the lesson page: step, level, answered, misses, times they left the page. It sees nothing outside the lesson page. It needs the small worker in <code>live/</code> deployed once (see <code>live/README.md</code>).</p>
+    <div class="row"><input id="lv-url" type="url" placeholder="https://your-worker.workers.dev" style="width:320px" aria-label="Worker address"><input id="lv-tok" type="password" placeholder="Teacher token" aria-label="Teacher token" style="width:200px"><select id="lv-les" aria-label="Lesson"></select><button class="p" id="lv-go" type="button">Watch</button><button id="lv-stop" type="button">Stop</button><span class="hint" id="lv-msg"></span></div>
+    <div style="overflow-x:auto"><table id="lv" hidden></table></div>
+  </section>
+
+  <section class="card" style="margin-bottom:14px"><h2>Bell schedule</h2>
+    <table id="sched"></table>
+    <p class="hint">Edit <code>shared/bell.js</code> (the SCHEDULE block) to change a period. Mon to Thu guided notes end at the 42-minute mark and lessons lock until then. On Friday there is no early end: the lesson stays locked until the bell.</p>
+  </section>
+
+  <section class="card"><h2>More</h2>
+    <p><a href="../portal/index.html">Review portal</a>: load a class's scores files to see standards by student, or hand the link to students.</p>
+    <p><a href="../physics/lessons/teacher.html">Physics teacher page</a> · <a href="../chemistry/teacher.html">Chemistry teacher page</a> · <a href="../calculus/unit-2-differentiation/2-7-product-rule-teacher.html">Calculus teacher page</a></p>
+    <p class="hint">Add <code>#key</code> to any guided lesson's address to see exactly what students see, with every step open and the answers marked.</p></section>
+</div>
+<div id="fs" hidden><div id="fsc"></div><div id="fsd" class="hint"></div><button id="fsx" type="button">Close</button></div>
+<script src="../shared/config.js"></script>
+<script src="../shared/bell.js"></script>
+<script src="../shared/codes.js"></script>
+<script src="../shared/lessons.js"></script>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)},B=MrD.bell,L=MrD.lessons,COURSE={physics:"physics",chem:"chem",calc:"calc"};
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  var cname={physics:"Physics",chem:"Chemistry",calc:"Calculus"};
+
+  function paint(){
+    var d=new Date();
+    $("now").textContent=d.toLocaleDateString([],{weekday:"long",month:"long",day:"numeric"})+" · "+B.fmtTime(d)+" · code day "+B.dayKey();
+    var rows=Object.keys(cname).map(function(c){
+      var k=B.clock(c),s=k.session;
+      return "<tr><td>"+cname[c]+"</td><td>"+(s?'<span class="on">in session</span>, '+(k.friday?"locked until the bell "+B.fmtTime(s.end):k.canEnd?"notes end now":"notes end "+B.fmtTime(s.endMark)):'<span class="off">not in session</span>')+"</td></tr>";
+    }).join("");
+    $("status-body").innerHTML="<table>"+rows+"</table><p class=\"hint\">"+(B.gatesOn()?"Huddle codes are being asked for now (weekdays 7:00 AM to 3:00 PM).":"Huddle codes are off now: students finishing at home are never stopped for a code.")+"</p>";
+    $("ov").textContent=MrD.codes.override();
+    $("gate-note").textContent="Codes change at 7:00 AM and are readable from then on. Tap a code to show it large for the board.";
+    $("codes").innerHTML="<tr><th>Lesson</th><th>Codes</th><th>Teacher view</th></tr>"+L.map(function(l){
+      return "<tr><td>"+esc(cname[l.course])+": "+esc(l.title)+"</td><td>"+l.gates.map(function(g){var c=MrD.codes.gate(l.id,g.key);return esc(g.label)+' <a href="#" data-c="'+c+'" data-t="'+esc(l.title+" · "+g.label)+'" class="code" style="font-size:1.2rem;text-decoration:none">'+c+"</a>"}).join(" &nbsp; ")+'</td><td><a href="../'+l.href+'#key">#key view</a> · <a href="../'+l.teacher+'">teacher page</a></td></tr>';
+    }).join("");
+    [].forEach.call($("codes").querySelectorAll("a[data-c]"),function(a){a.onclick=function(e){e.preventDefault();$("fsc").textContent=a.getAttribute("data-c");$("fsd").textContent=a.getAttribute("data-t");$("fs").hidden=false}});
+  }
+  $("fsx").onclick=function(){$("fs").hidden=true};
+  paint();setInterval(paint,30000);
+
+  /* lock desk */
+  L.forEach(function(l){var o=document.createElement("option");o.value=l.id;o.textContent=cname[l.course]+": "+l.title;$("ll").appendChild(o);o=o.cloneNode(true);$("lv-les").appendChild(o)});
+  $("ll").value="atom-discovery";
+  function lock(){var n=$("ln").value.trim();$("lc").textContent=n?MrD.codes.lock($("ll").value,n,$("lk").value):""}
+  $("ln").oninput=lock;$("lk").oninput=lock;$("ll").onchange=lock;
+
+  /* schedule */
+  var rows="<tr><th>Class</th><th>Mon to Thu</th><th>Friday</th></tr>";
+  Object.keys(B.SCHEDULE).forEach(function(c){var s=B.SCHEDULE[c];
+    function f(list){return list.map(function(p){return p[0]+" to "+p[1]}).join(", ")}
+    rows+="<tr><td>"+esc(s.label)+"</td><td>"+f(s.weekday)+" (notes end "+s.weekday.map(function(p){var m=+p[0].slice(0,2)*60+ +p[0].slice(3)+B.CFG.endMinute;return B.fmtTime(new Date(2000,0,1,0,m))}).join(", ")+")</td><td>"+f(s.friday)+" (to the bell)</td></tr>"});
+  $("sched").innerHTML=rows;
+
+  /* live view */
+  var store=null,timer=0;
+  try{store=JSON.parse(localStorage.getItem("mrd.teacher.live")||"null")}catch(e){}
+  $("lv-url").value=(store&&store.url)||(MrD.config&&MrD.config.liveUrl)||"";$("lv-tok").value=(store&&store.tok)||"";if(store&&store.les)$("lv-les").value=store.les;
+  function ago(ms){var s=Math.round(ms/1000);return s<90?s+" s":Math.round(s/60)+" min"}
+  function poll(){
+    var u=$("lv-url").value.trim().replace(/\/$/,""),tok=$("lv-tok").value,l=L.filter(function(x){return x.id===$("lv-les").value})[0];
+    if(!u||!tok||!l){$("lv-msg").textContent="Add the worker address and your teacher token.";return}
+    fetch(u+"/class?course="+encodeURIComponent(l.course)+"&lesson="+encodeURIComponent(l.id)+"&day="+encodeURIComponent(B.dayKey()),{headers:{"x-teacher":tok}}).then(function(r){if(!r.ok)throw new Error(r.status===401?"Wrong token.":"Worker said "+r.status);return r.json()}).then(function(list){
+      var t=$("lv");t.hidden=false;$("lv-msg").textContent=list.length+" student"+(list.length===1?"":"s")+" · updated "+B.fmtTime(new Date());
+      t.innerHTML="<tr><th>Student</th><th>Per</th><th>Step</th><th>Level</th><th>Answered</th><th>Misses</th><th>Left page</th><th>Active</th><th>Seen</th></tr>"+list.map(function(b){
+        var age=Date.now()-b.at,cls=b.done?"done":b.stuck?"stuck":age>90000?"idle":"";
+        return '<tr class="'+cls+'"><td>'+esc(b.first)+"</td><td>"+esc(b.period)+"</td><td>"+esc(b.step)+" ("+b.stepIdx+"/"+b.stepCount+")"+(b.done?" ✔":"")+"</td><td>"+(b.band==null?"":b.band)+"</td><td>"+b.answered+"</td><td>"+b.misses+"</td><td>"+b.exits+"×</td><td>"+Math.round(b.secs/60)+" min</td><td>"+ago(age)+" ago</td></tr>";
+      }).join("");
+    }).catch(function(e){$("lv-msg").textContent=e.message||"Could not reach the worker."});
+  }
+  $("lv-go").onclick=function(){try{localStorage.setItem("mrd.teacher.live",JSON.stringify({url:$("lv-url").value.trim(),tok:$("lv-tok").value,les:$("lv-les").value}))}catch(e){}clearInterval(timer);poll();timer=setInterval(poll,8000)};
+  $("lv-stop").onclick=function(){clearInterval(timer);$("lv-msg").textContent="Stopped."};
+})();
+</script>
+</body>
+</html>

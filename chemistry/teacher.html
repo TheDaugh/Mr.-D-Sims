@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chemistry · Teacher page</title>
+<link rel="stylesheet" href="shared/lab.css">
+<style>
+.wrap{max-width:none;padding-inline:clamp(12px,3vw,40px)}
+.code{font:800 1.8rem ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.box{border:1px solid var(--line,#ccd);border-radius:10px;padding:12px 16px;background:var(--panel,transparent)}
+table.t{border-collapse:collapse}table.t td,table.t th{border:1px solid var(--line,#ccd);padding:4px 10px;text-align:left}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><a class="back" href="index.html">← Chemistry</a><span class="crumb">Teacher page</span></header>
+  <h1>Chemistry · Teacher page</h1>
+  <p id="mode" class="lead"></p>
+
+  <div class="grid">
+    <section class="box"><h2>Atom Discovery · today's codes</h2>
+      <p>Huddle 1 <span class="code" id="h1"></span></p>
+      <p>Huddle 2 <span class="code" id="h2"></span></p>
+      <p>Unlock any locked student <span class="code" id="ov"></span></p>
+      <p class="hint">Codes change at 7:00 AM and are available from then on. Students are asked for huddle codes only on weekdays 7:00 AM to 3:00 PM. After 3:00 PM, or at home, no code is needed.</p>
+      <p><button class="btn" id="proj" type="button">Show the huddle code large</button></p>
+    </section>
+
+    <section class="box"><h2>Lock desk</h2>
+      <p>A locked student's screen shows a name and a lock number. The override code above frees <b>any</b> student on any lock. For one student's own code:</p>
+      <div class="row"><input id="ln" type="text" placeholder="Name as typed" style="width:220px" aria-label="Student name"><input id="lk" type="number" min="1" value="2" style="width:70px" aria-label="Lock number"><b id="lc" class="code"></b></div>
+      <p class="hint">Locked mode runs only during chemistry's period: until the 42-minute mark Monday to Thursday, and the whole period on Friday. Exit 1 warns. From exit 2 the screen locks.</p>
+    </section>
+
+    <section class="box"><h2>Today's periods</h2>
+      <table class="t" id="per"></table>
+      <p class="hint">Guided notes end at the end mark (Mon to Thu, 42 minutes after the bell). On Friday there is no 42-minute mark: the lesson stays locked and runs to the bell.</p>
+    </section>
+
+    <section class="box"><h2>Check a stamp</h2>
+      <div class="row"><input id="sn" type="text" placeholder="Student name as typed" style="width:200px" aria-label="Name"><input id="sp" type="text" placeholder="Period" style="width:80px" aria-label="Period"><b id="sc" class="code"></b></div>
+      <p class="hint">The stamp on the student's final screen reads ATOM-xxxx. It matches this code for that name and period on the day they finished. The final screen also says how far they got (part, practice, or takeaways) and has a copyable summary line.</p>
+    </section>
+
+    <section class="box"><h2>Links</h2>
+      <p><a href="unit-3-atoms-ions/atom-discovery.html#key">Atom Discovery in teacher view (#key)</a>: the real student page, all steps open, answers marked, codes skipped, lock off.</p>
+      <p><a href="../teacher/index.html">All classes: codes and live view</a></p>
+      <p><a href="../portal/index.html">Review portal</a></p>
+    </section>
+  </div>
+</div>
+<div id="fs" hidden style="position:fixed;inset:0;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50"><div id="fsc" style="font:800 22vw ui-monospace,monospace;letter-spacing:.1em"></div><button class="btn" id="fsx" type="button">Close</button></div>
+<script src="../shared/config.js"></script>
+<script src="../shared/bell.js"></script>
+<script src="../shared/codes.js"></script>
+<script>
+(function(){
+  var L="atom-discovery",$=function(i){return document.getElementById(i)},c=MrD.bell.clock("chem");
+  $("h1").textContent=MrD.codes.gate(L,"h1");$("h2").textContent=MrD.codes.gate(L,"h2");$("ov").textContent=MrD.codes.override();
+  $("mode").textContent=(c.mode==="class"?"Chemistry is in session. ":"Chemistry is not in session. ")+(c.gates?"Huddle codes are required right now.":"Huddle codes are off right now (before 7:00 AM, after 3:00 PM, or a weekend).");
+  function lock(){var n=$("ln").value.trim();$("lc").textContent=n?MrD.codes.fnv?lockCode(n,$("lk").value):"":""}
+  function lockCode(n,k){return MrD.codes.lock(L,n,k)}
+  $("ln").oninput=lock;$("lk").oninput=lock;
+  function stamp(){var n=$("sn").value.trim();$("sc").textContent=n?"ATOM-"+MrD.codes.stamp(L,n,$("sp").value.trim()):""}
+  $("sn").oninput=stamp;$("sp").oninput=stamp;
+  var ps=MrD.bell.periods("chem");var t=$("per");
+  if(!ps.length)t.innerHTML="<tr><td>No chemistry periods today.</td></tr>";
+  else t.innerHTML="<tr><th>Period</th><th>Bell</th><th>Notes end</th><th>Ends</th></tr>"+ps.map(function(p,i){return "<tr><td>"+(i+1)+"</td><td>"+MrD.bell.fmtTime(p.start)+"</td><td>"+(p.friday?"at the bell":MrD.bell.fmtTime(p.endMark))+"</td><td>"+MrD.bell.fmtTime(p.end)+"</td></tr>"}).join("");
+  $("proj").onclick=function(){$("fsc").textContent=MrD.codes.gate(L,"h1");$("fs").hidden=false};$("fsx").onclick=function(){$("fs").hidden=true};
+})();
+</script>
+</body>
+</html>

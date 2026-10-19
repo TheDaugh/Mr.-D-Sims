@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Review Portal · Mr. D's Sims</title>
+<meta name="description" content="See which standards you are strong on, and practice the ones you are not. Built from your own scores.">
+<link rel="stylesheet" href="../calculus/shared/katex/katex.min.css">
+<link rel="stylesheet" href="../calculus/shared/lesson.css">
+<style>
+.wrap{max-width:none;padding-inline:clamp(12px,3vw,40px)}
+.strands{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.strand{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface)}
+.strand h3{margin:0 0 4px;font-size:1.05rem}
+.bar{height:12px;border-radius:99px;background:var(--line);overflow:hidden;margin:8px 0 4px}
+.bar>i{display:block;height:100%;background:var(--good)}
+.bar.review>i{background:#c0392b}.bar.getting>i{background:#d99a00}.bar.few>i{background:#8896a5}
+.tag{display:inline-block;font:700 .75rem var(--mono,monospace);letter-spacing:.04em;padding:1px 8px;border-radius:99px;border:1px solid var(--line)}
+.tag.review{border-color:#c0392b;color:#c0392b}.tag.getting{border-color:#d99a00;color:#8a6500}.tag.strong{border-color:var(--good);color:var(--good)}
+.codes{font-size:.82rem;color:var(--muted)}
+.rev{font-size:.78rem;color:#8a6500}
+.chips2{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chips2 span{border:1px solid var(--line);border-radius:99px;padding:3px 10px;font-size:.85rem}
+table.cls{border-collapse:collapse;width:100%;font-size:.9rem}table.cls th,table.cls td{border:1px solid var(--line);padding:5px 8px;text-align:center}table.cls th:first-child,table.cls td:first-child{text-align:left}
+td.c-review{background:rgba(192,57,43,.18)}td.c-getting{background:rgba(217,154,0,.2)}td.c-strong{background:rgba(35,130,70,.2)}td.c-few{color:var(--muted)}
+.opt{display:block;margin:8px 0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.opt svg{max-width:220px;height:auto;vertical-align:middle}
+.hide-calc .calc-only{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a class="back" href="../index.html">← Mr. D's Sims</a><div class="links"><button type="button" id="b-export">Save my scores (JSON)</button></div></div>
+  <h1>Review portal</h1>
+  <p class="sub">See which standards you are strong on, and practice the ones you are not. It is built from your own scores.</p>
+
+  <section class="card" id="load">
+    <h2>Your scores</h2>
+    <p id="load-msg" class="hint"></p>
+    <div class="row">
+      <label class="btn" style="cursor:pointer">Add a scores file (JSON)<input id="file" type="file" accept=".json,application/json" multiple hidden></label>
+      <button class="btn" type="button" id="b-device">Use the scores saved on this device</button>
+      <button class="btn" type="button" id="b-clear">Clear what is loaded</button>
+    </div>
+    <details class="toolbox"><summary>Only have a code?</summary><div class="inner">
+      <p class="hint">Paste a physics report code, or a calculus hand-in code with the name, period and date it was made. Codes carry less detail than the scores saved on the device.</p>
+      <p><label>Code (one per line) <textarea id="codes" rows="3" style="width:100%"></textarea></label></p>
+      <div class="row"><label>First name <input id="c-name" type="text"></label><label>Period <input id="c-per" type="text" style="width:5em"></label><label>Date <input id="c-day" type="date"></label><button class="btn" type="button" id="b-codes">Add codes</button></div>
+      <p id="c-msg" class="hint"></p>
+    </div></details>
+    <div id="loaded" class="chips2"></div>
+  </section>
+
+  <section id="who" class="card" hidden></section>
+  <section id="class" class="card" hidden></section>
+  <section id="me" hidden></section>
+  <section class="card" id="practice" hidden></section>
+  <footer>Your scores stay on your device. Nothing is sent anywhere unless you save the file and hand it in. · <span id="std-note"></span></footer>
+</div>
+
+<script src="../shared/config.js"></script>
+<script src="../shared/bell.js"></script>
+<script src="../shared/codes.js"></script>
+<script src="../shared/profile.js"></script>
+<script src="adapters.js"></script>
+<!-- physics question generators (the same ones the lesson uses) -->
+<script src="../physics/lessons/engine/lesson.js"></script>
+<script src="../physics/lessons/engine/ice-sim.js"></script>
+<script src="../physics/lessons/content/nfl-items.js"></script>
+<!-- chemistry practice -->
+<script src="../chemistry/shared/practice.js"></script>
+<!-- calculus practice -->
+<script src="../calculus/shared/katex/katex.min.js"></script>
+<script src="../calculus/shared/mathcheck.js"></script>
+<script src="../calculus/shared/qkit.js"></script>
+<script src="../calculus/unit-2-differentiation/2-7-product-rule.content.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var Q = window.QKIT, el = Q.el;
+  var STD = null;                       // standards.json
+  var recs = [];                        // every record loaded this visit: {course,lesson,first,period,day,items,...}
+  var who = null;                       // key of the student being viewed, or null for the class
+  var LS = 'mrd.portal.who';
+
+  /* ---------- records ---------- */
+  function rid(r) { return [r.course, r.lesson, r.day, (r.first || '').toLowerCase(), (r.period || '').toLowerCase()].join('|'); }
+  function addRecs(list) {
+    var n = 0;
+    list.forEach(function (r) {
+      if (!r || !r.course || !r.lesson || !Array.isArray(r.items)) return;
+      var k = rid(r), i;
+      for (i = 0; i < recs.length; i++) if (rid(recs[i]) === k) { recs[i] = r; n++; return; }
+      recs.push(r); n++;
+    });
+    return n;
+  }
+  function studentKey(r) { return (r.first || '?').toLowerCase() + '|' + (r.period || '').toLowerCase(); }
+  function students() {
+    var m = {}; recs.forEach(function (r) { var k = studentKey(r); (m[k] = m[k] || { key: k, first: r.first || '?', period: r.period || '', recs: [] }).recs.push(r); });
+    return Object.keys(m).map(function (k) { return m[k]; }).sort(function (a, b) { return a.period.localeCompare(b.period) || a.first.localeCompare(b.first); });
+  }
+
+  /* ---------- standards ---------- */
+  function strandFor(r, item) {
+    var s = String(item.skill);
+    if (s.indexOf('review.') === 0) return s.slice(7);
+    var keys = [r.course + '/' + r.lesson + '/' + s, r.course + '/' + s], map = STD.skills, i, best = null, bl = -1;
+    for (i = 0; i < keys.length; i++) if (map[keys[i]]) return map[keys[i]];
+    Object.keys(map).forEach(function (k) { if (k.slice(-1) === '*') { var p = k.slice(0, -1); keys.forEach(function (x) { if (x.indexOf(p) === 0 && p.length > bl) { best = map[k]; bl = p.length; } }); } });
+    return best;
+  }
+  function score(it) { return it.firstTry ? 1 : it.ok ? 0.5 : 0; }
+  function tally(rs) {
+    var T = {}, unmapped = {};
+    Object.keys(STD.standards).forEach(function (id) { T[id] = { n: 0, sum: 0, days: {} }; });
+    rs.forEach(function (r) { r.items.forEach(function (it) {
+      var id = strandFor(r, it);
+      if (!id || !T[id]) { unmapped[r.course + '/' + it.skill] = (unmapped[r.course + '/' + it.skill] || 0) + 1; return; }
+      T[id].n++; T[id].sum += score(it); T[id].days[r.day] = 1;
+    }); });
+    Object.keys(T).forEach(function (id) { var t = T[id]; t.pct = t.n ? t.sum / t.n : null; t.level = !t.n ? 'none' : t.n < 3 ? 'few' : t.pct >= 0.8 ? 'strong' : t.pct >= 0.55 ? 'getting' : 'review'; });
+    T._unmapped = unmapped; return T;
+  }
+  var LEVEL = { none: 'No scores yet', few: 'Not enough yet', strong: 'Strong', getting: 'Getting there', review: 'Review this' };
+  function bandFor(p) { return p == null ? 2 : p < 0.5 ? 1 : p < 0.7 ? 2 : p < 0.85 ? 3 : 4; }
+
+  /* ---------- render ---------- */
+  function codesHTML(s) {
+    return (s.codes || []).map(function (c) { return '<div class="codes">' + Q.esc(c.framework) + ' ' + Q.esc(c.code) + (c.title ? ': ' + Q.esc(c.title) : '') + (c.note ? ' <i>(' + Q.esc(c.note) + ')</i>' : '') + '</div>'; }).join('') + (s.needsReview ? '<div class="rev">Alignment needs Mr. D’s review.</div>' : '');
+  }
+  function renderLoaded() {
+    var box = $('loaded'); box.innerHTML = '';
+    if (!recs.length) { $('load-msg').textContent = 'Nothing is loaded yet. Use the scores saved on this device, or add a scores file Mr. D or a lesson gave you.'; return; }
+    var st = students();
+    $('load-msg').textContent = recs.length + ' lesson record' + (recs.length === 1 ? '' : 's') + ' from ' + st.length + ' student' + (st.length === 1 ? '' : 's') + ' loaded.';
+    recs.slice().sort(function (a, b) { return a.day < b.day ? 1 : -1; }).slice(0, 12).forEach(function (r) { box.appendChild(el('span', null, Q.esc(r.title || r.lesson) + ' · ' + Q.esc(r.first || '?') + (r.period ? ' p' + Q.esc(r.period) : '') + ' · ' + Q.esc(r.day))); });
+  }
+  function renderAll() {
+    renderLoaded();
+    var st = students(), multi = st.length > 1;
+    $('who').hidden = !multi; $('class').hidden = !multi || who; $('me').hidden = true;
+    if (multi) {
+      var w = $('who'); w.innerHTML = '<h2>Who</h2>'; var sel = el('select'); sel.setAttribute('aria-label', 'Student');
+      var o0 = el('option', null, 'Whole class'); o0.value = ''; sel.appendChild(o0);
+      st.forEach(function (s) { var o = el('option', null, Q.esc(s.first) + (s.period ? ' · period ' + Q.esc(s.period) : '')); o.value = s.key; sel.appendChild(o); });
+      sel.value = who || ''; sel.onchange = function () { who = sel.value || null; renderAll(); }; w.appendChild(sel);
+    }
+    if (!st.length) { $('class').hidden = true; $('practice').hidden = true; return; }
+    if (multi && !who) { renderClass(st); $('practice').hidden = true; return; }
+    var mine = multi ? st.filter(function (s) { return s.key === who; })[0] : st[0];
+    renderMe(mine);
+  }
+  function renderClass(st) {
+    var c = $('class'); c.hidden = false; c.innerHTML = '<h2>Class overview</h2><p class="hint">Each cell is the share of that student’s answers that were right on the first try (a right answer after a retry counts half). Red cells are the ones to reteach or group. A cell needs 3 or more answers before it is colored.</p>';
+    var ids = Object.keys(STD.standards).filter(function (id) { return st.some(function (s) { return tally(s.recs)[id].n; }); });
+    var tl = st.map(function (s) { return tally(s.recs); });
+    var t = el('table', 'cls'), head = '<tr><th>Student</th>' + ids.map(function (id) { return '<th title="' + Q.esc(STD.standards[id].title) + '">' + Q.esc(id) + '</th>'; }).join('') + '</tr>';
+    t.innerHTML = head + st.map(function (s, i) { return '<tr><td><a href="#" data-k="' + Q.esc(s.key) + '">' + Q.esc(s.first) + (s.period ? ' p' + Q.esc(s.period) : '') + '</a></td>' + ids.map(function (id) { var x = tl[i][id]; return '<td class="c-' + x.level + '">' + (x.n ? Math.round(x.pct * 100) + '%<br><small>' + x.n + '</small>' : '–') + '</td>'; }).join('') + '</tr>'; }).join('') +
+      '<tr><td><b>Class</b></td>' + ids.map(function (id) { var n = 0, sum = 0; tl.forEach(function (x) { n += x[id].n; sum += x[id].sum; }); var lv = !n ? 'none' : n < 3 ? 'few' : sum / n >= 0.8 ? 'strong' : sum / n >= 0.55 ? 'getting' : 'review'; return '<td class="c-' + lv + '"><b>' + (n ? Math.round(sum / n * 100) + '%' : '–') + '</b></td>'; }).join('') + '</tr>';
+    c.appendChild(el('div', 'scrollx', '')).appendChild(t);
+    c.querySelectorAll('a[data-k]').forEach(function (a) { a.onclick = function (e) { e.preventDefault(); who = a.getAttribute('data-k'); renderAll(); }; });
+    var key = el('div', null, '<h3>Standards on this page</h3>' + ids.map(function (id) { return '<p><b>' + Q.esc(id) + '</b> ' + Q.esc(STD.standards[id].title) + codesHTML(STD.standards[id]) + '</p>'; }).join(''));
+    c.appendChild(key);
+    var um = {}; tl.forEach(function (x) { Object.keys(x._unmapped).forEach(function (k) { um[k] = (um[k] || 0) + x._unmapped[k]; }); });
+    if (Object.keys(um).length) c.appendChild(el('p', 'hint', 'Not counted toward any standard yet (add them in <code>portal/standards.json</code>): ' + Object.keys(um).map(Q.esc).join(', ')));
+    var row = el('div', 'row'), b = el('button', 'btn', 'Download the class scores (JSON)'); b.type = 'button'; b.onclick = function () { download('class-scores.json', PortalAdapters.bundle(recs)); }; row.appendChild(b); c.appendChild(row);
+  }
+  function renderMe(s) {
+    var T = tally(s.recs), me = $('me'); me.hidden = false; me.innerHTML = '';
+    var ids = Object.keys(STD.standards).filter(function (id) { return T[id].n; });
+    var head = el('section', 'card'); head.innerHTML = '<h2>' + Q.esc(s.first) + (s.period ? ' · period ' + Q.esc(s.period) : '') + '</h2><p class="hint">Where you are on each standard. Right on the first try counts fully, right after a retry counts half.</p>';
+    if (who) { var back = el('button', 'btn small', '← Whole class'); back.type = 'button'; back.onclick = function () { who = null; renderAll(); }; head.appendChild(back); }
+    me.appendChild(head);
+    if (!ids.length) { head.appendChild(el('p', null, 'No scores match a standard yet. Finish a lesson, or load a scores file.')); return; }
+    var order = ids.slice().sort(function (a, b) { var A = T[a], B = T[b], r = { review: 0, getting: 1, few: 2, strong: 3 }; return r[A.level] - r[B.level] || A.pct - B.pct; });
+    var grid = el('div', 'strands'); me.appendChild(grid);
+    order.forEach(function (id) {
+      var d = STD.standards[id], t = T[id], card = el('div', 'strand');
+      card.innerHTML = '<h3>' + Q.esc(d.title) + '</h3><span class="tag ' + t.level + '">' + LEVEL[t.level] + '</span> <small>' + Q.esc(id) + '</small><div class="bar ' + t.level + '"><i style="width:' + Math.round(t.pct * 100) + '%"></i></div><div class="hint">' + Math.round(t.pct * 100) + '% of ' + t.n + ' answers</div><p>' + Q.esc(d.can) + '</p>' + codesHTML(d);
+      var row = el('div', 'row');
+      if (d.practice.gens.length) { var b = el('button', 'btn' + (t.level === 'review' || t.level === 'getting' || t.level === 'few' ? ' primary' : ''), 'Practice this'); b.type = 'button'; b.onclick = function () { startPractice(id, s, bandFor(t.pct)); }; row.appendChild(b); }
+      if (d.practice.lesson) { var a = el('a', 'btn', Q.esc(d.practice.lesson.label)); a.href = d.practice.lesson.href; row.appendChild(a); }
+      card.appendChild(row); grid.appendChild(card);
+    });
+    var un = Object.keys(T._unmapped); if (un.length) me.appendChild(el('p', 'hint', 'Not counted toward any standard yet: ' + un.map(Q.esc).join(', ') + '. Mr. D can add them in portal/standards.json.'));
+  }
+
+  /* ---------- practice ---------- */
+  var P = null;   // current practice session
+  function rngFor(seed) { return window.LE && LE.rng ? LE.rng(seed) : Math.random; }
+  function shuffleWith(arr, r) { var a = arr.slice(), i, j, t; for (i = a.length - 1; i > 0; i--) { j = Math.floor(r() * (i + 1)); t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function makeQuestion(gen, band, n, seed) {
+    var kind = gen.split(':')[0], key = gen.split(':')[1];
+    if (kind === 'physics') {
+      var sk = NFL.skills.filter(function (x) { return x.id === key; })[0], r = rngFor(seed + '|' + n + '|' + key + '|' + band), q = sk.gen(band, r);
+      var skill = 'review.' ; return { skillTitle: sk.title, q: q, kind: q.type === 'choice' ? 'choice' : 'num' };
+    }
+    if (kind === 'chem') { var sp = ChemPractice.spec(n, +key, seed); return { skillTitle: sp.title, kind: 'num', q: { prompt: sp.q, answer: sp.ans, tol: 0.01, unit: sp.unit, hint: sp.hint, worked: sp.why } }; }
+    if (kind === 'calc') { return { skillTitle: 'Product rule', kind: 'calc', q: PR2.more(n, Math.max(+key, band), seed) }; }
+  }
+  function startPractice(id, s, band) {
+    var d = STD.standards[id];
+    P = { id: id, who: s, band: band, n: 0, up: 0, down: 0, items: [], seed: s.first + '|' + s.period + '|' + Date.now() };
+    $('practice').hidden = false; nextQuestion(); $('practice').scrollIntoView({ behavior: 'smooth' });
+  }
+  function nextQuestion() {
+    var d = STD.standards[P.id], box = $('practice'); box.innerHTML = '';
+    var gens = d.practice.gens, gen = gens[P.n % gens.length], mq = makeQuestion(gen, P.band, P.n, P.seed);
+    box.appendChild(el('h2', null, Q.esc(d.title)));
+    var bar = el('p', 'hint', 'Question ' + (P.n + 1) + ' · ' + Q.esc(mq.skillTitle)); box.appendChild(bar);
+    var done = el('div', 'row'), stop = el('button', 'btn small', 'Stop practicing'); stop.type = 'button'; stop.onclick = function () { box.hidden = true; P = null; renderAll(); }; done.appendChild(stop);
+    var host = el('div'); box.appendChild(host);
+    function finish(first, ok) {
+      P.items.push({ skill: 'review.' + P.id, title: 'Review: ' + d.title, band: P.band, firstTry: first, ok: ok });
+      if (first) { P.up++; P.down = 0; if (P.up >= 2 && P.band < 4) { P.band++; P.up = 0; } } else { P.down++; P.up = 0; if (P.down >= 2 && P.band > 1) { P.band--; P.down = 0; } }
+      P.n++; saveReview();
+      var nb = el('button', 'btn primary', 'Next question'); nb.type = 'button'; nb.onclick = nextQuestion; var r = el('div', 'row'); r.appendChild(nb); host.appendChild(r);
+    }
+    if (mq.kind === 'calc') {
+      Q.render(host, mq.q, { seed: 'p|' + P.n, onDone: function (res) { finish(!!res.clean, true); } });
+    } else if (mq.kind === 'choice') {
+      var q = mq.q, order = shuffleWith(q.options.map(function (o, i) { return i; }), rngFor(P.seed + 'o' + P.n)), failed = false, fb = el('div', 'fb');
+      host.appendChild(el('div', null, q.prompt));
+      var name = 'o' + P.n;
+      order.forEach(function (oi) { var o = q.options[oi], lab = el('label', 'opt'); lab.innerHTML = '<input type="radio" name="' + name + '"> ' + (typeof o === 'string' ? o : (o.svg || '') + ' ' + Q.esc(o.label || '')); lab.firstChild.value = oi; host.appendChild(lab); });
+      var b = el('button', 'btn', 'Check'); b.type = 'button'; host.appendChild(b); host.appendChild(fb);
+      b.onclick = function () {
+        var sel = host.querySelector('input:checked'); if (!sel) return;
+        if (+sel.value === q.answer) { host.querySelectorAll('input').forEach(function (x) { x.disabled = true; }); b.disabled = true; fb.className = 'fb ok'; fb.innerHTML = '<p>Right. ' + (q.worked || '') + '</p>'; finish(!failed, true); }
+        else { failed = true; fb.className = 'fb bad'; fb.innerHTML = '<p>Not yet. ' + (q.hint || 'Look at the picture again.') + '</p>'; }
+      };
+    } else {
+      var q2 = mq.q, failed2 = false, fb2 = el('div', 'fb'), inp = document.createElement('input'); inp.type = 'number'; inp.step = 'any'; inp.setAttribute('aria-label', 'Your answer');
+      host.appendChild(el('div', null, q2.prompt));
+      var row2 = el('div', 'row'), b2 = el('button', 'btn', 'Check'); b2.type = 'button'; row2.appendChild(inp); row2.appendChild(el('span', null, Q.esc(q2.unit || ''))); row2.appendChild(b2); host.appendChild(row2); host.appendChild(fb2);
+      b2.onclick = function () {
+        var v = parseFloat(inp.value); if (isNaN(v)) return;
+        var okv = window.LE && LE.numOK ? LE.numOK(v, q2.answer, q2.tol, q2.abs) : Math.abs(v - q2.answer) <= Math.max(Math.abs(q2.answer) * (q2.tol || 0.02), q2.abs || 0);
+        if (okv) { inp.disabled = true; b2.disabled = true; fb2.className = 'fb ok'; fb2.innerHTML = '<p>Right. ' + (q2.worked || '') + '</p>'; finish(!failed2, true); }
+        else { failed2 = true; fb2.className = 'fb bad'; fb2.innerHTML = '<p>Not yet. ' + (q2.hint || 'Check your work.') + '</p>'; }
+      };
+    }
+    box.appendChild(done);
+  }
+  function saveReview() {
+    /* practice done here is saved to this device as its own record, so improvement shows up the next time */
+    var s = P.who, rec = { course: STD.standards[P.id].course, lesson: 'review-' + P.id, title: 'Review: ' + STD.standards[P.id].title, first: s.first, period: s.period, day: MrD.bell.dayKey(), reached: 1, of: 1, items: P.items, source: 'review portal' };
+    if (MrD.profile.record(rec)) { addRecs([Object.assign({ saved: Date.now() }, rec)]); renderLoaded(); }
+  }
+
+  /* ---------- loading ---------- */
+  function download(name, text) {
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  function fromDevice() { var n = addRecs(MrD.profile.all()); $('load-msg').textContent = n ? '' : 'There are no scores saved on this device yet. Finish a lesson first.'; renderAll(); }
+  $('b-device').onclick = fromDevice;
+  $('b-clear').onclick = function () { recs = []; who = null; P = null; $('practice').hidden = true; renderAll(); };
+  $('b-export').onclick = function () { download('my-scores.json', PortalAdapters.bundle(recs.length ? recs : MrD.profile.all())); };
+  $('file').onchange = function () {
+    var files = [].slice.call(this.files), bad = [];
+    Promise.all(files.map(function (f) { return f.text().then(function (t) { try { var j = JSON.parse(t); var list = Array.isArray(j) ? j : j && j.records; if (!Array.isArray(list)) throw 0; addRecs(list); } catch (e) { bad.push(f.name); } }); })).then(function () {
+      renderAll(); if (bad.length) $('load-msg').textContent += ' These files were not scores files: ' + bad.join(', ') + '.';
+    });
+  };
+  $('b-codes').onclick = function () {
+    var lines = $('codes').value.split(/\n+/).map(function (s) { return s.trim(); }).filter(Boolean), name = $('c-name').value.trim(), per = $('c-per').value.trim(), day = $('c-day').value || MrD.bell.dayKey(), got = [], bad = [];
+    lines.forEach(function (ln) {
+      var r = null;
+      if (/^NEW~/i.test(ln)) r = PortalAdapters.physicsReport(ln, LE, NFL);
+      else if (/^PR2-/i.test(ln)) { if (!name) { bad.push('calculus codes need the first name'); return; } r = PortalAdapters.calcHandIn(name, per, day, ln, PR2); if (r && r.error) { bad.push(r.error); r = null; } }
+      if (r) got.push(r); else if (!/need|checksum/.test(bad[bad.length - 1] || '')) bad.push(ln.slice(0, 24) + '…');
+    });
+    addRecs(got); $('c-msg').textContent = got.length + ' added.' + (bad.length ? ' Could not read: ' + bad.join('; ') : ''); renderAll();
+  };
+
+  fetch('standards.json').then(function (r) { return r.json(); }).then(function (j) {
+    STD = j; $('std-note').textContent = 'Standards map: portal/standards.json';
+    var h = /(?:^|[#&])load\b/.test(location.hash); fromDevice();
+  }).catch(function () { $('load-msg').textContent = 'Could not load portal/standards.json. If you opened this page from a folder, use the website address instead.'; });
+})();
+</script>
+</body>
+</html>

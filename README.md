@@ -2,7 +2,15 @@
 
 Classroom simulations. Each one is a single HTML file that runs in any modern browser, so there is nothing to install and they work on Chromebooks and phones.
 
-Open `index.html` for the front page. It links to `physics/`, `chemistry/` and `calculus/`, and each has its own hub.
+Open `index.html` for the front page. It links to `physics/`, `chemistry/` and `calculus/`. Each course page is a full-screen hub organized by unit, with tabs for **Lessons**, **Virtual labs** and **Sims**.
+
+| Folder | What it is |
+|---|---|
+| `shared/` | Code every guided lesson uses: the school clock (`bell.js`), daily codes (`codes.js`), the one teacher bar (`teacherbar.js`), the live view client, student score profile, printable notes, and the course hub. |
+| `teacher/` | `teacher/index.html`: today's codes for every lesson, the unlock-any-student code, lock desk, bell schedule and live view. |
+| `portal/` | `portal/index.html`: the standards-based review portal that reads students' scores and gives personalized practice. |
+| `live/` | A small Cloudflare Worker for the live view (optional, see `live/README.md`). |
+| `docs/` | `docs/LESSON-STANDARD.md`: the rules every guided lesson follows and what each class changes when it builds the next one. |
 
 ## Physics
 
@@ -46,7 +54,7 @@ Every page is plain HTML with its styles and script inside the file. The physics
 
 ## Chemistry
 
-The `chemistry/` folder holds daily lesson sims (each with a student sheet PDF) and virtual labs, with a hub page at `chemistry/index.html` that lists them by unit. Each entry in `labs.js` has a `type` of `lesson` or `lab`. Each lab opens with the glassware already set up and the instructions on the page.
+The `chemistry/` folder holds guided lessons and virtual labs, with a hub page at `chemistry/index.html` that lists them by unit. Each entry in `labs.js` has a `type` of `lesson`, `lab` or `sim`. Each lab opens with the glassware already set up and the instructions on the page. Lessons no longer have a written handout: their notes build on the page and print, save as PDF, or download as `.tex`.
 
 | Unit | Lab |
 |---|---|
@@ -55,9 +63,9 @@ The `chemistry/` folder holds daily lesson sims (each with a student sheet PDF) 
 
 To add a lab, put the page in its unit folder and add one entry to `chemistry/labs.js`. Chemistry pages share `chemistry/shared/lab.css`, so keep the `../shared/lab.css` link when copying one.
 
-A chemistry lesson with a teacher key keeps the key on its own page, `<lesson>-key.html`, not behind `#key`. Build it with `node chemistry/tools/make-key.mjs <lesson>.html` and re-run that after every edit to the lesson. The key page also shows the day's gate codes.
+Every guided lesson, in every class, uses the same teacher switch: add `#key` to its address. You see the real student page with every step open, the correct answers marked, huddle codes skipped, locked mode off and a teacher bar with today's codes. There is no separate key page to rebuild. `chemistry/teacher.html` has the chemistry codes, lock desk and stamp checker.
 
-`chemistry/shared/lock.js` is the locked mode a lesson can opt into: fullscreen, every exit logged on the stamp, a lock from the second exit that needs a per-student code from the key page, and a code after closing the page. It deters. It cannot stop a Chromebook from opening a tab, so real enforcement stays with the school's Chromebook management.
+`shared/lock.js` is the locked mode a lesson can opt into (Atom Discovery uses it): fullscreen, every exit logged on the stamp, a lock from the second exit that needs a per-student code, and a code after closing the page. It runs only during chemistry's period, until the 42-minute mark Monday to Thursday and the whole period on Friday. The lock desk (in `#key` and on `teacher/index.html`) shows one **unlock-any-student** code that frees every locked student, so you are never locked out. It deters. It cannot stop a Chromebook from opening a tab, so real enforcement stays with the school's Chromebook management.
 
 ## Calculus
 
@@ -65,7 +73,7 @@ The `calculus/` folder holds AP Calculus AB sims, with a hub at `calculus/index.
 
 | Unit | Page |
 |---|---|
-| 2 · Differentiation | `2-7-product-rule.html` (guided lesson that adjusts to each student: warm-up placement, prediction test, four sim missions, huddle, adaptive build and practice, mastery check, online notes that print as a PDF and export as `.tex`). Also `2-7-product-rule-teacher.html` (class code, facilitation notes, full key, hand-in decoder) and `2-7-product-rule-outline.md`. |
+| 2 · Differentiation | `2-7-product-rule.html` (guided lesson that adjusts to each student: 5-minute timed warm-up, prediction test, four sim missions, huddle, adaptive build and practice, mastery check, endless practice until the end mark, a concept key, online notes that print as a PDF and export as `.tex`). Also `2-7-product-rule-teacher.html` (class code, facilitation notes, full key, hand-in decoder) and `2-7-product-rule-outline.md`. |
 | 6 · Integration and Accumulation of Change | `accumulation-lab.html` (two tabs: the accumulation machine, where g(x) = ∫f builds up as you drag x, and Riemann sums with left, right, midpoint and trapezoid rules and an error-vs-n plot) |
 
 Most calculus pages are one self-contained file, so the same rules as the physics sims apply: constants and function lists sit at the top of the `<script>` block.
@@ -78,6 +86,10 @@ Guided lessons share code in `calculus/shared/`:
 - `lesson.css` has the shared styles and the print layout for student notes.
 - `katex/` is KaTeX 0.19.0 (MIT license) so math renders offline.
 
-A lesson is a content file (`*.content.js`, all questions and answers), the student page, and a teacher page. Students never see their path; the hidden levels are Build, Apply, Stretch and Extend.
+A lesson is a content file (`*.content.js`, all questions and answers), the student page, and a teacher page. Students never see their path; the lesson moves between four hidden levels.
 
-**Teacher access.** Open `calculus/index.html` and click “Teacher view” at the bottom (or add `#teacher` to the address once). Each lesson card then shows its teacher page, a preview link that opens every step and lets you pick a path, and the outline. Adding `#key` to a lesson’s address jumps to its teacher page. The class code on the teacher page changes daily and unlocks the huddle step. Students finish with a hand-in code; paste it into the decoder on the teacher page. There is no server, so progress and notes live in the student’s browser on that device.
+**Teacher access.** Add `#key` to a lesson's address (the same switch as physics and chemistry). The course teacher page and the all-classes page (`teacher/index.html`) hold the codes. Students finish with a hand-in code; paste it into the decoder on the teacher page. Progress and notes live in the student's browser on that device; scores for the review portal are saved there too.
+
+## One clock for every class
+
+`shared/bell.js` knows the periods (physics 9:00; chemistry 10:40 and 1:50; calculus 12:10; Friday 40-minute periods). Huddle codes are asked for only on weekdays 7:00 AM to 3:00 PM; after 3:00 PM, or at home, none. Today's codes are readable from 7:00 AM. Guided notes end at the 42-minute mark Monday to Thursday and at the bell on Friday. To change a time, edit the SCHEDULE block in that one file. Read `docs/LESSON-STANDARD.md` before building the next lesson.

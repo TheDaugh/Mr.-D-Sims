@@ -1,14 +1,14 @@
 // The hub reads this list. To add something: build the page in its unit folder,
 // then add one entry below. Nothing else needs to change.
-//   type:  "lesson" (a daily lesson sim with a student sheet) or "lab" (a virtual lab)
+//   type:  "lesson" (a guided lesson), "lab" (a virtual lab) or "sim" (free-play simulation)
 //   day:   lesson number inside the unit (lessons only)
-//   sheet: optional path to the student sheet PDF, shown as a link under the card
+//   teacher: optional links shown under the card, e.g. [{label:"Teacher key (#key)", href:"..."}]
 window.UNITS = [
   {
     id: "unit-2",
     title: "Unit 2 · Properties of Matter",
     blurb: "Temperature, heat, and what happens to particles when matter changes phase.",
-    labs: [
+    entries: [
       {
         title: "Heating Curve of Water",
         type: "lab",
@@ -47,16 +47,16 @@ window.UNITS = [
     id: "unit-3",
     title: "Unit 3 · Atoms and Ions",
     blurb: "How we know atoms exist, and what is inside them.",
-    labs: [
+    entries: [
       {
         title: "Atom Discovery: Democritus to Dalton",
         type: "lesson",
         day: 1,
-        sheet: "unit-3-atoms-ions/atom-discovery-sheet.pdf",
         icon: "⚛️",
         href: "unit-3-atoms-ions/atom-discovery.html",
-        blurb: "Cut gold in half until you run out of room, burn hydrogen in oxygen, and weigh your way to Dalton's atomic theory. Core and challenge tiers.",
-        tags: ["atomic theory", "Dalton", "conservation of mass", "definite proportions"]
+        blurb: "Cut gold in half until you run out of room, burn hydrogen in oxygen, and weigh your way to Dalton's atomic theory. Your own notes build as you go and print at the end.",
+        tags: ["atomic theory", "Dalton", "conservation of mass", "definite proportions"],
+        teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/atom-discovery.html#key" }, { label: "Teacher page", href: "teacher.html" }]
       }
     ]
   }
