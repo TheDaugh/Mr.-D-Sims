@@ -71,6 +71,7 @@ const DATA={parts:[
  {type:"mcq",predict:true,q:"You will spark different amounts of hydrogen and oxygen. What will happen?",opts:[{t:"Any amounts can combine completely into water."},{t:"Hydrogen and oxygen only combine in one fixed mass ratio. Extra of either is left over."},{t:"The ratio changes depending on how much you start with."}],note:"Now test it below."},
  {type:"widget",id:"water",tasks:["Run a trial where nothing is left over.","Run a trial where oxygen is left over.","Run a trial where hydrogen is left over."]},
  {type:"num",q:"In your trials, how many grams of oxygen were used for every 1 g of hydrogen used?",ans:8,tol:0.01,unit:"g O per 1 g H",why:"Every trial that used both up gave O used ÷ H used = 8. Water is 8 parts oxygen to 1 part hydrogen by mass, every time.",hint:"Pick a trial. Divide the oxygen used by the hydrogen used. Do the same for a second trial."},
+ {type:"gate",id:1,say:"Huddle 1 (about 4 min, at the board). Ask: what did every trial that used up both gases have in common? Take answers until someone says 8 g of oxygen for every 1 g of hydrogen, and have the class write it as MY RULE in their own words. Then name it: the Law of Definite Proportions (Proust). Hold back the word Dalton until Part 4."},
  {type:"num",q:"Predict: you spark <b>4 g of hydrogen</b> with <b>40 g of oxygen</b>. How many grams of water form?",ans:36,tol:0.01,unit:"g water",why:"4 g H needs 32 g O (4 × 8). Together that is 36 g of water. 8 g of oxygen is left over.",hint:"First find how much oxygen 4 g of hydrogen can use. Only that much reacts."},
  {type:"num",q:"How many grams of oxygen are left over in that trial?",ans:8,tol:0.01,unit:"g O",why:"40 g supplied − 32 g used = 8 g left.",hint:"Supplied minus used."},
  {type:"mcq",q:"Compare the total mass <b>before</b> the spark with the total mass <b>after</b> (water plus anything left over). What do you see in every trial?",opts:[{t:"The total after is a little smaller. Some mass turned into energy."},{t:"The total mass is the same before and after.",ok:1},{t:"The total after is bigger because water is new."}],why:"Mass in = mass out. Lavoisier (1789) weighed everything in sealed containers and found this every time: matter is rearranged, not made or destroyed.",hint:"Look at the “mass in” and “mass out” numbers under the picture."},
@@ -94,7 +95,8 @@ const DATA={parts:[
   {q:"A compound always has the same atoms in the same ratio.",ans:1,why:"Dalton’s postulate that explains the Law of Definite Proportions."}
  ],hint:"Ask: could this statement be backed by a balance reading, or only by an argument?"},
  {type:"mcq",q:"In Dalton’s model, can a chemical reaction turn a hydrogen atom into an oxygen atom?",opts:[{t:"Yes, if you add enough energy."},{t:"No. Reactions only rearrange atoms. They never change one kind into another.",ok:1},{t:"Yes, that’s how water forms."}],why:"Dalton: atoms are neither created, destroyed, nor changed into another kind in a reaction. That’s why mass is conserved and why every atom of hydrogen counts as the same hydrogen.",hint:"What stays fixed about each atom in Dalton’s model?"},
- {type:"mcq",q:"Dalton pictured an atom as a smooth, solid ball with nothing inside. Which of these could that picture <b>not</b> yet explain?",opts:[{t:"Why hydrogen and oxygen always combine in fixed mass ratios."},{t:"Why mass is conserved in a reaction."},{t:"Why rubbing a balloon on your hair makes sparks and static.",ok:1}],why:"Fixed ratios and conserved mass both follow from solid, unchanging atoms. Static charge does not. A ball with no insides has nothing that could carry a charge. That puzzle leads to Day 2.",hint:"Which one has nothing to do with masses of atoms?"}
+ {type:"mcq",q:"Dalton pictured an atom as a smooth, solid ball with nothing inside. Which of these could that picture <b>not</b> yet explain?",opts:[{t:"Why hydrogen and oxygen always combine in fixed mass ratios."},{t:"Why mass is conserved in a reaction."},{t:"Why rubbing a balloon on your hair makes sparks and static.",ok:1}],why:"Fixed ratios and conserved mass both follow from solid, unchanging atoms. Static charge does not. A ball with no insides has nothing that could carry a charge. That puzzle leads to Day 2.",hint:"Which one has nothing to do with masses of atoms?"},
+ {type:"gate",id:2,say:"Huddle 2 (about 4 min, before the core stamp). Show of hands: which statements in the Who Said It table needed a balance, and which needed only an argument? Then ask the static question aloud: what would an atom need to have to explain a spark? Write two or three answers on the board. Day 2 opens with them."}
 ]},
 {title:"Dalton’s Guess",tier:2,sub:"Mass ratios told Dalton how heavy one atom is compared to another, but only if he knew the formula. He had to guess.",blocks:[
  {type:"info",html:"Dalton had no way to count atoms in a molecule. His rule: <b>if two elements make only one compound, assume the simplest formula, 1 atom to 1 atom.</b> For water that means <b>HO</b>. Test what that assumption does to the mass of an oxygen atom."},
@@ -122,13 +124,18 @@ function h(tag,attrs,...kids){const e=document.createElement(tag);for(const k in
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const SVGNS="http://www.w3.org/2000/svg";
 function sv(tag,attrs,...kids){const e=document.createElementNS(SVGNS,tag);for(const k in(attrs||{}))e.setAttribute(k,attrs[k]);kids.flat().forEach(c=>{if(c==null)return;e.append(c.nodeType?c:document.createTextNode(c))});return e}
-const PREVIEW=/preview/.test(location.hash),KEYVIEW=/key/.test(location.hash);
+const PREVIEW=/preview/.test(location.hash),KEYVIEW=window.__KEY__===true;
 const ST={name:"",t0:0,q:0,qFirst:0,retries:0,tasks:0,tasksDone:0,partIdx:0,partsDone:[],preds:[],open:"",between:false};
 let inProgress=false,CORE=0,uid=0;
 const app=document.getElementById("app"),chipsEl=document.getElementById("chips");
 window.addEventListener("beforeunload",e=>{if(inProgress){e.preventDefault();e.returnValue=""}});
 const fmtT=s=>{s=Math.floor(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
-const DONE_TYPES=["mcq","num","rows","widget","open"];
+const DONE_TYPES=["mcq","num","rows","widget","open","gate"];
+/* Teacher-code gates: the code is a hash of lesson, gate number and today's date. The key page shows it.
+   It stops a class from sprinting past a huddle. A student who reads this script can compute it. */
+const LESSON_ID="atom-discovery";
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const gateCode=id=>{let x=2166136261;const s=LESSON_ID+"|"+id+"|"+today();for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619)>>>0}return String(1000+x%9000)};
 const g=n=>(Math.round(n*100)/100).toString();
 
 /* ---------- widgets ---------- */
@@ -314,11 +321,12 @@ WIDGET.two=(tick)=>{
 };
 
 WIDGET.guess=(tick)=>{
-  const seen={HO:false,H2O:false};let f="HO";
+  const seen={HO:false,H2O:false};let f="";
   const svg=sv("svg",{class:"scene",viewBox:"0 0 520 190",role:"img","aria-label":"Picture of a water molecule under the chosen formula with circle area showing atom mass"});
   const read=h("div",{class:"readout",style:"margin-top:10px"});
-  const sel=h("select",{"aria-label":"Formula for water",onchange:e=>{f=e.target.value;draw()}},h("option",{value:"HO"},"Water = HO (Dalton’s simplest guess)"),h("option",{value:"H2O"},"Water = H₂O (modern formula)"));
+  const sel=h("select",{"aria-label":"Formula for water",onchange:e=>{f=e.target.value;draw()}},h("option",{value:""},"Pick a formula…"),h("option",{value:"HO"},"Water = HO (Dalton’s simplest guess)"),h("option",{value:"H2O"},"Water = H₂O (modern formula)"));
   function draw(){
+    if(!f){svg.replaceChildren(sv("text",{x:260,y:95,"text-anchor":"middle","font-size":13,fill:"currentColor",opacity:.7},"Pick a formula for water to see what it does to the oxygen atom."));read.replaceChildren();return}
     const nH=f==="HO"?1:2,mO=8*nH/1; // O:H atom mass ratio = 8 (O g per 1 g H) × (H atoms / O atoms)
     const pf=f==="HO"?"HO₂":"H₂O₂";
     seen[f]=true;if(seen.HO)tick(0);if(seen.H2O)tick(1);
@@ -431,6 +439,15 @@ BLOCK.figure=(b)=>{
   return h("div",{class:"card"},wrap);
 };
 
+BLOCK.gate=(b,done)=>{
+  const fb=feedback(),inp=h("input",{type:"text",inputmode:"numeric",maxlength:4,autocomplete:"off","aria-label":"Code from Mr. D",style:"width:120px;font-size:1.3rem;text-align:center"});
+  const btn=h("button",{class:"btn",onclick:()=>{if(inp.value.trim()===gateCode(b.id)){inp.disabled=true;btn.disabled=true;show(fb,true,"✔ Unlocked.");done()}else show(fb,false,"Not the code. Eyes up and wait for Mr. D.")}},"Unlock");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  const card=h("div",{class:"card",style:"border:2px dashed var(--accent);text-align:center"},h("h2",{},"✋ Eyes up. Mr. D has the code."),h("p",{style:"margin:0 auto 10px;max-width:46ch"},"Stop here. Class talk comes first. Don’t go on until you have the code."),h("div",{class:"row",style:"justify-content:center"},inp,btn),fb);
+  if(PREVIEW)card.append(h("div",{class:"row",style:"justify-content:center;margin-top:8px"},h("button",{class:"ghost",onclick:()=>{inp.disabled=true;btn.disabled=true;done()}},"Skip (preview)")));
+  return card;
+};
+
 BLOCK.open=(b,done)=>{
   const ta=h("textarea",{"aria-label":"Your response",placeholder:b.frame}),cnt=h("span",{class:"hint"},"0 / "+b.min+" characters");const fb=feedback();
   const btn=h("button",{class:"btn",disabled:"",onclick:()=>{ST.open=ta.value.trim();ta.disabled=true;btn.disabled=true;show(fb,true,"✔ Saved. Show your teacher the final screen.");done()}},"Save my answer");
@@ -501,7 +518,9 @@ const WIDGET_KEY={
 const strip=s=>String(s).replace(/<[^>]+>/g,"");
 function showKey(){
   chipsEl.replaceChildren();app.replaceChildren();
-  app.append(h("div",{class:"card"},h("h2",{},"Teacher key"),h("p",{},"Every answer with the reason the student sees. Open the page without #key for the student version. Add #preview to the address for skip buttons.")));
+  const gates=DATA.parts.flatMap(P=>P.blocks.filter(b=>b.type==="gate"));
+  app.append(h("div",{class:"card"},h("h2",{},"Teacher key"),h("p",{},"Every answer with the reason the student sees. The student page is atom-discovery.html. Add #preview to its address for skip buttons."),
+    h("p",{html:`<b>Gate codes for ${today()}:</b> `+gates.map(b=>`Gate ${b.id} <b style="font-size:1.2rem">${gateCode(b.id)}</b>`).join(" · ")+". Codes change at midnight."})));
   const key=h("div",{class:"key"});
   DATA.parts.forEach((P,i)=>{
     key.append(h("h3",{},`Part ${i+1}${P.tier===2?" ★ Challenge":""}: ${P.title}`));
@@ -510,6 +529,7 @@ function showKey(){
       if(b.type==="num")key.append(h("div",{class:"it",html:`<b>${b.q}</b><br>✔ ${[].concat(b.ans).join(" or ")} ${b.unit||""} (±${b.tol})<br><i>${b.why}</i>`}));
       if(b.type==="rows")key.append(h("div",{class:"it",html:`<b>${b.q}</b>`+b.rows.map(r=>`<br>• ${r.q} → <b>${b.choices[r.ans]}</b>. <i>${r.why}</i>`).join("")}));
       if(b.type==="widget")key.append(h("div",{class:"it",html:`<b>Sim tasks:</b> ${b.tasks.join(" ")}<br><i>${WIDGET_KEY[b.id]}</i>`}));
+      if(b.type==="gate")key.append(h("div",{class:"it",html:`<b>✋ Gate ${b.id}. Students stop here. Today’s code: ${gateCode(b.id)}</b><br>${b.say}`}));
       if(b.type==="open")key.append(h("div",{class:"it",html:`<b>${b.q}</b><br>Open response (teacher reads it in the copied summary). Good answers: static cling or sparks → atoms must contain charged parts that can move; neon glow → atoms can give off light, so they must have an inside that can change; lightning → charge is a property of matter. Accept any observation that a mass-only ball cannot explain, paired with a reasonable “atoms need…”.`}));
     });
   });

@@ -41,6 +41,8 @@ The `chemistry/` folder holds daily lesson sims (each with a student sheet PDF) 
 
 To add a lab, put the page in its unit folder and add one entry to `chemistry/labs.js`. Chemistry pages share `chemistry/shared/lab.css`, so keep the `../shared/lab.css` link when copying one.
 
+A chemistry lesson with a teacher key keeps the key on its own page, `<lesson>-key.html`, not behind `#key`. Build it with `node chemistry/tools/make-key.mjs <lesson>.html` and re-run that after every edit to the lesson. The key page also shows the day's gate codes.
+
 ## Calculus
 
 The `calculus/` folder holds AP Calculus AB sims, with a hub at `calculus/index.html` that lists them by unit. The list lives in `calculus/sims.js`; add one entry there to add a card.

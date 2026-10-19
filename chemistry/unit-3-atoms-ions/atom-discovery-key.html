@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex">
+<script>window.__KEY__=true;</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher key: Atom Discovery: Democritus to Dalton</title>
+<meta name="description" content="Cut gold in half until you run out of room, burn hydrogen in oxygen, and weigh your way to Dalton's atomic theory.">
+<link rel="stylesheet" href="../shared/lab.css">
+<style>
+  .wrap{max-width:900px}
+  #chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+  .chip{padding:2px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:.85rem;color:var(--muted)}
+  .chip.on{border-color:var(--accent);color:var(--accent);font-weight:700}
+  .chip.done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+  .tier{margin-left:10px;font-size:.7rem;font-family:system-ui,sans-serif;letter-spacing:.06em;background:var(--hot);color:#fff;padding:2px 8px;border-radius:999px;vertical-align:middle}
+  .sub{color:var(--muted);margin:0 0 14px;max-width:68ch}
+  .btn{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btn.ghost{background:var(--panel);color:var(--ink);border-color:var(--line)}
+  .btn.big{font-size:1.05rem;min-height:46px;padding:8px 22px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .stamp{border:3px solid var(--ok);border-radius:14px;text-align:center;padding:14px;margin:10px 0;color:var(--ok);background:var(--ok-bg)}
+  .stamp .big{font-size:1.6rem;font-weight:800;letter-spacing:.04em}
+  table.sum{margin:10px 0}
+  .card.final h2{font-size:1.4rem}
+  .task{display:flex;gap:8px;align-items:flex-start;padding:3px 0;font-size:.93rem}
+  .task.ok{color:var(--ok)}
+  .task .bx{width:18px;height:18px;border:2px solid var(--line);border-radius:4px;flex:none;margin-top:2px;text-align:center;line-height:14px;font-size:13px}
+  .task.ok .bx{background:var(--ok);border-color:var(--ok);color:#fff}
+  .key .it{border-bottom:1px solid var(--line);padding:8px 0;font-size:.93rem}
+  .key h3{margin-top:18px;color:var(--accent)}
+  textarea{width:100%;min-height:120px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}
+  .wtbl td,.wtbl th{padding:4px 6px;font-size:.85rem}
+  input[type=range]{width:100%}
+  .sl{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);flex:1 1 200px}
+  .sl b{color:var(--ink)}
+  .figs{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  figure.pix{margin:0;flex:1 1 200px;max-width:260px;text-align:center}
+  figure.pix canvas{width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;border:2px solid var(--line);border-radius:6px;background:#111;cursor:pointer}
+  figure.pix figcaption{font-size:.82rem;color:var(--muted);margin-top:6px;text-align:left}
+  figure.pix .cr{font-size:.72rem;opacity:.8}
+  .scene text{font-family:system-ui,sans-serif}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="back" href="../">← Lab hub</a>
+    <span class="crumb">Unit 3 · Atoms and Ions · Day 1</span>
+  </header>
+  <h1>Atom Discovery: Democritus to Dalton</h1>
+  <p class="lead">Two thinkers, 2,200 years apart. One had an idea. The other had a balance. You will do both jobs today.</p>
+  <div id="chips" aria-label="Progress"></div>
+  <main id="app"></main>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const DATA={parts:[
+{title:"Cut It Forever",tier:1,sub:"Democritus claimed you would eventually reach a piece that cannot be cut. He never tried it. You will.",blocks:[
+ {type:"info",html:"Around 400 BCE, <b>Democritus</b> argued: cut a piece of matter in half, then half again. Either you can do this forever, or you reach a piece too small to cut. He called that piece <b>atomos</b> (“uncuttable”). He reasoned his way there. He never measured anything."},
+ {type:"figure",items:[{"src": "img/democritus.png", "cap": "Democritus, painted by Hendrick ter Brugghen (1628). Called “the laughing philosopher.” He argued for atoms with logic alone.", "alt": "Painting of Democritus", "credit": "Public domain · Wikimedia Commons"}]},
+ {type:"mcq",predict:true,q:"A cube of gold about 1 cm on a side. Cut it in half and keep one half. Cut that in half, and keep going. About how many cuts until you are holding <b>one single atom</b>?",opts:[{t:"About 10 cuts"},{t:"About 30 cuts"},{t:"About 75 cuts"},{t:"About 1,000 cuts"},{t:"Forever. You can always cut it again."}],note:"Write it in the Cold Open box on your sheet."},
+ {type:"widget",id:"halve",tasks:["Keep cutting until only one gold atom is left."]},
+ {type:"figure",items:[{"src": "img/goldstm.png", "cap": "A gold surface imaged with a scanning tunneling microscope. The ridges are rows of gold atoms, so these are real atoms in a real picture.", "alt": "Scanning tunneling microscope image of gold atoms in rows", "credit": "Public domain · Wikimedia Commons"}]},
+ {type:"num",q:"How many cuts did it take to get from the whole cube down to one atom?",ans:75,tol:1,unit:"cuts",why:"Every cut halves the number of atoms. The cube starts with about 4 × 10²² of them, which is 2⁷⁵. Halve that 75 times and one is left. The longest side shrinks by half only every third cut, because the cube has three directions to cut in.",hint:"Look at the “cuts so far” number when the atom count reaches 1."},
+ {type:"mcq",q:"You are holding one gold atom. Your tools cannot cut it. Does that <b>prove</b> Democritus was right that atoms can’t be divided?",opts:[{t:"Yes. If no tool can cut it, it can’t be cut."},{t:"No. It shows our tools stop here. A better tool might still split it.",ok:1},{t:"Yes. Gold atoms are solid all the way through."}],why:"Failing to cut something is not proof it can’t be cut. Democritus had a good argument but no evidence. Getting evidence is what Dalton did.",hint:"Think about the difference between “we can’t” and “it can’t be done.”"}
+]},
+{title:"Make Water",tier:1,sub:"Burn hydrogen in oxygen and weigh everything before and after. Look for a pattern in the masses.",blocks:[
+ {type:"info",html:"In 1799 <b>Joseph Proust</b> weighed the elements in compounds from many sources and found something odd: a given compound always had the same recipe by mass. Test that with water."},
+ {type:"figure",items:[{"src": "img/proust.png", "cap": "Joseph Proust (1754–1826), in a bronze medallion by David d'Angers. He showed that a compound always has the same recipe by mass.", "alt": "Bronze medallion portrait of Joseph Proust", "credit": "CC0 · Wikimedia Commons"}, {"src": "img/lavoisier.png", "cap": "Antoine and Marie-Anne Lavoisier, painted by Jacques-Louis David (1788). He weighed everything. She drew his lab apparatus and kept his notes.", "alt": "Painting of Antoine Lavoisier and his wife Marie-Anne", "credit": "Public domain · Wikimedia Commons"}]},
+ {type:"mcq",predict:true,q:"You will spark different amounts of hydrogen and oxygen. What will happen?",opts:[{t:"Any amounts can combine completely into water."},{t:"Hydrogen and oxygen only combine in one fixed mass ratio. Extra of either is left over."},{t:"The ratio changes depending on how much you start with."}],note:"Now test it below."},
+ {type:"widget",id:"water",tasks:["Run a trial where nothing is left over.","Run a trial where oxygen is left over.","Run a trial where hydrogen is left over."]},
+ {type:"num",q:"In your trials, how many grams of oxygen were used for every 1 g of hydrogen used?",ans:8,tol:0.01,unit:"g O per 1 g H",why:"Every trial that used both up gave O used ÷ H used = 8. Water is 8 parts oxygen to 1 part hydrogen by mass, every time.",hint:"Pick a trial. Divide the oxygen used by the hydrogen used. Do the same for a second trial."},
+ {type:"gate",id:1,say:"Huddle 1 (about 4 min, at the board). Ask: what did every trial that used up both gases have in common? Take answers until someone says 8 g of oxygen for every 1 g of hydrogen, and have the class write it as MY RULE in their own words. Then name it: the Law of Definite Proportions (Proust). Hold back the word Dalton until Part 4."},
+ {type:"num",q:"Predict: you spark <b>4 g of hydrogen</b> with <b>40 g of oxygen</b>. How many grams of water form?",ans:36,tol:0.01,unit:"g water",why:"4 g H needs 32 g O (4 × 8). Together that is 36 g of water. 8 g of oxygen is left over.",hint:"First find how much oxygen 4 g of hydrogen can use. Only that much reacts."},
+ {type:"num",q:"How many grams of oxygen are left over in that trial?",ans:8,tol:0.01,unit:"g O",why:"40 g supplied − 32 g used = 8 g left.",hint:"Supplied minus used."},
+ {type:"mcq",q:"Compare the total mass <b>before</b> the spark with the total mass <b>after</b> (water plus anything left over). What do you see in every trial?",opts:[{t:"The total after is a little smaller. Some mass turned into energy."},{t:"The total mass is the same before and after.",ok:1},{t:"The total after is bigger because water is new."}],why:"Mass in = mass out. Lavoisier (1789) weighed everything in sealed containers and found this every time: matter is rearranged, not made or destroyed.",hint:"Look at the “mass in” and “mass out” numbers under the picture."},
+ {type:"mcq",q:"Dalton explained the fixed 8 : 1 recipe with atoms. Which explanation fits?",opts:[{t:"Every water particle is the same combination of atoms, and each kind of atom has its own fixed mass, so the masses always add in the same ratio.",ok:1},{t:"Water is mostly oxygen, so oxygen is always in charge of the reaction."},{t:"Atoms of hydrogen and oxygen can’t touch, so they have to be separated by a fixed distance."}],why:"If every water particle is, say, 2 H atoms plus 1 O atom, and every H atom has the same mass and every O atom has the same mass, then any big pile of water has the same mass ratio as one particle.",hint:"What would have to be true about the particles and the atoms inside them for every sample to match?"}
+]},
+{title:"Two Compounds, One Pair of Elements",tier:1,sub:"Hydrogen and oxygen can make more than one substance. Do their recipes have anything in common?",blocks:[
+ {type:"info",html:"Besides water, hydrogen and oxygen can make a second compound, <b>hydrogen peroxide</b>. It is the bubbly stuff in the brown bottle. It has completely different properties from water, so it must be a different recipe."},
+ {type:"figure",items:[{"src": "img/h2o2.png", "cap": "Hydrogen peroxide from a pharmacy (label in Russian). The bottle is brown because light makes H₂O₂ slowly break down into water and oxygen.", "alt": "Brown bottle of hydrogen peroxide", "credit": "Public domain · Wikimedia Commons"}]},
+ {type:"mcq",predict:true,q:"For 1 g of hydrogen, how much oxygen do you expect peroxide to use? (Water uses 8 g.)",opts:[{t:"8 g, the same as water"},{t:"16 g"},{t:"About 11 g, somewhere in between"},{t:"No way to predict it"}],note:"Now measure it below."},
+ {type:"widget",id:"two",tasks:["Combine hydrogen with oxygen to make Compound A (water).","Combine hydrogen with oxygen to make Compound B (peroxide)."]},
+ {type:"num",q:"Peroxide uses how many times as much oxygen as water does, for the <b>same mass of hydrogen</b>?",ans:2,tol:0.01,unit:"times",why:"Peroxide: 16 g O per 1 g H. Water: 8 g O per 1 g H. 16 ÷ 8 = 2.",hint:"Divide the oxygen per 1 g H in B by the oxygen per 1 g H in A."},
+ {type:"mcq",q:"Why is the answer a clean whole number like 2, and not something like 1.37?",opts:[{t:"Peroxide’s molecule has one whole extra oxygen atom for each one that water has. Atoms come in whole units, so the masses differ by whole-number steps.",ok:1},{t:"Peroxide is just a more concentrated form of water."},{t:"It is a coincidence. It could have been any number."}],why:"This pattern is the Law of Multiple Proportions. You can’t add 0.37 of an atom, so the extra mass from one compound to the next comes in whole-atom jumps.",hint:"Can you add part of an atom to a molecule?"}
+]},
+{title:"Say It Right",tier:1,sub:"Sort out who said what, and what each of them actually had to back it up.",blocks:[
+ {type:"figure",items:[{"src": "img/dalton.png", "cap": "John Dalton, painted by Thomas Phillips (1835). A teacher, like you are, who kept weather records for 57 years.", "alt": "Portrait of John Dalton", "credit": "Public domain · Wikimedia Commons"}]},
+ {type:"rows",q:"For each statement, decide who it describes.",choices:["Democritus only","Dalton only","Both"],rows:[
+  {q:"Everything is made of tiny pieces that can’t be cut.",ans:2,why:"The shared idea. Democritus proposed it; Dalton revived it."},
+  {q:"The idea came from reasoning alone, with no measurements.",ans:0,why:"Democritus argued from logic. He had no balance and no data."},
+  {q:"He used measured mass ratios of compounds as evidence.",ans:1,why:"Dalton’s edge was data: the 8 : 1 and 16 : 1 style ratios that Proust, Lavoisier and others measured."},
+  {q:"Atoms of different elements have different masses.",ans:1,why:"This is how Dalton explained why the mass ratios in compounds are fixed."},
+  {q:"A compound always has the same atoms in the same ratio.",ans:1,why:"Dalton’s postulate that explains the Law of Definite Proportions."}
+ ],hint:"Ask: could this statement be backed by a balance reading, or only by an argument?"},
+ {type:"mcq",q:"In Dalton’s model, can a chemical reaction turn a hydrogen atom into an oxygen atom?",opts:[{t:"Yes, if you add enough energy."},{t:"No. Reactions only rearrange atoms. They never change one kind into another.",ok:1},{t:"Yes, that’s how water forms."}],why:"Dalton: atoms are neither created, destroyed, nor changed into another kind in a reaction. That’s why mass is conserved and why every atom of hydrogen counts as the same hydrogen.",hint:"What stays fixed about each atom in Dalton’s model?"},
+ {type:"mcq",q:"Dalton pictured an atom as a smooth, solid ball with nothing inside. Which of these could that picture <b>not</b> yet explain?",opts:[{t:"Why hydrogen and oxygen always combine in fixed mass ratios."},{t:"Why mass is conserved in a reaction."},{t:"Why rubbing a balloon on your hair makes sparks and static.",ok:1}],why:"Fixed ratios and conserved mass both follow from solid, unchanging atoms. Static charge does not. A ball with no insides has nothing that could carry a charge. That puzzle leads to Day 2.",hint:"Which one has nothing to do with masses of atoms?"},
+ {type:"gate",id:2,say:"Huddle 2 (about 4 min, before the core stamp). Show of hands: which statements in the Who Said It table needed a balance, and which needed only an argument? Then ask the static question aloud: what would an atom need to have to explain a spark? Write two or three answers on the board. Day 2 opens with them."}
+]},
+{title:"Dalton’s Guess",tier:2,sub:"Mass ratios told Dalton how heavy one atom is compared to another, but only if he knew the formula. He had to guess.",blocks:[
+ {type:"info",html:"Dalton had no way to count atoms in a molecule. His rule: <b>if two elements make only one compound, assume the simplest formula, 1 atom to 1 atom.</b> For water that means <b>HO</b>. Test what that assumption does to the mass of an oxygen atom."},
+ {type:"widget",id:"guess",tasks:["Try Dalton’s guess for water (HO).","Try the modern formula for water (H₂O)."]},
+ {type:"num",q:"If water is <b>HO</b>, one oxygen atom is how many times as heavy as one hydrogen atom?",ans:8,tol:0.01,unit:"times",why:"HO is 1 H atom and 1 O atom. The mass ratio O : H is 8 : 1, so one O atom is 8 times heavier than one H atom.",hint:"One atom of each: the atom-mass ratio equals the mass ratio."},
+ {type:"num",q:"If water is <b>H₂O</b>, one oxygen atom is how many times as heavy as one hydrogen atom?",ans:16,tol:0.01,unit:"times",why:"Say H = 1 unit. Then 8 g of O goes with 1 g of H, so 16 g of O goes with 2 g of H. H₂O has 2 H atoms (2 units) for one O atom, so one O atom is 16 units: 16 times one H atom.",hint:"H₂O has two H atoms for each O atom. How many grams of O go with 2 g of H?"},
+ {type:"mcq",q:"Peroxide has 16 g of oxygen per 1 g of hydrogen. If Dalton’s O atom is 8 times a hydrogen atom (water = HO), what is peroxide’s formula in his system?",opts:[{t:"HO"},{t:"HO₂",ok:1},{t:"H₂O"},{t:"H₂O₂"}],why:"16 g O is twice the 8 g O that makes up one atom’s worth per H. So there are 2 oxygen atoms per hydrogen atom: HO₂.",hint:"How many oxygen atoms’ worth of mass is 16 g if one O atom is worth 8 g?"},
+ {type:"mcq",q:"Dalton’s set (HO, HO₂, O = 8) and the modern set (H₂O, H₂O₂, O = 16) <b>both match every mass measurement</b>. What does that tell you?",opts:[{t:"Dalton’s atoms don’t exist."},{t:"Mass ratios alone can’t tell you the number of atoms in a molecule. You need another kind of evidence.",ok:1},{t:"Chemists should always assume 1 : 1."}],why:"Both formula sets give the same mass ratios, so weighing can’t pick between them. Chemists needed other evidence (gas volumes came next) to settle the question.",hint:"Do the two sets of formulas disagree about any mass measurement?"}
+]},
+{title:"Nitrogen’s Oxides",tier:2,sub:"Nitrogen and oxygen make several compounds. Test whether the multiple-proportions pattern holds up.",blocks:[
+ {type:"widget",id:"nox",tasks:["Make all three oxides of nitrogen, using 14 g of nitrogen each time."]},
+ {type:"num",q:"Divide the oxygen mass in the <b>biggest</b> oxide by the oxygen mass in the <b>smallest</b>. What do you get?",ans:4,tol:0.01,unit:"times",why:"32 ÷ 8 = 4. The three oxides have 8, 16 and 32 g of O per 14 g N, a 1 : 2 : 4 ratio.",hint:"Biggest oxide: 32 g O. Smallest: 8 g O."},
+ {type:"mcq",q:"The oxygen masses (for a fixed mass of nitrogen) are in small whole-number ratios. What is this pattern called?",opts:[{t:"Law of Conservation of Mass"},{t:"Law of Definite Proportions"},{t:"Law of Multiple Proportions",ok:1}],why:"Conservation of mass: mass in = mass out. Definite proportions: one compound, one recipe. Multiple proportions: one pair of elements, several compounds, simple whole-number ratios between recipes.",hint:"This one compares several different compounds made from the same two elements."},
+ {type:"num",q:"A fourth oxide of nitrogen is found with <b>24 g</b> of oxygen per 14 g of nitrogen. Divide by the smallest amount (8 g). Does it fit the pattern? Enter the ratio.",ans:3,tol:0.01,unit:"× the smallest",why:"24 ÷ 8 = 3, a whole number. It fits. (It’s N₂O₃, and it’s real.)",hint:"24 ÷ 8."},
+ {type:"mcq",q:"Between the 8 g oxide and the 16 g oxide, the extra 8 g of oxygen per 14 g of nitrogen represents…",opts:[{t:"One extra oxygen atom per nitrogen atom, because atoms add in whole numbers.",ok:1},{t:"Half of an oxygen atom."},{t:"Oxygen dissolving in the compound."}],why:"The smallest amount is one atom’s worth (relative to N). The other oxides add whole numbers of those, so the ratios are 1 : 2 : 4. Atoms can’t be split into pieces by chemistry.",hint:"Remember that you can’t add part of an atom."}
+]},
+{title:"Beyond Dalton",tier:2,sub:"Dalton’s atom is a solid, unbreakable ball. Is that enough?",blocks:[
+ {type:"info",html:"Dalton’s model explained conservation of mass, fixed recipes and multiple proportions with one idea. But atoms in his model are featureless balls. Name something you have seen that a featureless, unbreakable ball could <b>not</b> explain."},
+ {type:"open",q:"Name an observation (static cling, lightning, a spark when you touch a doorknob, a glowing neon sign, anything) and explain what a solid ball with nothing inside could not explain about it. Then say what an atom would need to have to explain it. Your teacher will read this.",min:60,frame:"Dalton’s model can’t explain ____ because ____. So atoms might need ____."}
+]}
+]};
+
+/* ============ ENGINE ============ */
+function h(tag,attrs,...kids){const e=document.createElement(tag);for(const k in(attrs||{})){if(k==="class")e.className=attrs[k];else if(k==="html")e.innerHTML=attrs[k];else if(k.startsWith("on"))e.addEventListener(k.slice(2),attrs[k]);else e.setAttribute(k,attrs[k])}kids.flat().forEach(c=>{if(c==null)return;e.append(c.nodeType?c:document.createTextNode(c))});return e}
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,attrs,...kids){const e=document.createElementNS(SVGNS,tag);for(const k in(attrs||{}))e.setAttribute(k,attrs[k]);kids.flat().forEach(c=>{if(c==null)return;e.append(c.nodeType?c:document.createTextNode(c))});return e}
+const PREVIEW=/preview/.test(location.hash),KEYVIEW=window.__KEY__===true;
+const ST={name:"",t0:0,q:0,qFirst:0,retries:0,tasks:0,tasksDone:0,partIdx:0,partsDone:[],preds:[],open:"",between:false};
+let inProgress=false,CORE=0,uid=0;
+const app=document.getElementById("app"),chipsEl=document.getElementById("chips");
+window.addEventListener("beforeunload",e=>{if(inProgress){e.preventDefault();e.returnValue=""}});
+const fmtT=s=>{s=Math.floor(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+const DONE_TYPES=["mcq","num","rows","widget","open","gate"];
+/* Teacher-code gates: the code is a hash of lesson, gate number and today's date. The key page shows it.
+   It stops a class from sprinting past a huddle. A student who reads this script can compute it. */
+const LESSON_ID="atom-discovery";
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const gateCode=id=>{let x=2166136261;const s=LESSON_ID+"|"+id+"|"+today();for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619)>>>0}return String(1000+x%9000)};
+const g=n=>(Math.round(n*100)/100).toString();
+
+/* ---------- widgets ---------- */
+const WIDGET={};
+
+WIDGET.halve=(tick)=>{
+  /* Model: gold atoms as touching 0.288 nm cubes in a square stack. The start cube is 2^25 atoms along
+     each edge (9.7 mm, about 1 cm), so 2^75 atoms in all. Every cut keeps half the atoms. The cuts turn
+     x, y, z in order, so the piece is a cube again every third cut. After 75 cuts exactly one atom is left. */
+  const ATOM=0.288,MAXN=75,SIZE0=ATOM*Math.pow(2,25),FX=14,FY=12,FW=250,FH=250,DEP=.35;
+  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const C={f:"#e0b030",t:"#f3d36b",r:"#b88a1c",ln:"#7a5a0c"};
+  let n=0,busy=false,raf=0;
+  const exps=k=>{const m=MAXN-k;return[Math.ceil((m-2)/3),Math.ceil((m-1)/3),Math.ceil(m/3)].map(v=>Math.max(0,v))};
+  const dimsOf=k=>exps(k).map(e=>Math.pow(2,e));
+  const longest=k=>ATOM*Math.max(...dimsOf(k));
+  const axisCut=k=>{const a=exps(k-1),b=exps(k);return b.findIndex((v,i)=>v<a[i])};
+  const fit=D=>Math.min(FW*.78/(D[0]+DEP*D[2]),FH*.78/(D[1]+DEP*D[2]));
+  const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2,clamp=t=>Math.max(0,Math.min(1,t)),lerp=(a,b,t)=>a+(b-a)*t;
+  const SUP="⁰¹²³⁴⁵⁶⁷⁸⁹",sup=v=>String(v).replace(/\d/g,d=>SUP[d]);
+  const atomsAt=k=>{const m=MAXN-k;if(m<=20)return Math.pow(2,m).toLocaleString("en-US");const e=Math.floor(m*Math.log10(2));return(Math.pow(2,m)/Math.pow(10,e)).toFixed(1)+"×10"+sup(e)};
+  const sig=x=>String(Number(x.toPrecision(2)));
+  const fmtSize=nm=>{if(nm>=1e7)return sig(nm/1e7)+" cm";if(nm>=1e6)return sig(nm/1e6)+" mm";if(nm>=1e3)return sig(nm/1e3)+" µm";return sig(nm)+" nm"};
+  const LIKE=[[SIZE0,"a sugar cube"],[2e6,"a grain of rice"],[4e5,"a grain of salt"],[8e4,"a human hair’s width"],[3e4,"a skin cell"],[7e3,"a red blood cell"],[1e3,"a bacterium"],[100,"a virus"],[2,"the width of DNA"]];
+  const marks=[[SIZE0,"sugar cube"],[1e6,"1 mm"],[1e5,"hair"],[1e3,"bacterium"],[100,"virus"],[2,"DNA"],[ATOM,"gold atom"]];
+  const xOf=k=>30+460*k/MAXN;
+
+  const svg=sv("svg",{class:"scene",viewBox:"0 0 520 346",role:"img","aria-label":"A block of gold cut in half again and again, shown zoomed to fit, with its true size and a scale from a sugar cube down to one gold atom"});
+  svg.append(sv("defs",{},sv("radialGradient",{id:"augold",cx:".35",cy:".3",r:".75"},sv("stop",{offset:"0","stop-color":"#fff1b8"}),sv("stop",{offset:".45","stop-color":"#e3b21f"}),sv("stop",{offset:"1","stop-color":"#8c6a0e"}))));
+  const stat=sv("g"),dyn=sv("g");svg.append(stat,dyn);
+
+  function poly(g,pts,fill){g.append(sv("polygon",{points:pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" "),fill,stroke:C.ln,"stroke-width":1,"stroke-linejoin":"round"}))}
+  function ln(g,x1,y1,x2,y2){g.append(sv("line",{x1:x1.toFixed(1),y1:y1.toFixed(1),x2:x2.toFixed(1),y2:y2.toFixed(1),stroke:C.ln,"stroke-opacity":.35,"stroke-width":.6}))}
+  /* draw a piece of D=[x,y,z] atoms, one atom = s px, front-face top-left at (x,y) */
+  function drawAt(parent,D,s,x,y,alpha){
+    const g=sv("g",{opacity:alpha.toFixed(2)}),w=D[0]*s,h=D[1]*s,dp=D[2]*s,px=DEP*dp,py=-DEP*dp;
+    if(D[0]*D[1]*D[2]<=256){ // few enough to show every atom, back layer first
+      for(let k=D[2]-1;k>=0;k--)for(let j=0;j<D[1];j++)for(let i=0;i<D[0];i++)
+        g.append(sv("circle",{cx:(x+(i+.5)*s+k*DEP*s).toFixed(1),cy:(y+(j+.5)*s-k*DEP*s).toFixed(1),r:(s*.46).toFixed(1),fill:"url(#augold)",stroke:C.ln,"stroke-width":.6}));
+    }else{
+      poly(g,[[x,y],[x+w,y],[x+w+px,y+py],[x+px,y+py]],C.t);
+      poly(g,[[x+w,y],[x+w+px,y+py],[x+w+px,y+h+py],[x+w,y+h]],C.r);
+      g.append(sv("rect",{x:x.toFixed(1),y:y.toFixed(1),width:w.toFixed(1),height:h.toFixed(1),fill:C.f,stroke:C.ln,"stroke-width":1}));
+      if(D[0]<=32&&D[1]<=32&&D[2]<=32){ // faint grid: the atoms start to show
+        for(let i=1;i<D[0];i++){ln(g,x+i*s,y,x+i*s,y+h);ln(g,x+i*s,y,x+i*s+px,y+py)}
+        for(let j=1;j<D[1];j++){ln(g,x,y+j*s,x+w,y+j*s);ln(g,x+w,y+j*s,x+w+px,y+j*s+py)}
+        for(let k=1;k<D[2];k++){ln(g,x+k*DEP*s,y-k*DEP*s,x+w+k*DEP*s,y-k*DEP*s);ln(g,x+w+k*DEP*s,y-k*DEP*s,x+w+k*DEP*s,y+h-k*DEP*s)}
+      }
+    }
+    parent.append(g);
+  }
+  function drawCentered(parent,D,s,cx,cy,alpha){const dp=D[2]*s,bw=D[0]*s+DEP*dp,bh=D[1]*s+DEP*dp;drawAt(parent,D,s,cx-bw/2,cy-bh/2+DEP*dp,alpha)}
+
+  function drawStatic(){
+    stat.replaceChildren();
+    const L=longest(n),D=dimsOf(n);
+    stat.append(sv("rect",{x:FX,y:FY,width:FW,height:FH,rx:10,fill:"none",stroke:"currentColor","stroke-opacity":.3}));
+    stat.append(sv("text",{x:FX+10,y:FY+FH-10,"font-size":11,fill:"currentColor","fill-opacity":.8},"Zoomed ×"+Math.round(SIZE0/L).toLocaleString("en-US")+" to keep it in view"));
+    // true size: the dashed square is the cube you started with
+    const IX=310,IY=34,IS=130,kpx=IS/SIZE0,pw=D[0]*ATOM*kpx,ph=D[1]*ATOM*kpx,seen=Math.max(pw,ph)>=2.5;
+    stat.append(sv("text",{x:IX,y:24,"font-size":12,"font-weight":700,fill:"currentColor"},"True size"));
+    stat.append(sv("rect",{x:IX,y:IY,width:IS,height:IS,fill:"none",stroke:"currentColor","stroke-opacity":.45,"stroke-dasharray":"4 3"}));
+    if(seen)stat.append(sv("rect",{x:IX,y:IY+IS-ph,width:pw,height:ph,fill:C.f,stroke:C.ln}));
+    else{stat.append(sv("circle",{cx:IX+3,cy:IY+IS-3,r:9,fill:"none",stroke:"var(--hot)","stroke-width":2}));stat.append(sv("rect",{x:IX+2,y:IY+IS-4,width:2,height:2,fill:C.ln}))}
+    stat.append(sv("text",{x:IX,y:IY+IS+16,"font-size":11,fill:"currentColor","fill-opacity":.8},seen?"Dashed: your starting size.":"Too small to see. Ring = the piece."));
+    const like=n>=MAXN?"one gold atom":LIKE.reduce((b,c)=>Math.abs(Math.log(L/c[0]))<Math.abs(Math.log(L/b[0]))?c:b)[1];
+    stat.append(sv("text",{x:IX,y:206,"font-size":11,fill:"currentColor","fill-opacity":.8},"Closest in size to:"));
+    stat.append(sv("text",{x:IX,y:228,"font-size":15,"font-weight":700,fill:"currentColor"},like));
+    // scale line: one step per cut
+    const Y=300;
+    stat.append(sv("line",{x1:xOf(0),y1:Y,x2:xOf(MAXN),y2:Y,stroke:"currentColor","stroke-width":2,"stroke-opacity":.5}));
+    marks.forEach(([s,l],i)=>{const x=xOf(3*Math.log2(SIZE0/s));
+      stat.append(sv("line",{x1:x,y1:Y-6,x2:x,y2:Y+6,stroke:"currentColor","stroke-width":2,"stroke-opacity":.6}));
+      stat.append(sv("text",{x,y:i%2?Y+22:Y-10,"text-anchor":i===marks.length-1?"end":i===0?"start":"middle","font-size":11,fill:"currentColor"},l))});
+    stat.append(sv("circle",{cx:xOf(n),cy:Y,r:8,fill:"var(--hot)",stroke:"#fff","stroke-width":2}));
+    stat.append(sv("text",{x:260,y:340,"text-anchor":"middle","font-size":11,fill:"currentColor","fill-opacity":.7},"each step along the line is one cut"));
+  }
+
+  /* one cut: knife plane, discarded half drifts off and fades, kept half zooms to fill the frame */
+  function renderCut(t,ax,Do,Dn,s0,sN){
+    dyn.replaceChildren();
+    const w=Do[0]*s0,h=Do[1]*s0,dp=Do[2]*s0,px=DEP*dp,py=-DEP*dp,x=FX+(FW-w-px)/2,y=FY+(FH-h-px)/2+px;
+    const gap=ease(clamp((t-.1)/.5))*.5*[w,h,dp][ax],fade=clamp(1-(t-.1)/.6);
+    let kx=x,ky=y,gx,gy;
+    if(ax===0){gx=x+w/2+gap;gy=y}
+    else if(ax===1){ky=y+h/2;gx=x;gy=y-gap}
+    else{gx=x+px/2+gap*.7;gy=y+py/2-gap*.7}
+    drawAt(dyn,Dn,s0,gx,gy,fade);
+    if(t<=.5)drawAt(dyn,Dn,s0,kx,ky,1);
+    else{
+      const b=ease((t-.5)/.5),wk=Dn[0]*s0,hk=Dn[1]*s0,dk=Dn[2]*s0,cxA=kx+(wk+DEP*dk)/2,cyA=ky+(hk-DEP*dk)/2;
+      drawCentered(dyn,Dn,lerp(s0,sN,b),lerp(cxA,FX+FW/2,b),lerp(cyA,FY+FH/2,b),1);
+    }
+    if(t<.55){
+      const P=ax===0?[[x+w/2,y],[x+w/2+px,y+py],[x+w/2+px,y+h+py],[x+w/2,y+h]]
+        :ax===1?[[x,y+h/2],[x+w,y+h/2],[x+w+px,y+h/2+py],[x+px,y+h/2+py]]
+        :[[x+px/2,y+py/2],[x+px/2+w,y+py/2],[x+px/2+w,y+py/2+h],[x+px/2,y+py/2+h]];
+      dyn.append(sv("polygon",{points:P.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" "),fill:"rgba(184,59,36,.22)",stroke:"var(--hot)","stroke-width":2.5,opacity:(.85*(1-t/.55)).toFixed(2)}));
+    }
+  }
+  function cutOnce(dur){return new Promise(res=>{
+    const k=n+1;if(dur<=0){n=k;res();return}
+    const ax=axisCut(k),Do=dimsOf(n),Dn=dimsOf(k),s0=fit(Do),sN=fit(Dn),t0=performance.now();
+    const step=now=>{const t=clamp((now-t0)/dur);renderCut(t,ax,Do,Dn,s0,sN);if(t<1)raf=requestAnimationFrame(step);else{n=k;res()}};
+    raf=requestAnimationFrame(step);
+  })}
+
+  const read=h("div",{class:"readout"});
+  const msg=h("div",{class:"note","aria-live":"polite",style:"margin-top:10px"});
+  const b1=h("button",{class:"btn",onclick:()=>cutN(1)},"Cut in half ×1"),b5=h("button",{class:"btn ghost",onclick:()=>cutN(5)},"Cut ×5"),b10=h("button",{class:"btn ghost",onclick:()=>cutN(10)},"Cut ×10"),br=h("button",{class:"ghost",onclick:()=>{cancelAnimationFrame(raf);busy=false;n=0;refresh()}},"Reset");
+  function refresh(){
+    drawStatic();dyn.replaceChildren();const D=dimsOf(n);drawCentered(dyn,D,fit(D),FX+FW/2,FY+FH/2,1);
+    read.replaceChildren(
+      h("div",{class:"stat"},h("b",{},String(n)),h("span",{},"cuts so far")),
+      h("div",{class:"stat"},h("b",{},fmtSize(longest(n))),h("span",{},"longest side of the piece")),
+      h("div",{class:"stat"},h("b",{},atomsAt(n)),h("span",{},"gold atoms in the piece")));
+    b1.disabled=b5.disabled=b10.disabled=busy||n>=MAXN;
+    if(n>=MAXN){msg.innerHTML="<b>That’s one gold atom.</b> The next cut would have to split an atom. Democritus says that’s impossible. Our knives can’t do it. But does that settle it?";tick(0)}
+    else if(n===0)msg.textContent="Slice the cube in half and keep one half. Then do it again. Watch the atom count.";
+    else msg.textContent="Each cut throws away half of the gold. The longest side shrinks by half only every third cut, because the cube has three directions to cut in.";
+  }
+  async function cutN(k){
+    if(busy)return;busy=true;refresh();
+    for(let i=0;i<k&&n<MAXN&&busy;i++){await cutOnce(reduce?0:k===1?650:260);refresh()}
+    busy=false;refresh();
+  }
+  refresh();
+  return h("div",{},svg,h("div",{class:"row",style:"margin:10px 0"},b1,b5,b10,br),read,msg);
+};
+
+WIDGET.water=(tick)=>{
+  const trials=[];let H=2,O=8;
+  const svg=sv("svg",{class:"scene",viewBox:"0 0 520 210",role:"img","aria-label":"Bars showing grams of hydrogen and oxygen before the spark and water and leftovers after"});
+  const hv=h("b",{},"2"),ov=h("b",{},"8");
+  const sH=h("input",{type:"range",min:0,max:10,step:1,value:2,"aria-label":"Grams of hydrogen",oninput:e=>{H=+e.target.value;hv.textContent=H;preview()}});
+  const sO=h("input",{type:"range",min:0,max:100,step:1,value:8,"aria-label":"Grams of oxygen",oninput:e=>{O=+e.target.value;ov.textContent=O;preview()}});
+  const tb=h("tbody");
+  const tbl=h("table",{class:"wtbl"},h("thead",{},h("tr",{},["Trial","H in (g)","O in (g)","Water (g)","H left (g)","O left (g)","Mass in = out?","O used ÷ H used"].map(t=>h("th",{},t)))),tb);
+  const mass=h("div",{class:"readout"});
+  function calc(H,O){const k=Math.min(H,O/8),w=9*k;return{H,O,w,lH:H-k,lO:O-8*k,usedH:k,usedO:8*k}}
+  function bar(x,y,w0,hgt,col,label,val){if(hgt<0.5&&val===0){svg.append(sv("text",{x:x+w0/2,y:y-4,"text-anchor":"middle","font-size":10,fill:"currentColor",opacity:.6},label+" 0 g"));return}
+    svg.append(sv("rect",{x,y:y-hgt,width:w0,height:Math.max(hgt,0),fill:col,stroke:"rgba(0,0,0,.4)"}));
+    svg.append(sv("text",{x:x+w0/2,y:y-hgt-4,"text-anchor":"middle","font-size":11,fill:"currentColor"},label+" "+g(val)+" g"))}
+  function drawScene(r,after){
+    svg.replaceChildren();const sc=150/Math.max(r.H+r.O,20);
+    svg.append(sv("text",{x:100,y:20,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"currentColor"},"Before the spark"));
+    svg.append(sv("text",{x:360,y:20,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"currentColor"},"After the spark"));
+    svg.append(sv("line",{x1:20,y1:190,x2:500,y2:190,stroke:"currentColor",opacity:.4}));
+    bar(40,190,50,r.H*sc,"#9ec5f0","H",r.H);bar(110,190,50,r.O*sc,"#e88b7f","O",r.O);
+    if(after){bar(220,190,60,r.w*sc,"#7fb3d9","Water",r.w);bar(300,190,50,r.lH*sc,"#9ec5f0","H left",r.lH);bar(370,190,50,r.lO*sc,"#e88b7f","O left",r.lO);
+      svg.append(sv("text",{x:260,y:206,"text-anchor":"middle","font-size":11,fill:"currentColor",opacity:.7},"mass in: "+g(r.H+r.O)+" g    mass out: "+g(r.w+r.lH+r.lO)+" g"))}
+    else svg.append(sv("text",{x:360,y:110,"text-anchor":"middle","font-size":13,fill:"currentColor",opacity:.6},"Press Spark!"));
+  }
+  function preview(){drawScene({H,O,w:0,lH:0,lO:0},false)}
+  function spark(){
+    if(H===0&&O===0)return;const r=calc(H,O);trials.push(r);drawScene(r,true);
+    tb.append(h("tr",{},h("td",{},String(trials.length)),h("td",{},g(r.H)),h("td",{},g(r.O)),h("td",{},g(r.w)),h("td",{},g(r.lH)),h("td",{},g(r.lO)),h("td",{},"✔ "+g(r.H+r.O)+" = "+g(r.w+r.lH+r.lO)),h("td",{},r.usedH>0?g(r.usedO/r.usedH):"—")));
+    if(r.w>0&&r.lH<1e-9&&r.lO<1e-9)tick(0);
+    if(r.w>0&&r.lO>1e-9&&r.lH<1e-9)tick(1);
+    if(r.w>0&&r.lH>1e-9&&r.lO<1e-9)tick(2);
+  }
+  preview();
+  return h("div",{},svg,
+    h("div",{class:"controls",style:"margin:10px 0"},h("label",{class:"sl"},h("span",{},"Hydrogen: ",hv," g"),sH),h("label",{class:"sl"},h("span",{},"Oxygen: ",ov," g"),sO),h("button",{class:"btn",onclick:spark},"⚡ Spark")),
+    h("div",{style:"overflow-x:auto"},tbl));
+};
+
+WIDGET.two=(tick)=>{
+  const seen={A:false,B:false};let comp="A",Hg=1;
+  const info=h("div",{class:"note"});
+  const sel=h("select",{"aria-label":"Compound",onchange:e=>{comp=e.target.value;setInfo()}},h("option",{value:"A"},"Compound A (water)"),h("option",{value:"B"},"Compound B (hydrogen peroxide)"));
+  const hs=h("select",{"aria-label":"Grams of hydrogen",onchange:e=>{Hg=+e.target.value}},[1,2,3,4].map(v=>h("option",{value:v},v+" g of hydrogen")));
+  const tb=h("tbody");
+  const tbl=h("table",{class:"wtbl"},h("thead",{},h("tr",{},["Compound","H used (g)","O used (g)","O per 1 g H (g)"].map(t=>h("th",{},t)))),tb);
+  const setInfo=()=>{info.innerHTML=comp==="A"?"<b>Compound A, water.</b> Clear, odorless, drinkable.":"<b>Compound B, hydrogen peroxide.</b> Clear, but it bleaches hair, fizzes on cuts, and slowly breaks down to water and oxygen gas."};
+  const out=h("div",{class:"readout",style:"margin:10px 0"});
+  setInfo();
+  const run=()=>{const per=comp==="A"?8:16,O=per*Hg;
+    out.replaceChildren(h("div",{class:"stat"},h("b",{},g(O)+" g"),h("span",{},"oxygen combined with "+Hg+" g of hydrogen")),h("div",{class:"stat"},h("b",{},g(O+Hg)+" g"),h("span",{},"mass of compound formed")));
+    tb.append(h("tr",{},h("td",{},comp==="A"?"A (water)":"B (peroxide)"),h("td",{},String(Hg)),h("td",{},g(O)),h("td",{},g(O/Hg))));
+    seen[comp]=true;if(seen.A)tick(0);if(seen.B)tick(1)};
+  return h("div",{},h("div",{class:"controls",style:"margin-bottom:10px"},h("label",{},"Compound",sel),h("label",{},"Hydrogen",hs),h("button",{class:"btn",onclick:run},"Combine with oxygen")),info,out,h("div",{style:"overflow-x:auto"},tbl));
+};
+
+WIDGET.guess=(tick)=>{
+  const seen={HO:false,H2O:false};let f="";
+  const svg=sv("svg",{class:"scene",viewBox:"0 0 520 190",role:"img","aria-label":"Picture of a water molecule under the chosen formula with circle area showing atom mass"});
+  const read=h("div",{class:"readout",style:"margin-top:10px"});
+  const sel=h("select",{"aria-label":"Formula for water",onchange:e=>{f=e.target.value;draw()}},h("option",{value:""},"Pick a formula…"),h("option",{value:"HO"},"Water = HO (Dalton’s simplest guess)"),h("option",{value:"H2O"},"Water = H₂O (modern formula)"));
+  function draw(){
+    if(!f){svg.replaceChildren(sv("text",{x:260,y:95,"text-anchor":"middle","font-size":13,fill:"currentColor",opacity:.7},"Pick a formula for water to see what it does to the oxygen atom."));read.replaceChildren();return}
+    const nH=f==="HO"?1:2,mO=8*nH/1; // O:H atom mass ratio = 8 (O g per 1 g H) × (H atoms / O atoms)
+    const pf=f==="HO"?"HO₂":"H₂O₂";
+    seen[f]=true;if(seen.HO)tick(0);if(seen.H2O)tick(1);
+    svg.replaceChildren();
+    const rH=14,rO=rH*Math.sqrt(mO);
+    svg.append(sv("text",{x:130,y:22,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"currentColor"},"Water: "+(f==="HO"?"HO":"H₂O")));
+    const cx=100,cy=100;svg.append(sv("circle",{cx,cy,r:rO,fill:"#e88b7f",stroke:"rgba(0,0,0,.4)"}));svg.append(sv("text",{x:cx,y:cy+4,"text-anchor":"middle","font-size":13,"font-weight":700,fill:"#000"},"O"));
+    for(let i=0;i<nH;i++){const hx=cx+rO+rH-2,hy=cy+(nH===1?0:(i?1:-1)*(rH+4));svg.append(sv("circle",{cx:hx,cy:hy,r:rH,fill:"#9ec5f0",stroke:"rgba(0,0,0,.4)"}));svg.append(sv("text",{x:hx,y:hy+4,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"#000"},"H"))}
+    svg.append(sv("text",{x:390,y:60,"text-anchor":"middle","font-size":12,fill:"currentColor"},"Data: 8 g O for every 1 g H"));
+    svg.append(sv("text",{x:390,y:90,"text-anchor":"middle","font-size":12,fill:"currentColor"},"Data: 16 g O for every 1 g H in peroxide"));
+    svg.append(sv("text",{x:390,y:130,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"currentColor"},"Circle area = atom mass"));
+    read.replaceChildren(h("div",{class:"stat"},h("b",{},String(mO)),h("span",{},"one O atom ÷ one H atom (mass)")),h("div",{class:"stat"},h("b",{},pf),h("span",{},"peroxide formula that fits the data")));
+  }
+  draw();
+  return h("div",{},h("div",{class:"controls",style:"margin-bottom:10px"},h("label",{},"Pick a formula for water",sel)),svg,read);
+};
+
+WIDGET.nox=(tick)=>{
+  const ox=[{k:"X",o:8},{k:"Y",o:16},{k:"Z",o:32}],seen={};const out=h("div",{class:"readout",style:"margin:10px 0"});
+  const svg=sv("svg",{class:"scene",viewBox:"0 0 520 130",role:"img","aria-label":"Blocks of 8 grams of oxygen stacked for each nitrogen oxide"});
+  const tb=h("tbody");const tbl=h("table",{class:"wtbl"},h("thead",{},h("tr",{},["Oxide","N used (g)","O used (g)","O per 14 g N (g)"].map(t=>h("th",{},t)))),tb);
+  function run(o){seen[o.k]=true;
+    out.replaceChildren(h("div",{class:"stat"},h("b",{},o.o+" g"),h("span",{},"oxygen combined with 14 g of nitrogen")));
+    tb.append(h("tr",{},h("td",{},"Oxide "+o.k),h("td",{},"14"),h("td",{},String(o.o)),h("td",{},String(o.o))));
+    svg.replaceChildren();svg.append(sv("text",{x:20,y:20,"font-size":12,"font-weight":700,fill:"currentColor"},"Oxide "+o.k+": each block = 8 g of oxygen"));
+    for(let i=0;i<o.o/8;i++)svg.append(sv("rect",{x:20+i*50,y:40,width:44,height:44,fill:"#e88b7f",stroke:"rgba(0,0,0,.4)"}));
+    svg.append(sv("rect",{x:20,y:92,width:44,height:30,fill:"#8fb98f",stroke:"rgba(0,0,0,.4)"}));svg.append(sv("text",{x:72,y:112,"font-size":12,fill:"currentColor"},"14 g nitrogen"));
+    if(ox.every(x=>seen[x.k]))tick(0)}
+  svg.append(sv("text",{x:20,y:60,"font-size":12,fill:"currentColor",opacity:.7},"Pick an oxide to see its oxygen blocks."));
+  return h("div",{},h("p",{class:"hint"},"Nitrogen forms several compounds with oxygen. Chemists first labeled them X, Y and Z, before they knew the formulas."),
+    h("div",{class:"row",style:"margin:10px 0"},ox.map(o=>h("button",{class:"btn ghost",onclick:()=>run(o)},"Make Oxide "+o.k+" (14 g N)"))),svg,out,h("div",{style:"overflow-x:auto"},tbl));
+};
+
+/* ---------- blocks ---------- */
+const BLOCK={};
+function feedback(){return h("div",{class:"fb"})}
+function show(fb,ok,html){fb.className="fb show "+(ok?"ok":"no");fb.innerHTML=html}
+function qCard(...k){return h("div",{class:"card"},h("div",{class:"q"},...k))}
+
+BLOCK.info=(b)=>h("div",{class:"card"},h("div",{class:"note",html:b.html}));
+
+BLOCK.mcq=(b,done)=>{
+  const name="q"+(++uid);let failed=false,counted=false;const fb=feedback();
+  const opts=b.predict?b.opts:shuffle(b.opts);
+  const box=h("div",{class:"opts"},opts.map(o=>h("label",{},h("input",{type:"radio",name}),h("span",{html:o.t}))));
+  const btn=h("button",{class:"btn",onclick:()=>{
+    const i=[...box.querySelectorAll("input")].findIndex(x=>x.checked);if(i<0)return;const o=opts[i];
+    if(b.predict){ST.preds.push({q:b.q,choice:o.t});box.querySelectorAll("input").forEach(x=>x.disabled=true);btn.disabled=true;show(fb,true,"🔒 Locked in. "+(b.note||"Now test it."));done();return}
+    if(!counted){counted=true;ST.q++}
+    if(o.ok){if(!failed)ST.qFirst++;box.querySelectorAll("input").forEach(x=>x.disabled=true);btn.disabled=true;show(fb,true,"✔ "+b.why);done()}
+    else{failed=true;ST.retries++;show(fb,false,"Not quite. "+(b.hint||"Look again."))}
+  }},b.predict?"Lock in my guess":"Check");
+  return qCard(h("p",{html:b.q}),box,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+
+BLOCK.num=(b,done)=>{
+  let failed=false,counted=false;const fb=feedback();
+  const inp=h("input",{type:"number",step:"any",inputmode:"decimal","aria-label":"Your answer",style:"width:140px"});
+  const btn=h("button",{class:"btn",onclick:()=>{
+    const v=parseFloat(inp.value);if(isNaN(v))return;
+    if(!counted){counted=true;ST.q++}
+    if([].concat(b.ans).some(a=>Math.abs(v-a)<=b.tol)){if(!failed)ST.qFirst++;inp.disabled=true;btn.disabled=true;show(fb,true,"✔ "+b.why);done()}
+    else{failed=true;ST.retries++;show(fb,false,"Not quite. "+(b.hint||"Check your work."))}
+  }},"Check");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  return qCard(h("p",{html:b.q}),h("div",{class:"row"},inp,h("span",{},b.unit||""),btn),fb);
+};
+
+BLOCK.rows=(b,done)=>{
+  let counted=false,anyFail=false;const fb=feedback();
+  const sels=b.rows.map(r=>h("select",{"aria-label":r.q},h("option",{value:""},"Choose…"),b.choices.map((c,i)=>h("option",{value:i},c))));
+  const per=b.rows.map(()=>({first:true}));
+  const lines=b.rows.map((r,i)=>h("div",{class:"row",style:"margin:8px 0;justify-content:space-between"},h("span",{style:"flex:1 1 300px"},r.q),sels[i]));
+  const btn=h("button",{class:"btn",onclick:()=>{
+    if(sels.some(s=>s.value===""))return;
+    if(!counted){counted=true;ST.q+=b.rows.length}
+    let bad=0;const msgs=[];
+    b.rows.forEach((r,i)=>{const ok=+sels[i].value===r.ans;if(ok){if(per[i].first&&!anyFail)ST.qFirst++;sels[i].disabled=true;sels[i].style.outline="2px solid var(--ok)"}else{bad++;per[i].first=false;sels[i].style.outline="2px solid var(--bad)"}});
+    if(bad){anyFail=true;ST.retries++;show(fb,false,bad+" not right yet. "+b.hint)}
+    else{btn.disabled=true;show(fb,true,"✔ All five.<br>"+b.rows.map(r=>"• "+r.why).join("<br>"));done()}
+  }},"Check");
+  return qCard(h("p",{html:b.q}),...lines,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+
+BLOCK.widget=(b,done)=>{
+  const marks=b.tasks.map(()=>false),els=b.tasks.map(t=>h("div",{class:"task"},h("span",{class:"bx"}),h("span",{},t)));
+  ST.tasks+=b.tasks.length;
+  const tick=i=>{if(marks[i])return;marks[i]=true;ST.tasksDone++;els[i].classList.add("ok");els[i].querySelector(".bx").textContent="✓";if(marks.every(Boolean))done()};
+  const w=WIDGET[b.id](tick);
+  return h("div",{class:"card"},h("div",{style:"margin-bottom:8px"},h("b",{},"Sim tasks"),els),w);
+};
+
+
+BLOCK.figure=(b)=>{
+  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const wrap=h("div",{class:"figs"});
+  b.items.forEach(it=>{
+    const img=new Image(),cv=h("canvas",{role:"img","aria-label":it.alt||it.cap,title:"Click to replay"}),ctx=cv.getContext("2d");
+    let run=0;
+    function frame(step){ // step = block size in source pixels; 1 = sharp
+      const W=cv.width,H=cv.height,sw=Math.max(1,Math.round(W/step)),sh=Math.max(1,Math.round(H/step));
+      const t=document.createElement("canvas");t.width=sw;t.height=sh;const tc=t.getContext("2d");tc.imageSmoothingEnabled=true;tc.drawImage(img,0,0,sw,sh);
+      ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,W,H);ctx.drawImage(t,0,0,sw,sh,0,0,W,H)}
+    function play(){const id=++run;if(reduce){frame(1);return}[32,16,8,4,2,1].forEach((st,i)=>setTimeout(()=>{if(id===run)frame(st)},i*170))}
+    img.onload=()=>{cv.width=img.width;cv.height=img.height;frame(1);
+      if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();play()}},{threshold:.4});frame(32);io.observe(cv)}else play()};
+    img.src=it.src;cv.addEventListener("click",play);
+    wrap.append(h("figure",{class:"pix"},cv,h("figcaption",{},it.cap,h("div",{class:"cr"},it.credit||""))));
+  });
+  return h("div",{class:"card"},wrap);
+};
+
+BLOCK.gate=(b,done)=>{
+  const fb=feedback(),inp=h("input",{type:"text",inputmode:"numeric",maxlength:4,autocomplete:"off","aria-label":"Code from Mr. D",style:"width:120px;font-size:1.3rem;text-align:center"});
+  const btn=h("button",{class:"btn",onclick:()=>{if(inp.value.trim()===gateCode(b.id)){inp.disabled=true;btn.disabled=true;show(fb,true,"✔ Unlocked.");done()}else show(fb,false,"Not the code. Eyes up and wait for Mr. D.")}},"Unlock");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  const card=h("div",{class:"card",style:"border:2px dashed var(--accent);text-align:center"},h("h2",{},"✋ Eyes up. Mr. D has the code."),h("p",{style:"margin:0 auto 10px;max-width:46ch"},"Stop here. Class talk comes first. Don’t go on until you have the code."),h("div",{class:"row",style:"justify-content:center"},inp,btn),fb);
+  if(PREVIEW)card.append(h("div",{class:"row",style:"justify-content:center;margin-top:8px"},h("button",{class:"ghost",onclick:()=>{inp.disabled=true;btn.disabled=true;done()}},"Skip (preview)")));
+  return card;
+};
+
+BLOCK.open=(b,done)=>{
+  const ta=h("textarea",{"aria-label":"Your response",placeholder:b.frame}),cnt=h("span",{class:"hint"},"0 / "+b.min+" characters");const fb=feedback();
+  const btn=h("button",{class:"btn",disabled:"",onclick:()=>{ST.open=ta.value.trim();ta.disabled=true;btn.disabled=true;show(fb,true,"✔ Saved. Show your teacher the final screen.");done()}},"Save my answer");
+  ta.addEventListener("input",()=>{cnt.textContent=ta.value.trim().length+" / "+b.min+" characters";btn.disabled=ta.value.trim().length<b.min});
+  return qCard(h("p",{html:b.q}),ta,h("div",{class:"row",style:"margin-top:8px"},btn,cnt),fb);
+};
+
+/* ---------- part runner ---------- */
+function chips(){chipsEl.replaceChildren(...DATA.parts.map((p,i)=>h("span",{class:"chip"+(ST.partsDone[i]?" done":i===ST.partIdx&&!ST.between?" on":"")},(ST.partsDone[i]?"✓ ":"")+(p.tier===2?"★":"")+(i+1))))}
+function showPart(i){
+  ST.between=false;ST.partIdx=i;chips();app.replaceChildren();window.scrollTo(0,0);
+  const P=DATA.parts[i];
+  app.append(h("h2",{},`Part ${i+1} of ${DATA.parts.length}: ${P.title}`,P.tier===2?h("span",{class:"tier"},"CHALLENGE"):null),h("p",{class:"sub"},P.sub));
+  const last=i===DATA.parts.length-1,coreEnd=i===CORE-1;
+  const advance=()=>{ST.partsDone[i]=true;if(last)showFinal();else if(coreEnd)showCore();else showPart(i+1)};
+  const nextBtn=h("button",{class:"btn big",disabled:"",onclick:advance},last?"Finish ✔":coreEnd?"Finish core ✔":"Next part →");
+  const nextWrap=h("div",{class:"row",style:"justify-content:center;margin:20px 0"},nextBtn);
+  if(PREVIEW)nextWrap.append(h("button",{class:"ghost",onclick:advance},"Skip (preview)"));
+  const needed=P.blocks.filter(b=>DONE_TYPES.includes(b.type)).length;let got=0,idx=0;const cards=[];
+  const unlock=()=>{if(got===needed){nextBtn.disabled=false;nextBtn.removeAttribute("disabled")}};
+  const reveal=()=>{
+    while(idx<P.blocks.length){
+      const b=P.blocks[idx++];let fin=false;
+      const card=BLOCK[b.type](b,()=>{if(fin)return;fin=true;got++;unlock();reveal()});
+      card._b=b;cards.push(card);app.append(card);
+      if(DONE_TYPES.includes(b.type)&&!fin)break;
+    }
+    app.append(nextWrap);unlock();
+  };
+  reveal();window.__cards=cards;
+}
+function summaryText(label){
+  const secs=(Date.now()-ST.t0)/1000,when=new Date();
+  let t=`${ST.name} · Atom Discovery (Unit 3 Day 1) · ${label} · time ${fmtT(secs)} · questions right on the first try ${ST.qFirst}/${ST.q} · retries ${ST.retries} · sim tasks ${ST.tasksDone}/${ST.tasks} · ${when.toLocaleDateString()} ${when.toLocaleTimeString()}`;
+  if(ST.open)t+=` · Beyond Dalton: "${ST.open.slice(0,400)}"`;
+  return t;
+}
+function stampCard(title,label,extra){
+  const secs=(Date.now()-ST.t0)/1000,when=new Date(),txt=summaryText(label);
+  const st=h("div",{class:"stamp"},h("div",{class:"big"},title),h("div",{style:"font-size:24px;margin:4px 0"},ST.name),h("div",{},`${when.toLocaleDateString()} · ${when.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}`));
+  const tbl=h("table",{class:"sum"},
+    h("tr",{},h("th",{},"Time"),h("td",{},fmtT(secs))),
+    h("tr",{},h("th",{},"Sim tasks finished"),h("td",{},`${ST.tasksDone} of ${ST.tasks}`)),
+    h("tr",{},h("th",{},"Questions right on the first try"),h("td",{},`${ST.qFirst} of ${ST.q}`)),
+    h("tr",{},h("th",{},"Times you fixed a wrong answer"),h("td",{},String(ST.retries))));
+  const copy=h("button",{class:"ghost",onclick:async()=>{try{await navigator.clipboard.writeText(txt);copy.textContent="Copied ✔"}catch(e){copy.textContent="Select and copy the line below"}}},"Copy summary");
+  return[st,tbl,h("div",{class:"row",style:"justify-content:center"},copy,...(extra||[])),h("p",{class:"hint",style:"word-break:break-word"},txt)];
+}
+function showCore(){
+  ST.between=true;chips();app.replaceChildren();window.scrollTo(0,0);
+  const go=h("button",{class:"btn big",onclick:()=>showPart(CORE)},"★ Keep going: Challenge tier →");
+  app.append(h("div",{class:"card final"},h("h2",{},"Core complete! 🎉"),h("p",{},"Show this screen to Mr. D, then finish your core takeaways on your sheet. If you still have time, the Challenge tier is harder and different."),...stampCard("✔ CORE COMPLETE","CORE COMPLETE (parts 1-"+CORE+")",[go])));
+}
+function showFinal(){
+  inProgress=false;chips();app.replaceChildren();window.scrollTo(0,0);
+  app.append(h("div",{class:"card final"},h("h2",{},"Challenge complete! 🏆"),h("p",{},"Show this screen to Mr. D. Then finish the Challenge takeaways on your sheet."),...stampCard("★ CHALLENGE COMPLETE","ALL "+DATA.parts.length+" PARTS COMPLETE (core + challenge)")));
+}
+function start(){inProgress=true;ST.t0=Date.now();showPart(0)}
+
+/* ---------- teacher key (#key) ---------- */
+const WIDGET_KEY={
+ halve:"Halving widget. Each cut keeps half the gold, so it halves the atom count. The start cube is 2²⁵ atoms along an edge (9.7 mm, about 1 cm), so 2⁷⁵ ≈ 3.8 × 10²² atoms. Cuts turn x, y, z in order, so the side halves only every third cut and the piece is a cube again every third cut. One atom is left at exactly 75 cuts, then the cut buttons disable. Individual atoms are drawn for the last 8 cuts.",
+ water:"Water widget. Fixed 8 : 1 O:H by mass. Trials: perfect (e.g. 2 g H + 16 g O), O left over (e.g. 2 g H + 30 g O), H left over (e.g. 5 g H + 16 g O). Mass in always equals mass out.",
+ two:"Two-compound widget. A (water) = 8 g O per 1 g H. B (peroxide) = 16 g O per 1 g H.",
+ guess:"Formula toggle. HO gives O atom = 8 × H atom and peroxide HO₂. H₂O gives O atom = 16 × H atom and peroxide H₂O₂. Both fit the mass data.",
+ nox:"Three oxides with 14 g N: oxide X 8 g O, Y 16 g O, Z 32 g O (really N₂O, NO, NO₂). Ratio 1 : 2 : 4."
+};
+const strip=s=>String(s).replace(/<[^>]+>/g,"");
+function showKey(){
+  chipsEl.replaceChildren();app.replaceChildren();
+  const gates=DATA.parts.flatMap(P=>P.blocks.filter(b=>b.type==="gate"));
+  app.append(h("div",{class:"card"},h("h2",{},"Teacher key"),h("p",{},"Every answer with the reason the student sees. The student page is atom-discovery.html. Add #preview to its address for skip buttons."),
+    h("p",{html:`<b>Gate codes for ${today()}:</b> `+gates.map(b=>`Gate ${b.id} <b style="font-size:1.2rem">${gateCode(b.id)}</b>`).join(" · ")+". Codes change at midnight."})));
+  const key=h("div",{class:"key"});
+  DATA.parts.forEach((P,i)=>{
+    key.append(h("h3",{},`Part ${i+1}${P.tier===2?" ★ Challenge":""}: ${P.title}`));
+    P.blocks.forEach(b=>{
+      if(b.type==="mcq"){const ok=b.predict?null:b.opts.find(o=>o.ok);key.append(h("div",{class:"it",html:`<b>${b.predict?"[Predict, any answer accepted] ":""}${b.q}</b><br>`+(b.predict?`Options: ${b.opts.map(o=>o.t).join(" / ")}`:`✔ ${ok.t}<br><i>${b.why}</i>`)}))}
+      if(b.type==="num")key.append(h("div",{class:"it",html:`<b>${b.q}</b><br>✔ ${[].concat(b.ans).join(" or ")} ${b.unit||""} (±${b.tol})<br><i>${b.why}</i>`}));
+      if(b.type==="rows")key.append(h("div",{class:"it",html:`<b>${b.q}</b>`+b.rows.map(r=>`<br>• ${r.q} → <b>${b.choices[r.ans]}</b>. <i>${r.why}</i>`).join("")}));
+      if(b.type==="widget")key.append(h("div",{class:"it",html:`<b>Sim tasks:</b> ${b.tasks.join(" ")}<br><i>${WIDGET_KEY[b.id]}</i>`}));
+      if(b.type==="gate")key.append(h("div",{class:"it",html:`<b>✋ Gate ${b.id}. Students stop here. Today’s code: ${gateCode(b.id)}</b><br>${b.say}`}));
+      if(b.type==="open")key.append(h("div",{class:"it",html:`<b>${b.q}</b><br>Open response (teacher reads it in the copied summary). Good answers: static cling or sparks → atoms must contain charged parts that can move; neon glow → atoms can give off light, so they must have an inside that can change; lightning → charge is a property of matter. Accept any observation that a mass-only ball cannot explain, paired with a reasonable “atoms need…”.`}));
+    });
+  });
+  app.append(key);
+}
+
+/* ---------- boot ---------- */
+CORE=DATA.parts.filter(p=>p.tier===1).length;
+if(KEYVIEW){showKey()}
+else{
+  chips();
+  const i=h("input",{type:"text",id:"nm",placeholder:"First and last name",autocomplete:"off"});
+  const b=h("button",{class:"btn big",style:"margin-top:12px",onclick:()=>{const v=i.value.trim();if(!v){i.focus();return}ST.name=v;start()}},"Start →");
+  i.addEventListener("keydown",e=>{if(e.key==="Enter")b.click()});
+  app.append(h("div",{class:"card",id:"start"},h("h2",{},"Atom Discovery"),
+    h("p",{},"Predict first, then run the sim to see if you were right. A wrong answer gives a hint and you try again. Please don’t refresh the page."),
+    h("p",{},`Parts 1 to ${CORE} are the core. Parts marked ★ are the Challenge tier: harder, and different in kind. Do the Cold Open on your sheet before you start.`),
+    h("p",{},h("b",{},"Your name:")),i,h("div",{},b)));
+}
+window.__qa={ST,DATA,WIDGET,BLOCK,cards:()=>window.__cards||[]};
+</script>
+</body>
+</html>
