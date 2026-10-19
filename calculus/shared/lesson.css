@@ -1,0 +1,144 @@
+/* lesson.css: shared styles for the guided calculus lessons and their teacher pages. */
+:root{--bg:#eef2f6;--surface:#fff;--stage:#f7fafc;--ink:#142230;--muted:#566878;--line:#cbd6e0;--accent:#2b4fd9;--good:#1c7d4a;--warn:#b3412e;--gold:#c9791a;--soft:#e8eefc;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e161e;--surface:#16212b;--stage:#101a23;--ink:#e6edf3;--muted:#92a3b3;--line:#2a3a48;--accent:#8aa4ff;--good:#4fcf8c;--warn:#ff7d68;--gold:#f0a94a;--soft:#1b2740;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);padding:18px 16px 64px}
+.wrap{max-width:960px;margin-inline:auto}
+a{color:var(--accent)}
+.back{font:600 .8rem var(--mono);color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent)}
+h1{font:800 clamp(1.9rem,5vw,2.6rem)/1.05 var(--display);letter-spacing:-.02em;margin:.3rem 0 .2rem}
+h2{font:800 1.35rem var(--display);margin:0 0 .5rem}
+h3{font:800 1.08rem var(--display);margin:.9rem 0 .3rem}
+.sub{color:var(--muted);margin:0}
+.topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between}
+.topbar .links{display:flex;gap:14px;font:600 .8rem var(--mono)}
+.topbar .links a,.topbar .links button{color:var(--muted);text-decoration:none;background:none;border:0;padding:0;cursor:pointer;font:inherit}
+.topbar .links a:hover,.topbar .links button:hover{color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+nav.chips{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0 14px}
+nav.chips button{font:600 .8rem var(--mono);padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+nav.chips button[aria-current="step"]{background:var(--accent);border-color:var(--accent);color:#fff}
+nav.chips button:disabled{opacity:.4;cursor:default}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:0 0 14px}
+.card.flat{background:var(--stage)}
+[hidden]{display:none!important}
+.btn{font:600 .97rem var(--body);padding:9px 16px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.small{padding:5px 10px;font-size:.85rem}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+input[type=text],select,textarea{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);max-width:100%}
+input[type=text]{width:11em}
+input.wide{width:min(100%,26em)}
+textarea{width:100%;min-height:84px}
+input.bad,textarea.bad{border-color:var(--warn)}
+input.ok{border-color:var(--good)}
+.hint{font-size:.9rem;color:var(--muted);margin:.5rem 0 0}
+.muted{color:var(--muted)}
+.qlabel{font:600 .72rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.job{border-left:4px solid var(--accent);padding:4px 0 4px 12px;margin:0 0 12px}
+.formal{margin:12px 0;padding:12px 14px;border-left:4px solid var(--good);background:var(--stage);font-size:1.05rem}
+.tag{font:600 .72rem var(--mono);padding:1px 6px;border-radius:3px;background:var(--warn);color:#fff}
+.pill{display:inline-block;font:400 .72rem var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:1px 7px;margin:0 6px 4px 0}
+
+/* questions */
+.q-card{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:0 0 12px;background:var(--surface)}
+.q-card.done{background:var(--stage)}
+.q-prompt{font-size:1.05rem}
+.q-prompt p{margin:.3rem 0}
+.q-body{margin-top:10px}
+.q-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:10px 18px}
+.q-field label{display:block;font-size:.95rem;margin-bottom:3px}
+.q-field .unit{color:var(--muted);font-size:.9rem;margin-left:6px}
+.q-field .mark{font-weight:700;margin-left:6px}
+.q-field .mark.ok{color:var(--good)} .q-field .mark.bad{color:var(--warn)}
+.choices{display:flex;flex-direction:column;gap:8px;margin:6px 0}
+.choice{display:flex;gap:8px;align-items:flex-start;font-size:1rem;padding:6px 8px;border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.choice:hover{border-color:var(--accent)}
+.choice.sel{border-color:var(--accent);background:var(--soft)}
+.choice.right{border-color:var(--good)} .choice.wrong{border-color:var(--warn)}
+.match-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+.match-row .lab{min-width:12em}
+.pad{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
+.pad button{font:600 .85rem var(--mono);padding:3px 8px;border:1px solid var(--line);border-radius:5px;background:var(--stage);color:var(--ink);cursor:pointer}
+.pad button:hover{border-color:var(--accent)}
+.preview{min-height:1.9em;margin-top:6px;padding:4px 8px;background:var(--stage);border-radius:6px;font-size:1.02rem;overflow-x:auto}
+.preview .none{color:var(--muted);font-size:.88rem}
+.preview .err{color:var(--muted);font-size:.88rem;font-style:italic}
+.fb{margin:.6rem 0 0;padding:8px 10px;border-radius:6px;font-size:.98rem}
+.fb.ok{border-left:4px solid var(--good);background:var(--stage)}
+.fb.bad{border-left:4px solid var(--warn);background:var(--stage)}
+.fb.info{border-left:4px solid var(--accent);background:var(--stage)}
+.fb p{margin:.2rem 0}
+.worked{margin-top:8px;padding:8px 10px;border-left:4px solid var(--gold);background:var(--stage)}
+.figure{margin:8px 0}
+.figure svg{max-width:100%;height:auto}
+details.doneq{border:1px solid var(--line);border-radius:8px;margin:0 0 8px;background:var(--stage)}
+details.doneq summary{cursor:pointer;padding:8px 12px;font-size:.95rem}
+details.doneq .inner{padding:0 12px 10px}
+.progress{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.progress span{font:600 .75rem var(--mono);padding:4px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.progress span.now{border-color:var(--accent);color:var(--accent)}
+.progress span.done{background:var(--good);border-color:var(--good);color:#fff}
+.bigq{padding:10px 14px;margin:0 0 12px;border:1px solid var(--accent);border-radius:8px;background:var(--soft)}
+.bigq b{font-family:var(--display)}
+
+/* simulation */
+.sim{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:start}
+@media (max-width:780px){.sim{grid-template-columns:1fr}}
+canvas.simcv{display:block;width:100%;height:auto;background:var(--stage);border:1px solid var(--line);border-radius:6px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.88rem;margin-top:8px}
+.sw{display:inline-block;width:12px;height:12px;border:1px solid var(--ink);vertical-align:-1px;margin-right:5px}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:4px 14px;font:400 .86rem var(--mono);color:var(--muted);margin-top:8px}
+.readout b{color:var(--ink)}
+.readout.hidden-nums{display:block;font:italic .92rem var(--body)}
+.controls label{display:block;margin-top:8px;font-size:.92rem}
+.controls input[type=range]{width:100%}
+.controls .val{font:600 .88rem var(--mono);color:var(--accent)}
+table.data{width:100%;border-collapse:collapse;font-size:.9rem;font-variant-numeric:tabular-nums;margin-top:10px}
+table.data th,table.data td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+table.data th{font:600 .7rem var(--mono);color:var(--muted);letter-spacing:.04em}
+.scroll{overflow-x:auto}
+
+/* toolbox and notes */
+details.toolbox{border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:0 0 14px}
+details.toolbox summary{cursor:pointer;padding:9px 14px;font:600 .9rem var(--mono)}
+details.toolbox .inner{padding:2px 16px 12px;columns:2 18rem;column-gap:28px}
+details.toolbox .inner p{margin:.25rem 0;break-inside:avoid}
+.routine{margin:10px 0 14px;padding:10px 14px;border:1px solid var(--line);border-radius:6px;background:var(--stage)}
+.routine ol{margin:.3rem 0 0 1.2rem;padding:0}
+.drawer{position:fixed;inset:0;background:rgba(10,18,26,.55);z-index:20;display:flex;justify-content:flex-end}
+.drawer .panel{width:min(640px,100%);height:100%;overflow:auto;background:var(--surface);padding:18px 20px;border-left:1px solid var(--line)}
+.drawer .close{float:right}
+.stamp{font:800 2rem var(--mono);letter-spacing:.12em;border:3px double var(--good);color:var(--good);display:inline-block;padding:10px 16px;border-radius:6px;transform:rotate(-2deg)}
+.code{font:600 1.6rem var(--mono);letter-spacing:.14em;color:var(--accent)}
+.bigcode{font:800 clamp(4rem,18vw,9rem)/1 var(--mono);letter-spacing:.2em;color:var(--accent);text-align:center;padding:30px 0}
+.teacherbar{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 12px;margin:0 0 12px;border:2px dashed var(--warn);border-radius:8px;background:var(--surface);font-size:.9rem}
+footer{margin-top:24px;font:400 .75rem var(--mono);color:var(--muted)}
+
+/* printed notes (Cornell style) */
+.notes-doc{font-family:var(--body);color:#111;background:#fff;padding:0}
+.notes-doc h1{font-size:1.5rem;margin:0}
+.notes-doc h2{font-size:1.08rem;border-bottom:1.5px solid #333;margin:16px 0 6px;padding-bottom:2px}
+.notes-doc .meta{display:flex;justify-content:space-between;border-bottom:2px solid #111;padding:4px 0 8px;margin-bottom:6px;font-size:.95rem}
+.notes-doc table{border-collapse:collapse;width:100%;font-size:.92rem}
+.notes-doc td,.notes-doc th{border:1px solid #888;padding:4px 7px;vertical-align:top;text-align:left}
+.notes-doc td.cue{width:30%;background:#f0f0f0;font-weight:600}
+.notes-doc .blank{color:#a33;font-style:italic}
+.notes-doc .small{font-size:.85rem;color:#444}
+.notes-doc svg{max-width:340px;height:auto}
+.notes-doc .box{border:1.5px solid #111;padding:6px 10px;margin:6px 0}
+#print-root{position:absolute;left:-99999px;top:0;width:720px;overflow:hidden}
+@media print{
+  body{background:#fff;padding:0;font-size:10.5pt}
+  body > *:not(#print-root){display:none!important}
+  #print-root{position:static!important;width:auto!important;overflow:visible!important}
+  .notes-doc h2{break-after:avoid}
+  .notes-doc tr,.notes-doc td table,.notes-doc .box{break-inside:avoid}
+  .notes-doc svg{max-width:210px}
+  .notes-doc *{color:#111}
+  @page{margin:16mm}
+}

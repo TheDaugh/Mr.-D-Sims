@@ -47,7 +47,19 @@ The `calculus/` folder holds AP Calculus AB sims, with a hub at `calculus/index.
 
 | Unit | Page |
 |---|---|
-| 2 · Differentiation | `2-7-product-rule.html` (Day 1 guided lesson: predict, grow rectangles to see two strips and a vanishing corner, name the rule, build two derivatives, adjusting questions; add `#key` for the teacher key; outline in `2-7-product-rule-outline.md`) |
+| 2 · Differentiation | `2-7-product-rule.html` (guided lesson that adjusts to each student: warm-up placement, prediction test, four sim missions, huddle, adaptive build and practice, mastery check, online notes that print as a PDF and export as `.tex`). Also `2-7-product-rule-teacher.html` (class code, facilitation notes, full key, hand-in decoder) and `2-7-product-rule-outline.md`. |
 | 6 · Integration and Accumulation of Change | `accumulation-lab.html` (two tabs: the accumulation machine, where g(x) = ∫f builds up as you drag x, and Riemann sums with left, right, midpoint and trapezoid rules and an error-vs-n plot) |
 
-Each page is one self-contained file, so the same rules as the physics sims apply: constants and function lists sit at the top of the `<script>` block.
+Most calculus pages are one self-contained file, so the same rules as the physics sims apply: constants and function lists sit at the top of the `<script>` block.
+
+### Guided lessons (Unit 2 onward)
+Guided lessons share code in `calculus/shared/`:
+
+- `mathcheck.js` reads typed answers (`x^2`, `3x`, `e^x`, `sin(x)`) and checks them by numeric equivalence, so any equivalent form counts.
+- `qkit.js` draws a question with a live math preview, a hint ladder, named wrong answers, and a result the lesson uses to adjust difficulty.
+- `lesson.css` has the shared styles and the print layout for student notes.
+- `katex/` is KaTeX 0.19.0 (MIT license) so math renders offline.
+
+A lesson is a content file (`*.content.js`, all questions and answers), the student page, and a teacher page. Students never see their path; the hidden levels are Build, Apply, Stretch and Extend.
+
+**Teacher access.** Open `calculus/index.html` and click “Teacher view” at the bottom (or add `#teacher` to the address once). Each lesson card then shows its teacher page, a preview link that opens every step and lets you pick a path, and the outline. Adding `#key` to a lesson’s address jumps to its teacher page. The class code on the teacher page changes daily and unlocks the huddle step. Students finish with a hand-in code; paste it into the decoder on the teacher page. There is no server, so progress and notes live in the student’s browser on that device.

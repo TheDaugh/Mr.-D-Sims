@@ -9,8 +9,13 @@ window.UNITS = [
       {
         title: "2.7 The Product Rule",
         href: "unit-2-differentiation/2-7-product-rule.html",
-        blurb: "Grow rectangles and watch the area change in two strips and a vanishing corner. Then build (f·g)′ = f′g + fg′ one step at a time. Add #key to the address for the teacher key.",
-        tags: ["product rule", "area model", "guided lesson", "~42 min"]
+        blurb: "A guided lesson that adjusts to each student. Predict, run a rectangle experiment where you compute first and the sim reveals second, build the rule, then show you own it. Notes print as a PDF.",
+        tags: ["product rule", "adaptive", "online notes + PDF", "~60 min, two parts"],
+        teacher: [
+          { label: "Teacher page + key", href: "unit-2-differentiation/2-7-product-rule-teacher.html" },
+          { label: "Preview as student", href: "unit-2-differentiation/2-7-product-rule.html#preview" },
+          { label: "Outline", href: "unit-2-differentiation/2-7-product-rule-outline.md" }
+        ]
       }
     ]
   },

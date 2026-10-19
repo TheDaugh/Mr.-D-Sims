@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2.7 Product Rule · Teacher Page</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/katex/katex.min.css">
+<link rel="stylesheet" href="../shared/lesson.css">
+<style>
+.teacherbar{position:static!important}
+table.t{width:100%;border-collapse:collapse;font-size:.95rem;margin:8px 0}
+table.t th,table.t td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+table.t th{background:var(--stage);font:600 .78rem var(--mono)}
+.keyq{border-top:1px solid var(--line);padding:10px 0}
+.keyq .ans{margin:2px 0;font-size:.97rem}
+.keyq .ans b{font-family:var(--mono);font-size:.78rem;color:var(--muted);font-weight:600}
+.keyq .wk{margin:6px 0 0;padding:6px 10px;border-left:4px solid var(--gold);background:var(--stage);font-size:.95rem}
+.keyq .trap{color:var(--muted);font-size:.88rem}
+details.sec{border:1px solid var(--line);border-radius:8px;background:var(--surface);margin:0 0 12px}
+details.sec>summary{cursor:pointer;padding:12px 16px;font:800 1.1rem var(--display)}
+details.sec>.in{padding:0 18px 14px}
+.lane{border-left:5px solid var(--accent);padding:2px 0 2px 12px;margin:10px 0}
+.lane.l1{border-color:var(--gold)} .lane.l2{border-color:var(--accent)} .lane.l3{border-color:var(--good)} .lane.l4{border-color:var(--warn)}
+.fs{position:fixed;inset:0;background:var(--bg);z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><a class="back" href="../index.html">← Calculus</a><div class="links"><a href="2-7-product-rule.html#preview">Preview as student</a><a href="2-7-product-rule-outline.md">Lesson outline</a></div></div>
+  <h1>2.7 The Product Rule</h1>
+  <p class="sub">Teacher page · class code, facilitation notes, full answer key, hand-in decoder</p>
+  <div class="teacherbar"><span class="tag">TEACHER</span> This page is not password-protected. It is reachable from the calculus hub’s “Teacher view” link and by adding #key to the student lesson’s address. Do not share the address with students.</div>
+
+  <section class="card">
+    <h2>Today’s class code</h2>
+    <p class="hint">Students enter this at the huddle (after the experiment). It changes every day, so yesterday’s code will not work.</p>
+    <div class="code" id="today-code" style="font-size:3rem"></div>
+    <div class="row"><button class="btn primary" type="button" id="project">Show full screen</button>
+      <label>Code for another date <input type="date" id="other-date"></label> <span class="code" id="other-code" style="font-size:1.2rem"></span></div>
+  </section>
+
+  <details class="sec" open><summary>At a glance</summary><div class="in">
+    <table class="t"><thead><tr><th>Step</th><th>Time</th><th>What students do</th><th>What you watch</th></tr></thead><tbody>
+      <tr><td>1 Start · 2 Warm-up</td><td>4 min</td><td>Six derivative skills, two tries each, no hints. Places the student on a path.</td><td>Hand-in code shows which warm-up items they missed.</td></tr>
+      <tr><td>3 Predict</td><td>4 min</td><td>Lock a prediction, test it on $x^2$ and $x^3$ (5 vs 6), write a line on what changed.</td><td>Kids who locked in “$f'g'$” are the ones the huddle is for.</td></tr>
+      <tr><td>4 Explore</td><td>15–20 min</td><td>Four missions on a growing rectangle. Compute first, then the sim reveals. Typed answers, hints that appear after misses.</td><td>Mission 2 (shrink Δt) is where limits connect to derivatives. Mission 3 splits by path.</td></tr>
+      <tr><td>5 Huddle</td><td>3–5 min</td><td>Whole-class talk. Class code unlocks the rest. Student writes the rule in words.</td><td>Script below.</td></tr>
+      <tr><td colspan="4"><i>Natural stopping point for a split lesson. Progress saves on the device.</i></td></tr>
+      <tr><td>6 Build</td><td>8 min</td><td>Two problems with the f, g, f′, g′ routine. Scaffolds fade with level.</td><td>Level 1 also multiplies out first and sees both routes agree.</td></tr>
+      <tr><td>7 Practice</td><td>12–15 min</td><td>Eight adaptive problems. Clean work earns harder ones; a rough patch drops back.</td><td>Named wrong answers appear in the student’s notes under “Traps I hit”.</td></tr>
+      <tr><td>8 Check</td><td>6–8 min</td><td>Four problems, no hints, two tries each. Need 3 of 4 including the idea question. A miss routes to guided recovery and a second form.</td><td>Two misses sets the “conference” flag in the hand-in code.</td></tr>
+      <tr><td>9 Wrap-up</td><td>5 min</td><td>Summary in own words, then a hand-in code, a print-ready PDF of their notes, and a .tex file.</td><td>Paste the code into the decoder below.</td></tr>
+    </tbody></table>
+    <h3>The four paths (students never see these labels)</h3>
+    <div class="lane l1"><b>1 · Build</b>. Placed here when the warm-up score is 0 to 2, or after two rough items in a row. All four pieces are scaffolded ($f$, $g$, $f'$, $g'$, then the result), with a multiply-it-out cross-check. Hint ladder of three. Contexts: small polynomials, a revenue table, a table of values.</div>
+    <div class="lane l2"><b>2 · Apply</b>. Warm-up 3 to 5. Names $f$ and $g$ and derivatives, then assembles. Trig, exponential, tangent lines, revenue rate, horizontal tangents.</div>
+    <div class="lane l3"><b>3 · Stretch</b>. Warm-up 6/6 clean, or two clean items at Apply. Gives $f$ and $g$ and asks for derivatives and result; logs, radicals, unknown functions, units-based argument, rewriting a quotient as a product.</div>
+    <div class="lane l4"><b>4 · Extend</b>. Two clean items at Stretch. Result only. Three-factor products, the second derivative $(fg)''$, deriving the quotient rule, the limit-definition proof, a related-rates volume, solving $h'=0$ with the quadratic formula.</div>
+    <p>Rules: two clean items in a row (no misses, no hints) raise the path by one. Two rough ones (three misses, or the worked solution revealed) lower it by one. Middle results hold steady. The preview link lets you open any step and pick a path yourself.</p>
+  </div></details>
+
+  <details class="sec"><summary>Facilitation notes</summary><div class="in">
+    <h3>The huddle (2 to 3 minutes)</h3>
+    <ol><li>Put the picture on the board: rectangle $f$ by $g$, a green strip, an orange strip, a red corner.</li>
+      <li>Ask: “Which piece did each term of $f'g+fg'$ come from?” Take two answers.</li>
+      <li>Ask: “Cut $\Delta t$ in half. What happens to each strip? To the corner?” (Halves, halves, quarters.) Then: “So in the limit…?”</li>
+      <li>Name it: product rule. Ask someone to say it in words before they type it.</li></ol>
+    <h3>Misconceptions to listen for</h3>
+    <table class="t"><thead><tr><th>Student says</th><th>Where it comes from</th><th>Response</th></tr></thead><tbody>
+      <tr><td>“Just multiply the derivatives.”</td><td>Derivatives “distribute” by analogy with sums.</td><td>Point to the test: $x^2\cdot x^3$. And units: revenue per month times price per month is not revenue per month.</td></tr>
+      <tr><td>Gets only one strip.</td><td>Forgets the other factor also changes.</td><td>Ask which side of the rectangle is growing that the answer ignores.</td></tr>
+      <tr><td>Minus sign between the terms.</td><td>Mixing with the quotient rule.</td><td>Both strips <i>add</i> area; a negative derivative already handles shrinking.</td></tr>
+      <tr><td>“It worked in Mission 3 so the rule is fine.”</td><td>One accidental match.</td><td>A rule must hold for every pair; one counterexample ends it.</td></tr>
+      <tr><td>Expands first, avoids the rule.</td><td>Valid for polynomials.</td><td>Praise it: it is the check. Then hand them $x^2\sin x$.</td></tr>
+    </tbody></table>
+    <h3>For the student who is not taking the AP exam</h3>
+    <p>The warm-up, scaffolds, and multiply-it-out cross-check build the process; the rectangle supplies the concept without needing a limit definition. The path moves with accuracy, so a student who is solid conceptually but shaky on mechanics lands in Build or Apply and still finishes with a printable set of notes and a check they can pass.</p>
+    <h3>Alignment with Math Medic 2.7</h3>
+    <table class="t"><thead><tr><th>Math Medic idea</th><th>Where it appears here</th></tr></thead><tbody>
+      <tr><td>Revenue $R=N\cdot P$ and $R'\neq N'P'$</td><td>Practice p1c, p2e, p3f (units argument), check items mA4 and mB4</td></tr>
+      <tr><td>Distribute first as an alternative</td><td>Build path 1 (multiply out, differentiate, compare); warm-up item 6</td></tr>
+      <tr><td>Rewrite as a product (e.g. $e^t\cdot t^{-2}$)</td><td>Practice p3g</td></tr>
+      <tr><td>Radicals</td><td>Warm-up item 3, build b3c, practice p3c</td></tr>
+      <tr><td>Table and graph-style values</td><td>Practice p1d, p2d, p3d, p3e; check mA3 and mB3</td></tr>
+    </tbody></table>
+  </div></details>
+
+  <details class="sec"><summary>Hand-in decoder</summary><div class="in">
+    <p class="hint">Students show a code like <span class="code" style="font-size:1rem">PR2-2.2.3.0.4.1.1.0.4.38.0.9.14-A1B</span> at the end. Paste it here with their first name to read it. The checksum catches a mistyped code or a changed name.</p>
+    <div class="row"><label>First name <input type="text" id="dec-name"></label><label>Code <input type="text" id="dec-code" class="wide"></label><button class="btn primary" type="button" id="dec-go">Decode</button></div>
+    <div id="dec-out"></div>
+  </div></details>
+
+  <div id="key"></div>
+  <footer>Answers are checked by numeric equivalence at nine sample points, so any equivalent form is accepted. Every answer in this key was verified independently with a computer algebra system before release.</footer>
+</div>
+<div class="fs" id="fs" hidden><div class="bigcode" id="fs-code"></div><p class="hint" id="fs-date"></p><button class="btn" type="button" id="fs-close">Close</button></div>
+
+<script src="../shared/katex/katex.min.js"></script>
+<script src="../shared/mathcheck.js"></script>
+<script src="../shared/qkit.js"></script>
+<script src="2-7-product-rule.content.js"></script>
+<script>
+(function () {
+  'use strict';
+  var C = PR2, Q = QKIT, rich = Q.rich;
+  function $(id) { return document.getElementById(id); }
+  var NAMES = { 1: 'Build', 2: 'Apply', 3: 'Stretch', 4: 'Extend' };
+
+  /* render $...$ in the static page text */
+  (function mathify() {
+    var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null), nodes = [], n;
+    while ((n = w.nextNode())) { if (n.nodeValue.indexOf('$') >= 0 && !/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName)) nodes.push(n); }
+    nodes.forEach(function (t) { var span = document.createElement('span'); span.innerHTML = Q.inline(t.nodeValue); t.parentNode.replaceChild(span, t); });
+  })();
+
+  /* class code */
+  $('today-code').textContent = C.codeFor('huddle');
+  $('project').onclick = function () { $('fs-code').textContent = C.codeFor('huddle'); $('fs-date').textContent = 'Class code for ' + C.today(); $('fs').hidden = false; };
+  $('fs-close').onclick = function () { $('fs').hidden = true; };
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') $('fs').hidden = true; });
+  $('other-date').onchange = function () { $('other-code').textContent = this.value ? C.hashStr(C.LESSON + '|huddle|' + this.value) : ''; };
+
+  /* decoder */
+  $('dec-go').onclick = function () {
+    var r = C.decodeHandIn($('dec-name').value, $('dec-code').value), out = $('dec-out'); out.innerHTML = '';
+    if (!r.ok) { out.innerHTML = '<div class="fb bad"><p>' + Q.esc(r.why) + '</p></div>'; return; }
+    var n = r.nums, missed = [];
+    C.READY.forEach(function (q, i) { if (n[3] & (1 << i)) missed.push(q.skill); });
+    var lines = [];
+    lines.push('Warm-up: missed ' + (missed.length ? missed.join(', ') : 'nothing') + '.');
+    lines.push('Started on the <b>' + NAMES[n[1]] + '</b> path' + (n[2] > n[1] ? ' and rose to <b>' + NAMES[n[2]] + '</b>' : n[2] < n[1] ? ' and dropped to ' + NAMES[n[2]] : ', held steady') + '.');
+    lines.push('Check: <b>' + n[4] + ' of 4</b>' + (n[5] ? ', idea question right' : ', idea question missed') + ', attempt ' + n[6] + '.');
+    lines.push(n[12] + ' items answered, ' + n[11] + ' clean, ' + n[7] + ' assisted, ' + n[8] + ' hints; about ' + n[9] + ' active minutes.');
+    if (n[10] & 1) lines.push('Worked solo (no class code at the huddle).');
+    if (n[10] & 2) lines.push('<b>Conference flag.</b> The check did not land after two attempts.');
+    out.innerHTML = '<div class="fb ok">' + lines.map(function (l) { return '<p>' + l + '</p>'; }).join('') + '</div>' +
+      '<table class="t"><tbody>' + r.rows.map(function (x) { return '<tr><td>' + Q.esc(x[0]) + '</td><td>' + x[1] + '</td></tr>'; }).join('') + '</tbody></table>';
+  };
+
+  /* key */
+  function fieldAnswer(f) {
+    if (f.type === 'text') return '<i>open response (checked for length only)</i>';
+    if (f.type === 'mc') return Q.inline(f.choices[f.ans]);
+    if (f.type === 'num') return String(f.answer);
+    return Q.tex(MC.toLatex(f.answer, f.vars || ['x']), false);
+  }
+  function qBlock(q, label) {
+    var d = document.createElement('div'); d.className = 'keyq';
+    var h = '<p class="qlabel">' + Q.esc(label || q.id) + (q.skill ? ' · ' + Q.esc(q.skill) : '') + '</p><div>' + rich(q.prompt) + '</div>';
+    q.fields.forEach(function (f) {
+      h += '<p class="ans"><b>ANSWER</b> ' + (f.label ? Q.inline(f.label) + ' ' : '') + fieldAnswer(f) + '</p>';
+      (f.traps || []).forEach(function (t) { h += '<p class="trap">Named wrong answer: ' + (t.expr ? Q.tex(MC.toLatex(t.expr, f.vars || ['x']), false) : t.value) + ' → ' + Q.inline(t.msg) + '</p>'; });
+    });
+    if (q.keyNote) h += '<p class="ans"><b>NOTE</b> ' + Q.inline(q.keyNote) + '</p>';
+    if (q.worked) h += '<div class="wk">' + rich(q.worked) + '</div>';
+    d.innerHTML = h; return d;
+  }
+  function section(title, build, open) {
+    var det = document.createElement('details'); det.className = 'sec'; if (open) det.open = true;
+    det.innerHTML = '<summary>' + title + '</summary>'; var inn = document.createElement('div'); inn.className = 'in'; det.appendChild(inn); build(inn); $('key').appendChild(det);
+  }
+  function specQ(entry, level) { return entry.spec ? C.buildQ(entry.spec, level) : entry.q ? entry.q : entry.fields ? entry : C.buildQ(entry, level); }
+
+  section('Key · Warm-up (hidden placement)', function (b) {
+    var note = document.createElement('p'); note.className = 'hint'; note.textContent = 'Score 0 to 2 starts the Build path; 3 to 5 starts Apply; 6 of 6 with no assisted items starts Stretch.'; b.appendChild(note);
+    C.READY.forEach(function (q, i) { b.appendChild(qBlock(q, 'Warm-up ' + (i + 1))); });
+  });
+  section('Key · Predict and test', function (b) {
+    var d = document.createElement('div'); d.className = 'keyq';
+    d.innerHTML = '<p class="qlabel">Prediction choices (no scoring)</p><ol type="A">' + C.PREDICT.choices.map(function (c) { return '<li>' + Q.inline(c) + '</li>'; }).join('') + '</ol><p class="hint">B is where the math lands; A is the common misconception the test refutes.</p>';
+    b.appendChild(d); b.appendChild(qBlock(C.PREDICT.test, 'Test'));
+  });
+  section('Key · Experiment missions', function (b) {
+    var M = C.MISSIONS, ra = M.rectA;
+    var intro = document.createElement('div'); intro.innerHTML = rich('Rectangle for Missions 1, 2 and 4: $f=' + ra.f + ',\\ g=' + ra.g + ',\\ f\'=' + ra.fp + ',\\ g\'=' + ra.gp + '$. At $\\Delta t=0.5$ the strips are 3 and 2, the corner is 0.5, and $\\Delta A=5.5$.'); b.appendChild(intro);
+    var h3 = document.createElement('h3'); h3.textContent = 'Mission 1 · Measure'; b.appendChild(h3); M.m1.forEach(function (q) { b.appendChild(qBlock(q)); });
+    h3 = document.createElement('h3'); h3.textContent = 'Mission 2 · Shrink the time step'; b.appendChild(h3); M.m2.forEach(function (q) { b.appendChild(qBlock(q)); });
+    h3 = document.createElement('h3'); h3.textContent = 'Mission 3 · Design a rectangle'; b.appendChild(h3);
+    var p = document.createElement('div'); p.className = 'keyq'; p.innerHTML = rich('Builds and Applies: set $f=2,\\ g=5,\\ f\'=3,\\ g\'=-1$, predict, grow. Then the freeze challenge. **Example freeze answer:** $f=2,\\ g=2,\\ f\'=1,\\ g\'=-1$ (needs $f\'g=-fg\'$, so opposite signs). Stretch and Extend skip the guided part and also get the accident challenge. **Example accident answer:** $f=1,\\ g=1,\\ f\'=2,\\ g\'=2$ (then $f\'g\'=4=f\'g+fg\'$).'); b.appendChild(p);
+    [M.m3.guidedQ, M.m3.freezeQ, M.m3.accidentQ].forEach(function (q) { b.appendChild(qBlock(q)); });
+    h3 = document.createElement('h3'); h3.textContent = 'Mission 4 · Name it'; b.appendChild(h3);
+    b.appendChild(qBlock(M.m4.steps, 'Build path')); b.appendChild(qBlock(M.m4.single, 'All other paths'));
+  });
+  section('Key · Build problems by path', function (b) {
+    [1, 2, 3, 4].forEach(function (l) {
+      var h3 = document.createElement('h3'); h3.textContent = 'Path ' + l + ' · ' + NAMES[l]; b.appendChild(h3);
+      C.BUILD[l].forEach(function (s) { b.appendChild(qBlock(C.buildQ(s, l), s.id)); });
+    });
+  });
+  section('Key · Practice pools by path', function (b) {
+    [1, 2, 3, 4].forEach(function (l) {
+      var h3 = document.createElement('h3'); h3.textContent = 'Path ' + l + ' · ' + NAMES[l]; b.appendChild(h3);
+      C.PRACTICE[l].forEach(function (e) { var q = specQ(e, l); b.appendChild(qBlock(q, q.id)); });
+    });
+  });
+  section('Key · Check (forms A and B) and recovery', function (b) {
+    ['A', 'B'].forEach(function (k) {
+      var h3 = document.createElement('h3'); h3.textContent = 'Form ' + k + ' (pass: 3 of 4 including item 1)'; b.appendChild(h3);
+      C.MASTERY[k].forEach(function (e, i) { var q = e.spec ? C.buildQ(e.spec, 4) : (e.q || e); b.appendChild(qBlock(q, k + (i + 1))); });
+    });
+    var h3 = document.createElement('h3'); h3.textContent = 'Recovery set (after a first miss)'; b.appendChild(h3);
+    C.RECOVERY.forEach(function (e) { var q = specQ(e, 1); b.appendChild(qBlock(q, q.id)); });
+  });
+})();
+</script>
+</body>
+</html>
