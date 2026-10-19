@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Product Rule · Area Grows Two Ways</title>
+<meta name="description" content="AP Calculus 2.7, the product rule. Day 1 online lesson for Mr. D’s calculus class. Add #key to the address for the teacher key.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f6;--surface:#fff;--stage:#f7fafc;--ink:#142230;--muted:#566878;--line:#cbd6e0;--accent:#2b4fd9;--good:#1c7d4a;--warn:#b3412e;--gold:#c9791a;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e161e;--surface:#16212b;--stage:#101a23;--ink:#e6edf3;--muted:#92a3b3;--line:#2a3a48;--accent:#8aa4ff;--good:#4fcf8c;--warn:#ff7d68;--gold:#f0a94a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);padding:18px 16px 56px}
+.wrap{max-width:900px;margin-inline:auto}
+.back{font:600 .8rem var(--mono);color:var(--muted);text-decoration:none}
+.back:hover{color:var(--accent)}
+h1{font:800 clamp(1.9rem,5vw,2.6rem)/1.05 var(--display);letter-spacing:-.02em;margin:.3rem 0 .2rem}
+h2{font:800 1.35rem var(--display);margin:0 0 .5rem}
+.sub{color:var(--muted);margin:0}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+nav#steps{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 14px}
+nav#steps button{font:600 .8rem var(--mono);padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+nav#steps button[aria-current="step"]{background:var(--accent);border-color:var(--accent);color:#fff}
+nav#steps button:disabled{opacity:.4;cursor:default}
+section.card,.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:0 0 14px}
+section[hidden],[hidden]{display:none!important}
+.btn{font:600 .97rem var(--body);padding:9px 16px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+input[type=text],select,textarea{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);max-width:100%}
+input[type=text]{width:14em}
+textarea{width:100%;min-height:90px}
+label.block{display:block;margin-top:12px}
+.choices{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.choice,.choices label{display:flex;gap:8px;align-items:flex-start;font-size:1rem}
+.opt{text-align:left;width:100%;font-size:1rem}
+.opt.picked-wrong{border-color:var(--warn);color:var(--warn)}
+.opt.picked-right{border-color:var(--good);color:var(--good);font-weight:600}
+.q{font-weight:600;font-size:1.05rem;margin:4px 0 6px}
+.qlabel{font:600 .75rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0}
+.hint{font-size:.9rem;color:var(--muted);margin:.5rem 0 0}
+.msg{margin:.6rem 0 0}
+.msg.ok{color:var(--good)} .msg.bad{color:var(--warn)}
+.job{border-left:4px solid var(--accent);padding:4px 0 4px 12px;margin:0 0 12px}
+.done-line{margin:.25rem 0;color:var(--muted)}
+.done-line b{color:var(--ink)}
+.formal{margin:12px 0;padding:12px 14px;border-left:4px solid var(--good);background:var(--stage);font-size:1.05rem}
+.routine{margin:10px 0 14px;padding:10px 14px;border:1px solid var(--line);border-radius:6px;background:var(--stage)}
+.routine ol{margin:.3rem 0 0 1.2rem;padding:0}
+.routine li{margin:.2rem 0}
+canvas#area{display:block;width:100%;height:auto;background:var(--stage);border:1px solid var(--line);border-radius:6px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px;align-items:start}
+@media (max-width:760px){.layout{grid-template-columns:1fr}}
+.readout{display:flex;flex-wrap:wrap;gap:4px 18px;font:400 .88rem var(--mono);color:var(--muted);margin-top:8px}
+.readout b{color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.9rem;margin-top:8px}
+.sw{display:inline-block;width:12px;height:12px;border:1px solid var(--ink);vertical-align:-1px;margin-right:5px}
+table{width:100%;border-collapse:collapse;font-size:.92rem;font-variant-numeric:tabular-nums;margin-top:12px}
+th,td{text-align:left;padding:5px 7px;border-bottom:1px solid var(--line)}
+th{font:600 .72rem var(--mono);color:var(--muted);letter-spacing:.04em}
+.code{font:600 1.7rem var(--mono);letter-spacing:.14em;color:var(--accent)}
+.key{border:2px dashed var(--warn)}
+.key h3{font:800 1.1rem var(--display);margin:.2rem 0 .4rem}
+.key ol,.key ul{margin:.3rem 0 .3rem 1.2rem;padding:0}
+.key li{margin:.2rem 0}
+svg.diagram{display:block;width:100%;max-width:420px;height:auto;margin:10px 0}
+svg.diagram text{font:600 13px var(--body);fill:var(--ink)}
+svg.diagram .small{font:400 12px var(--mono);fill:var(--muted)}
+footer{margin-top:24px;font:400 .75rem var(--mono);color:var(--muted)}
+.stamp{font:800 2rem var(--mono);letter-spacing:.12em;border:3px double var(--good);color:var(--good);display:inline-block;padding:10px 16px;border-radius:6px;transform:rotate(-2deg)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="../index.html">&larr; Calculus sims</a>
+<header>
+  <h1>The Product Rule</h1>
+  <p class="sub">Lesson 2.7 · Area grows two ways · Day 1, online · about 42 minutes</p>
+</header>
+
+<div id="teacher" class="card key" hidden></div>
+<nav id="steps" aria-label="Lesson steps"></nav>
+
+<!-- 0 · START -->
+<section class="card" data-step="start">
+  <h2>Before you start</h2>
+  <p>You will make a prediction, grow rectangles and watch the area change, write a rule in your own words, build two derivatives one step at a time, and answer three questions that adjust to your work. Enter the first name and period you use in class.</p>
+  <div class="row">
+    <label>First name <input id="who-first" type="text" maxlength="20" autocomplete="off"></label>
+    <label>Period <input id="who-period" type="text" maxlength="4" autocomplete="off"></label>
+  </div>
+  <div class="row"><button class="btn primary" id="go-start" type="button">Continue</button></div>
+  <p class="msg bad" id="msg-start" hidden>Enter both, then continue.</p>
+</section>
+
+<!-- 1 · PREDICT -->
+<section class="card" data-step="predict" hidden>
+  <h2>1 · Predict</h2>
+  <p>A rectangle is 3 units wide and 3 units tall. Right now the width is growing at 1 unit per second and the height is growing at 1 unit per second. At this instant, how fast is the area growing?</p>
+  <div class="choices" role="radiogroup" aria-label="Prediction">
+    <label><input type="radio" name="pred" value="A"> 1 square unit per second</label>
+    <label><input type="radio" name="pred" value="B"> 2 square units per second</label>
+    <label><input type="radio" name="pred" value="C"> 6 square units per second</label>
+  </div>
+  <div class="row"><button class="btn primary" id="lock-pred" type="button">Lock my prediction</button></div>
+  <p class="hint">Once locked, it stays. The point is to compare what you thought with what happens.</p>
+  <p class="msg bad" id="msg-pred" hidden>Choose one answer first.</p>
+  <div class="row"><button class="btn" id="next-predict" type="button" disabled>Continue</button></div>
+</section>
+
+<!-- 2 · PLAY WITH A JOB -->
+<section class="card" data-step="play" hidden>
+  <h2>2 · Play with a job</h2>
+  <p class="job"><b>Your job:</b> Pick a rectangle and a time step Δt, then grow it. The sim measures how fast the area grew (ΔA ÷ Δt) and splits the new area into three pieces. Compare the rate with the two strip rates added together, and watch what happens to the corner as Δt shrinks. The lesson unlocks after four runs, three different Δt values, one Δt of 0.05 or smaller, and two different rectangles.</p>
+  <div class="layout">
+    <div>
+      <canvas id="area" width="560" height="340" role="img" aria-label="Rectangle growing in width and height, with the new area split into a right strip, a top strip and a corner"></canvas>
+      <div class="legend">
+        <span><span class="sw" style="background:rgba(43,79,217,.3)"></span>Starting rectangle</span>
+        <span><span class="sw" style="background:rgba(28,125,74,.7)"></span>Right strip (width grows)</span>
+        <span><span class="sw" style="background:rgba(230,150,40,.75)"></span>Top strip (height grows)</span>
+        <span><span class="sw" style="background:rgba(179,65,46,.95)"></span>Corner</span>
+      </div>
+      <div class="readout">
+        <span>Rectangle <b id="r-rect">none yet</b></span>
+        <span>ΔA <b id="r-dA">—</b></span>
+        <span>ΔA ÷ Δt <b id="r-rate">—</b></span>
+        <span>Right strip rate <b id="r-s1">—</b></span>
+        <span>Top strip rate <b id="r-s2">—</b></span>
+        <span>Corner vs strips <b id="r-share">—</b></span>
+      </div>
+    </div>
+    <aside class="card" style="margin:0">
+      <label>Rectangle <select id="rect"></select></label>
+      <label class="block">Time step Δt (seconds) <select id="dt"></select></label>
+      <div class="row"><button class="btn primary" id="grow" type="button" disabled>Grow it</button></div>
+      <p class="hint" id="grow-hint">Lock your prediction to start running.</p>
+    </aside>
+  </div>
+  <table id="log" aria-label="Data log">
+    <thead><tr><th>Run</th><th>Rectangle</th><th>Δt</th><th>ΔA ÷ Δt</th><th>Strip rates added</th><th>Corner vs strips</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <p class="hint">Runs <b id="g-runs">0</b> · Different Δt <b id="g-dt">0</b> of 3 · Smallest Δt <b id="g-min">none</b> (need 0.05 or less) · Rectangles <b id="g-rect">0</b> of 2</p>
+  <div class="row"><button class="btn primary" id="next-play" type="button" disabled>Continue</button></div>
+</section>
+
+<!-- 3 · HUDDLE -->
+<section class="card" data-step="huddle" hidden>
+  <h2>3 · Huddle</h2>
+  <p>Look up. Mr. D is showing the class results. When he gives the code, enter it here.</p>
+  <div class="row">
+    <input id="code-huddle" type="text" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="Class code">
+    <button class="btn" id="check-huddle" type="button">Enter code</button>
+  </div>
+  <p class="msg bad" id="msg-huddle" hidden>That code is not right. Ask Mr. D to check it.</p>
+  <div id="rule-wrap" hidden>
+    <label class="block">The area grew in three pieces. Which two pieces matter, how do you find the size of each, and what happened to the corner as Δt got small? Write your rule in your own words.
+      <textarea id="rule" rows="4"></textarea>
+    </label>
+    <p class="hint">At least 20 characters.</p>
+  </div>
+  <div class="row"><button class="btn primary" id="next-huddle" type="button" disabled>Continue</button></div>
+</section>
+
+<!-- 4 · NAME IT -->
+<section class="card" data-step="name" hidden>
+  <h2>4 · Name it</h2>
+  <p>Call the width f and the height g. Both change, so the area f·g changes. The rule you wrote has a formal name, the product rule:</p>
+  <svg class="diagram" viewBox="0 0 360 230" role="img" aria-label="Rectangle of width f and height g, with a right strip labeled f prime times g, a top strip labeled f times g prime, and a tiny corner">
+    <rect x="20" y="60" width="200" height="140" style="fill:var(--accent);fill-opacity:.18;stroke:var(--ink)"/>
+    <rect x="220" y="60" width="44" height="140" style="fill:var(--good);fill-opacity:.6;stroke:var(--ink)"/>
+    <rect x="20" y="22" width="200" height="38" style="fill:var(--gold);fill-opacity:.65;stroke:var(--ink)"/>
+    <rect x="220" y="22" width="44" height="38" style="fill:var(--warn);fill-opacity:.9;stroke:var(--ink)"/>
+    <text x="95" y="135">f · g</text>
+    <text x="52" y="46">f · g′ (top strip)</text>
+    <text x="269" y="132">f′ · g</text>
+    <text x="269" y="148" class="small">right strip</text>
+    <text x="269" y="40" class="small">corner → 0</text>
+    <text x="20" y="218" class="small">width f, height g; each grows by a tiny step</text>
+  </svg>
+  <blockquote class="formal" id="formal-text">The derivative of a product is the derivative of the first times the second, plus the first times the derivative of the second.</blockquote>
+  <p>In symbols, (f·g)′ = f′·g + f·g′. It is not f′·g′. That product is the corner, and the corner disappears in the limit.</p>
+  <label class="block">Copy the statement exactly, as a record of the formal version:
+    <textarea id="formal" rows="3"></textarea>
+  </label>
+  <p class="hint">Match the wording above. Spacing, commas and capital letters do not matter.</p>
+  <p class="msg bad" id="msg-name" hidden>Not yet. Copy the statement above, word for word.</p>
+  <div class="row"><button class="btn primary" id="next-name" type="button" disabled>Continue</button></div>
+</section>
+
+<!-- 5 · BUILD IT -->
+<section class="card" data-step="build" hidden>
+  <h2>5 · Build it</h2>
+  <div class="routine">
+    <b>The routine. It never changes.</b>
+    <ol>
+      <li>Name f and g, the two factors.</li>
+      <li>Differentiate each one alone: f′ and g′.</li>
+      <li>Assemble: f′·g + f·g′.</li>
+      <li>Tidy up, only if the problem asks.</li>
+    </ol>
+  </div>
+  <p class="hint">Each finished step stays on screen. A hint appears after each miss.</p>
+  <div id="build-box"></div>
+  <div class="row"><button class="btn primary" id="next-build" type="button" disabled>Continue</button></div>
+</section>
+
+<!-- 6 · TRY IT -->
+<section class="card" data-step="try" hidden>
+  <h2>6 · Try it</h2>
+  <p class="hint">Three questions. Keep going until each one is right; a hint appears after each miss.</p>
+  <div id="try-box"></div>
+  <div class="row"><button class="btn primary" id="next-try" type="button" disabled>Continue</button></div>
+</section>
+
+<!-- 7 · CHECK -->
+<section class="card" data-step="check" hidden>
+  <h2>7 · Check</h2>
+  <p class="hint">Everyone answers this question. No hints, by design.</p>
+  <div id="check-box"></div>
+  <div id="reflect-wrap" hidden>
+    <label class="block">Look at your prediction from step 1. Which strip did you miss, or which rule did you use, and why did it feel right?
+      <textarea id="reflect" rows="3"></textarea>
+    </label>
+    <p class="hint">At least 15 characters.</p>
+  </div>
+  <div class="row"><button class="btn primary" id="next-check" type="button" disabled>Continue</button></div>
+</section>
+
+<!-- 8 · STAMP -->
+<section class="card" data-step="stamp" hidden>
+  <h2>Done</h2>
+  <p>Show this code to Mr. D.</p>
+  <p><span class="stamp" id="stamp-code">PROD-----</span></p>
+  <p id="stamp-line" class="hint"></p>
+  <p class="hint">Keep your data log and your rule. Day 2 is Math Medic 2.7 practice, using the same four-step routine.</p>
+</section>
+
+<footer>Lesson 2.7 · Mr. D’s calculus sims · Rectangles grow linearly during each run, so the exact area rate at the start is f′g + fg′</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- constants and content (edit here) ---------- */
+  var LESSON = 'product-rule-v1';
+  var STEPS = ['start', 'predict', 'play', 'huddle', 'name', 'build', 'try', 'check', 'stamp'];
+  var LABELS = ['Start', 'Predict', 'Play', 'Huddle', 'Name it', 'Build it', 'Try it', 'Check', 'Stamp'];
+  var KEY = /(^|[#&])key\b/.test(location.hash);
+  var FORMAL = 'The derivative of a product is the derivative of the first times the second, plus the first times the derivative of the second.';
+  var PRED_KEY = 'C';
+  var RUNG_NAMES = ['foundation', 'core', 'transfer', 'extension'];
+  var START_RUNG = 1;
+  var DTS = [1, 0.5, 0.2, 0.1, 0.05, 0.01];
+  // f = width, g = height, fp = f′ (width growth per second), gp = g′ (height growth per second)
+  var RECTS = [
+    { id: 'r1', name: '3 by 3, both grow +1 per s',        f: 3, g: 3, fp: 1,   gp: 1 },
+    { id: 'r2', name: '4 by 2, width +1, height +3',       f: 4, g: 2, fp: 1,   gp: 3 },
+    { id: 'r3', name: '5 by 4, width +2, height −1',       f: 5, g: 4, fp: 2,   gp: -1 },
+    { id: 'r4', name: '2 by 6, width +0.5, height +2',     f: 2, g: 6, fp: 0.5, gp: 2 }
+  ];
+
+  // Build it: two derivatives, four slots each. ans = index of correct option; done = the worked line kept on screen.
+  var BUILD = [
+    { expr: 'h(x) = x⁴(3x + 2)', slots: [
+      { label: 'Step 1 · Name f and g', q: 'Which pair names the two factors of h(x) = x⁴(3x + 2)?',
+        opts: ['f = x⁴ and g = 3x + 2', 'f = 3x and g = x⁴ + 2', 'f = x⁴(3x) and g = 2', 'f = x and g = 4(3x + 2)'], ans: 0,
+        hint: 'A product is two factors multiplied together. What are the two things being multiplied?',
+        worked: 'The two factors are x⁴ and (3x + 2).', done: 'f = x⁴, g = 3x + 2' },
+      { label: 'Step 2 · Differentiate each alone', q: 'Find f′ and g′.',
+        opts: ['f′ = 4x³ and g′ = 3', 'f′ = 4x³ and g′ = 3x + 2', 'f′ = x⁵ and g′ = 3', 'f′ = 4x⁴ and g′ = 3'], ans: 0,
+        hint: 'Power rule: bring the exponent down, then lower the exponent by one. The derivative of 3x is 3, and the derivative of a constant is 0.',
+        worked: 'f′ = 4x³ and g′ = 3.', done: 'f′ = 4x³, g′ = 3' },
+      { label: 'Step 3 · Assemble f′·g + f·g′', q: 'Which expression is h′(x) from the product rule?',
+        opts: ['4x³(3x + 2) + x⁴·3', '4x³·3', 'x⁴(3x + 2) + 4x³·3', '4x³(3x + 2) − x⁴·3'], ans: 0,
+        hint: 'The pattern is f′ times g, plus f times g′. Plus, not minus, and each derivative sits beside the other factor.',
+        worked: 'f′·g = 4x³(3x + 2) and f·g′ = x⁴·3, so h′(x) = 4x³(3x + 2) + x⁴·3.', done: 'h′(x) = 4x³(3x + 2) + x⁴·3' },
+      { label: 'Step 4 · Tidy up', q: 'Simplify h′(x) = 4x³(3x + 2) + x⁴·3.',
+        opts: ['15x⁴ + 8x³', '12x⁴ + 8x³', '15x⁴ + 5x³', '12x³ + 3x⁴'], ans: 0,
+        hint: 'Distribute 4x³ across (3x + 2). Then add 3x⁴ and combine the like terms.',
+        worked: '4x³(3x + 2) = 12x⁴ + 8x³. Adding 3x⁴ gives 15x⁴ + 8x³. Check: expand h first to 3x⁵ + 2x⁴, and its derivative is 15x⁴ + 8x³.', done: 'h′(x) = 15x⁴ + 8x³' }
+    ]},
+    { expr: 'h(x) = (x² − 5)eˣ', slots: [
+      { label: 'Step 1 · Name f and g', q: 'Which pair names the two factors of h(x) = (x² − 5)eˣ?',
+        opts: ['f = x² − 5 and g = eˣ', 'f = x² and g = −5eˣ', 'f = x² − 5eˣ and g = 1', 'f = eˣ and g = x²'], ans: 0,
+        hint: 'Look for the two things multiplied. One is in parentheses.',
+        worked: 'The two factors are (x² − 5) and eˣ.', done: 'f = x² − 5, g = eˣ' },
+      { label: 'Step 2 · Differentiate each alone', q: 'Find f′ and g′.',
+        opts: ['f′ = 2x and g′ = eˣ', 'f′ = 2x − 5 and g′ = eˣ', 'f′ = 2x and g′ = x·eˣ⁻¹', 'f′ = x and g′ = eˣ'], ans: 0,
+        hint: 'The derivative of x² is 2x, and the derivative of the constant −5 is 0. The function eˣ is its own derivative.',
+        worked: 'f′ = 2x and g′ = eˣ.', done: 'f′ = 2x, g′ = eˣ' },
+      { label: 'Step 3 · Assemble f′·g + f·g′', q: 'Which expression is h′(x)?',
+        opts: ['2x·eˣ + (x² − 5)·eˣ', '2x·eˣ', '2x(x² − 5) + eˣ·eˣ', '2x·eˣ − (x² − 5)·eˣ'], ans: 0,
+        hint: 'f′ times g, plus f times g′. Here f′ = 2x, g = eˣ, f = x² − 5, g′ = eˣ.',
+        worked: 'f′·g = 2x·eˣ and f·g′ = (x² − 5)·eˣ, so h′(x) = 2x·eˣ + (x² − 5)·eˣ.', done: 'h′(x) = 2x·eˣ + (x² − 5)·eˣ' },
+      { label: 'Step 4 · Tidy up', q: 'Factor out eˣ.',
+        opts: ['eˣ(x² + 2x − 5)', 'eˣ(x² − 5)', 'eˣ(2x − 5)', 'eˣ(x² + 2x + 5)'], ans: 0,
+        hint: 'Both terms contain eˣ. Pull it out front and combine what is left: 2x + (x² − 5).',
+        worked: 'eˣ(2x + x² − 5) = eˣ(x² + 2x − 5). Leaving it unfactored is also correct.', done: 'h′(x) = eˣ(x² + 2x − 5)' }
+    ]}
+  ];
+
+  // Try it: three items, four rungs each (0 foundation, 1 core, 2 transfer, 3 extension). ans = index of correct option.
+  var ITEMS = [
+    { title: 'Setting up the rule', rungs: [
+      { q: 'A rectangle is 4 m wide and 5 m tall. Only the width is growing, at 1 m per second. The height stays at 5 m. How fast is the area growing?',
+        opts: ['5 m² per second', '1 m² per second', '4 m² per second', '9 m² per second'], ans: 0,
+        hint: 'The new strip along the right side is as tall as the rectangle. Each second it gets 1 m wider. Strip area = 1 × 5.',
+        worked: 'The new strip is 1 m wide and 5 m tall, so the area grows by 5 m² each second.' },
+      { q: 'h(x) = x²(x + 3). Which expression is h′(x) from the product rule?',
+        opts: ['2x(x + 3) + x²·1', '2x·1', 'x²(x + 3) + 2x·1', '2x(x + 3)·x²·1'], ans: 0,
+        hint: 'Write f′·g first, then f·g′. Here f = x² and g = x + 3.',
+        worked: 'f′ = 2x and g′ = 1, so h′(x) = 2x(x + 3) + x²·1.' },
+      { q: 'For h(x) = x²(x + 3), find h′(2).',
+        opts: ['24', '4', '20', '12'], ans: 0,
+        hint: 'Use h′(x) = 2x(x + 3) + x², then replace x with 2.',
+        worked: 'h′(2) = 2·2·(2 + 3) + 2² = 20 + 4 = 24.' },
+      { q: 'To prove the product rule from the limit definition, you add and subtract one term in the numerator of [f(x + h)g(x + h) − f(x)g(x)] ÷ h. Which term makes the two pieces split cleanly?',
+        opts: ['f(x + h)g(x)', 'f(x)g(x)', 'f′(x)g(x)', 'f(x + h)g(x + h)'], ans: 0,
+        hint: 'You want one piece that looks like f(x + h) times a change in g, and another that looks like g(x) times a change in f.',
+        worked: 'Adding and subtracting f(x + h)g(x) gives f(x + h)[g(x + h) − g(x)] + g(x)[f(x + h) − f(x)]. Divide by h and take the limit: f·g′ + g·f′.' }
+    ]},
+    { title: 'Real functions', rungs: [
+      { q: 'A garden is 6 ft long and 3 ft wide. The length grows 2 ft per day and the width grows 1 ft per day. The area grows through two strips: (length growth × width) plus (width growth × length). How fast is the area growing?',
+        opts: ['12 ft² per day', '2 ft² per day', '8 ft² per day', '18 ft² per day'], ans: 0,
+        hint: 'Find each strip separately, then add them.',
+        worked: 'Length strip: 2 × 3 = 6. Width strip: 1 × 6 = 6. Total: 12 ft² per day.' },
+      { q: 'h(x) = x·sin x. Which expression is h′(x)?',
+        opts: ['sin x + x cos x', 'cos x', 'x cos x', 'sin x cos x'], ans: 0,
+        hint: 'f = x and g = sin x. Then f′ = 1 and g′ = cos x. Assemble f′·g + f·g′.',
+        worked: 'f′·g = 1·sin x and f·g′ = x·cos x, so h′(x) = sin x + x cos x.' },
+      { q: 'h(x) = x·eˣ. Find the slope of the tangent line at x = 1.',
+        opts: ['2e', 'e', 'e²', 'e + 1'], ans: 0,
+        hint: 'h′(x) = 1·eˣ + x·eˣ. Replace x with 1.',
+        worked: 'h′(1) = e + e = 2e.' },
+      { q: 'h(x) = (x² + 1)·ln x. Find h′(e).',
+        opts: ['3e + 1/e', '2e + 1', 'e² + 1', '3e'], ans: 0,
+        hint: 'h′(x) = 2x·ln x + (x² + 1)·(1/x). At x = e, ln e = 1.',
+        worked: 'h′(e) = 2e·1 + (e² + 1)/e = 2e + e + 1/e = 3e + 1/e.' }
+    ]},
+    { title: 'Tables and tangent lines', rungs: [
+      { q: 'A rectangle is 2 wide and 5 tall. The width grows 3 per second and the height grows 4 per second. Area rate = (width growth × height) + (width × height growth). What is it?',
+        opts: ['23', '12', '7', '10'], ans: 0,
+        hint: 'Right strip: 3 × 5. Top strip: 2 × 4. Add them.',
+        worked: '3 × 5 = 15 and 2 × 4 = 8, so the area grows at 23 square units per second.' },
+      { q: 'Let h(x) = f(x)·g(x). A table gives f(2) = 3, f′(2) = 4, g(2) = −1, g′(2) = 5. Find h′(2).',
+        opts: ['11', '20', '−4', '−19'], ans: 0,
+        hint: 'h′(2) = f′(2)·g(2) + f(2)·g′(2). Watch the negative sign on g(2).',
+        worked: 'h′(2) = 4·(−1) + 3·5 = −4 + 15 = 11.' },
+      { q: 'Let h(x) = f(x)·g(x) with f(1) = 2, f′(1) = −3, g(1) = 4, g′(1) = 0.5. Which is the tangent line to h at x = 1?',
+        opts: ['y − 8 = −11(x − 1)', 'y − 8 = −1.5(x − 1)', 'y + 11 = 8(x − 1)', 'y − 11 = −8(x − 1)'], ans: 0,
+        hint: 'You need a point and a slope. Point: (1, f(1)·g(1)). Slope: h′(1) from the product rule.',
+        worked: 'h(1) = 2·4 = 8 and h′(1) = (−3)(4) + (2)(0.5) = −11, so y − 8 = −11(x − 1).' },
+      { q: 'Let h(x) = f(x)·g(x), where f and g are differentiable, f(a) = 0 and g(a) = 0. What is h′(a)?',
+        opts: ['0', 'f′(a)·g′(a)', 'f′(a) + g′(a)', 'It does not exist'], ans: 0,
+        hint: 'Write h′(a) = f′(a)·g(a) + f(a)·g′(a) and substitute the two zeros.',
+        worked: 'Both products contain a zero factor, so h′(a) = 0 + 0 = 0, even when f′(a)·g′(a) is not zero.' }
+    ]}
+  ];
+  var CHECK = {
+    q: 'If h(x) = x³(2x − 1), which expression is h′(x)?',
+    opts: ['3x²(2x − 1) + x³·2', '3x²·2', 'x³(2x − 1) + 3x²·2', '3x² + 2'],
+    ans: 0
+  };
+
+  /* ---------- helpers ---------- */
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function today() { return new Date().toLocaleDateString('en-CA'); }
+  function hashStr(s) { var x = 5381; for (var i = 0; i < s.length; i++) x = ((x * 33) + s.charCodeAt(i)) % 1000000; return String(x % 10000).padStart(4, '0'); }
+  function codeFor(cp) { return hashStr(LESSON + '|' + cp + '|' + today()); }
+  function normalize(s) { return String(s || '').replace(/[^\p{L}\p{N}]+/gu, ' ').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  // Stable per-student shuffle so the correct answer is not always first.
+  function mix(s) {
+    var h = 2166136261;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    h ^= h >>> 16; h = Math.imul(h, 2246822507); h ^= h >>> 13; h = Math.imul(h, 3266489909); h ^= h >>> 16;
+    return h >>> 0;
+  }
+  function perm(n, seed) {
+    var a = [];
+    for (var i = 0; i < n; i++) a.push({ i: i, k: mix(seed + '|' + i) });
+    a.sort(function (x, y) { return (x.k - y.k) || (x.i - y.i); });
+    return a.map(function (o) { return o.i; });
+  }
+  function seedFor(id) { return LESSON + '|' + S.first + '|' + S.period + '|' + id; }
+  function fmt(n, d) { return (Math.round(n * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d); }
+  function pct(v) { return (v < 1 ? v.toFixed(2) : v.toFixed(1)) + '%'; }
+
+  /* ---------- state ---------- */
+  var KEYSTORE = 'productRule.v1';
+  function fresh() {
+    return { lesson: LESSON, step: 'start', first: '', period: '', pred: null, runs: [],
+             huddleOK: false, rule: '', formal: '', buildIdx: 0, buildMisses: 0, buildLog: [],
+             tryIdx: 0, tryRung: START_RUNG, tryMisses: 0, tryStart: 0, tryLog: [], check: null, reflect: '' };
+  }
+  function load() {
+    try { var v = JSON.parse(localStorage.getItem(KEYSTORE)); if (v && v.lesson === LESSON) return v; } catch (e) {}
+    return fresh();
+  }
+  var S = load();
+  function save() { try { localStorage.setItem(KEYSTORE, JSON.stringify(S)); } catch (e) {} }
+  var BUILD_TOTAL = BUILD.reduce(function (n, p) { return n + p.slots.length; }, 0);
+
+  /* ---------- gates ---------- */
+  function playGate() {
+    var dts = {}, rects = {}, min = Infinity;
+    S.runs.forEach(function (r) { dts[r.dt] = true; rects[r.rid] = true; if (r.dt < min) min = r.dt; });
+    return !!S.pred && S.runs.length >= 4 && Object.keys(dts).length >= 3 && min <= 0.05 && Object.keys(rects).length >= 2;
+  }
+  function canLeave(step) {
+    switch (step) {
+      case 'start': return S.first.trim().length > 0 && S.period.trim().length > 0;
+      case 'predict': return !!S.pred;
+      case 'play': return playGate();
+      case 'huddle': return !!S.huddleOK && S.rule.trim().length >= 20;
+      case 'name': return normalize(S.formal) === normalize(FORMAL);
+      case 'build': return S.buildIdx >= BUILD_TOTAL;
+      case 'try': return S.tryIdx >= ITEMS.length;
+      case 'check': return !!S.check && S.reflect.trim().length >= 15;
+      default: return false;
+    }
+  }
+  function reachable() {
+    if (KEY) return STEPS.length - 1;
+    var i = 0;
+    while (i < STEPS.length - 1 && canLeave(STEPS[i])) i++;
+    return i;
+  }
+  function currentStep() { return STEPS.indexOf(S.step) < 0 ? 'start' : S.step; }
+  function goto(step) {
+    var idx = STEPS.indexOf(step);
+    if (idx < 0 || idx > reachable()) return;
+    S.step = step; save(); renderAll();
+    window.scrollTo(0, 0);
+  }
+  function advance(from) {
+    if (!canLeave(from)) return false;
+    goto(STEPS[STEPS.indexOf(from) + 1]);
+    return true;
+  }
+
+  /* ---------- navigation ---------- */
+  function renderNav() {
+    var nav = $('steps'); nav.textContent = '';
+    var max = reachable(), cur = STEPS.indexOf(currentStep());
+    STEPS.forEach(function (s, i) {
+      var b = el('button', null, (i + 1) + ' ' + LABELS[i]);
+      b.type = 'button';
+      if (i === cur) b.setAttribute('aria-current', 'step');
+      b.disabled = i > max;
+      b.onclick = function () { goto(s); };
+      nav.appendChild(b);
+    });
+  }
+
+  /* ---------- step 0: start ---------- */
+  function renderStart() { $('who-first').value = S.first; $('who-period').value = S.period; }
+  $('go-start').onclick = function () {
+    S.first = $('who-first').value; S.period = $('who-period').value; save();
+    if (!advance('start')) $('msg-start').hidden = false;
+  };
+
+  /* ---------- step 1: predict ---------- */
+  function renderPredict() {
+    document.querySelectorAll('input[name=pred]').forEach(function (r) { r.checked = S.pred === r.value; r.disabled = !!S.pred; });
+    $('lock-pred').disabled = !!S.pred;
+    $('next-predict').disabled = !S.pred;
+  }
+  $('lock-pred').onclick = function () {
+    var sel = document.querySelector('input[name=pred]:checked');
+    if (!sel) { $('msg-pred').hidden = false; return; }
+    S.pred = sel.value; save(); renderAll();
+  };
+  $('next-predict').onclick = function () { advance('predict'); };
+
+  /* ---------- step 2: play ---------- */
+  var cv = $('area'), cx = cv.getContext('2d'), anim = null;
+  var SC = 36, OX = 40, OY = 300;
+  RECTS.forEach(function (r, i) { var o = el('option', null, r.name); o.value = String(i); $('rect').appendChild(o); });
+  DTS.forEach(function (d, i) { var o = el('option', null, String(d)); o.value = String(d); if (i === 0) o.selected = true; $('dt').appendChild(o); });
+
+  function box(x0, y0, x1, y1, fill, dashed) {
+    var X = OX + Math.min(x0, x1) * SC, Y = OY - Math.max(y0, y1) * SC;
+    var w = Math.abs(x1 - x0) * SC, h = Math.abs(y1 - y0) * SC;
+    cx.fillStyle = fill; cx.fillRect(X, Y, w, h);
+    cx.setLineDash(dashed ? [4, 3] : []); cx.strokeRect(X, Y, w, h); cx.setLineDash([]);
+  }
+  function draw(now) {
+    var ink = getComputedStyle(document.body).color, W = cv.width;
+    cx.clearRect(0, 0, W, cv.height);
+    var R = anim ? anim.r : RECTS[+$('rect').value];
+    var p = anim ? Math.min(1, (now - anim.t0) / anim.dur) : 0;
+    var d = anim ? anim.dt * p : 0;
+    cx.strokeStyle = 'rgba(120,130,140,.6)'; cx.lineWidth = 1;
+    cx.beginPath(); cx.moveTo(OX, OY); cx.lineTo(W - 20, OY); cx.moveTo(OX, OY); cx.lineTo(OX, 14); cx.stroke();
+    cx.strokeStyle = ink; cx.lineWidth = 1.5;
+    box(0, 0, R.f, R.g, 'rgba(43,79,217,.16)', false);
+    cx.fillStyle = ink; cx.font = '14px sans-serif';
+    cx.fillText('Start: width f = ' + R.f + ', height g = ' + R.g, OX, OY + 24);
+    if (d > 0) {
+      box(R.f, 0, R.f + R.fp * d, R.g, 'rgba(28,125,74,.6)', R.fp < 0);
+      box(0, R.g, R.f, R.g + R.gp * d, 'rgba(230,150,40,.65)', R.gp < 0);
+      box(R.f, R.g, R.f + R.fp * d, R.g + R.gp * d, 'rgba(179,65,46,.95)', R.fp * R.gp < 0);
+    }
+    if (anim && p >= 1) {
+      cx.fillStyle = ink;
+      cx.fillText('Dashed = takes area away', W - 190, 20);
+    }
+    if (anim && p < 1) requestAnimationFrame(draw);
+  }
+
+  function grow() {
+    if (!S.pred) return;
+    var R = RECTS[+$('rect').value], dt = +$('dt').value;
+    var dA = (R.f + R.fp * dt) * (R.g + R.gp * dt) - R.f * R.g;
+    var s1 = R.fp * R.g, s2 = R.f * R.gp;           // strip rates
+    var corner = R.fp * R.gp * dt * dt;
+    var share = Math.abs(corner) / (Math.abs(s1 * dt) + Math.abs(s2 * dt)) * 100;
+    S.runs.push({ rid: R.id, name: R.name, dt: dt, rate: dA / dt, sum: s1 + s2, s1: s1, s2: s2, share: share });
+    save();
+    anim = { t0: performance.now(), dur: 1400, r: R, dt: dt };
+    $('r-rect').textContent = R.name;
+    $('r-dA').textContent = fmt(dA, 4);
+    $('r-rate').textContent = fmt(dA / dt, 3);
+    $('r-s1').textContent = fmt(s1, 2);
+    $('r-s2').textContent = fmt(s2, 2);
+    $('r-share').textContent = pct(share);
+    requestAnimationFrame(draw);
+    renderPlay();
+  }
+  $('grow').onclick = grow;
+  $('rect').onchange = function () { anim = null; draw(performance.now()); };
+
+  function renderPlay() {
+    var tb = document.querySelector('#log tbody'); tb.textContent = '';
+    S.runs.forEach(function (r, i) {
+      var tr = el('tr');
+      [String(i + 1), r.name, String(r.dt), fmt(r.rate, 3), fmt(r.sum, 2), pct(r.share)].forEach(function (v) { tr.appendChild(el('td', null, v)); });
+      tb.appendChild(tr);
+    });
+    var dts = {}, rects = {}, min = Infinity;
+    S.runs.forEach(function (r) { dts[r.dt] = true; rects[r.rid] = true; if (r.dt < min) min = r.dt; });
+    $('g-runs').textContent = String(S.runs.length);
+    $('g-dt').textContent = String(Object.keys(dts).length);
+    $('g-min').textContent = S.runs.length ? String(min) : 'none';
+    $('g-rect').textContent = String(Object.keys(rects).length);
+    $('grow').disabled = !S.pred;
+    $('grow-hint').textContent = S.pred ? 'Pick a rectangle and a Δt, then grow it. Each run adds a row to the log.' : 'Lock your prediction to start running.';
+    $('next-play').disabled = !playGate();
+    if (!anim) draw(performance.now());
+  }
+  $('next-play').onclick = function () { advance('play'); };
+
+  /* ---------- step 3: huddle ---------- */
+  $('check-huddle').onclick = function () {
+    if ($('code-huddle').value.trim() === codeFor('huddle1')) { S.huddleOK = true; $('msg-huddle').hidden = true; save(); renderAll(); }
+    else { $('msg-huddle').hidden = false; }
+  };
+  $('rule').addEventListener('input', function () { S.rule = this.value; save(); renderHuddle(); });
+  function renderHuddle() {
+    $('rule-wrap').hidden = !S.huddleOK;
+    $('rule').value = S.rule;
+    $('next-huddle').disabled = !canLeave('huddle');
+  }
+  $('next-huddle').onclick = function () { advance('huddle'); };
+
+  /* ---------- step 4: name it ---------- */
+  $('formal').addEventListener('input', function () { S.formal = this.value; save(); renderName(); });
+  function renderName() {
+    $('formal').value = S.formal;
+    var ok = canLeave('name');
+    $('next-name').disabled = !ok;
+    $('msg-name').hidden = ok || normalize(S.formal).length === 0;
+  }
+  $('next-name').onclick = function () { advance('name'); };
+
+  /* ---------- multiple choice (shared by build and try) ---------- */
+  // Calls onDone when the question is answered correctly, or after the second miss with the reasoning shown.
+  function mc(host, q, seed, missKey, onDone) {
+    var order = perm(q.opts.length, seed);
+    var list = el('div', 'choices'), fb = el('p', 'msg'), btns = [], solved = false;
+    function lock() { btns.forEach(function (x) { x.disabled = true; }); }
+    order.forEach(function (oi) {
+      var b = el('button', 'btn opt', q.opts[oi]); b.type = 'button';
+      b.onclick = function () {
+        if (solved || b.disabled) return;
+        if (oi === q.ans) {
+          solved = true; lock(); b.classList.add('picked-right');
+          fb.className = 'msg ok'; fb.textContent = 'Correct. ' + q.worked;
+          onDone();
+        } else {
+          S[missKey]++; save();
+          b.classList.add('picked-wrong'); b.disabled = true;
+          fb.className = 'msg bad'; fb.textContent = 'Not quite. ' + q.hint;
+          if (S[missKey] >= 2) {
+            solved = true; lock();
+            fb.className = 'msg'; fb.textContent = 'Here is the reasoning. ' + q.worked;
+            onDone();
+          }
+        }
+      };
+      btns.push(b); list.appendChild(b);
+    });
+    host.appendChild(list); host.appendChild(fb);
+  }
+  function nextButton(host, label, fn) {
+    var nb = el('button', 'btn primary', label); nb.type = 'button'; nb.onclick = fn;
+    host.appendChild(el('div', 'row')).appendChild(nb);
+  }
+
+  /* ---------- step 5: build it (fixed four-step routine) ---------- */
+  function renderBuild() {
+    var host = $('build-box'); host.textContent = '';
+    var offset = 0;
+    BUILD.forEach(function (p, pi) {
+      if (offset > S.buildIdx) { offset += p.slots.length; return; }
+      var card = el('div', 'job');
+      card.appendChild(el('p', 'qlabel', 'Problem ' + (pi + 1)));
+      card.appendChild(el('p', 'q', p.expr));
+      p.slots.forEach(function (s, si) {
+        var k = offset + si;
+        if (k < S.buildIdx) {
+          var line = el('p', 'done-line');
+          line.appendChild(document.createTextNode(s.label + ': '));
+          line.appendChild(el('b', null, s.done));
+          card.appendChild(line);
+        } else if (k === S.buildIdx) {
+          card.appendChild(el('p', 'qlabel', s.label));
+          card.appendChild(el('p', 'q', s.q));
+          mc(card, s, seedFor('build' + k), 'buildMisses', function () {
+            nextButton(card, k + 1 < BUILD_TOTAL ? 'Next step' : 'Finish building', function () { finishSlot(k); });
+          });
+        }
+      });
+      host.appendChild(card);
+      offset += p.slots.length;
+    });
+    if (S.buildIdx >= BUILD_TOTAL) host.appendChild(el('p', 'msg ok', 'Both derivatives are built. Continue to the questions that adjust to your work.'));
+    $('next-build').disabled = !canLeave('build');
+  }
+  function finishSlot(k) {
+    S.buildLog.push({ slot: k + 1, misses: S.buildMisses });
+    S.buildIdx = k + 1; S.buildMisses = 0; save(); renderAll();
+  }
+  $('next-build').onclick = function () { advance('build'); };
+
+  /* ---------- step 6: try it (hidden difficulty ladder) ---------- */
+  function renderTry() {
+    var host = $('try-box'); host.textContent = '';
+    if (S.tryIdx >= ITEMS.length) {
+      host.appendChild(el('p', 'msg ok', 'All three questions are done. Continue to the final check.'));
+      $('next-try').disabled = false;
+      return;
+    }
+    $('next-try').disabled = true;
+    var item = ITEMS[S.tryIdx], q = item.rungs[S.tryRung];
+    if (!S.tryStart && currentStep() === 'try') { S.tryStart = Date.now(); save(); }
+    host.appendChild(el('p', 'qlabel', 'Question ' + (S.tryIdx + 1) + ' of ' + ITEMS.length + ' · ' + item.title));
+    host.appendChild(el('p', 'q', q.q));
+    mc(host, q, seedFor('try' + S.tryIdx + 'r' + S.tryRung), 'tryMisses', function () {
+      nextButton(host, S.tryIdx + 1 < ITEMS.length ? 'Next question' : 'Finish questions', finishItem);
+    });
+  }
+  // Clean first try moves up, one miss holds, two or more move down.
+  function finishItem() {
+    var m = S.tryMisses, r = S.tryRung, top = ITEMS[0].rungs.length - 1;
+    var next = m === 0 ? Math.min(top, r + 1) : (m === 1 ? r : Math.max(0, r - 1));
+    S.tryLog.push({ item: S.tryIdx + 1, rung: r, misses: m, secs: S.tryStart ? Math.round((Date.now() - S.tryStart) / 1000) : 0 });
+    S.tryIdx++; S.tryRung = next; S.tryMisses = 0; S.tryStart = 0;
+    save(); renderAll();
+  }
+  $('next-try').onclick = function () { advance('try'); };
+
+  /* ---------- step 7: check ---------- */
+  function renderCheck() {
+    var host = $('check-box'); host.textContent = '';
+    host.appendChild(el('p', 'q', CHECK.q));
+    if (!S.check) {
+      var list = el('div', 'choices');
+      perm(CHECK.opts.length, seedFor('check')).forEach(function (oi) {
+        var lab = el('label', 'choice');
+        var r = document.createElement('input'); r.type = 'radio'; r.name = 'check'; r.value = String(oi);
+        lab.appendChild(r); lab.appendChild(document.createTextNode(' ' + CHECK.opts[oi]));
+        list.appendChild(lab);
+      });
+      host.appendChild(list);
+      var b = el('button', 'btn primary', 'Submit answer'); b.type = 'button';
+      b.onclick = function () {
+        var sel = document.querySelector('input[name=check]:checked');
+        if (!sel) return;
+        S.check = { choice: +sel.value, correct: +sel.value === CHECK.ans };
+        save(); renderAll();
+      };
+      host.appendChild(b);
+    } else {
+      host.appendChild(el('p', 'msg ok', 'Recorded. Mr. D will go over the class results.'));
+    }
+    $('reflect-wrap').hidden = !S.check;
+    $('reflect').value = S.reflect;
+    $('next-check').disabled = !canLeave('check');
+  }
+  $('reflect').addEventListener('input', function () { S.reflect = this.value; save(); $('next-check').disabled = !canLeave('check'); });
+  $('next-check').onclick = function () { advance('check'); };
+
+  /* ---------- step 8: stamp ---------- */
+  function renderStamp() {
+    var ok = canLeave('check');
+    $('stamp-code').textContent = ok ? 'PROD-' + hashStr(S.first + '|' + S.period + '|' + LESSON + '|' + today()) : 'PROD-----';
+    $('stamp-line').textContent = ok ? 'Name: ' + S.first + ' · Period ' + S.period : 'Finish every step to get your code.';
+  }
+
+  /* ---------- teacher key ---------- */
+  function renderKey() {
+    var host = $('teacher');
+    host.hidden = !KEY; host.textContent = '';
+    if (!KEY) return;
+    host.appendChild(el('h3', null, 'Teacher key · 2.7 The Product Rule'));
+    host.appendChild(el('p', 'hint', 'Students do not see this panel. The step buttons above ignore the gates in this view. Logs below are from this device only; a live class view is not connected yet.'));
+    var codes = el('ul');
+    codes.appendChild(el('li', null, 'Today’s huddle code (Huddle 1): ' + codeFor('huddle1')));
+    codes.appendChild(el('li', null, 'Stamp code is built from name, period and date; the student sees it at the end.'));
+    host.appendChild(codes);
+
+    host.appendChild(el('h3', null, 'Answer key'));
+    var ak = el('ul');
+    ak.appendChild(el('li', null, 'Predict: ' + PRED_KEY + ' (6 square units per second: right strip 1×3 plus top strip 3×1). A = multiplied the rates (1×1). B = added the rates (1+1).'));
+    ak.appendChild(el('li', null, 'Play, exact strip-rate sums: 3 by 3 → 6; 4 by 2 → 14; 5 by 4 → 3; 2 by 6 → 7. The measured ΔA ÷ Δt equals the sum plus f′g′·Δt, so it closes in as Δt shrinks.'));
+    ak.appendChild(el('li', null, 'Name it: the student copies the formal statement. (f·g)′ = f′g + fg′, not f′g′.'));
+    BUILD.forEach(function (p, pi) {
+      ak.appendChild(el('li', null, 'Build ' + (pi + 1) + ' ' + p.expr + ': ' + p.slots.map(function (s) { return s.done; }).join(' → ')));
+    });
+    ITEMS.forEach(function (it, i) {
+      var parts = it.rungs.map(function (r, ri) { return ri + ' ' + RUNG_NAMES[ri] + ' = ' + r.opts[r.ans]; });
+      ak.appendChild(el('li', null, 'Item ' + (i + 1) + ' (' + it.title + '): ' + parts.join(' · ')));
+    });
+    ak.appendChild(el('li', null, 'Check: ' + CHECK.opts[CHECK.ans] + '. Wrong picks: 3x²·2 is f′g′; x³(2x − 1) + 3x²·2 puts the primes on the wrong factors.'));
+    host.appendChild(ak);
+
+    host.appendChild(el('h3', null, 'This device’s log'));
+    var lg = el('ul');
+    var predNote = S.pred === 'A' ? ' (multiplied the rates)' : S.pred === 'B' ? ' (added the rates)' : S.pred === 'C' ? ' (correct)' : '';
+    lg.appendChild(el('li', null, 'Student: ' + (S.first || '—') + ' · period ' + (S.period || '—') + ' · prediction ' + (S.pred || 'not locked') + predNote + ' · runs ' + S.runs.length));
+    if (!S.buildLog.length) lg.appendChild(el('li', null, 'No build slots finished yet.'));
+    else lg.appendChild(el('li', null, 'Build misses by slot: ' + S.buildLog.map(function (b) { return b.slot + ':' + b.misses; }).join(' · ')));
+    if (!S.tryLog.length) lg.appendChild(el('li', null, 'No try-it questions finished yet.'));
+    S.tryLog.forEach(function (t) {
+      var flag = (t.secs < 4 && t.misses > 0) ? ' · GUESSING?' : '';
+      lg.appendChild(el('li', null, 'Q' + t.item + ' on rung ' + t.rung + ' (' + RUNG_NAMES[t.rung] + ') · misses ' + t.misses + ' · ' + t.secs + ' s' + flag));
+    });
+    if (S.tryIdx >= ITEMS.length) lg.appendChild(el('li', null, 'Ended on rung ' + S.tryRung + ' (' + RUNG_NAMES[S.tryRung] + ').'));
+    if (S.check) lg.appendChild(el('li', null, 'Check: ' + (S.check.correct ? 'correct' : 'not correct, chose “' + CHECK.opts[S.check.choice] + '”')));
+    host.appendChild(lg);
+    var rs = el('button', 'btn', 'Reset this device'); rs.type = 'button';
+    rs.onclick = function () { if (confirm('Clear this device’s saved progress?')) { S = fresh(); save(); anim = null; renderAll(); } };
+    host.appendChild(el('div', 'row')).appendChild(rs);
+  }
+
+  /* ---------- render ---------- */
+  function renderAll() {
+    var step = currentStep();
+    STEPS.forEach(function (s) {
+      var sec = document.querySelector('section[data-step="' + s + '"]');
+      if (sec) sec.hidden = s !== step;
+    });
+    renderNav(); renderStart(); renderPredict(); renderPlay(); renderHuddle(); renderName(); renderBuild(); renderTry(); renderCheck(); renderStamp(); renderKey();
+    $('next-predict').disabled = !S.pred;
+    $('next-huddle').disabled = !canLeave('huddle');
+    $('next-name').disabled = !canLeave('name');
+    $('next-build').disabled = !canLeave('build');
+    $('next-check').disabled = !canLeave('check');
+    $('next-play').disabled = !playGate();
+  }
+  window.addEventListener('hashchange', function () { KEY = /(^|[#&])key\b/.test(location.hash); renderAll(); });
+  renderAll();
+})();
+</script>
+</body>
+</html>

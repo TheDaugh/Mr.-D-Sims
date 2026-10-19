@@ -47,6 +47,7 @@ The `calculus/` folder holds AP Calculus AB sims, with a hub at `calculus/index.
 
 | Unit | Page |
 |---|---|
+| 2 · Differentiation | `2-7-product-rule.html` (Day 1 guided lesson: predict, grow rectangles to see two strips and a vanishing corner, name the rule, build two derivatives, adjusting questions; add `#key` for the teacher key; outline in `2-7-product-rule-outline.md`) |
 | 6 · Integration and Accumulation of Change | `accumulation-lab.html` (two tabs: the accumulation machine, where g(x) = ∫f builds up as you drag x, and Riemann sums with left, right, midpoint and trapezoid rules and an error-vs-n plot) |
 
 Each page is one self-contained file, so the same rules as the physics sims apply: constants and function lists sit at the top of the `<script>` block.
