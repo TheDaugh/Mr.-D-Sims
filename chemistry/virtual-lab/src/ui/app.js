@@ -70,7 +70,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   if (HEAT && TUT) { const at = hsubs.indexOf(TUT.id), ti = lab.tubes.indexOf(TUT.unknown); if (at >= 0 && ti >= 0) [hsubs[at], hsubs[ti]] = [hsubs[ti], hsubs[at]]; }
   const unknowns = HEAT ? lab.tubes.map((L, i) => ({ label: L, id: hsubs[i] })) : order.slice(0, 4).map((id, i) => ({ label: "ABCD"[i], id }));
   const truth = {}; if (!HEAT) for (const id of solids) truth[id] = fingerprint(world, EL, id, lab.standard);
-  const TEACHER = window.__TEACHER__ === true;
+  const TEACHER = window.__TEACHER__ === true || (/(^|[#&])(key|preview)\b/.test(location.hash) && !!(window.MrD && MrD.access && MrD.access.unlocked()));
   const ACT = createActive();
   const log = new Log();
   { const add0 = log.add.bind(log); log.add = (t, d) => { ACT.poke(performance.now() / 1000); return add0(t, d); }; }
