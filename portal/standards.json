@@ -43,6 +43,12 @@
       "needsReview": true,
       "practice": { "gens": ["chem:3", "chem:4"], "lesson": { "label": "Atom Discovery lesson", "href": "../chemistry/unit-3-atoms-ions/atom-discovery.html" } }
     },
+    "CHEM-ATOM-4": {
+      "course": "chem", "title": "The nuclear atom from evidence",
+      "can": "I can use scattering data to explain why the plum-pudding model failed and what the results show about the nucleus.",
+      "codes": [], "needsReview": true,
+      "practice": { "gens": [], "lesson": { "label": "Rutherford's Gold Foil lesson", "href": "../chemistry/unit-3-atoms-ions/rutherford-gold-foil.html" } }
+    },
     "CHEM-LAB-1": {
       "course": "chem", "title": "Working safely in the lab",
       "can": "I put on protective equipment before handling chemicals and avoid hazards.",
@@ -90,6 +96,7 @@
     "chem/chem.atom-mass-ratios": "CHEM-ATOM-3",
     "chem/chem.practice.peroxide": "CHEM-ATOM-3",
     "chem/chem.practice.nitrogen-oxides": "CHEM-ATOM-3",
+    "chem/chem.foil-predict": "CHEM-ATOM-4", "chem/chem.foil-run": "CHEM-ATOM-4", "chem/chem.foil-data": "CHEM-ATOM-4", "chem/chem.foil-meaning": "CHEM-ATOM-4", "chem/chem.foil-cer": "CHEM-ATOM-4", "chem/chem.foil-thickness": "CHEM-ATOM-4", "chem/chem.foil-takeaways": "CHEM-ATOM-4", "chem/chem.practice.foil": "CHEM-ATOM-4",
     "chem/chem.lab-safety": "CHEM-LAB-1",
     "chem/chem.lab-procedure": "CHEM-LAB-2",
     "chem/chem.lab-data": "CHEM-LAB-2",

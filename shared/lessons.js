@@ -14,6 +14,9 @@ window.MrD.lessons = [
   { course: "chem", id: "atom-discovery", title: "Atom Discovery: Democritus to Dalton", unit: "Unit 3 · Atoms and Ions",
     href: "chemistry/unit-3-atoms-ions/atom-discovery.html", teacher: "chemistry/teacher.html",
     gates: [{ key: "h1", label: "Huddle 1" }, { key: "h2", label: "Huddle 2" }], live: true },
+  { course: "chem", id: "rutherford-gold-foil", title: "Rutherford's Gold Foil", unit: "Unit 3 · Atoms and Ions",
+    href: "chemistry/unit-3-atoms-ions/rutherford-gold-foil.html", teacher: "chemistry/teacher.html",
+    gates: [{ key: "h1", label: "Huddle 1" }], live: true },
   { course: "calc", id: "product-rule-v2", title: "2.7 The Product Rule", unit: "Unit 2 · Differentiation",
     href: "calculus/unit-2-differentiation/2-7-product-rule.html", teacher: "calculus/unit-2-differentiation/2-7-product-rule-teacher.html",
     gates: [{ key: "h1", label: "Huddle" }], live: true }

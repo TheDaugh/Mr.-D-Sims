@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rutherford’s Gold Foil</title>
+<meta name="description" content="Fire alpha particles at a gold foil, count where they land, and let the data rewrite the plum-pudding atom.">
+<link rel="stylesheet" href="../shared/lab.css">
+<style>
+  .wrap{max-width:900px}
+  #chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+  .chip{padding:2px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:.85rem;color:var(--muted)}
+  .chip.on{border-color:var(--accent);color:var(--accent);font-weight:700}
+  .chip.done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+  .wrap{max-width:none;padding-inline:clamp(12px,3vw,40px)}
+  .keyline{margin-top:10px;padding:8px 10px;border-left:4px solid var(--ok);background:rgba(60,160,90,.1);font-size:.9rem}
+  .endbar{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:center;padding:10px 14px;margin:0 0 12px;background:#fff4d6;border:2px solid #d9a400;border-radius:8px;color:#3a2c00}
+  .endbar[hidden]{display:none}
+  .tier{margin-left:10px;font-size:.7rem;font-family:system-ui,sans-serif;letter-spacing:.06em;background:var(--hot);color:#fff;padding:2px 8px;border-radius:999px;vertical-align:middle}
+  .sub{color:var(--muted);margin:0 0 14px;max-width:68ch}
+  .btn{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btn.ghost{background:var(--panel);color:var(--ink);border-color:var(--line)}
+  .btn.big{font-size:1.05rem;min-height:46px;padding:8px 22px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .stamp{border:3px solid var(--ok);border-radius:14px;text-align:center;padding:14px;margin:10px 0;color:var(--ok);background:var(--ok-bg)}
+  .stamp .big{font-size:1.6rem;font-weight:800;letter-spacing:.04em}
+  table.sum{margin:10px 0}
+  .card.final h2{font-size:1.4rem}
+  .task{display:flex;gap:8px;align-items:flex-start;padding:3px 0;font-size:.93rem}
+  .task.ok{color:var(--ok)}
+  .task .bx{width:18px;height:18px;border:2px solid var(--line);border-radius:4px;flex:none;margin-top:2px;text-align:center;line-height:14px;font-size:13px}
+  .task.ok .bx{background:var(--ok);border-color:var(--ok);color:#fff}
+  .key .it{border-bottom:1px solid var(--line);padding:8px 0;font-size:.93rem}
+  .key h3{margin-top:18px;color:var(--accent)}
+  textarea{width:100%;min-height:120px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}
+  .wtbl td,.wtbl th{padding:4px 6px;font-size:.85rem}
+  input[type=range]{width:100%}
+  .sl{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);flex:1 1 200px}
+  .sl b{color:var(--ink)}
+  .figs{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  figure.pix{margin:0;flex:1 1 200px;max-width:260px;text-align:center}
+  figure.pix canvas{width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;border:2px solid var(--line);border-radius:6px;background:#111;cursor:pointer}
+  figure.pix figcaption{font-size:.82rem;color:var(--muted);margin-top:6px;text-align:left}
+  figure.pix .cr{font-size:.72rem;opacity:.8}
+  .scene text{font-family:system-ui,sans-serif}
+  .bt td,.bt th{padding:3px 4px;font-size:.72rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="back" href="../index.html">← Chemistry</a>
+    <span class="crumb">Unit 3 · Atoms and Ions</span>
+    <button type="button" class="ghost" id="open-notes" style="margin-left:auto" title="Your own notes for this lesson. They fill in as you work, and you print them as a PDF at the end.">My notes</button>
+  </header>
+  <h1>Rutherford’s Gold Foil</h1>
+  <p class="lead">Fire alpha particles at gold. Count where they land. Then let the data rewrite the atom.</p>
+  <div class="mrd-tb" id="tb" hidden></div>
+  <div id="desk"></div>
+  <div id="endbar" class="endbar" hidden></div>
+  <div id="chips" aria-label="Progress"></div>
+  <main id="app"></main>
+</div>
+
+<script src="../../shared/config.js"></script>
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
+<script src="../../shared/teacherbar.js"></script>
+<script src="../../shared/live.js"></script>
+<script src="../../shared/profile.js"></script>
+<script src="../../shared/notes.js"></script>
+<script src="../../shared/lock.js"></script>
+<script src="../shared/foil-model.js"></script>
+<script src="../shared/practice-foil.js"></script>
+<script>
+/* ============ DATA ============ */
+const DATA={parts:[
+{title:"Predict First",sub:"Thomson pictured the atom as a ball of positive charge with electrons stuck in it like plums in a pudding. Before you test that picture, commit to a prediction.",blocks:[
+ {type:"info",html:"In 1904 <b>J. J. Thomson</b> proposed the <b>plum-pudding atom</b>: the positive charge is spread evenly through the whole atom, and the light, negative electrons are embedded in it. Five years later, <b>Hans Geiger and Ernest Marsden</b>, working in <b>Ernest Rutherford’s</b> lab, fired <b>alpha particles</b> at a thin foil of gold atoms. An alpha particle is fast, about 7,000 times heavier than an electron, and positively charged. A detector screen around the foil recorded where each one landed, measured as an angle from its original straight path."},
+ {type:"widget",id:"predict",tasks:["Lock in your prediction and your reason."]}
+]},
+{title:"Run It",sub:"Fire alpha particles at gold atoms. Test the plum-pudding atom first, then the real foil.",blocks:[
+ {type:"info",html:"The detector counts every alpha particle by the angle it lands at, in bins of 10°. <b>0°</b> means it kept going straight. <b>90°</b> means it was turned sideways. Past <b>90°</b> means it came back toward the source. Use the slider to set how many particles per second leave the source. The plum-pudding test needs 10,000 particles. The real foil needs 20,000, because the rarest events need a big sample. <b>Note:</b> the sim’s gold nucleus is made stronger than the real one so that rare events show up in seconds. Rutherford’s team counted about 1 rebound in 8,000."},
+ {type:"widget",id:"foil",tasks:["Fire at least 10,000 alpha particles at the plum-pudding atom.","Fire 20,000 alpha particles at the real gold foil (fill the detector)."]}
+]},
+{title:"Find the Pattern",sub:"Your detector log is a table of counts. Turn it into three fractions.",blocks:[
+ {type:"info",html:"<b>Straight through</b> means the first column, 0–10°. <b>Deflected</b> means 10° up to 90°. <b>Rebounded</b> means 90° and beyond. Use the counts from your own <b>real gold foil</b> run."},
+ {type:"datatable"},
+ {type:"num",save:"pStraight",calc:"straight",q:"What <b>percent</b> of your alpha particles went <b>straight through</b>? (0–10°, divided by the total fired, times 100.)",tol:0.3,unit:"%",why:"The first column of your table, divided by the total fired and multiplied by 100. Nearly all of them.",hint:"Look at the first column of the real-foil row in the table (0–10°). Divide that count by the total at the end of the row, then multiply by 100.",key:"about 96.7%"},
+ {type:"num",save:"pDeflected",calc:"deflected",q:"What <b>percent</b> were <b>deflected</b> (10° up to 90°)?",tol:0.3,unit:"%",why:"Add the counts from 10–20° through 80–90°, divide by the total, multiply by 100. A few.",hint:"Add the eight columns from 10–20° through 80–90° in the real-foil row. Divide that sum by the total, then multiply by 100.",key:"about 3.2%"},
+ {type:"num",save:"nRebound",calc:"rebound",tolRel:0.12,q:"About <b>1 in how many</b> rebounded (90° or more)? Enter the N in “1 in N”.",unit:"(1 in N)",why:"Add the counts from 90–100° through 170–180°, then divide the total fired by that sum. Very few.",hint:"Add the nine columns from 90–100° through 170–180° in the real-foil row. Divide the total fired by that sum.",key:"about 1 in 4,000 (5 rebounds in 20,000)"},
+ {type:"gate",id:1,say:"Huddle 1 (at the board). Put the three numbers on the board: nearly all straight through, a few deflected, a very few rebounded. Ask: what did Thomson’s atom predict for each? Take answers until someone says it predicted all three would be ‘straight through’. Then ask what it would take to turn a heavy alpha particle around."}
+]},
+{title:"What It Means",sub:"Every result is a clue about what is inside the atom. Match each one, then rebuild the atom and see if the sim agrees.",blocks:[
+ {type:"rows",save:"matched",q:"Match each result to what it shows about the atom.",choices:["Mostly empty space","A concentrated positive charge","A heavy, dense center"],rows:[
+  {q:"Nearly all alpha particles went straight through.",ans:0,why:"If most of the atom were solid, they would hit something. They went through, so most of the atom is empty."},
+  {q:"A few alpha particles were deflected through large angles.",ans:1,why:"A positive alpha particle is only pushed hard by positive charge packed into a small spot. Spread-out charge pushes weakly."},
+  {q:"A very few alpha particles bounced back.",ans:2,why:"Only something much heavier than an alpha particle could turn it around, like a ball bouncing off a bowling ball."}
+ ],hint:"Ask what would have to be true inside the atom for that result to happen."},
+ {type:"widget",id:"nucleus",tasks:["Pack the positive charge into a nucleus.","Fire alpha particles at your nuclear atom and compare with the foil data."]},
+ {type:"mcq",q:"Your nuclear atom gave counts very close to the real foil. Which change to the atom made the difference?",opts:[{t:"Packing the positive charge and most of the mass into a tiny center, with the electrons far outside it.",ok:1},{t:"Spreading the positive charge out evenly through the atom."},{t:"Adding more electrons to the pudding."},{t:"Making the whole atom bigger."}],why:"The nucleus is a tiny, dense, positive center. Most alpha particles miss it, and the few that pass close are turned hard.",hint:"Which change makes some alpha particles feel a very strong push, and most feel almost none?"}
+]},
+{title:"Write the Revision",sub:"A scientist changes a model by writing down why the old one failed. Do that now, with your own numbers.",blocks:[
+ {type:"info",html:"Write a <b>claim</b>, <b>evidence</b> and <b>reasoning</b>. Your evidence must include <b>at least one specific count from your own run</b>, such as the number that bounced back or the number you fired. Your reasoning connects that evidence to the atom."},
+ {type:"cer"}
+]},
+{title:"Change the Foil",sub:"Now you are the experimenter. Change the foil, predict the effect, then run it.",blocks:[
+ {type:"mcq",predict:true,reason:true,reasonKey:"thickReason",note:"Now run it.",q:"You will make the gold foil <b>twice as thick</b>. How will the number of alpha particles deflected by 10° or more change?",opts:[{t:"Fewer"},{t:"About the same"},{t:"About twice as many"},{t:"Many more than twice as many"}]},
+ {type:"mcq",predict:true,reason:true,reasonKey:"alReason",note:"Now run it.",q:"You will swap the gold for <b>aluminum</b>, whose nuclei carry much less positive charge (13 instead of 79). How many alpha particles will be deflected by 10° or more, compared with gold of the same thickness?",opts:[{t:"More than gold"},{t:"About the same as gold"},{t:"Far fewer than gold"}]},
+ {type:"widget",id:"foil2",tasks:["Run gold at thickness 1×.","Run gold at thickness 2×.","Run aluminum at thickness 1×."]},
+ {type:"num",save:"thickRatio",calc:"thickRatio",tol:0.15,q:"How many times as many alpha particles were deflected by 10° or more with the <b>2× gold foil</b> as with the <b>1× gold foil</b>? (Use the “bent 10° or more” column.)",unit:"times",why:"Twice the layers of atoms gives twice the chances for a close pass. The count roughly doubles.",hint:"Divide the 2× gold row’s “bent 10° or more” count by the 1× gold row’s.",key:"2.0"},
+ {type:"num",save:"alRatio",calc:"alRatio",tolRel:0.15,q:"How many times as many alpha particles were deflected by 10° or more with <b>gold</b> as with <b>aluminum</b>, both at thickness 1×?",unit:"times",why:"Gold’s nucleus has far more positive charge, so it pushes much harder. Deflections go as the charge squared: (79 ÷ 13)² is about 37.",hint:"Divide the gold 1× row’s “bent 10° or more” count by the aluminum 1× row’s.",key:"about 37 to 40"},
+ {type:"mcq",q:"Why does aluminum deflect so much less than gold?",opts:[{t:"Its nucleus has less positive charge, so it pushes an alpha particle less when one passes close.",ok:1},{t:"Aluminum atoms have no nucleus."},{t:"Aluminum atoms are solid all the way through."},{t:"Alpha particles are attracted to aluminum."}],why:"The push on an alpha particle comes from the nucleus’s positive charge. Less charge, weaker push, fewer big turns.",hint:"What in the atom pushes on the alpha particle?"}
+]}
+]};
+
+/* ============ ENGINE ============ */
+function h(tag,attrs,...kids){const e=document.createElement(tag);for(const k in(attrs||{})){if(k==="class")e.className=attrs[k];else if(k==="html")e.innerHTML=attrs[k];else if(k.startsWith("on"))e.addEventListener(k.slice(2),attrs[k]);else e.setAttribute(k,attrs[k])}kids.flat().forEach(c=>{if(c==null)return;e.append(c.nodeType?c:document.createTextNode(c))});return e}
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,attrs,...kids){const e=document.createElementNS(SVGNS,tag);for(const k in(attrs||{}))e.setAttribute(k,attrs[k]);kids.flat().forEach(c=>{if(c==null)return;e.append(c.nodeType?c:document.createTextNode(c))});return e}
+const KEY=MrD.isKey(),clk=()=>MrD.bell.clock("chem");
+const ST={name:"",period:"",t0:0,q:0,qFirst:0,retries:0,tasks:0,tasksDone:0,partIdx:0,partsDone:[],preds:[],between:false,screen:"part",keep:{},data:(()=>{const z=()=>Array(18).fill(0);return{plum:{n:0,hist:z()},real:{n:0,hist:z()},nuc:{n:0,hist:z()},f2:[]}})(),log:[],max:0,ended:false,endIdx:0,finished:false,tk:{},pr:{i:0,band:1,up:0,down:0,clean:0}};
+let inProgress=false,uid=0,LOCK_ON=false;
+const app=document.getElementById("app"),chipsEl=document.getElementById("chips");
+window.addEventListener("beforeunload",e=>{if(inProgress){e.preventDefault();e.returnValue=""}});
+const fmtT=s=>{s=Math.floor(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+const DONE_TYPES=["mcq","num","rows","widget","open","gate","cloze","cer"];
+/* Huddle codes come from shared/codes.js (MrD.codes.gate), so the key view, the teacher page and the student page always agree.
+   They are asked for only on weekdays 7:00 AM to 3:00 PM (shared/bell.js). */
+const LESSON_ID="rutherford-gold-foil";
+/* Locked mode (see ../../shared/lock.js): on only during chemistry's period, never in #key, and off with #nolock=<code> from the lock desk. */
+LessonLock.init({id:LESSON_ID,root:document.querySelector(".wrap"),onChange:()=>chips()});
+const NOLOCK=(/nolock=(\d+)/.exec(location.hash)||[])[1]===LessonLock.offCode();
+const lockSnap=()=>JSON.parse(JSON.stringify(ST));
+const lockTxt=()=>{if(!LOCK_ON)return"";const L=LessonLock.stats();return` · left the lesson ${L.total}× · away ${fmtT(L.awaySec)}`};
+const g=n=>(Math.round(n*100)/100).toString();
+
+/* ---------- gold-foil helpers ---------- */
+const FM=FoilModel,NB=FM.BINS,binL=i=>`${i*10}–${i*10+10}°`,grpOf=i=>i===0?"s":i<=8?"d":"r";
+const GCOL={s:"#7fb3d9",d:"#f0a43a",r:"#e5484d"},GBG={s:"rgba(127,179,217,.25)",d:"rgba(240,164,58,.25)",r:"rgba(229,72,77,.25)"};
+const histSum=(hh,k)=>FM.sum(hh,k==="s"?"straight":k==="d"?"deflected":"rebound");
+const total=hh=>hh.reduce((a,b)=>a+b,0),num=n=>n.toLocaleString("en-US");
+const rotOf=()=>{if(!ST.keep.rot)ST.keep.rot=[Math.random(),Math.random()];return ST.keep.rot};
+/* A stream continues where its counter left off, so a run that is paused and started again never repeats a particle. */
+const streamOf=(n,shift)=>{const r=rotOf();return{i:n,r1:(r[0]+(shift||0))%1,r2:(r[1]+(shift||0))%1}};
+function binTable(rows){
+  const head=h("tr",{},h("th",{},"Angle"),[...Array(NB).keys()].map(i=>h("th",{style:`background:${GBG[grpOf(i)]}`},binL(i))),h("th",{},"Total"));
+  const body=rows.map(r=>h("tr",{},h("th",{style:"text-align:left;white-space:nowrap"},r.label),r.hist.map(c=>h("td",{style:"text-align:right"},num(c))),h("td",{style:"text-align:right;font-weight:700"},num(total(r.hist)))));
+  return h("div",{style:"overflow-x:auto"},h("table",{class:"wtbl bt",style:"white-space:nowrap"},h("thead",{},head),h("tbody",{},body)));
+}
+/* log-scale bar chart on a canvas; series = [{hist,color?}], one bar per 10° bin, side by side when there are two */
+function drawHist(cv,series){
+  const c=cv.getContext("2d"),W=cv.width,H=cv.height,L=62,B=48,T=22,pw=W-L-10,ph=H-B-T;
+  c.clearRect(0,0,W,H);c.font="15px system-ui,sans-serif";
+  const mx=Math.max(1,...series.flatMap(s=>s.hist)),lg=v=>Math.log10(v+1)/Math.log10(mx+1);
+  c.strokeStyle="rgba(150,150,150,.5)";c.fillStyle="rgba(150,150,150,.9)";c.textAlign="right";
+  for(const v of [0,1,10,100,1000,10000]){if(v>mx)break;const y=T+ph*(1-lg(v));c.beginPath();c.moveTo(L,y);c.lineTo(L+pw,y);c.stroke();c.fillText(num(v),L-5,y+5)}
+  const bw=pw/NB;
+  for(let i=0;i<NB;i++)series.forEach((s,k)=>{
+    const v=s.hist[i],hh=ph*lg(v),w=(bw-4)/series.length,x=L+i*bw+2+k*w;
+    c.fillStyle=series.length>1?(k?"#e5484d":"#7fb3d9"):GCOL[grpOf(i)];
+    if(v>0){c.fillRect(x,T+ph-hh,w,hh);c.fillStyle="rgba(150,150,150,.95)";c.textAlign="center";c.font="13px system-ui,sans-serif";if(series.length===1)c.fillText(num(v),x+w/2,T+ph-hh-4);c.font="15px system-ui,sans-serif"}
+  });
+  c.fillStyle="rgba(150,150,150,.95)";c.textAlign="center";
+  for(let i=0;i<=NB;i+=2)c.fillText(i*10,L+i*bw,H-B+18);
+  c.fillText("Angle from the original path (°)  ·  bar height is a log scale",L+pw/2,H-6);
+}
+const circ=(c,x,y,r)=>{c.beginPath();c.arc(x,y,r,0,7);c.fill()};
+function atomPic(c,x,y,r,m){
+  if(m==="plum"){c.fillStyle="rgba(229,72,77,.5)";circ(c,x,y,r);c.fillStyle="#5aa9ff";[[.4,-.3],[-.5,.1],[.1,.5],[.3,.2],[-.2,-.5],[-.4,-.35]].forEach(p=>circ(c,x+p[0]*r,y+p[1]*r,2.2))}
+  else{c.fillStyle="rgba(90,169,255,.16)";circ(c,x,y,r);c.fillStyle="#e5484d";circ(c,x,y,2.4);c.fillStyle="#5aa9ff";[[.92,0],[-.65,.65],[-.3,-.88]].forEach(p=>circ(c,x+p[0]*r,y+p[1]*r,2))}
+}
+
+/* ---------- widgets ---------- */
+const WIDGET={};
+
+WIDGET.predict=(tick)=>{
+  const ZONES=[["A","0–10°","almost straight on"],["B","10–45°",""],["C","45–90°","sideways"],["D","90–135°","back toward the source"],["E","135–180°","almost straight back"]];
+  const svg=sv("svg",{class:"scene",viewBox:"0 0 520 190",role:"img","aria-label":"A plum-pudding atom, and an alpha beam aimed at a foil with the detector divided into five angle zones"});
+  svg.append(sv("circle",{cx:100,cy:95,r:78,fill:"rgba(229,72,77,.22)",stroke:"rgba(229,72,77,.8)","stroke-width":2}));
+  [[60,60],[120,50],[145,100],[85,115],[110,140],[55,100],[130,75],[75,80]].forEach(p=>svg.append(sv("circle",{cx:p[0],cy:p[1],r:5,fill:"#5aa9ff",stroke:"rgba(0,0,0,.4)"})));
+  [[90,70],[105,100],[70,130],[125,120],[100,60]].forEach(p=>svg.append(sv("text",{x:p[0],y:p[1],"font-size":14,fill:"rgba(229,72,77,.9)","text-anchor":"middle"},"+")));
+  svg.append(sv("text",{x:100,y:15,"text-anchor":"middle","font-size":11,fill:"currentColor","font-weight":700},"Plum-pudding gold atom"));
+  svg.append(sv("text",{x:100,y:184,"text-anchor":"middle","font-size":10.5,fill:"currentColor","fill-opacity":.8},"+ spread out · electrons embedded"));
+  const cx=420,cy=100,R=78;
+  svg.append(sv("line",{x1:250,y1:cy,x2:cx-6,y2:cy,stroke:"#f0a43a","stroke-width":2.5,"stroke-dasharray":"6 4"}));
+  svg.append(sv("text",{x:300,y:cy-10,"text-anchor":"middle","font-size":11,fill:"#f0a43a"},"alpha beam →"));
+  svg.append(sv("rect",{x:cx-5,y:cy-55,width:10,height:110,fill:"#e0b030",opacity:.85}));
+  svg.append(sv("text",{x:cx,y:cy+72,"text-anchor":"middle","font-size":10.5,fill:"currentColor","fill-opacity":.8},"gold foil"));
+  [10,45,90,135].forEach(a=>[1,-1].forEach(sg=>{const r=a*Math.PI/180;svg.append(sv("line",{x1:cx,y1:cy,x2:cx+R*Math.cos(r),y2:cy-sg*R*Math.sin(r),stroke:"currentColor","stroke-opacity":.35,"stroke-dasharray":"3 3"}))}));
+  svg.append(sv("path",{d:`M ${cx+R} ${cy} A ${R} ${R} 0 0 0 ${cx-R} ${cy}`,fill:"none",stroke:"currentColor","stroke-opacity":.3}));
+  svg.append(sv("path",{d:`M ${cx+R} ${cy} A ${R} ${R} 0 0 1 ${cx-R} ${cy}`,fill:"none",stroke:"currentColor","stroke-opacity":.3}));
+  [5,27,67,112,157].forEach((a,i)=>{const r=a*Math.PI/180;svg.append(sv("text",{x:cx+(R-16)*Math.cos(r),y:cy-(R-16)*Math.sin(r)+4,"text-anchor":"middle","font-size":13,"font-weight":700,fill:"currentColor"},ZONES[i][0]))});
+  const ins=ZONES.map(z=>h("input",{type:"number",min:0,max:100,step:1,value:0,inputmode:"numeric","aria-label":"Alpha particles in zone "+z[0]+" ("+z[1]+")",style:"width:84px",oninput:upd}));
+  const left=h("b",{},"100"),ta=h("textarea",{"aria-label":"Why do you think so?",placeholder:"I think they will land there because ...",style:"min-height:70px",oninput:upd});
+  const btn=h("button",{class:"btn",disabled:"",onclick:lock},"Lock in my prediction"),fb=feedback();
+  function used(){return ins.reduce((a,i)=>a+(Math.max(0,Math.floor(+i.value||0))),0)}
+  function upd(){const u=used();left.textContent=100-u;left.style.color=u===100?"var(--ok)":u>100?"var(--bad)":"inherit";btn.disabled=!(u===100&&ta.value.trim().length>=10)}
+  function lock(){
+    const z=ins.map(i=>Math.max(0,Math.floor(+i.value||0)));
+    ST.keep.predZones=z;ST.keep.predReason=ta.value.trim();
+    ST.preds.push({q:"Where will 100 alpha particles land? (plum-pudding atom)",choice:ZONES.map((q,i)=>q[0]+" "+q[1]+": "+z[i]).join(" · ")});
+    ins.forEach(i=>i.disabled=true);ta.disabled=true;btn.disabled=true;show(fb,true,"🔒 Locked in. Now test it.");tick(0);
+  }
+  return h("div",{},svg,
+    h("p",{},h("b",{},"Place all 100 alpha particles."),` Shared out across the five detector zones, where do you think they will land if the atom is a plum pudding? Zone A is almost straight on. Zones D and E are back toward the source.`),
+    h("div",{class:"row",style:"margin:8px 0"},ZONES.map((z,i)=>h("label",{class:"sl",style:"flex:0 1 150px"},h("span",{},h("b",{},z[0]),"  ",z[1]),z[2]?h("span",{class:"hint"},z[2]):null,ins[i]))),
+    h("p",{},"Particles left to place: ",left),
+    h("p",{},"In one sentence, why do you think so?"),ta,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+
+WIDGET.foil=(tick)=>{
+  const W=520,H=300,CAP=20000,NEED=10000,CX=205,CY=150,R=108,K={plum:"plum",real:"real"};
+  let model=ST.data.real.n>0?"real":"plum",run=false,last=0,raf=0,tracks=[],rate=2000;
+  const cv=h("canvas",{width:W*2,height:H*2,role:"img","aria-label":"Top view of an alpha beam hitting a foil, with the detector arc around it showing where each particle lands",style:"width:100%;max-width:760px;border-radius:8px;display:block;margin:0 auto;background:#0e1620"});
+  const c=cv.getContext("2d");c.scale(2,2);
+  const mkLayer=()=>{const o=document.createElement("canvas");o.width=W*2;o.height=H*2;const x=o.getContext("2d");x.scale(2,2);return{o,x}};
+  const layer={plum:mkLayer(),real:mkLayer()};
+  const hist=h("canvas",{width:1040,height:300,role:"img","aria-label":"Bar chart of detector counts by angle",style:"width:100%;max-width:760px;display:block;margin:8px auto"});
+  const status=h("div",{class:"readout","aria-live":"polite"}),msg=h("div",{class:"note",style:"margin-top:8px"});
+  const tableHost=h("div");
+  const go=h("button",{class:"btn",onclick:toggle},"▶ Fire"),
+    rl=h("b",{},num(rate)),
+    sl=h("input",{type:"range",min:500,max:6000,step:500,value:rate,"aria-label":"Beam rate in particles per second",oninput:e=>{rate=+e.target.value;rl.textContent=num(rate)}});
+  const rad=m=>h("label",{style:"display:flex;gap:6px;align-items:center"},h("input",{type:"radio",name:"fm"+(++uid),value:m,onchange:()=>pick(m)}),m==="plum"?"Plum-pudding atom":"Real gold foil");
+  const rP=rad("plum"),rR=rad("real");
+  const rIn=[rP.querySelector("input"),rR.querySelector("input")];
+  rIn[0].name=rIn[1].name="fm"+uid;
+  function pick(m){if(m==="real"&&ST.data.plum.n<NEED){rIn[0].checked=true;return}if(run)toggle();model=m;draw();update()}
+  function base(){
+    c.fillStyle="#0e1620";c.fillRect(0,0,W,H);
+    c.strokeStyle="rgba(255,255,255,.2)";c.lineWidth=1;c.beginPath();c.arc(CX,CY,R,0,7);c.stroke();
+    c.fillStyle="rgba(255,255,255,.45)";c.font="10px system-ui,sans-serif";c.textAlign="center";
+    [0,30,60,90,120,150,180].forEach(a=>{const t=a*Math.PI/180;c.fillText(a+"°",CX+(R+14)*Math.cos(t),CY-(R+14)*Math.sin(t)+3)});
+    c.strokeStyle="#f0a43a";c.setLineDash([6,4]);c.lineWidth=2;c.beginPath();c.moveTo(36,CY);c.lineTo(CX-22,CY);c.stroke();c.setLineDash([]);
+    c.fillStyle="#8892a0";c.fillRect(12,CY-12,24,24);c.fillStyle="#f0a43a";c.fillRect(30,CY-3,6,6);
+    c.fillStyle="rgba(255,255,255,.7)";c.textAlign="left";c.fillText("α source",8,CY+28);
+    c.fillStyle="rgba(224,176,48,.28)";c.fillRect(CX-20,CY-92,40,184);
+    for(let k=-2;k<=2;k++)atomPic(c,CX,CY+k*38,17,model);
+    c.fillStyle="rgba(255,255,255,.7)";c.textAlign="center";c.fillText(model==="plum"?"foil of plum-pudding atoms":"foil of real gold atoms",CX,H-8);
+  }
+  function draw(){
+    base();c.drawImage(layer[model].o,0,0,W,H);
+    tracks.forEach(t=>{c.strokeStyle=t.col;c.globalAlpha=.7;c.lineWidth=1;c.beginPath();c.moveTo(CX-18,CY);c.lineTo(CX,CY);c.lineTo(t.x,t.y);c.stroke();c.globalAlpha=1});
+    c.fillStyle="rgba(255,255,255,.85)";c.textAlign="left";c.font="12px system-ui,sans-serif";c.fillText("Fired: "+num(ST.data[model].n),W-120,18);
+  }
+  function tableRows(){return[{label:"Plum pudding",hist:ST.data.plum.hist},{label:"Real gold foil",hist:ST.data.real.hist}]}
+  function update(){
+    const D=ST.data[model];drawHist(hist,[{hist:D.hist}]);tableHost.replaceChildren(binTable(tableRows()));
+    status.replaceChildren(h("div",{class:"stat"},h("b",{},num(D.n)),h("span",{},"alpha particles fired (limit "+num(CAP)+")")),h("div",{class:"stat"},h("b",{},model==="plum"?"Plum pudding":"Real gold foil"),h("span",{},"atom being tested")));
+    rIn[0].checked=model==="plum";rIn[1].checked=model==="real";rIn[1].disabled=ST.data.plum.n<NEED;
+    go.textContent=run?"⏸ Pause":"▶ Fire";go.disabled=D.n>=CAP;
+    msg.textContent=ST.data.plum.n<NEED?"Start with the plum-pudding atom. Fire at least 10,000 alpha particles and watch where they land.":model==="plum"&&ST.data.real.n===0?"Now switch to the real gold foil and fill the detector with 20,000 alpha particles. Compare the two logs.":D.n>=CAP?"The detector is full for this atom.":"Read the detector log below the chart. Which angles caught the most? Which caught only a few?";
+    if(ST.data.plum.n>=NEED)tick(0);if(ST.data.real.n>=CAP)tick(1);
+  }
+  function toggle(){run=!run;if(run){last=performance.now();raf=requestAnimationFrame(step)}else cancelAnimationFrame(raf);update()}
+  function step(ts){
+    if(!run)return;const dt=Math.min(.05,(ts-last)/1000);last=ts;
+    const D=ST.data[model],k=Math.min(CAP-D.n,Math.max(1,Math.round(rate*dt)));
+    const lx=layer[model].x,st=streamOf(D.n,model==="plum"?0:0),tr=[];tracks=[];
+    const res=FM.fire(st,k,model==="plum"?"plum":"nuc","Au",1,a=>{
+      const t=a*Math.PI/180,sg=Math.random()<.5?1:-1,x=CX+R*Math.cos(t),y=CY-sg*R*Math.sin(t),g=grpOf(Math.min(NB-1,Math.floor(a/10))),col=GCOL[g];
+      lx.fillStyle=col;lx.globalAlpha=g==="s"?.35:.95;lx.fillRect(x-(g==="s"?.8:1.6),y-(g==="s"?.8:1.6),g==="s"?1.6:3.2,g==="s"?1.6:3.2);lx.globalAlpha=1;
+      if(tracks.length<5||g!=="s"&&tracks.length<9)tracks.push({x,y,col});
+    });
+    D.n=st.i;res.hist.forEach((v,i)=>D.hist[i]+=v);
+    if(D.n>=CAP&&run){run=false;cancelAnimationFrame(raf)}
+    draw();update();if(run)raf=requestAnimationFrame(step);
+  }
+  draw();update();
+  return h("div",{},h("div",{class:"row",style:"margin-bottom:8px;gap:18px"},rP,rR),cv,
+    h("div",{class:"controls",style:"margin:10px 0"},h("label",{class:"sl"},h("span",{},"Beam rate: ",rl," particles per second"),sl),go),
+    status,msg,hist,h("p",{},h("b",{},"Detector log (counts by angle)")),tableHost);
+};
+
+/* the results table the data questions read from */
+const datatableBlock=()=>{
+  const D=ST.data,card=h("div",{class:"card"});
+  card.append(h("div",{class:"q"},h("p",{},h("b",{},"Your detector log")),
+    binTable([{label:"Plum pudding",hist:D.plum.hist},{label:"Real gold foil",hist:D.real.hist}]),
+    h("p",{class:"hint"},"Blue columns: straight through. Orange: deflected. Red: rebounded."),
+    total(D.real.hist)===0?h("p",{class:"hint"},"Your table is empty because the real-foil run has not been done in this window. (Teacher view: expect about 96.7% straight, 3.2% deflected, 1 in 4,000 rebounded.)"):null));
+  return card;
+};
+
+WIDGET.nucleus=(tick)=>{
+  let packed=false,fired=false,t=0,raf=0;
+  const svg=sv("svg",{class:"scene",viewBox:"0 0 520 196",style:"max-width:400px;display:block;margin:0 auto",role:"img","aria-label":"An atom whose positive charge shrinks from a spread-out cloud into a tiny nucleus with electrons far outside"});
+  const cloud=sv("circle",{cx:260,cy:104,r:70,fill:"rgba(229,72,77,.3)",stroke:"rgba(229,72,77,.9)","stroke-width":2});
+  const core=sv("circle",{cx:260,cy:104,r:4,fill:"#e5484d",opacity:0});
+  const ring=sv("circle",{cx:260,cy:104,r:76,fill:"none",stroke:"rgba(90,169,255,.5)","stroke-dasharray":"3 4"});
+  const els=[0,1,2,3,4,5].map(i=>sv("circle",{cx:260+76*Math.cos(i*1.05),cy:104+76*Math.sin(i*1.05),r:5,fill:"#5aa9ff",stroke:"rgba(0,0,0,.4)"}));
+  const cap=sv("text",{x:260,y:14,"text-anchor":"middle","font-size":13,"font-weight":700,fill:"currentColor"},"The positive charge is spread out");
+  svg.append(ring,cloud,core,...els,cap);
+  function paint(){const e=t*t*(3-2*t),r=70-66*e;cloud.setAttribute("r",r.toFixed(1));cloud.setAttribute("fill-opacity",(.3+.7*e).toFixed(2));core.setAttribute("opacity",e>.9?1:0);
+    cap.textContent=t>=1?"All of the positive charge is in a tiny nucleus":"Packing the positive charge..."}
+  const pack=h("button",{class:"btn",onclick:()=>{pack.disabled=true;const t0=performance.now(),dur=1400;const f=ts=>{t=Math.min(1,(ts-t0)/dur);paint();if(t<1)raf=requestAnimationFrame(f);else{packed=true;fire.disabled=false;tick(0);msg.textContent="The charge and most of the mass are now in a point at the center. Fire alpha particles at it."}};raf=requestAnimationFrame(f)}},"Pack the positive charge into a nucleus");
+  const fire=h("button",{class:"btn",disabled:"",onclick:()=>{
+    const N=Math.max(NEED0,ST.data.real.n),st=streamOf(0,.37),res=FM.fire(st,N,"nuc","Au",1);ST.data.nuc={n:st.i,hist:res.hist};fired=true;fire.disabled=true;show();tick(1)}},"Fire alpha particles at my nuclear atom");
+  const NEED0=10000,msg=h("div",{class:"note",style:"margin:10px 0"},"Press the first button. The electrons stay where they are. Only the positive charge moves."),out=h("div"),chart=h("canvas",{width:1040,height:300,role:"img","aria-label":"Counts by angle for the real foil and for your nuclear atom","aria-live":"polite",style:"width:100%;max-width:760px;display:none;margin:8px auto"});
+  function show(){
+    const a=ST.data.real,b=ST.data.nuc;chart.style.display="block";drawHist(chart,[{hist:a.hist},{hist:b.hist}]);
+    const pc=(hh,k)=>total(hh)?(100*histSum(hh,k)/total(hh)).toFixed(2)+"%":"—";
+    out.replaceChildren(h("p",{},h("span",{style:"color:#7fb3d9;font-weight:700"},"■ Real foil (your run)"),"    ",h("span",{style:"color:#e5484d;font-weight:700"},"■ Your nuclear atom")),
+      binTable([{label:"Real foil",hist:a.hist},{label:"Your nuclear atom",hist:b.hist}]),
+      h("div",{class:"readout",style:"margin-top:10px"},
+        h("div",{class:"stat"},h("b",{},pc(a.hist,"s")+" / "+pc(b.hist,"s")),h("span",{},"straight through: foil / your atom")),
+        h("div",{class:"stat"},h("b",{},pc(a.hist,"d")+" / "+pc(b.hist,"d")),h("span",{},"deflected: foil / your atom")),
+        h("div",{class:"stat"},h("b",{},histSum(a.hist,"r")+" / "+histSum(b.hist,"r")),h("span",{},"rebounded: foil / your atom"))));
+    msg.textContent="Same number of alpha particles in both. Compare the two rows.";
+  }
+  if(ST.data.nuc.n>0){packed=true;t=1;paint();pack.disabled=true;fire.disabled=true;show();tick(0);tick(1)}
+  return h("div",{},svg,h("div",{class:"row",style:"margin:10px 0"},pack,fire),msg,chart,out);
+};
+
+WIDGET.foil2=(tick)=>{
+  const TN={Au:"Gold",Ag:"Silver",Al:"Aluminum"},N=20000;let t="Au",th=1;
+  const tb=h("tbody");
+  const tbl=h("table",{class:"wtbl"},h("thead",{},h("tr",{},["Foil","Fired","Bent 10° or more","Of those, rebounded (90°+)","Percent bent 10° or more"].map(x=>h("th",{},x)))),tb);
+  const info=h("div",{class:"note",style:"margin:8px 0"});
+  const st=h("select",{"aria-label":"Target atom",onchange:e=>t=e.target.value},Object.keys(TN).map(k=>h("option",{value:k},TN[k]+" (nuclear charge "+FM.TARGETS[k].Z+")")));
+  const ts=h("select",{"aria-label":"Foil thickness",onchange:e=>th=+e.target.value},[.5,1,2,4].map(v=>h("option",{value:v},v+"× thickness")));
+  ts.value="1";
+  function ge10(r){return N-histSum(r.hist,"s")}
+  function addRow(r){tb.append(h("tr",{},h("td",{},TN[r.t]+" at "+r.th+"×"),h("td",{},num(r.n)),h("td",{},num(r.ge10)),h("td",{},String(r.reb)),h("td",{},(100*r.ge10/r.n).toFixed(2)+"%")))}
+  function ticks(){const f=ST.data.f2;if(f.some(r=>r.t==="Au"&&r.th===1))tick(0);if(f.some(r=>r.t==="Au"&&r.th===2))tick(1);if(f.some(r=>r.t==="Al"&&r.th===1))tick(2)}
+  const go=h("button",{class:"btn",onclick:()=>{
+    if(ST.data.f2.some(r=>r.t===t&&r.th===th)){info.textContent="You already ran that foil. Pick a different one.";return}
+    const s=streamOf(0,0),res=FM.fire(s,N,"nuc",t,th),r={t,th,n:N,hist:res.hist,ge10:N-histSum(res.hist,"s"),reb:histSum(res.hist,"r")};
+    ST.data.f2.push(r);addRow(r);info.textContent="Fired "+num(N)+" alpha particles at "+TN[t].toLowerCase()+" foil, "+th+"× thick. "+num(r.ge10)+" were bent 10° or more.";ticks()}},"Fire "+num(N)+" alpha particles");
+  ST.data.f2.forEach(addRow);ticks();
+  return h("div",{},h("div",{class:"controls",style:"margin-bottom:10px"},h("label",{},"Target",st),h("label",{},"Thickness",ts),go),info,h("div",{style:"overflow-x:auto"},tbl),
+    h("p",{class:"hint"},"Run the three foils in the task list. You can run others too: silver, or 0.5× and 4× thickness."));
+};
+
+/* ---------- blocks ---------- */
+const BLOCK={};
+function feedback(){return h("div",{class:"fb"})}
+function show(fb,ok,html){fb.className="fb show "+(ok?"ok":"no");fb.innerHTML=html}
+const strip=s=>String(s).replace(/<[^>]+>/g,"");
+const logq=first=>ST.log.push({skill:CUR.skill,title:CUR.title,band:CUR.band,first:!!first});
+function qCard(...k){return h("div",{class:"card"},h("div",{class:"q"},...k))}
+
+BLOCK.info=(b)=>h("div",{class:"card"},h("div",{class:"note",html:b.html}));
+
+BLOCK.mcq=(b,done)=>{
+  const name="q"+(++uid);let failed=false,counted=false;const fb=feedback(),extra=h("div");
+  const opts=b.predict?b.opts:shuffle(b.opts);
+  const box=h("div",{class:"opts"},opts.map(o=>h("label",{},h("input",{type:"radio",name}),h("span",{html:o.t}))));
+  const btn=h("button",{class:"btn",onclick:()=>{
+    const i=[...box.querySelectorAll("input")].findIndex(x=>x.checked);if(i<0)return;const o=opts[i];
+    if(b.predict){ST.preds.push({q:b.q,choice:o.t});box.querySelectorAll("input").forEach(x=>x.disabled=true);btn.disabled=true;
+      if(b.reason){const ta=h("textarea",{"aria-label":"Why do you think so?",placeholder:"I think this because ...",style:"min-height:70px"}),sv2=h("button",{class:"btn",disabled:"",onclick:()=>{ST.keep[b.reasonKey||"coldReason"]=ta.value.trim();ta.disabled=true;sv2.disabled=true;show(fb,true,"🔒 Locked in. "+(b.note||"Now test it."));done()}},"Save my reason");
+        ta.addEventListener("input",()=>{sv2.disabled=ta.value.trim().length<10});extra.append(h("p",{},"In a sentence, why do you think so?"),ta,h("div",{class:"row",style:"margin-top:8px"},sv2));return}
+      show(fb,true,"🔒 Locked in. "+(b.note||"Now test it."));done();return}
+    if(!counted){counted=true;ST.q++}
+    if(o.ok){if(!failed)ST.qFirst++;logq(!failed);box.querySelectorAll("input").forEach(x=>x.disabled=true);btn.disabled=true;show(fb,true,"✔ "+b.why);done()}
+    else{failed=true;ST.retries++;show(fb,false,"Not quite. "+(b.hint||"Look again."))}
+  }},b.predict?"Lock in my guess":"Check");
+  return qCard(h("p",{html:b.q}),box,h("div",{class:"row",style:"margin-top:8px"},btn),extra,fb);
+};
+
+BLOCK.num=(b,done)=>{
+  let failed=false,counted=false;const fb=feedback();
+  const inp=h("input",{type:"number",step:"any",inputmode:"decimal","aria-label":"Your answer",style:"width:140px"});
+  const btn=h("button",{class:"btn",onclick:()=>{
+    const v=parseFloat(inp.value);if(isNaN(v))return;
+    if(!counted){counted=true;ST.q++}
+    const tg=b.calc?[CALC[b.calc]()]:[].concat(b.ans);
+    if(tg.some(a=>!isNaN(a)&&(b.tolRel?Math.abs(v-a)<=Math.abs(a)*b.tolRel+(b.tol||0):Math.abs(v-a)<=b.tol))){if(!failed)ST.qFirst++;logq(!failed);if(b.save)ST.keep[b.save]=Math.round(v*100)/100;inp.disabled=true;btn.disabled=true;show(fb,true,"✔ "+b.why);done()}
+    else{failed=true;ST.retries++;show(fb,false,"Not quite. "+(b.hint||"Check your work."))}
+  }},"Check");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  return qCard(h("p",{html:b.q}),h("div",{class:"row"},inp,h("span",{},b.unit||""),btn),fb);
+};
+
+BLOCK.rows=(b,done)=>{
+  let counted=false,anyFail=false;const fb=feedback();
+  const sels=b.rows.map(r=>h("select",{"aria-label":r.q},h("option",{value:""},"Choose…"),b.choices.map((c,i)=>h("option",{value:i},c))));
+  const per=b.rows.map(()=>({first:true}));
+  const lines=b.rows.map((r,i)=>h("div",{class:"row",style:"margin:8px 0;justify-content:space-between"},h("span",{style:"flex:1 1 300px"},r.q),sels[i]));
+  const btn=h("button",{class:"btn",onclick:()=>{
+    if(sels.some(s=>s.value===""))return;
+    if(!counted){counted=true;ST.q+=b.rows.length}
+    let bad=0;const msgs=[];
+    b.rows.forEach((r,i)=>{const ok=+sels[i].value===r.ans;if(ok){if(per[i].first&&!anyFail)ST.qFirst++;sels[i].disabled=true;sels[i].style.outline="2px solid var(--ok)"}else{bad++;per[i].first=false;sels[i].style.outline="2px solid var(--bad)"}});
+    if(bad){anyFail=true;ST.retries++;show(fb,false,bad+" not right yet. "+b.hint)}
+    else{btn.disabled=true;if(b.save)ST.keep[b.save]=true;per.forEach(x=>logq(x.first&&!anyFail));show(fb,true,"✔ All correct.<br>"+b.rows.map(r=>"• "+r.why).join("<br>"));done()}
+  }},"Check");
+  return qCard(h("p",{html:b.q}),...lines,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+
+BLOCK.widget=(b,done)=>{
+  const marks=b.tasks.map(()=>false),els=b.tasks.map(t=>h("div",{class:"task"},h("span",{class:"bx"}),h("span",{},t)));
+  ST.tasks+=b.tasks.length;
+  const tick=i=>{if(marks[i])return;marks[i]=true;ST.tasksDone++;els[i].classList.add("ok");els[i].querySelector(".bx").textContent="✓";if(marks.every(Boolean))done()};
+  const w=WIDGET[b.id](tick);
+  return h("div",{class:"card"},h("div",{style:"margin-bottom:8px"},h("b",{},"Sim tasks"),els),w);
+};
+
+
+BLOCK.figure=(b)=>{
+  const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const wrap=h("div",{class:"figs"});
+  b.items.forEach(it=>{
+    const img=new Image(),cv=h("canvas",{role:"img","aria-label":it.alt||it.cap,title:"Click to replay"}),ctx=cv.getContext("2d");
+    let run=0;
+    function frame(step){ // step = block size in source pixels; 1 = sharp
+      const W=cv.width,H=cv.height,sw=Math.max(1,Math.round(W/step)),sh=Math.max(1,Math.round(H/step));
+      const t=document.createElement("canvas");t.width=sw;t.height=sh;const tc=t.getContext("2d");tc.imageSmoothingEnabled=true;tc.drawImage(img,0,0,sw,sh);
+      ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,W,H);ctx.drawImage(t,0,0,sw,sh,0,0,W,H)}
+    function play(){const id=++run;if(reduce){frame(1);return}[32,16,8,4,2,1].forEach((st,i)=>setTimeout(()=>{if(id===run)frame(st)},i*170))}
+    img.onload=()=>{cv.width=img.width;cv.height=img.height;frame(1);
+      if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();play()}},{threshold:.4});frame(32);io.observe(cv)}else play()};
+    img.onerror=()=>{const cd=wrap.closest(".card");if(cd)cd.hidden=true};img.src=it.src;cv.addEventListener("click",play);
+    wrap.append(h("figure",{class:"pix"},cv,h("figcaption",{},it.cap,h("div",{class:"cr"},it.credit||""))));
+  });
+  return h("div",{class:"card"},wrap);
+};
+
+BLOCK.gate=(b,done)=>{
+  /* Huddle codes are asked for only on weekdays 7:00 AM to 3:00 PM, and never in #key. At home the stop is a quiet note. */
+  if(KEY||!MrD.bell.gatesOn()){
+    setTimeout(done,0);
+    return h("div",{class:"card",style:"border:2px dashed var(--accent);text-align:center"},h("p",{style:"margin:0"},KEY?"✋ Class huddle here. The code is skipped in the teacher view.":"✋ In class there is a huddle here. Outside school hours, keep going."));
+  }
+  const fb=feedback(),inp=h("input",{type:"text",inputmode:"numeric",maxlength:4,autocomplete:"off","aria-label":"Code from Mr. D",style:"width:120px;font-size:1.3rem;text-align:center"});
+  const btn=h("button",{class:"btn",onclick:()=>{if(inp.value.trim()===MrD.codes.gate(LESSON_ID,"h"+b.id)){inp.disabled=true;btn.disabled=true;show(fb,true,"✔ Unlocked.");done()}else show(fb,false,"Not the code. Eyes up and wait for Mr. D.")}},"Unlock");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  return h("div",{class:"card",style:"border:2px dashed var(--accent);text-align:center"},h("h2",{},"✋ Eyes up. Mr. D has the code."),h("p",{style:"margin:0 auto 10px;max-width:46ch"},"Stop here. Class talk comes first. Don’t go on until you have the code."),h("div",{class:"row",style:"justify-content:center"},inp,btn),fb);
+};
+
+BLOCK.open=(b,done)=>{
+  const key=b.save||"open",ta=h("textarea",{"aria-label":"Your response",placeholder:b.frame}),cnt=h("span",{class:"hint"},"0 / "+b.min+" characters");const fb=feedback();
+  const btn=h("button",{class:"btn",disabled:"",onclick:()=>{ST.keep[key]=ta.value.trim();ta.disabled=true;btn.disabled=true;show(fb,true,"✔ Saved to your notes.");done()}},"Save my answer");
+  ta.addEventListener("input",()=>{cnt.textContent=ta.value.trim().length+" / "+b.min+" characters";btn.disabled=ta.value.trim().length<b.min});
+  if(b.value){ta.value=b.value;ta.dispatchEvent(new Event("input"))}
+  return qCard(h("p",{html:b.q}),ta,h("div",{class:"row",style:"margin-top:8px"},btn,cnt),fb);
+};
+
+/* ---------- gold-foil blocks: computed answers, the datatable, and the claim-evidence-reasoning response ---------- */
+const CALC={
+  straight:()=>{const h=ST.data.real.hist,t=total(h);return t?100*histSum(h,"s")/t:NaN},
+  deflected:()=>{const h=ST.data.real.hist,t=total(h);return t?100*histSum(h,"d")/t:NaN},
+  rebound:()=>{const h=ST.data.real.hist,r=histSum(h,"r");return r?total(h)/r:NaN},
+  thickRatio:()=>{const a=ST.data.f2.find(r=>r.t==="Au"&&r.th===1),b=ST.data.f2.find(r=>r.t==="Au"&&r.th===2);return a&&b&&a.ge10?b.ge10/a.ge10:NaN},
+  alRatio:()=>{const a=ST.data.f2.find(r=>r.t==="Au"&&r.th===1),b=ST.data.f2.find(r=>r.t==="Al"&&r.th===1);return a&&b&&b.ge10?a.ge10/b.ge10:NaN}
+};
+BLOCK.datatable=datatableBlock;
+const CER_PRE="The plum-pudding model fails because ";
+function citedCounts(){const s=new Set(),D=ST.data;[D.real,D.plum].forEach(d=>{if(d.n){s.add(String(d.n));d.hist.forEach(v=>{if(v>0)s.add(String(v))});["s","d","r"].forEach(k=>{const v=histSum(d.hist,k);if(v>0)s.add(String(v))})}});return s}
+function citesCount(txt){
+  const nums=(txt.replace(/(\d),(?=\d{3})/g,"$1").match(/\d+/g)||[]),set=citedCounts();
+  return set.size?nums.some(n=>set.has(String(+n))):nums.length>0;
+}
+BLOCK.cer=(b,done)=>{
+  let counted=false,failed=false;const fb=feedback();
+  const mk2=(lab,ph,val,min)=>{const t=h("textarea",{"aria-label":lab,placeholder:ph,style:"min-height:84px"});if(val)t.value=val;return t};
+  const c=mk2("Claim","Finish the sentence: what is wrong with the plum-pudding model?",CER_PRE),e=mk2("Evidence","In my run, ____ of ____ alpha particles ...",""),r=mk2("Reasoning","This means the atom must have ____, because ____.","");
+  const btn=h("button",{class:"btn",onclick:()=>{
+    if(!counted){counted=true;ST.q++}
+    const claim=c.value.trim(),cb=claim.replace(CER_PRE.trim(),"").trim(),ev=e.value.trim(),rs=r.value.trim();let msg="";
+    if(!claim.toLowerCase().startsWith(CER_PRE.trim().toLowerCase())||cb.length<15)msg="Your claim starts with “The plum-pudding model fails because” and then says what the model could not explain.";
+    else if(ev.length<30)msg="Your evidence needs a full sentence about what your detector counted.";
+    else if(!citesCount(ev))msg="Your evidence needs a specific count from your own run. Look at your table: use the number that rebounded, the number deflected, or the number you fired.";
+    else if(rs.length<40)msg="Your reasoning should connect your evidence to the inside of the atom. What must be true for those counts to happen, and why can’t a spread-out positive charge do it?";
+    if(msg){failed=true;ST.retries++;show(fb,false,"Not yet. "+msg);return}
+    if(!failed)ST.qFirst++;logq(!failed);ST.keep.cer={claim,evidence:ev,reasoning:rs};[c,e,r].forEach(t=>t.disabled=true);btn.disabled=true;show(fb,true,"✔ Saved to your notes.");done();
+  }},"Save my revision");
+  return qCard(h("p",{html:"<b>Claim.</b> Finish this sentence."}),c,h("p",{html:"<b>Evidence.</b> Cite at least one specific count from your own run."}),e,h("p",{html:"<b>Reasoning.</b> Explain what the evidence shows about the atom."}),r,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+
+/* ---------- part runner ---------- */
+const NP=DATA.parts.length;            // lesson parts; then "Keep practicing" (NP) and "Takeaways" (NP+1)
+const SKILLS=[["chem.foil-predict","Predicting from a model"],["chem.foil-run","Running the experiment"],["chem.foil-data","Reading the detector data"],["chem.foil-meaning","What each result means"],["chem.foil-cer","Claim, evidence, reasoning"],["chem.foil-thickness","Thickness and nuclear charge"]];
+const CUR={skill:"",title:"",band:null};
+const stepName=i=>i<NP?`Part ${i+1}: ${DATA.parts[i].title}`:i===NP?"Keep practicing":"Takeaways";
+function mk(b,done){const c=BLOCK[b.type](b,done);if(KEY)keyMark(c,b);return c}
+
+function chips(){
+  const el=[...DATA.parts.map((p,i)=>h("span",{class:"chip"+(ST.partsDone[i]?" done":ST.screen==="part"&&i===ST.partIdx?" on":""),onclick:KEY?()=>showPart(i):null,style:KEY?"cursor:pointer":""},(ST.partsDone[i]?"✓ ":"")+(i+1))),
+    h("span",{class:"chip"+(ST.screen==="practice"?" on":""),onclick:KEY?()=>showPractice():null,style:KEY?"cursor:pointer":""},"Practice"),
+    h("span",{class:"chip"+(ST.screen==="takeaways"?" on":ST.finished?" done":""),onclick:KEY?()=>showTakeaways():null,style:KEY?"cursor:pointer":""},"Notes")];
+  if(LOCK_ON&&inProgress)el.push(h("span",{class:"chip",style:"margin-left:auto"},"🔒 exits "+LessonLock.stats().total));
+  chipsEl.replaceChildren(...el);
+}
+function enterScreen(screen,idx){ST.screen=screen;ST.max=Math.max(ST.max,idx);ST.between=screen!=="part";if(LOCK_ON&&screen!=="final")LessonLock.save(screen==="part"?idx:NP,screen!=="part",lockSnap());chips();app.replaceChildren();window.scrollTo(0,0);updateEndBar()}
+
+function showPart(i){
+  ST.partIdx=i;enterScreen("part",i);
+  const P=DATA.parts[i];CUR.skill=SKILLS[i][0];CUR.title=SKILLS[i][1];CUR.band=null;
+  app.append(h("h2",{},`Part ${i+1} of ${NP}: ${P.title}`),h("p",{class:"sub"},P.sub));
+  const last=i===NP-1;
+  const advance=()=>{ST.partsDone[i]=true;if(last)afterParts();else showPart(i+1)};
+  const nextBtn=h("button",{class:"btn big",disabled:"",onclick:advance},last?"Keep going →":"Next part →");
+  const nextWrap=h("div",{class:"row",style:"justify-content:center;margin:20px 0"},nextBtn);
+  const needed=P.blocks.filter(b=>DONE_TYPES.includes(b.type)).length;let got=0,idx=0;const cards=[];
+  const unlock=()=>{if(got===needed||KEY){nextBtn.disabled=false;nextBtn.removeAttribute("disabled")}};
+  const reveal=()=>{
+    while(idx<P.blocks.length){
+      const b=P.blocks[idx++];let fin=false;
+      const card=mk(b,()=>{if(fin)return;fin=true;got++;unlock();reveal()});
+      card._b=b;cards.push(card);app.append(card);
+      if(DONE_TYPES.includes(b.type)&&!fin&&!KEY)break;
+    }
+    app.append(nextWrap);unlock();
+  };
+  reveal();window.__cards=cards;
+}
+
+/* After the last part: practice until the end mark, then the takeaways.  At home, or once the end mark has passed, go straight to the takeaways. */
+function afterParts(){ if(clk().canEnd&&!KEY)showTakeaways(); else showPractice() }
+
+/* Endless gold-foil practice: ../shared/practice-foil.js (FoilPractice.spec). Every problem is a fresh number question at the student's own level (1 to 4), so nobody runs out. */
+const practiceSpec=(n,band,seed)=>FoilPractice.spec(n,band,seed);
+function showPractice(){
+  enterScreen("practice",NP);
+  app.append(h("h2",{},"Keep practicing"),h("p",{class:"sub"},"Fresh gold-foil problems at your level. Keep going until Mr. D calls time. There is always another one ready."));
+  const box=h("div");app.append(box);
+  if(KEY)app.append(h("div",{class:"row",style:"justify-content:center;margin:16px 0"},h("button",{class:"ghost",onclick:()=>showTakeaways()},"Teacher: go to the takeaways")));
+  const next=()=>{
+    box.replaceChildren();const spec=practiceSpec(ST.pr.i,ST.pr.band,ST.name+"|"+ST.period);
+    CUR.skill=spec.skill;CUR.title=spec.title;CUR.band=spec.band;const before=ST.qFirst;
+    box.append(h("p",{class:"hint"},`Problem ${ST.pr.i+1}`));
+    const card=mk(spec,()=>{
+      const first=ST.qFirst>before;ST.pr.i++;if(first){ST.pr.clean++;ST.pr.up++;ST.pr.down=0;if(ST.pr.up>=2&&ST.pr.band<4){ST.pr.band++;ST.pr.up=0}}else{ST.pr.down++;ST.pr.up=0;if(ST.pr.down>=2&&ST.pr.band>1){ST.pr.band--;ST.pr.down=0}}
+      box.append(h("div",{class:"row",style:"justify-content:center;margin:12px 0"},h("button",{class:"btn big",onclick:next},"Next problem →")));
+    });
+    box.append(card);
+  };
+  next();
+}
+
+/* ---------- the end mark ---------- */
+function updateEndBar(){
+  const bar=document.getElementById("endbar");if(!bar)return;const c=clk();
+  const show=c.needsEnd&&inProgress&&!KEY&&ST.screen!=="takeaways"&&ST.screen!=="final";
+  bar.hidden=!show;if(!show){bar.replaceChildren();return}
+  if(bar.firstChild)return;
+  bar.append(h("span",{html:c.mode==="class"?"<b>Time to end your guided notes.</b> Finish the question you are on, then press the button.":"<b>You can finish your notes now.</b>"}),
+    h("button",{class:"btn",onclick:()=>{ST.ended=true;ST.endIdx=ST.max;if(LOCK_ON)LessonLock.finish();showTakeaways()}},"End my guided notes"));
+}
+setInterval(()=>{if(ST.name)updateEndBar()},1000);
+
+/* ---------- takeaways: the part of the old handout that now lives on the page ---------- */
+BLOCK.cloze=(b,done)=>{
+  const fb=feedback(),bank=shuffle(b.bank),sels=b.items.map(it=>h("select",{"aria-label":"Missing word"},h("option",{value:""},"choose…"),bank.map(w=>h("option",{value:w},w))));
+  const lines=b.items.map((it,i)=>{const [pre,post]=it.t.split("___");return h("p",{style:"margin:8px 0"},pre,sels[i],post)});
+  const btn=h("button",{class:"btn",onclick:()=>{
+    if(sels.some(s=>!s.value))return;let bad=0;
+    sels.forEach((s,i)=>{const ok=s.value===b.items[i].a;s.style.outline="2px solid var(--"+(ok?"ok":"bad")+")";if(!ok)bad++});
+    if(bad)show(fb,false,bad+" not right yet. "+b.hint);else{sels.forEach(s=>s.disabled=true);btn.disabled=true;show(fb,true,b.okmsg||"✔ Correct.");done()}
+  }},"Check");
+  return qCard(h("p",{html:b.q}),...lines,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+const TAKEAWAYS=[
+ {type:"rows",flag:"models",q:"Which model does each statement fit?",choices:["Plum pudding","Nuclear atom","Both"],rows:[
+  {q:"The positive charge is spread through the whole atom.",ans:0,why:"That is Thomson’s picture."},
+  {q:"Atoms contain light, negative electrons.",ans:2,why:"Both models keep the electrons."},
+  {q:"Nearly all alpha particles should pass almost straight through.",ans:2,why:"Both predict that. The plum pudding is soft, the nuclear atom is mostly empty."},
+  {q:"A very few alpha particles should bounce almost straight back.",ans:1,why:"Only a tiny, heavy, positive nucleus can turn an alpha particle around."},
+  {q:"It explains the gold-foil data.",ans:1,why:"The nuclear atom reproduced your counts. The plum pudding could not."}
+ ],hint:"Which model can produce a rebound? Which results do both models expect?"},
+ {type:"cloze",flag:"cloze",okmsg:"✔ That is Rutherford’s picture of the atom.",q:"Fill in Rutherford’s nuclear atom.",bank:["nucleus","empty space","repelled","electrons","attracted","spread out"],items:[
+  {t:"1. All of the positive charge and most of the mass is packed into a tiny, dense ___.",a:"nucleus"},
+  {t:"2. Most of the atom is ___, so nearly all alpha particles go straight through.",a:"empty space"},
+  {t:"3. A positive alpha particle that passes close to the positive nucleus is ___ and turned sharply.",a:"repelled"},
+  {t:"4. The light ___ are found outside the nucleus.",a:"electrons"}
+ ],hint:"Which words match what the gold-foil data showed?"},
+ {type:"open",save:"open",flag:"exit",q:"Finish the sentence in your own words: the gold-foil results changed the atom model because ____. Rutherford’s atom still leaves open ____.",min:40,frame:"The gold-foil results changed the atom model because ____. Rutherford’s atom still leaves open ____."}
+];
+function showTakeaways(){
+  enterScreen("takeaways",NP+1);if(LOCK_ON&&ST.ended)LessonLock.finish();CUR.skill="chem.foil-takeaways";CUR.title="Takeaways";CUR.band=null;
+  app.append(h("h2",{},"Takeaways"),h("p",{class:"sub"},"These go straight into your notes."));
+  let got=0;const fin=h("button",{class:"btn big",disabled:"",onclick:showFinal},"Get my stamp and notes");
+  TAKEAWAYS.forEach(t=>{const b=Object.assign({},t);if(b.type==="open"&&ST.keep.open)b.value=ST.keep.open;let f=false;app.append(mk(b,()=>{if(f)return;f=true;ST.tk[b.flag]=true;got++;if(got===TAKEAWAYS.length||KEY){fin.disabled=false;fin.removeAttribute("disabled")}}))});
+  app.append(h("div",{class:"row",style:"justify-content:center;margin:20px 0"},fin,h("button",{class:"ghost",onclick:openNotes},"My notes")));
+  if(KEY){fin.disabled=false;fin.removeAttribute("disabled")}
+}
+
+/* ---------- notes (print, PDF, LaTeX) ---------- */
+function notesModel(){
+  const k=ST.keep,D=ST.data,tk=ST.tk,f=(c,v)=>c?v:"",Z=["A 0–10°","B 10–45°","C 45–90°","D 90–135°","E 135–180°"];
+  const rl=D.real.hist,pl=D.plum.hist,pc=(x,q)=>x!=null&&!isNaN(x)?String(Math.round(x*100)/100)+q:"";
+  const cer=k.cer||{};
+  return {title:"Rutherford’s Gold Foil",unit:"Unit 3 · Atoms and Ions",name:ST.name,period:ST.period,date:new Date().toLocaleDateString(),sections:[
+   {h:"Predict first: the plum-pudding atom",rows:[["Where I placed 100 alpha particles",k.predZones?Z.map((z,i)=>z+": "+k.predZones[i]).join(" · "):""],["Why I thought so",k.predReason||""]]},
+   {h:"Run it: detector log",table:{head:["Angle","Plum pudding","Real gold foil"],rows:[...Array(NB).keys()].map(i=>[binL(i),total(pl)?String(pl[i]):"",total(rl)?String(rl[i]):""]).concat(total(pl)||total(rl)?[["Total fired",String(total(pl)),String(total(rl))]]:[])}},
+   {h:"Find the pattern",rows:[["Percent that went straight through (0–10°)",pc(k.pStraight,"%")],["Percent deflected (10°–90°)",pc(k.pDeflected,"%")],["Rebounded: 1 in about",pc(k.nRebound,"")]]},
+   {h:"What each result means",table:{head:["Result","What it shows about the atom"],rows:[["Nearly all went straight through",f(k.matched,"Mostly empty space")],["A few were deflected through large angles",f(k.matched,"A concentrated positive charge")],["A very few bounced back",f(k.matched,"A heavy, dense center")]]}},
+   {h:"Claim, evidence, reasoning",rows:[["Claim",cer.claim||""],["Evidence (from my own run)",cer.evidence||""],["Reasoning",cer.reasoning||""]]},
+   {h:"Change the foil",table:{head:["Foil","Fired","Bent 10° or more","Rebounded (90°+)"],rows:D.f2.map(r=>[FM.TARGETS[r.t].name+" at "+r.th+"×",String(r.n),String(r.ge10),String(r.reb)])},rows:[["My prediction: twice as thick gold",k.thickReason||""],["My prediction: aluminum instead of gold",k.alReason||""],["2× gold gave this many times the 1× deflections",pc(k.thickRatio,"")],["Gold gave this many times aluminum’s deflections",pc(k.alRatio,"")]]},
+   {h:"Plum pudding or nuclear atom?",table:{head:["Statement","Model"],rows:[["Positive charge spread through the whole atom",f(tk.models,"Plum pudding")],["Electrons in the atom",f(tk.models,"Both")],["Nearly all alphas pass nearly straight",f(tk.models,"Both")],["A very few alphas bounce back",f(tk.models,"Nuclear atom")],["Explains the gold-foil data",f(tk.models,"Nuclear atom")]]}},
+   {h:"Rutherford’s nuclear atom",lines:tk.cloze?["All of the positive charge and most of the mass is packed into a tiny, dense nucleus.","Most of the atom is empty space, so nearly all alpha particles go straight through.","A positive alpha particle that passes close to the positive nucleus is repelled and turned sharply.","The light electrons are found outside the nucleus."]:["","","",""]},
+   {h:"Exit ticket",text:k.open||""}
+  ]};
+}
+function openNotes(){MrD.notes.open(notesModel,"gold-foil-notes-"+(ST.name||"student").toLowerCase().replace(/[^a-z0-9]/g,""))}
+
+/* ---------- the stamp ---------- */
+function recordProfile(){
+  const items=ST.log.map(l=>({skill:l.skill,title:l.title,band:l.band,firstTry:l.first,ok:true}));
+  MrD.profile.record({course:"chem",lesson:LESSON_ID,title:"Rutherford’s Gold Foil",first:ST.name,period:ST.period,day:MrD.bell.dayKey(),reached:(ST.ended?ST.endIdx:ST.max)+1,of:NP+2,items});
+}
+function summaryText(label){
+  const secs=(Date.now()-ST.t0)/1000,when=new Date(),k=ST.keep,D=ST.data,rl=D.real.hist;
+  let t=`${ST.name} · Period ${ST.period} · Gold Foil · ${label} · time ${fmtT(secs)} · questions right on the first try ${ST.qFirst}/${ST.q} · retries ${ST.retries} · sim tasks ${ST.tasksDone}/${ST.tasks} · practice problems ${ST.pr.i} (${ST.pr.clean} first try)${lockTxt()} · ${when.toLocaleDateString()} ${when.toLocaleTimeString()}`;
+  ST.preds.forEach((p,i)=>{t+=` · Prediction ${i+1}: ${strip(p.q).slice(0,70)} → ${strip(p.choice)}`});
+  if(k.predReason)t+=` · Why (prediction 1): "${k.predReason.slice(0,200)}"`;
+  if(k.thickReason)t+=` · Why (thicker foil): "${k.thickReason.slice(0,150)}"`;
+  if(k.alReason)t+=` · Why (aluminum): "${k.alReason.slice(0,150)}"`;
+  if(total(rl))t+=` · Real run: ${num(total(rl))} fired, straight ${histSum(rl,"s")}, deflected ${histSum(rl,"d")}, rebounded ${histSum(rl,"r")}`;
+  if(k.cer)t+=` · Claim: "${k.cer.claim.slice(0,200)}" · Evidence: "${k.cer.evidence.slice(0,250)}" · Reasoning: "${k.cer.reasoning.slice(0,250)}"`;
+  if(k.open)t+=` · Exit: "${k.open.slice(0,300)}"`;
+  return t;
+}
+function showFinal(){
+  ST.finished=true;ST.screen="final";inProgress=false;if(LOCK_ON)LessonLock.finish();chips();app.replaceChildren();window.scrollTo(0,0);updateEndBar();
+  recordProfile();
+  const reachedI=ST.ended?ST.endIdx:ST.max,label="got to "+stepName(reachedI)+" ("+(reachedI+1)+" of "+(NP+2)+")",when=new Date(),txt=summaryText(label);
+  const stamp="FOIL-"+MrD.codes.stamp(LESSON_ID,ST.name,ST.period);
+  const st=h("div",{class:"stamp"},h("div",{class:"big"},"✔ "+stamp),h("div",{style:"font-size:24px;margin:4px 0"},ST.name),h("div",{},`${when.toLocaleDateString()} · ${when.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}`));
+  const tbl=h("table",{class:"sum"},
+    h("tr",{},h("th",{},"How far you got"),h("td",{},`${stepName(reachedI)} (${reachedI+1} of ${NP+2})`)),
+    h("tr",{},h("th",{},"Time"),h("td",{},fmtT((Date.now()-ST.t0)/1000))),
+    h("tr",{},h("th",{},"Sim tasks finished"),h("td",{},`${ST.tasksDone} of ${ST.tasks}`)),
+    h("tr",{},h("th",{},"Questions right on the first try"),h("td",{},`${ST.qFirst} of ${ST.q}`)),
+    h("tr",{},h("th",{},"Practice problems"),h("td",{},String(ST.pr.i))),
+    LOCK_ON?h("tr",{},h("th",{},"Times you left the lesson"),h("td",{},String(LessonLock.stats().total))):null);
+  const copy=h("button",{class:"ghost",onclick:async()=>{try{await navigator.clipboard.writeText(txt);copy.textContent="Copied ✔"}catch(e){copy.textContent="Select and copy the line below"}}},"Copy summary");
+  app.append(h("div",{class:"card final"},h("h2",{},"Your guided notes are done 🎉"),h("p",{},"Show Mr. D this screen. The stamp is your proof that you finished, and it says how far you got."),st,tbl,
+    h("div",{class:"row",style:"justify-content:center"},h("button",{class:"btn big",onclick:openNotes},"My notes (print or save as PDF)"),copy),
+    h("p",{class:"hint"},"Your notes hold your prediction, your sim data, and the takeaways. Choose “Save as PDF” in the print window to keep a copy."),
+    h("p",{class:"hint",style:"word-break:break-word"},txt)));
+}
+
+function start(){ST.t0=Date.now();inProgress=true;MrD.live.attach({course:"chem",lessonId:LESSON_ID,who:()=>({first:ST.name,period:ST.period}),snap:liveSnap});showPart(0)}
+function liveSnap(){const i=ST.screen==="part"?ST.partIdx:ST.screen==="practice"?NP:NP+1;return{step:stepName(i).slice(0,30),stepIdx:i+1,stepCount:NP+2,band:ST.screen==="practice"?ST.pr.band:null,answered:ST.q,misses:ST.retries,prompt:"",exits:LOCK_ON?LessonLock.stats().total:0,secs:Math.round((Date.now()-ST.t0)/1000),done:!!ST.finished,stuck:ST.retries>=6}}
+
+function showResume(rec){
+  chips();const fb=feedback(),n=LessonLock.lockNo();
+  const inp=h("input",{type:"text",inputmode:"numeric",maxlength:4,autocomplete:"off","aria-label":"Unlock code from Mr. D",style:"width:130px;font-size:1.4rem;text-align:center"});
+  const btn=h("button",{class:"btn big",onclick:async()=>{const r=await LessonLock.resume(inp.value);
+    if(r==="ok"){Object.assign(ST,rec.snap||{},{name:rec.name});if(!rec.snap)ST.t0=Date.now();inProgress=true;rec.between?afterParts():showPart(rec.part||0)}
+    else if(r==="wrong")show(fb,false,"Not the code. Hand up and wait for Mr. D.");
+    else show(fb,false,"Fullscreen did not start. Click again.")}},"Unlock");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  app.append(h("div",{class:"card",style:"border:3px solid var(--hot);text-align:center"},h("h2",{},"🔒 Locked. Hand up, eyes forward."),
+    h("p",{},"You closed this lesson before you finished. Your work is saved up to the start of the part you were on. Mr. D needs to see you and give you a code."),
+    h("p",{},h("b",{},"Name: "),rec.name,"   ",h("b",{},"Lock number: "),String(n)),h("div",{class:"row",style:"justify-content:center"},inp,btn),fb));
+}
+
+/* ---------- teacher key (#key): the real student page, answers marked, codes skipped ---------- */
+const WIDGET_KEY={
+ predict:"Prediction widget. Any distribution that adds to 100 is accepted, with a reason of 10+ characters. No hint is given. A plum-pudding prediction is nearly all in zone A, which is correct for that model, so the surprise comes in the next part. Both the zones and the reason are logged on the stamp summary and in the notes.",
+ foil:"Sim. Plum-pudding atom: every alpha particle lands within 2.5° of straight (all 10,000 in the 0–10° bin). Real gold foil (the nuclear model, with the nucleus strengthened so a class sees rare events): about 96.7% in 0–10°, about 3.2% between 10° and 90°, about 1 in 4,000 past 90° (5 in 20,000). The sim runs a low-variance sequence, so the counts are close to those at any total. The real option unlocks after 10,000 plum-pudding particles. The real foil must reach 20,000 (the detector limit) to finish the task, so the rebound count is about 5 and stable.",
+ nucleus:"Pack the charge (animation), then fire as many alpha particles as the real run used. The nuclear atom uses the same model that produced the ‘real’ data, so the two rows agree within a count or two. That is the point: the sim reproduces the data.",
+ foil2:"Foil runs of 20,000 each. Expected: gold 1× about 653 bent 10° or more (5 rebounds); gold 2× about 1,306 (9 rebounds); gold 4× about 2,613 (21); gold 0.5× about 328 (3); silver 1× about 231 (2); aluminum 1× about 17 (0). Deflections scale with thickness and with nuclear charge squared."
+};
+function keyMark(card,b){
+  const note=html=>card.append(h("div",{class:"keyline",html}));
+  if(b.type==="mcq"){
+    if(b.predict)return note("<b>KEY</b> Prediction: any answer is accepted. It is saved to the student’s notes and the stamp summary. Expected result: "+(/twice as thick/.test(b.q)?"about twice as many deflections.":"far fewer than gold (about 1/37)."));
+    const ok=b.opts.find(o=>o.ok);note(`<b>KEY ✔</b> ${ok.t}<br><i>${b.why}</i>`);
+    card.querySelectorAll(".opts label").forEach(l=>{if(l.textContent.trim()===strip(ok.t).trim())l.style.outline="2px solid var(--ok)"});
+  }
+  if(b.type==="num")note(`<b>KEY ✔</b> ${b.calc?"Computed from the student’s own data: "+b.key:[].concat(b.ans).join(" or ")} ${b.unit||""} (accepted within ${b.tolRel?"±"+Math.round(b.tolRel*100)+"%":"±"+b.tol})<br><i>${b.why}</i>`);
+  if(b.type==="rows")note("<b>KEY ✔</b> "+b.rows.map(r=>`${strip(r.q)} → <b>${b.choices[r.ans]}</b>`).join("<br>"));
+  if(b.type==="cloze")note("<b>KEY ✔</b> "+b.items.map(it=>it.t.replace("___","<b>"+it.a+"</b>")).join("<br>"));
+  if(b.type==="widget")note(`<b>KEY</b> ${WIDGET_KEY[b.id]}`);
+  if(b.type==="datatable")note("<b>KEY</b> Table of the student’s own counts. It fills from the Run It part.");
+  if(b.type==="cer")note("<b>KEY</b> Required: the claim starts with “The plum-pudding model fails because”. A strong answer says the plum pudding predicts nearly every alpha particle goes almost straight, and none turned back. Evidence cites a specific count from the student’s own table (for example, 3 of 10,000 rebounded, or 330 deflected 10° or more). Reasoning says only a tiny, dense, positive center can turn a heavy alpha particle around, and spread-out charge cannot. The evidence is checked for a number that matches the student’s own counts.");
+  if(b.type==="open")note("<b>KEY</b> Open response, checked for length only. Good answers say the model changed because the data showed rebounds the plum pudding could not produce, and name an open question (what the electrons are doing, why they do not fall into the nucleus, what the nucleus is made of).");
+  if(b.type==="gate")note(`<b>KEY</b> Huddle ${b.id}. Today’s code: <b>${MrD.codes.gate(LESSON_ID,"h"+b.id)}</b>. Students see this stop only on weekdays 7:00 AM to 3:00 PM.<br>${b.say}`);
+}
+function lockDesk(){
+  const host=document.getElementById("desk");if(!host)return;host.replaceChildren();
+  const nm=h("input",{type:"text","aria-label":"Student name",placeholder:"Name as the student typed it",style:"width:240px"}),no=h("input",{type:"number",min:1,value:2,"aria-label":"Lock number",style:"width:80px"}),res=h("b",{style:"font-size:1.4rem;margin-left:10px"});
+  const calc=()=>{res.textContent=nm.value.trim()?LessonLock.unlockCode(nm.value,no.value):""};nm.addEventListener("input",calc);no.addEventListener("input",calc);
+  const stu=location.pathname.split("/").pop()||"rutherford-gold-foil.html",off=stu+"#nolock="+LessonLock.offCode();
+  host.append(h("details",{class:"card"},h("summary",{},h("b",{},"🔒 Lock desk")," (a locked student’s screen shows a name and a lock number)"),
+    h("p",{html:`<b>Unlock any locked student today:</b> <b style="font-size:1.4rem">${MrD.codes.override()}</b> (works for every student and every lock until 7:00 AM tomorrow)`}),
+    h("p",{},"Or get one student’s own code: type the name and lock number shown on their screen."),h("div",{class:"row"},nm,no,res),
+    h("p",{class:"hint"},"Exit 1 only warns. From exit 2 the screen locks. Locked mode runs only during chemistry’s period: until the 42-minute mark Monday to Thursday, and the whole period on Friday."),
+    h("p",{class:"hint"},"Link with locked mode off (an accommodation, or a device without fullscreen): ",h("a",{href:off},off))));
+}
+
+/* ---------- boot ---------- */
+if(KEY){
+  MrD.teacherBar(document.getElementById("tb"),{course:"chem",lessonId:LESSON_ID,gates:[{key:"h1",label:"Huddle 1"}],teacher:"../teacher.html",root:"../../"});
+  lockDesk();inProgress=true;ST.name="Preview";ST.period="0";ST.t0=Date.now();showPart(0);
+}else{
+  LOCK_ON=!NOLOCK&&clk().lockOn;
+  const REC=LOCK_ON?LessonLock.pending():null;
+  if(REC)showResume(REC);
+  else{
+    chips();
+    const i=h("input",{type:"text",id:"nm",placeholder:"First and last name",autocomplete:"off"}),pd=h("input",{type:"text",id:"pd",placeholder:"Period",maxlength:6,style:"width:90px"});
+    const fsMsg=h("p",{class:"hint",style:"color:var(--bad)"});
+    const b=h("button",{class:"btn big",style:"margin-top:12px",onclick:async()=>{const v=i.value.trim(),p=pd.value.trim();if(!v){i.focus();return}if(!p){pd.focus();return}ST.name=v;ST.period=p;LOCK_ON=!NOLOCK&&clk().lockOn;if(LOCK_ON&&!(await LessonLock.enter(v))){fsMsg.textContent="Fullscreen did not start. This lesson needs Chrome on your Chromebook. Tell Mr. D.";return}start()}},"Start →");
+    i.addEventListener("keydown",e=>{if(e.key==="Enter")pd.focus()});pd.addEventListener("keydown",e=>{if(e.key==="Enter")b.click()});
+    const c0=clk();
+    app.append(h("div",{class:"card",id:"start"},h("h2",{},"Rutherford’s Gold Foil"),
+      h("p",{},"Predict first, then run the sim to see if you were right. A wrong answer gives a hint and you try again. Please don’t refresh the page."),
+      h("p",{},"Work through the parts at your own pace. When you finish them, keep practicing until Mr. D calls time. Then you will finish your notes and get your stamp. Your notes print as a PDF."),
+      c0.lockOn?h("p",{class:"note"},"🔒 Locked mode. This lesson runs in fullscreen while class is on. Leaving it (Esc, a new tab, another window, closing the page) is recorded on your stamp. The second time, your screen locks until Mr. D gives you a code."):null,
+      c0.mode==="home"?h("p",{class:"note"},"You are working outside class time. No class codes are needed."):null,
+      h("p",{},h("b",{},"Your name and period:")),h("div",{class:"row"},i,pd),h("div",{},b),fsMsg));
+  }
+}
+document.getElementById("open-notes").onclick=openNotes;
+window.__qa={ST,DATA,WIDGET,BLOCK,practiceSpec,cards:()=>window.__cards||[]};
+</script>
+</body>
+</html>

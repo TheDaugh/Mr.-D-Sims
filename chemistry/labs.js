@@ -57,6 +57,16 @@ window.UNITS = [
         blurb: "Cut gold in half until you run out of room, burn hydrogen in oxygen, and weigh your way to Dalton's atomic theory. Your own notes build as you go and print at the end.",
         tags: ["atomic theory", "Dalton", "conservation of mass", "definite proportions"],
         teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/atom-discovery.html#key" }, { label: "Teacher page", href: "teacher.html" }]
+      },
+      {
+        title: "Rutherford's Gold Foil",
+        type: "lesson",
+        day: 2,
+        icon: "☢️",
+        href: "unit-3-atoms-ions/rutherford-gold-foil.html",
+        blurb: "Predict where alpha particles will land, fire them at a gold foil, count the angles, and rewrite the plum-pudding atom with your own numbers.",
+        tags: ["Rutherford", "nuclear atom", "claim-evidence-reasoning"],
+        teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/rutherford-gold-foil.html#key" }]
       }
     ]
   }
