@@ -11,6 +11,10 @@
    The unlock code is per student and per lock number, so one student cannot pass it to a friend.
    Real enforcement belongs to the school's Chromebook management. This is the in-page layer.
 
+   Shared by every class. Lives in /shared so physics and calculus can opt in with the same few lines.
+   Needs bell.js and codes.js first. The code day rolls over at 7:00 AM (see bell.js).
+   Teacher side: MrD.codes.override() is one code per day that unlocks ANY locked student. It is on every teacher bar.
+
    Use:  LessonLock.init({id, root, onChange})  once;  LessonLock.enter(name) from the Start click;
          LessonLock.save(part, between, snapshot) at each part;  LessonLock.finish() at the end. */
 (function () {
@@ -18,13 +22,14 @@
   var cfg = { id: "lesson", lockAt: 2, waitSec: 8, graceMs: 1500, root: null, onChange: null };
   var S = null, armed = false, overlay = null, away0 = 0, countdown = 0, beat = 0, listening = false, leaving = false;
 
-  var day = function () { var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
-  var norm = function (s) { return String(s || "").toLowerCase().replace(/\s+/g, " ").trim(); };
+  var day = function () { return MrD.bell.dayKey(); };
+  var norm = function (s) { return MrD.codes.norm(s); };
+  /* tag is "lock<n>" for a student's n-th lock, "off" for the #nolock link. */
   var code = function (name, tag) {
-    var s = cfg.id + "|" + norm(name) + "|" + tag + "|" + day(), x = 2166136261;
-    for (var i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 16777619) >>> 0; }
-    return String(1000 + x % 9000);
+    if (tag === "off") return MrD.codes.lockOff();
+    return MrD.codes.lock(cfg.id, name, String(tag).replace(/^lock/, ""));
   };
+  var overrideOK = function (v) { return String(v).trim() === MrD.codes.override(); };
   var key = function () { return "lock:" + cfg.id + ":" + day(); };
   var load = function () { try { return JSON.parse(localStorage.getItem(key())); } catch (e) { return null; } };
   var store = function () { try { if (S) localStorage.setItem(key(), JSON.stringify(S)); } catch (e) { } };
@@ -93,7 +98,7 @@
     } else {
       var inp = el("input", { type: "text", inputmode: "numeric", maxlength: "4", autocomplete: "off", "aria-label": "Unlock code from Mr. D", class: "ll-code" });
       var go = el("button", { class: "btn big", onclick: function () {
-        if (inp.value.trim() === code(S.name, "lock" + n)) back(); else msg.textContent = "Not the code. Hand up and wait for Mr. D.";
+        if (inp.value.trim() === code(S.name, "lock" + n) || overrideOK(inp.value)) back(); else msg.textContent = "Not the code. Hand up and wait for Mr. D.";
       } }, "Unlock");
       inp.addEventListener("keydown", function (e) { if (e.key === "Enter") go.click(); });
       card.append(el("h2", {}, "🔒 Locked. Hand up, eyes forward."),
@@ -148,7 +153,7 @@
     lockNo: function () { return total(); },
     resume: function (codeIn) {
       if (!S) return Promise.resolve("none");
-      if (String(codeIn).trim() !== code(S.name, "lock" + total())) return Promise.resolve("wrong");
+      if (String(codeIn).trim() !== code(S.name, "lock" + total()) && !overrideOK(codeIn)) return Promise.resolve("wrong");
       return enterFs().then(function (ok) {
         if (!ok) return "nofs";
         S.counted = false; armed = true; listen(); store(); startBeat(); emit();
@@ -165,6 +170,7 @@
     },
     stats: stats,
     unlockCode: function (name, n) { return code(name, "lock" + n); },
+    overrideCode: function () { return MrD.codes.override(); },
     offCode: function () { return code("", "off"); }
   };
 })();

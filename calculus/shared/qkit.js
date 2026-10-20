@@ -82,11 +82,13 @@
   /* render(host, q, opt) -> controller
      q: { prompt, figure, fields:[{id,label,type,answer|ans+choices,vars,domain,scale,tol,unit,min,pad,traps}],
           hints:[...], worked, good, why }
-     opt: { seed, noHints, maxTries, onDone(result), locked }
+     opt: { seed, noHints, maxTries, onDone(result), locked, moreHints:false (turn off the extra hint rungs), key:true (teacher #key: show the answer under each field) }
+     Hints: the question's own hints come first. After those run out the Hint button keeps going: it says which parts are still off,
+     then shows one missing piece per press until the whole answer is visible. A student is never left without a next step.
      result: { misses, hints, assisted, clean, traps:[msgs], answers:{id:value}, gaveUp } */
   function render(host, q, opt) {
     opt = opt || {};
-    var misses = 0, hintsShown = 0, finished = false, assisted = false, trapsHit = [];
+    var misses = 0, hintsShown = 0, finished = false, assisted = false, trapsHit = [], shownHints = [], revealed = {}, diagnosed = false;
     var card = el('div', 'q-card');
     card.appendChild(el('div', 'q-prompt', rich(q.prompt || '')));
     if (q.figure) card.appendChild(el('div', 'figure', q.figure));
@@ -168,6 +170,7 @@
         rec.lock = function () { inp.disabled = true; };
         rec.input = inp;
       }
+      if (opt.key && f.type !== 'text') { var kl = el('div', 'keyline'); kl.innerHTML = 'KEY: <b>' + fieldAnswerHtml(f) + '</b>'; wrap.appendChild(kl); }
       rec.wrap = wrap; rec.done = false;
       ctl.fields[f.id] = rec;
       grid.appendChild(wrap);
@@ -175,7 +178,7 @@
 
     var row = el('div', 'row'), btnCheck = el('button', 'btn primary', 'Check'), btnHint = null, btnWorked = null;
     btnCheck.type = 'button'; row.appendChild(btnCheck);
-    if (q.hints && q.hints.length && !opt.noHints) {
+    if (!opt.noHints) {
       btnHint = el('button', 'btn', 'Hint'); btnHint.type = 'button'; row.appendChild(btnHint);
     }
     btnWorked = el('button', 'btn', 'Show the worked solution'); btnWorked.type = 'button'; btnWorked.hidden = true; row.appendChild(btnWorked);
@@ -186,13 +189,37 @@
 
     function showFb(kind, html) { fb.className = 'fb ' + kind; fb.innerHTML = html; fb.hidden = !html; }
     function showHints() {
-      if (!hintsShown) { hintBox.hidden = true; return; }
+      if (!shownHints.length) { hintBox.hidden = true; return; }
       hintBox.hidden = false;
-      hintBox.innerHTML = q.hints.slice(0, hintsShown).map(function (h, i) { return '<p><b>Hint ' + (i + 1) + '.</b> ' + inline(h) + '</p>'; }).join('');
+      hintBox.innerHTML = shownHints.map(function (h, i) { return '<p><b>Hint ' + (i + 1) + '.</b> ' + inline(h) + '</p>'; }).join('');
+    }
+    function fieldAnswerHtml(f) {
+      if (f.type === 'mc') return inline(f.choices[f.ans]);
+      if (f.type === 'num') return esc(String(f.answer)) + (f.unit ? ' ' + inline(f.unit) : '');
+      try { return tex(MC.toLatex(String(f.answer), f.vars || ['x']), false); } catch (e) { return esc(String(f.answer)); }
+    }
+    function unsolved() { return q.fields.filter(function (f) { return f.type !== 'text' && !ctl.fields[f.id].done; }); }
+    /* The rungs after the question's own hints: where you are off, then one piece at a time. */
+    function genericHint() {
+      var open = unsolved();
+      if (!open.length) return null;
+      if (!diagnosed) {
+        diagnosed = true;
+        if (open.length > 1) return 'These parts are still open: ' + open.map(function (f) { return inline(f.label || f.id); }).join('; ') + '. Settle them one at a time, from the top. Each one feeds the next.';
+      }
+      for (var i = 0; i < open.length; i++) {
+        var f = open[i];
+        if (!revealed[f.id]) { revealed[f.id] = true; return 'Here is one piece. ' + (f.label ? inline(f.label) + ' ' : '') + '<b>' + fieldAnswerHtml(f) + '</b>. Type it in, then see how it feeds the next part.'; }
+      }
+      return null;
     }
     function nextHint() {
-      if (!q.hints || opt.noHints || hintsShown >= q.hints.length) return false;
-      hintsShown++; showHints(); return true;
+      if (opt.noHints) return false;
+      var authored = q.hints || [], h;
+      if (shownHints.length < authored.length) h = authored[shownHints.length];
+      else if (opt.moreHints !== false) h = genericHint();
+      if (!h) return false;
+      shownHints.push(h); hintsShown = shownHints.length; showHints(); return true;
     }
     function answers() { var o = {}; Object.keys(ctl.fields).forEach(function (k) { o[k] = ctl.fields[k].get(); }); return o; }
     function finish(gaveUp) {
@@ -247,7 +274,7 @@
       if (misses >= 3 && q.worked && !opt.noWorked) btnWorked.hidden = false;
     }
     btnCheck.onclick = check;
-    if (btnHint) btnHint.onclick = function () { if (!nextHint()) showFb('info', '<p>That is every hint. Try the worked solution if you are stuck.</p>'); if (q.worked && !opt.noWorked) btnWorked.hidden = misses < 1 && hintsShown < (q.hints || []).length; };
+    if (btnHint) btnHint.onclick = function () { if (!nextHint()) showFb('info', '<p>That is every hint. Try the worked solution if you are stuck.</p>'); if (q.worked && !opt.noWorked) btnWorked.hidden = misses < 1 && hintsShown < (q.hints || []).length + 1; };
     btnWorked.onclick = function () { showWorked(); showFb('info', '<p>Read it, then keep going. This one counts as assisted.</p>'); finish(true); };
 
     ctl.autofill = function (correct) {

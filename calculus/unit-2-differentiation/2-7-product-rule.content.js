@@ -1,7 +1,7 @@
 /* 2.7 The Product Rule: content for the student lesson and the teacher key.
    Every answer here is checked by a sympy script before release (see verify notes in the PR).
    Expressions use the mathcheck syntax: x^2, 3x, e^x, ln(x), sqrt(x), sin(x), implicit multiplication.
-   Levels: 1 Build (support), 2 Apply (core), 3 Stretch, 4 Extend. Students never see the level numbers. */
+   Levels 1 to 4 run from most support to least. Students never see the level numbers or names. */
 (function (root) {
   'use strict';
   var MC = root.MC;
@@ -124,7 +124,7 @@
     var hints = level <= 2
       ? ['Two factors are multiplied. Name the first $f$ and the second $g$.',
          'Differentiate each one on its own. The rule needs all four: $f$, $g$, $f\'$, $g\'$.',
-         'Assemble $f\'g+fg\'$ with your four pieces dropped in. Simplifying is optional.']
+         'Assemble $f\'g+fg\'$ with your four pieces dropped in. Simplifying is not required.']
       : ['Split the product into $f$ and $g$ and differentiate each.', 'Assemble $f\'g+fg\'$. Check you used one derivative and one original in each term.'];
     if (level === 1 && spec.expd) {
       fields.push(E('exp', 'Check a second way. Multiply $' + h + '$ out first: $' + h + '(x)=$', spec.expd),
@@ -273,7 +273,8 @@
 
   /* Hand-in code: numbers in base 36 plus a checksum that depends on the student's name. */
   var CODE_FIELDS = ['version', 'start level', 'peak level', 'warm-up misses (bitmask)', 'check items right (of 4)', 'concept item right', 'check attempts',
-    'assisted items', 'hints used', 'active minutes', 'flags (1 solo huddle, 2 needs conference)', 'clean items', 'items answered'];
+    'assisted items', 'hints used', 'active minutes', 'flags (2 needs conference, 4 finished at home)', 'clean items', 'items answered',
+    'warm-up seconds used (of 300)', 'warm-up ran out of time (1 yes)', 'warm-up items not reached', 'lesson step reached (of 9)', 'extra practice items', 'extra practice clean'];
   function codeChk(name, payload) {
     var s = String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '') + '|' + payload, h = 7;
     for (var i = 0; i < s.length; i++) h = (h * 131 + s.charCodeAt(i)) % 46656;
@@ -291,11 +292,65 @@
     return { ok: true, nums: nums, rows: CODE_FIELDS.map(function (l, i) { return [l, nums[i]]; }) };
   }
 
+
+  /* ---------- Endless practice ----------
+     When the eight set problems are done and class time remains, the lesson keeps handing out fresh product-rule
+     problems at the student's current level, so nobody runs out before the end of class.
+     Every answer is the unsimplified product-rule result, which the checker accepts by numeric equivalence. */
+  function seeded(seed) {
+    var h = 2166136261; seed = String(seed);
+    for (var i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
+    var a = h >>> 0;
+    return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  }
+  function pk(r, arr) { return arr[Math.floor(r() * arr.length)]; }
+  function wrap(t) { return /[+\-\/]/.test(String(t).replace(/^-/, '')) ? '(' + t + ')' : String(t); }
+  function mul(a, b) { return a === '1' ? String(b) : b === '1' ? String(a) : wrap(a) + ' ' + wrap(b); }
+  function term(c, e) {
+    var sign = c < 0 ? '-' : '', a = Math.abs(c), body = e === 0 ? String(a) : (a === 1 ? '' : String(a)) + (e === 1 ? 'x' : 'x^' + e);
+    return sign + body;
+  }
+  function poly(ts) {
+    var out = '';
+    ts.filter(function (t) { return t[0] !== 0; }).sort(function (x, y) { return y[1] - x[1]; }).forEach(function (t, i) {
+      var s = term(t[0], t[1]); out += (i && s[0] !== '-' ? '+' : '') + s;
+    });
+    return out || '0';
+  }
+  var G_ATOMS = [
+    { e: 'e^x', d: 'e^x', lvl: 2 }, { e: 'sin(x)', d: 'cos(x)', lvl: 2 }, { e: 'cos(x)', d: '-sin(x)', lvl: 2 }, { e: 'ln(x)', d: '1/x', lvl: 3 }
+  ];
+  function more(n, level, seed) {
+    var r = seeded(seed + '|' + n + '|' + level), L = Math.max(1, Math.min(4, level)), id = 'more' + n + 'L' + L, f, g, fp, gp, spec;
+    if (L === 1) {
+      var c = pk(r, [1, 2, 3, 4]), k = pk(r, [2, 3, 4]), a = pk(r, [1, 2, 3, 4]), b = pk(r, [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]);
+      f = term(c, k); g = poly([[a, 1], [b, 0]]); fp = term(c * k, k - 1); gp = String(a);
+      spec = { id: id, fn: f + '(' + g + ')', f: f, g: g, fp: fp, gp: gp,
+        res: poly([[c * a * (k + 1), k], [c * b * k, k - 1]]), expd: poly([[c * a, k + 1], [c * b, k]]) };
+    } else {
+      var F;
+      if (L === 2) F = pk(r, [function () { var c2 = pk(r, [1, 2, 3, 4]), k2 = pk(r, [1, 2, 3]); return { e: term(c2, k2), d: term(c2 * k2, k2 - 1) }; },
+                              function () { var c3 = pk(r, [2, 3, 4, 5]); return { e: 'x^2-' + c3, d: '2x' }; }])();
+      else if (L === 3) F = pk(r, [function () { var k3 = pk(r, [2, 3, 4]); return { e: 'x^' + k3, d: term(k3, k3 - 1) }; },
+                                    function () { return { e: 'sqrt(x)', d: '1/(2sqrt(x))' }; },
+                                    function () { var c4 = pk(r, [2, 3, 5]); return { e: 'x^2+' + c4 + 'x', d: '2x+' + c4 }; }])();
+      else F = pk(r, [function () { return { e: 'x^2+3x', d: '2x+3' }; }, function () { return { e: 'x^3', d: '3x^2' }; }, function () { return { e: 'x^2-2x', d: '2x-2' }; }])();
+      var G;
+      if (L === 4) G = pk(r, [{ e: 'e^x+ln(x)', d: 'e^x+1/x' }, { e: 'sin(x)+cos(x)', d: 'cos(x)-sin(x)' }, { e: 'e^x+sin(x)', d: 'e^x+cos(x)' }]);
+      else G = pk(r, G_ATOMS.filter(function (x) { return x.lvl <= L; }));
+      f = F.e; g = G.e; fp = F.d; gp = G.d;
+      var t1 = mul(fp, g), t2neg = gp[0] === '-', t2 = mul(f, t2neg ? gp.slice(1) : gp);
+      var fnStr = (/[+\-]/.test(f) ? '(' + f + ')' : f) + (/[+\-]/.test(g) ? '(' + g + ')' : (/^[a-z]/.test(g) ? ' ' : '') + g);
+      spec = { id: id, fn: fnStr, f: f, g: g, fp: fp, gp: gp, res: t1 + (t2neg ? '-' : '+') + t2 };
+    }
+    return buildQ(spec, L);
+  }
+
   root.PR2 = {
     LESSON: LESSON_ID, hashStr: hashStr, today: today,
-    codeFor: function (kind) { return hashStr(LESSON_ID + '|' + kind + '|' + today()); },
+    codeFor: function (kind) { return (window.MrD && MrD.codes) ? MrD.codes.gate('product-rule-v2', kind === 'huddle' ? 'h1' : kind) : hashStr(LESSON_ID + '|' + kind + '|' + today()); },
     encodeHandIn: encodeHandIn, decodeHandIn: decodeHandIn, CODE_FIELDS: CODE_FIELDS,
-    TITLE: '2.7 The Product Rule',
+    TITLE: '2.7 The Product Rule', more: more,
     READY: READY, PREDICT: PREDICT, MISSIONS: MISSIONS, BUILD: BUILD, PRACTICE: PRACTICE, MASTERY: MASTERY, RECOVERY: RECOVERY,
     buildQ: buildQ,
     make: function (entry, level) { return entry.spec ? buildQ(entry.spec, level) : entry.q ? entry.q : entry.fields ? entry : buildQ(entry, level); },

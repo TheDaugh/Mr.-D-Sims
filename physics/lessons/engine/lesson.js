@@ -1,7 +1,8 @@
 /* Mr. D's lesson engine. Shared by every online lesson.
    A lesson is a config object registered in window.LESSONS_REG (see content/). The engine supplies:
    state + autosave, step gating, per-student seeded numbers, question widgets (choice / num / cloze / text),
-   hidden difficulty bands, teacher codes, the #key view, the notes document (print + LaTeX) and the report code. */
+   hidden difficulty bands, teacher codes, the #key view, the notes document (print + LaTeX) and the report code.
+   The school clock (shared/bell.js) decides when huddle codes are asked for and when guided notes can end. */
 (function () {
   'use strict';
   var LE = window.LE = { debug: { qs: {} } };
@@ -19,7 +20,12 @@
   LE.rng = function (seed) { return mulberry(hash32(seed)); };
   LE.pick = function (r, arr) { return arr[Math.floor(r() * arr.length)]; };
   LE.today = function () { return new Date().toLocaleDateString('en-CA'); };
-  LE.codeFor = function (lessonId, cp, dateStr) { return String(hash32(lessonId + '|' + cp + '|' + (dateStr || LE.today())) % 10000).padStart(4, '0'); };
+  /* Huddle codes come from the shared module, so the teacher bar and the teacher dashboard always agree. */
+  LE.codeFor = function (lessonId, cp) { return MrD.codes.gate(lessonId, cp); };
+  /* Huddle codes are asked for only 7:00 AM to 3:00 PM on school days, and never in the #key view. */
+  LE.gatesOn = function () { return !KEY && MrD.bell.gatesOn(); };
+  LE.clock = function () { return MrD.bell.clock(CFG.course); };
+  LE.canEnd = function () { return KEY || LE.clock().canEnd; };
   LE.words = function (s) { var m = String(s || '').trim().match(/\S+/g); return m ? m.length : 0; };
   LE.fmtN = function (x) { return String(+Number(x).toFixed(3)); };
   LE.fmt = function (x, d) { if (!isFinite(x)) return String(x); var s = Number(x).toFixed(d == null ? 2 : d); return s; };
@@ -45,7 +51,7 @@
 
   /* ---------- state ---------- */
   function storeKey() { return 'le.' + CFG.id + '.v' + CFG.version; }
-  function fresh() { return { id: CFG.id, step: CFG.steps[0].id, first: '', period: '', seed: '', band0: 0, band: 0, bandLog: [], t: {}, q: {}, d: {}, huddle: {}, started: Date.now() }; }
+  function fresh() { return { id: CFG.id, step: CFG.steps[0].id, first: '', period: '', seed: '', band0: 0, band: 0, bandLog: [], t: {}, q: {}, d: {}, huddle: {}, started: Date.now(), max: 0, ended: '', endIdx: 0, hid: 0 }; }
   function load() { try { var v = JSON.parse(localStorage.getItem(storeKey())); if (v && v.id === CFG.id) return v; } catch (e) { } return fresh(); }
   function saveNow() { try { localStorage.setItem(storeKey(), JSON.stringify(S)); } catch (e) { } }
   LE.save = function () { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 150); };
@@ -58,14 +64,21 @@
   function stepIndex(id) { for (var i = 0; i < CFG.steps.length; i++) if (CFG.steps[i].id === id) return i; return 0; }
   function stepCan(i) { var st = CFG.steps[i]; if (KEY || st.optional) return true; try { return !!st.canLeave(ctx()); } catch (e) { return false; } }
   function reachable() {
-    if (KEY) return CFG.steps.length - 1;
+    if (KEY || S.ended) return CFG.steps.length - 1;
     var i = 0; while (i < CFG.steps.length - 1 && stepCan(i)) i++; return i;
   }
   function ctx() { return { S: S, LE: LE, band: LE.band(), key: KEY, cfg: CFG }; }
   LE.goto = function (id) {
     var idx = stepIndex(id); if (idx > reachable()) return;
-    S.step = id; viewNotes = false; saveNow(); LE.render(); window.scrollTo(0, 0);
+    S.step = id; S.max = Math.max(S.max || 0, idx); viewNotes = false; saveNow(); LE.render(); window.scrollTo(0, 0);
   };
+  LE.stepIndex = function (id) { return stepIndex(id || S.step); };
+  /* The student presses End at the end mark (or after the bell). Their stamp records the furthest step they reached. */
+  LE.endNow = function (why) {
+    S.ended = why || 'time'; S.endIdx = Math.max(S.max || 0, stepIndex(S.step)); S.endedAt = Date.now();
+    S.step = CFG.steps[CFG.steps.length - 1].id; saveNow(); LE.render(); window.scrollTo(0, 0);
+  };
+  LE.reached = function () { var i = S.ended ? S.endIdx : Math.max(S.max || 0, stepIndex(S.step)); return { idx: i, label: CFG.steps[Math.min(i, CFG.steps.length - 1)].label, of: CFG.steps.length }; };
   LE.next = function () { var i = stepIndex(S.step); if (i + 1 < CFG.steps.length && stepCan(i)) LE.goto(CFG.steps[i + 1].id); };
   LE.gate = function () {
     renderNav();
@@ -84,10 +97,36 @@
   }
 
   /* ---------- timing ---------- */
+  var lastCan = null, liveOn = false;
   function tick() {
-    if (!S || !S.first || document.visibilityState !== 'visible') return;
+    if (!S || !S.first) return;
+    updateEndBar();
+    if (document.visibilityState !== 'visible') return;
     S.t[S.step] = (S.t[S.step] || 0) + 1;
     if (S.t[S.step] % 5 === 0) saveNow();
+    var can = LE.canEnd();
+    if (lastCan !== null && can !== lastCan && CFG.steps[stepIndex(S.step)].id === CFG.steps[CFG.steps.length - 1].id && !viewNotes) LE.render();
+    lastCan = can;
+    if (!liveOn && !KEY) { liveOn = true; MrD.live.attach({ course: CFG.course, lessonId: CFG.id, who: function () { return { first: S.first, period: S.period }; }, snap: liveSnap }); }
+  }
+  /* "Time is up" banner. Shown only from the end mark on (or after the bell), never earlier, so there is no countdown to wait out. */
+  function updateEndBar() {
+    var b = $('endbar'); if (!b) return;
+    var last = CFG.steps[CFG.steps.length - 1].id, c = LE.clock();
+    var show = !KEY && !!S.first && !S.ended && S.step !== last && c.needsEnd;
+    if (show === !b.hidden) return;
+    b.hidden = !show; b.textContent = '';
+    if (!show) return;
+    b.appendChild(el('span', null, c.friday || c.afterBell ? 'The bell has rung. Finish the question you are on, then end your guided notes.' : 'Time for guided notes is up. Finish the question you are on, then end your guided notes.'));
+    var eb = el('button', 'btn primary', 'End my guided notes'); eb.type = 'button'; eb.onclick = function () { LE.endNow('time'); }; b.appendChild(eb);
+  }
+  function liveSnap() {
+    var ans = 0, miss = 0, k, prompt = '', stuck = false;
+    for (k in S.q) { if (S.q[k].done) ans++; miss += S.q[k].misses || 0; }
+    var boxes = document.querySelectorAll('#stage .q');
+    for (var i = 0; i < boxes.length; i++) { var qs = S.q[boxes[i].dataset.qid]; if (!qs || !qs.done) { var qt = boxes[i].querySelector('.qtext'); prompt = qt ? qt.textContent : ''; stuck = !!(qs && qs.misses >= 1); break; } }
+    var tot = 0; for (k in S.t) tot += S.t[k];
+    return { step: CFG.steps[stepIndex(S.step)].label, stepIdx: stepIndex(S.step) + 1, stepCount: CFG.steps.length, band: LE.band(), answered: ans, misses: miss, prompt: prompt, exits: S.hid || 0, secs: tot, stuck: stuck, done: !!S.ended };
   }
 
   /* ---------- question widgets ---------- */
@@ -357,7 +396,7 @@
     var stage = $('stage'); stage.textContent = '';
     renderNav();
     if (viewNotes) { notesView(stage); return; }
-    var i = stepIndex(S.step), st = CFG.steps[i];
+    var i = stepIndex(S.step), st = CFG.steps[i]; S.max = Math.max(S.max || 0, i);
     var card = el('section', 'card'); card.dataset.step = st.id; stage.appendChild(card);
     if (KEY && st.teacher) { var kp = el('div', 'keypanel'); kp.appendChild(el('h4', null, 'Teacher key \u00b7 ' + st.label)); var inner = el('div'); html(inner, st.teacher(ctx())); kp.appendChild(inner); stage.insertBefore(kp, card); }
     st.render(card, ctx());
@@ -371,23 +410,22 @@
   function keyBar() {
     var bar = $('keybar'); bar.hidden = !KEY; bar.textContent = '';
     if (!KEY) return;
-    bar.appendChild(el('span', null, 'TEACHER KEY ON'));
-    bar.appendChild(el('span', null, 'Huddle 1 code ' + LE.codeFor(CFG.id, 'h1')));
-    bar.appendChild(el('span', null, 'Huddle 2 code ' + LE.codeFor(CFG.id, 'h2')));
-    var tl = el('a', null, 'Teacher page'); tl.href = 'teacher.html#' + CFG.id; bar.appendChild(tl);
-    var bsel = el('label', null, 'Preview band '); var sel = el('select'); [1, 2, 3, 4].forEach(function (b) { var o = el('option', null, String(b)); o.value = String(b); if (b === LE.band()) o.selected = true; sel.appendChild(o); });
-    sel.onchange = function () { LE.setBand(+sel.value, 'key'); LE.render(); }; bsel.appendChild(sel); bar.appendChild(bsel);
-    var rs = el('button', 'btn small', 'Reset this device'); rs.type = 'button'; rs.onclick = function () { if (confirm('Clear saved progress on this device?')) LE.reset(); }; bar.appendChild(rs);
+    var extra = [];
+    var bsel = el('label', null, 'Preview level '); var sel = el('select'); [1, 2, 3, 4].forEach(function (b) { var o = el('option', null, String(b)); o.value = String(b); if (b === LE.band()) o.selected = true; sel.appendChild(o); });
+    sel.onchange = function () { LE.setBand(+sel.value, 'key'); LE.render(); }; bsel.appendChild(sel); extra.push(bsel);
+    var rs = el('button', null, 'Reset this device'); rs.type = 'button'; rs.onclick = function () { if (confirm('Clear saved progress on this device?')) LE.reset(); }; extra.push(rs);
+    MrD.teacherBar(bar, { course: CFG.course, lessonId: CFG.id, gates: CFG.gates, teacher: 'teacher.html#' + CFG.id, root: '../../', extra: extra });
   }
 
   LE.start = function (cfg) {
-    CFG = cfg; KEY = /(^|[#&])key\b/.test(location.hash);
+    CFG = cfg; KEY = MrD.isKey();
     S = load();
     document.title = cfg.title + ' \u00b7 Mr. D';
     $('title').textContent = cfg.title; $('subtitle').textContent = cfg.subtitle;
     $('btn-notes').onclick = function () { if (!S.first) return; viewNotes = true; LE.render(); window.scrollTo(0, 0); };
-    window.addEventListener('hashchange', function () { KEY = /(^|[#&])key\b/.test(location.hash); keyBar(); LE.render(); });
+    window.addEventListener('hashchange', function () { KEY = MrD.isKey(); keyBar(); LE.render(); });
     ticker = setInterval(tick, 1000);
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && S && S.first && !KEY) { S.hid = (S.hid || 0) + 1; saveNow(); } });
     window.addEventListener('pagehide', saveNow);
     keyBar(); LE.render();
   };

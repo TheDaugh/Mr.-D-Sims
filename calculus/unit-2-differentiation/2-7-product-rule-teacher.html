@@ -99,6 +99,9 @@ details.sec>.in{padding:0 18px 14px}
 </div>
 <div class="fs" id="fs" hidden><div class="bigcode" id="fs-code"></div><p class="hint" id="fs-date"></p><button class="btn" type="button" id="fs-close">Close</button></div>
 
+<script src="../../shared/config.js"></script>
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
 <script src="../shared/katex/katex.min.js"></script>
 <script src="../shared/mathcheck.js"></script>
 <script src="../shared/qkit.js"></script>
@@ -122,7 +125,7 @@ details.sec>.in{padding:0 18px 14px}
   $('project').onclick = function () { $('fs-code').textContent = C.codeFor('huddle'); $('fs-date').textContent = 'Class code for ' + C.today(); $('fs').hidden = false; };
   $('fs-close').onclick = function () { $('fs').hidden = true; };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') $('fs').hidden = true; });
-  $('other-date').onchange = function () { $('other-code').textContent = this.value ? C.hashStr(C.LESSON + '|huddle|' + this.value) : ''; };
+  $('other-date').onchange = function () { $('other-code').textContent = this.value ? MrD.codes.gate('product-rule-v2', 'h1', new Date(this.value + 'T09:00:00')) : ''; };
 
   /* decoder */
   $('dec-go').onclick = function () {
@@ -135,7 +138,9 @@ details.sec>.in{padding:0 18px 14px}
     lines.push('Started on the <b>' + NAMES[n[1]] + '</b> path' + (n[2] > n[1] ? ' and rose to <b>' + NAMES[n[2]] + '</b>' : n[2] < n[1] ? ' and dropped to ' + NAMES[n[2]] : ', held steady') + '.');
     lines.push('Check: <b>' + n[4] + ' of 4</b>' + (n[5] ? ', idea question right' : ', idea question missed') + ', attempt ' + n[6] + '.');
     lines.push(n[12] + ' items answered, ' + n[11] + ' clean, ' + n[7] + ' assisted, ' + n[8] + ' hints; about ' + n[9] + ' active minutes.');
-    if (n[10] & 1) lines.push('Worked solo (no class code at the huddle).');
+    if (n[10] & 4) lines.push('Finished outside school hours (no class code was needed).');
+    if (n[13] != null) lines.push('Warm-up: ' + n[13] + ' of 300 seconds used' + (n[14] ? ', <b>time ran out</b> with ' + n[15] + ' question' + (n[15] == 1 ? '' : 's') + ' not reached' : '') + '.');
+    if (n[16] != null) lines.push('Got to step <b>' + n[16] + ' of 9</b>; ' + n[17] + ' extra practice problem' + (n[17] == 1 ? '' : 's') + ' (' + n[18] + ' clean).');
     if (n[10] & 2) lines.push('<b>Conference flag.</b> The check did not land after two attempts.');
     out.innerHTML = '<div class="fb ok">' + lines.map(function (l) { return '<p>' + l + '</p>'; }).join('') + '</div>' +
       '<table class="t"><tbody>' + r.rows.map(function (x) { return '<tr><td>' + Q.esc(x[0]) + '</td><td>' + x[1] + '</td></tr>'; }).join('') + '</tbody></table>';

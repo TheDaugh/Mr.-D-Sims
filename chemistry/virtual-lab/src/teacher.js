@@ -5,6 +5,7 @@ import { buildReport } from "./report.js";
 import { downloadJSON } from "./log.js";
 import { profile, stateAt, checkData } from "./engine/heating.js";
 import { checkCode } from "./engine/integrity.js";
+import "../../../portal/adapters.js";   // sets window.PortalAdapters (also used by the review portal)
 // Active minutes and whether the record's check code still matches its facts.
 const activeTag = (rec) => rec.code ? `${Math.round((rec.activeSec || 0) / 60)} min active ${checkCode({ student: rec.student, lab: rec.lab, seed: rec.seed, activeSec: rec.activeSec, events: rec.codeEvents, cerDone: !!rec.cer }) === rec.code ? "✔" : "✘ edited?"}` : "no timer";
 
@@ -132,5 +133,9 @@ $("#csv").addEventListener("click", () => {
   const lines = [["student", "mode", "identified", "wrong_cells", "goggles_before_chemicals", "apron_before_chemicals", "incidents", "prelab_correct", "prelab_total", "cer_claim", "cer_evidence", "cer_reasoning", "rubric_claim", "rubric_evidence", "rubric_reasoning", "safety_points", "seconds"].join(",")];
   for (const { r, rec, scores } of rows) lines.push([r.student, r.mode, r.grade.identified, r.grade.wrong, r.setup[0].ok, r.setup[1].ok, r.incidents.length, r.prelab ? r.prelab.correct : "", r.prelab ? r.prelab.total : "", rec.cer ? rec.cer.claim : "", rec.cer ? (rec.cer.evidence || []).join("; ") : "", rec.cer ? rec.cer.reasoning : "", ...rubric.map((c) => scores[c.key] ?? ""), r.points ?? "", r.seconds].map(q).join(","));
   const a = h("a", { href: URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" })), download: "class-records.csv" }); document.body.append(a); a.click(); a.remove();
+});
+$("#portal").addEventListener("click", () => {
+  const records = rows.map(({ r }) => window.PortalAdapters.vlabRecord(r, ""));
+  const a = h("a", { href: URL.createObjectURL(new Blob([window.PortalAdapters.bundle(records)], { type: "application/json" })), download: "virtual-lab-scores.json" }); document.body.append(a); a.click(); a.remove();
 });
 window.__teacher = { load, rows: () => rows, heat: () => heat };

@@ -7,7 +7,8 @@
   function optText(o) { return typeof o === 'string' ? plain(o) : plain((o.label || o.html || '') + (o.desc ? ' (' + o.desc + ')' : '')); }
   function codeBox(card, c, key, label) {
     var S = c.S, wrap = el('div');
-    if (S.huddle[key]) { wrap.appendChild(el('p', 'msg ok', 'Code accepted.')); card.appendChild(wrap); return; }
+    if (!S.huddle[key] && !LE.gatesOn()) { S.huddle[key] = LE.isKey() ? 'key' : 'open'; LE.save(); }   // 3 PM to 7 AM, weekends, and #key: no code
+    if (S.huddle[key]) { if (S.huddle[key] === true) wrap.appendChild(el('p', 'msg ok', 'Code accepted.')); card.appendChild(wrap); return; }
     wrap.appendChild(el('p', null, 'Look up. Mr. D has the code. Enter it to continue.'));
     var row = el('div', 'row'), inp = el('input'); inp.type = 'text'; inp.inputMode = 'numeric'; inp.maxLength = 4; inp.setAttribute('aria-label', label); inp.style.width = '6em';
     var btn = el('button', 'btn', 'Enter code'); btn.type = 'button'; row.appendChild(inp); row.appendChild(btn); wrap.appendChild(row);
@@ -22,9 +23,9 @@
   steps.push({ id: 'start', label: 'Start',
     render: function (card, c) {
       var S = c.S; card.appendChild(el('h2', null, 'Newton’s First Law'));
-      var p = el('div', 'prose'); p.innerHTML = '<p>Today’s question is one that fooled people for two thousand years: <b>does an object need a force to keep moving?</b> You will predict, test it in a simulator, state the rule yourself, and then work problems that adjust to how you are doing. Your own notes build as you go, and you can print them at the end.</p><p>The questions adapt. Some people will see harder problems than others, and everyone ends on the same final check. If something feels easy or hard, that is the lesson doing its job.</p>';
+      var p = el('div', 'prose'); p.innerHTML = '<p>Today’s question is one that fooled people for two thousand years: <b>does an object need a force to keep moving?</b> You will predict, test it in a simulator, state the rule yourself, and then work problems that adjust to how you are doing. Your own notes build as you go, and you can print them at the end.</p><p>The questions adapt. Some people will see harder problems than others, and everyone ends on the same final check. If something feels easy or hard, that is the lesson doing its job. There is always another question waiting at your level, so keep going until Mr. D calls time.</p>';
       card.appendChild(p);
-      var ol = el('ol'); ['Warm-up (3 min)', 'Predict (5 min)', 'Investigate (15 min)', 'Huddle with Mr. D (4 min)', 'Name it and build your notes (8 min)', 'Try it (8 min)', 'Check (5 min)'].forEach(function (t) { ol.appendChild(el('li', null, t)); }); card.appendChild(ol);
+      var ol = el('ol'); ['Warm-up', 'Predict', 'Investigate', 'Huddle with Mr. D', 'Name it and build your notes', 'Try it', 'Check'].forEach(function (t) { ol.appendChild(el('li', null, t)); }); card.appendChild(ol);
       var row = el('div', 'row'); var f = el('input'); f.type = 'text'; f.maxLength = 20; f.value = S.first; f.setAttribute('aria-label', 'First name'); var pe = el('input'); pe.type = 'text'; pe.maxLength = 4; pe.value = S.period; pe.setAttribute('aria-label', 'Class period'); pe.style.width = '5em';
       var l1 = el('label', null, 'First name '); l1.appendChild(f); var l2 = el('label', null, 'Period '); l2.appendChild(pe); row.appendChild(l1); row.appendChild(l2); card.appendChild(row);
       card.appendChild(el('p', 'hint', 'First name and period only. No accounts. Your progress saves in this browser.'));
@@ -92,12 +93,12 @@
 
   steps.push({ id: 'huddle', label: 'Huddle',
     render: function (card, c) {
-      var S = c.S; card.appendChild(el('h2', null, '4 · Huddle'));
+      var S = c.S; S.d.pred = S.d.pred || []; card.appendChild(el('h2', null, '4 · Huddle'));
       codeBox(card, c, 'h1', 'Class code');
       if (!S.huddle.h1) return;
       card.appendChild(el('h3', null, 'Your predictions against the evidence'));
       var t = el('table', 'data'); t.innerHTML = '<thead><tr><th>Prediction</th><th>You chose</th><th>Sure?</th><th>The evidence says</th><th></th></tr></thead>'; var tb = el('tbody');
-      NFL.preds.forEach(function (P, i) { var st = S.d.pred[i], tr = el('tr'); var ok = st.pick === P.correct; tr.innerHTML = '<td>' + P.title + '</td><td>' + optText(P.options[st.pick]) + '</td><td>' + ['', 'Guess', 'Fairly sure', 'Certain'][st.conf] + '</td><td>' + optText(P.options[P.correct]) + '</td><td class="' + (ok ? 'ok' : '') + '">' + (ok ? '✓' : '✗') + '</td>'; tb.appendChild(tr); });
+      NFL.preds.forEach(function (P, i) { var st = S.d.pred[i] || { pick: null, conf: 0 }, tr = el('tr'); var ok = st.pick === P.correct; tr.innerHTML = '<td>' + P.title + '</td><td>' + (st.pick == null ? '(no prediction yet)' : optText(P.options[st.pick])) + '</td><td>' + ['', 'Guess', 'Fairly sure', 'Certain'][st.conf || 0] + '</td><td>' + optText(P.options[P.correct]) + '</td><td class="' + (ok ? 'ok' : '') + '">' + (ok ? '✓' : '✗') + '</td>'; tb.appendChild(tr); });
       t.appendChild(tb); var sc = el('div', 'scroll'); sc.appendChild(t); card.appendChild(sc);
       card.appendChild(el('h3', null, 'State the rule'));
       var host = el('div'); card.appendChild(host);
@@ -201,41 +202,70 @@
     return ['v2', S.first, S.period, S.band0, T.map(function (x) { return x.band; }).join('-'), T.map(function (x) { return x.misses; }).join('-'), S.warm == null ? '' : S.warm,
       P.map(function (p) { return p && p.pick != null ? L[p.pick] : '-'; }).join(''), P.map(function (p) { return p && p.conf || 0; }).join('-'),
       (c1 && c1.ok && c1.misses === 0 ? 1 : 0) + '-' + (c2 && c2.ok && c2.misses === 0 ? 1 : 0) + '-' + rub.join('') + '-' + (conf.C1 || 0) + (conf.C2 || 0),
-      sec.join('-'), T.map(function (x) { return x.secs; }).join('-'), LE.today()];
+      sec.join('-'), T.map(function (x) { return x.secs; }).join('-'), LE.today(),
+      LE.reached().idx + 1, S.ended ? 't' : 'f', (S.d.more && S.d.more.log ? S.d.more.log.length : 0) + '-' + (S.d.more && S.d.more.log ? S.d.more.log.filter(function (x) { return x.misses === 0; }).length : 0)];
   }
   NFL.reportFields = reportFields;
-  NFL.stamp = function (S) { return 'NFL-' + String(LE.hash32(ID + '|' + LE.norm(S.first) + '|' + LE.norm(S.period) + '|' + LE.today()) % 10000).padStart(4, '0'); };
+  /* One record for the review portal (shared/profile.js): every question the student worked, by skill. */
+  NFL.profileRecord = function (S) {
+    var all = ((S.d.try && S.d.try.log) || []).concat((S.d.more && S.d.more.log) || []), items = all.map(function (x) { return { skill: x.skill, title: x.title, band: x.band, firstTry: x.misses === 0, ok: !!x.ok }; });
+    var P = S.d.pred || [];
+    NFL.preds.forEach(function (pr, i) { var st = P[i]; if (st && st.pick != null) items.push({ skill: 'predict-' + (i + 1), band: S.band0 || 2, firstTry: st.pick === pr.correct, ok: st.pick === pr.correct }); });
+    ['C1', 'C2'].forEach(function (k) { var q = LE.qs(k); if (q && q.done) items.push({ skill: 'check-' + k.toLowerCase(), band: 2, firstTry: q.ok && q.misses === 0, ok: !!q.ok }); });
+    return { course: 'physics', lesson: ID, title: 'Newton’s First Law', first: S.first, period: S.period, day: LE.today(), reached: LE.reached().idx + 1, of: LE.reached().of, items: items };
+  };
+  NFL.stamp = function (S) { return 'NFL-' + MrD.codes.stamp(ID, S.first, S.period); };
+
+  /* Practice that never runs out. It shows on the last step until guided-notes time ends, so finishing early does not end the lesson.
+     Each question is one of the six skills at the student's current hidden level, with fresh numbers. */
+  function morePractice(host, c) {
+    var S = c.S, M = S.d.more = S.d.more || { n: 0, log: [] };
+    var n = M.n, sk = NFL.skills[n % NFL.skills.length], b = LE.band();
+    var q = sk.gen(b, LE.seedRng('more:' + n + ':' + b)); q.id = 'more.' + n + '.' + b; q.head = 'Practice ' + (n + 1) + ' · ' + sk.title;
+    var box = el('div'); host.appendChild(box);
+    function nextBtn() {
+      if (box.querySelector('.nextq')) return;
+      var row = el('div', 'row nextq'), nb = el('button', 'btn primary', 'Next question'); nb.type = 'button'; row.appendChild(nb); box.appendChild(row);
+      nb.onclick = function () {
+        var st = LE.qs(q.id), m = st.misses, nbd = m === 0 ? b + 1 : (m === 1 ? b : b - 1);
+        var ans = q.type === 'choice' ? optText(q.options[q.answer]) : (LE.fmtN(q.answer) + (q.unit ? ' ' + q.unit : ''));
+        M.log.push({ skill: sk.id, title: sk.title, band: b, misses: m, ok: !!st.ok, secs: st.secs || 0, p: plain(q.prompt), a: ans, w: plain(q.worked) });
+        LE.setBand(nbd, 'more'); M.n++; LE.save(); LE.render();
+      };
+    }
+    q.onDone = nextBtn; LE.ask(box, q); if (qdone(q.id)) nextBtn();
+  }
 
   steps.push({ id: 'notes', label: 'Notes',
     render: function (card, c) {
-      var S = c.S; card.appendChild(el('h2', null, 'Your notes and stamp'));
-      card.appendChild(el('p', null, 'You built these notes yourself as you worked: your predictions, your data, your rule, your definitions, and your solved problems. Print them or save them as a PDF, or download the LaTeX source.'));
+      var S = c.S; card.appendChild(el('h2', null, 'Notes and stamp'));
+      var ex = el('div', 'prose');
+      ex.innerHTML = '<p><b>My notes</b> is a study sheet the page writes from your own work today: your predictions, your data, your rule, your definitions and the problems you solved. It fills in as you go, so it is never blank. Print it or save it as a PDF to study from.</p>' +
+        '<p><b>The stamp</b> is your proof for Mr. D that you did today’s lesson. It is a four-digit code built from your name, your period and today’s date, so nobody else’s stamp matches yours.</p>';
+      card.appendChild(ex);
       var row = el('div', 'row'); var v = el('button', 'btn primary', 'View my notes'); v.type = 'button'; v.onclick = function () { LE.setViewNotes(true); LE.render(); window.scrollTo(0, 0); };
       var pr = el('button', 'btn', 'Print or save as PDF'); pr.type = 'button'; pr.onclick = function () { LE.print(); };
       var tx = el('button', 'btn', 'Download LaTeX (.tex)'); tx.type = 'button'; tx.onclick = function () { LE.downloadTex(); }; row.appendChild(v); row.appendChild(pr); row.appendChild(tx); card.appendChild(row);
+
+      if (!LE.canEnd()) {
+        card.appendChild(el('h3', null, 'Keep practicing'));
+        card.appendChild(el('p', 'hint', 'You have done every step. Your stamp appears when time for guided notes ends. Until then the questions keep coming at your level, and each one goes into your notes.'));
+        morePractice(card, c);
+        return;
+      }
+
+      var rc = LE.reached();
       card.appendChild(el('h3', null, 'Show this to Mr. D'));
       var p = el('p'); var sp = el('span', 'stamp', NFL.stamp(S)); p.appendChild(sp); card.appendChild(p);
-      card.appendChild(el('p', 'hint', 'Name: ' + S.first + ' · Period ' + S.period));
+      card.appendChild(el('p', 'hint', 'Name: ' + S.first + ' · Period ' + S.period + ' · You got to step ' + (rc.idx + 1) + ' of ' + rc.of + ' (' + rc.label + ')' + (S.d.more && S.d.more.log.length ? ' · ' + S.d.more.log.length + ' practice questions' : '')));
       var code = LE.encodeReport(ID, reportFields(S));
       card.appendChild(el('h3', null, 'Report code (paste into Classroom if Mr. D asks)'));
       var lc = el('div', 'longcode', code); card.appendChild(lc);
       var cp = el('button', 'btn small', 'Copy report code'); cp.type = 'button'; cp.onclick = function () { try { navigator.clipboard.writeText(code); cp.textContent = 'Copied'; } catch (e) { var r = document.createRange(); r.selectNodeContents(lc); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); cp.textContent = 'Selected: press Ctrl+C'; } }; card.appendChild(el('div', 'row')).appendChild(cp);
-      card.appendChild(el('p', 'hint', 'Want more? The next step has stretch problems for everyone, from honors to college level.'));
+      if (window.MrD && MrD.profile) MrD.profile.record(NFL.profileRecord(S));
     },
     canLeave: function () { return true; },
-    teacher: function (c) { return '<p>The stamp is a 4-digit code from name + period + today’s date. Check it on the Teacher page (type the name and period). The long report code carries each student’s starting band, band at each question, misses, predictions and confidence, check results and seconds per step; paste any number of them into the Teacher page to see them in a table. Stamp for this device: <b>' + NFL.stamp(c.S) + '</b>.</p>'; } });
-
-  steps.push({ id: 'beyond', label: 'Beyond', optional: true,
-    render: function (card, c) {
-      card.appendChild(el('h2', null, 'Beyond · stretch problems'));
-      card.appendChild(el('p', null, 'Optional. Choose one that matches how far you want to go. Each carries its level so you can see where it sits.'));
-      NFL.beyond.forEach(function (X) {
-        var det = el('details', 'part'); var sm = el('summary'); sm.appendChild(el('span', null, X.title)); sm.appendChild(el('span', 'st', X.level)); det.appendChild(sm); var inner = el('div', 'inner'); det.appendChild(inner); card.appendChild(det);
-        (X.q || [X.text]).forEach(function (q) { LE.ask(inner, q); });
-      });
-    },
-    canLeave: function () { return true; },
-    teacher: function () { return '<p>Optional extensions. X1 stopping distance on ice (honors, answers 367 m and 61 s). X2 linear drag, τ = m/b = 25 s and total distance v₀τ = 75 m (college, calculus). X3 Galileo’s ship, written argument that no mechanical experiment detects uniform motion. Written answers are not scored.</p>'; } });
+    teacher: function (c) { return '<p>The stamp is a 4-digit code from name + period + today’s date. Check it on the Teacher page (type the name and period). Stamp for this device: <b>' + NFL.stamp(c.S) + '</b>.</p><p><b>End rule.</b> Mon–Thu guided notes end at the 42-minute mark (9:42 for first-period physics); the red “End my guided notes” bar appears then. On Friday classes are 40 minutes, so there is no early end: the stamp is available at the bell. A student who finishes every step early lands here and keeps getting practice at their level until the end mark; the stamp appears at the end mark. After 3:00 PM (home) the stamp appears as soon as a student gets here. The stamp and report code record how far each student got.</p><p>The long report code carries each student’s starting band, band at each question, misses, predictions and confidence, check results, seconds per step, the step reached and practice counts; paste any number into the Teacher page to see them in a table.</p>'; } });
 
   /* ================= notes document ================= */
   function notesDoc(c) {
@@ -262,7 +292,7 @@
     var fb = NFL.fbdScenes.filter(function (s) { return d.fbd && d.fbd[s.id]; }).map(function (s) { return { forces: s.forces, title: s.title }; });
     secs.push({ title: 'Free-body diagrams', blocks: fb.length ? [{ type: 'fbds', items: fb }] : [{ type: 'blank' }, { type: 'blank' }] });
     secs.push({ title: 'The big misconception', blocks: qdone('name.misc') ? [{ type: 'box', text: NFL.misc.full }] : [{ type: 'blank' }] });
-    var log = (d.try && d.try.log) || [], pbk = [];
+    var log = ((d.try && d.try.log) || []).concat((d.more && d.more.log) || []), pbk = [];
     if (!log.length) pbk.push({ type: 'blank' });
     log.forEach(function (x, i) { pbk.push({ type: 'p', text: (i + 1) + '. ' + x.title + ' (' + (x.misses === 0 ? 'solved on the first try' : (x.ok ? 'solved with a hint' : 'needed the explanation')) + ')' }, { type: 'p', text: x.p }, { type: 'box', label: 'Answer:', text: x.a + '. ' + x.w }); });
     secs.push({ title: 'Problems I worked', blocks: pbk });
@@ -271,6 +301,7 @@
     return { title: 'Newton’s First Law: My Notes', sections: secs };
   }
 
-  var cfg = { id: ID, version: 2, title: 'Newton’s First Law', subtitle: 'Day 1 · online · about 45 minutes · questions adjust to you', steps: steps, notes: notesDoc };
+  var cfg = { id: ID, course: 'physics', version: 3, title: 'Newton’s First Law', subtitle: 'Online lesson · questions adjust to you', steps: steps, notes: notesDoc,
+    gates: [{ key: 'h1', label: 'Huddle 1' }, { key: 'h2', label: 'Huddle 2' }] };
   (window.LESSONS_REG = window.LESSONS_REG || {})[ID] = cfg;
 })();

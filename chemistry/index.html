@@ -2,72 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chemistry: Lessons and Labs</title>
-<meta name="description" content="Daily lesson sims, student sheets, and virtual labs for Mr. D's chemistry classes.">
-<link rel="stylesheet" href="shared/lab.css">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chemistry · Mr. D’s Sims</title>
+<meta name="description" content="Guided lessons and virtual labs for Mr. D’s chemistry classes.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/hub.css">
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <a class="back" href="../">← All sims</a>
-    <span class="crumb">Mr. D's Sims</span>
-  </header>
-  <h1>Chemistry</h1>
-  <p class="lead">Find your unit. Lessons are the daily sims that go with your student sheet. Labs are virtual lab benches. Predict first, then run it.</p>
-  <div class="row" id="filters" role="group" aria-label="Show" style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px"></div>
-  <main class="units" id="units"></main>
-</div>
+<div id="hub"></div>
+<script src="../shared/bell.js"></script>
 <script src="labs.js"></script>
+<script src="../shared/hub.js"></script>
 <script>
-(function () {
-  var root = document.getElementById("units"), fl = document.getElementById("filters"), mode = "all";
-  var modes = [["all", "Everything"], ["lesson", "Lessons"], ["lab", "Virtual labs"]];
-  function render() {
-    root.textContent = "";
-    window.UNITS.forEach(function (u) {
-      var labs = u.labs.filter(function (l) { return mode === "all" || (l.type || "lab") === mode; });
-      labs.sort(function (a, b) {
-        var ta = (a.type || "lab") === "lesson" ? 0 : 1, tb = (b.type || "lab") === "lesson" ? 0 : 1;
-        return ta - tb || (a.day || 0) - (b.day || 0);
-      });
-      if (!labs.length) return;
-      var sec = document.createElement("section");
-      var h = document.createElement("h2"); h.textContent = u.title; sec.appendChild(h);
-      var p = document.createElement("p"); p.className = "hint"; p.style.margin = "0"; p.textContent = u.blurb; sec.appendChild(p);
-      var cards = document.createElement("div"); cards.className = "cards";
-      labs.forEach(function (l) {
-        var wrap = document.createElement("div");
-        var a = document.createElement("a"); a.className = "lab-card"; a.href = l.href;
-        var ic = document.createElement("div"); ic.className = "icon"; ic.textContent = l.icon; ic.setAttribute("aria-hidden", "true");
-        var kind = document.createElement("div"); kind.className = "hint"; kind.style.fontWeight = "700";
-        kind.textContent = (l.type === "lesson") ? "LESSON" + (l.day ? " " + l.day : "") : "VIRTUAL LAB";
-        var t = document.createElement("h3"); t.textContent = l.title;
-        var b = document.createElement("p"); b.textContent = l.blurb;
-        a.appendChild(ic); a.appendChild(kind); a.appendChild(t); a.appendChild(b);
-        (l.tags || []).forEach(function (tag) {
-          var s = document.createElement("span"); s.className = "pill"; s.textContent = tag; s.style.marginRight = "6px";
-          a.appendChild(s);
-        });
-        wrap.appendChild(a);
-        if (l.sheet) {
-          var s2 = document.createElement("a"); s2.href = l.sheet; s2.textContent = "📄 Student sheet (PDF)";
-          s2.style.cssText = "display:inline-block;margin:6px 4px 0;font-size:.9rem;font-weight:600";
-          wrap.appendChild(s2);
-        }
-        cards.appendChild(wrap);
-      });
-      sec.appendChild(cards); root.appendChild(sec);
-    });
-  }
-  modes.forEach(function (m) {
-    var bt = document.createElement("button"); bt.textContent = m[1]; bt.setAttribute("aria-pressed", m[0] === mode);
-    bt.onclick = function () { mode = m[0]; Array.prototype.forEach.call(fl.children, function (c, i) { c.setAttribute("aria-pressed", modes[i][0] === mode); c.className = modes[i][0] === mode ? "primary" : ""; }); render(); };
-    if (m[0] === mode) bt.className = "primary";
-    fl.appendChild(bt);
-  });
-  render();
-})();
+MrD.hub({ course: "chem", title: "Chemistry", tagline: "Find your unit. Lessons guide you through the day. Labs are virtual benches. Predict first, then run it.", accent: "#14b8a6", units: window.UNITS, teacher: "teacher.html", root: "../" });
 </script>
 </body>
 </html>

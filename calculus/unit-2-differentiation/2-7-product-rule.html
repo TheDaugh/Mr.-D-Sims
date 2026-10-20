@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared/katex/katex.min.css">
 <link rel="stylesheet" href="../shared/lesson.css">
+<link rel="stylesheet" href="../shared/concepts.css">
 <style>
 .mission-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;align-items:baseline;margin-bottom:6px}
 .setupbox{padding:10px 14px;border:1px dashed var(--accent);border-radius:8px;background:var(--soft);margin-bottom:10px}
@@ -23,11 +24,12 @@
 <div class="wrap">
   <div class="topbar">
     <a class="back" href="../index.html">← Calculus</a>
-    <div class="links"><button type="button" id="open-notes">My notes</button><button type="button" id="reset">Start over</button></div>
+    <div class="links"><button type="button" id="open-concepts" title="Look back at what you have learned in calculus so far">Concept key</button><button type="button" id="open-notes" title="Your own notes for this lesson. They fill in as you work, and you print them as a PDF at the end.">My notes</button><button type="button" id="reset">Start over</button></div>
   </div>
   <h1>The Product Rule</h1>
   <p class="sub">AP Calculus 2.7 · a guided lesson that adjusts to your work</p>
-  <div class="teacherbar" id="pvbar" hidden></div>
+  <div class="mrd-tb" id="pvbar" hidden></div>
+  <div id="endbar" class="endbar" hidden></div>
   <nav class="chips" id="chips" aria-label="Lesson steps"></nav>
 
   <section class="card" id="step-start" hidden></section>
@@ -51,11 +53,26 @@
     <div id="notes-body"></div>
   </div>
 </div>
+<div class="drawer" id="drawer2" hidden role="dialog" aria-label="Concept key">
+  <div class="panel">
+    <button class="btn small close" type="button" id="close-concepts">Close</button>
+    <h2>Concept key</h2>
+    <p class="hint">What you have learned in calculus so far, in one place. New ideas appear here as you earn them in this lesson.</p>
+    <div id="concepts-body"></div>
+  </div>
+</div>
 <div id="print-root" aria-hidden="true"></div>
 
+<script src="../../shared/config.js"></script>
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
+<script src="../../shared/teacherbar.js"></script>
+<script src="../../shared/live.js"></script>
+<script src="../../shared/profile.js"></script>
 <script src="../shared/katex/katex.min.js"></script>
 <script src="../shared/mathcheck.js"></script>
 <script src="../shared/qkit.js"></script>
+<script src="../shared/concepts.js"></script>
 <script src="2-7-product-rule.content.js"></script>
 <script>
 (function () {
@@ -63,8 +80,9 @@
   var C = PR2, Q = QKIT, STORE = 'mrd.calc.pr2.v1';
   var STEPS = ['start', 'warm', 'predict', 'sim', 'huddle', 'build', 'practice', 'mastery', 'wrap'];
   var LABELS = { start: 'Start', warm: 'Warm-up', predict: 'Predict', sim: 'Explore', huddle: 'Huddle', build: 'Build', practice: 'Practice', mastery: 'Check', wrap: 'Wrap-up' };
-  if (/(^|[#&])key\b/.test(location.hash)) { location.replace('2-7-product-rule-teacher.html'); return; }
-  var DEBUG = /debug/.test(location.hash), PREVIEW = /preview/.test(location.hash), LAST = null;
+  var LESSON_ID = 'product-rule-v2', KEY = MrD.isKey(), PREVIEW = KEY;
+  var DEBUG = /debug/.test(location.hash), LAST = null;
+  function clk() { return MrD.bell.clock('calc'); }
 
   function $(id) { return document.getElementById(id); }
   var el = Q.el, rich = Q.rich;
@@ -73,11 +91,11 @@
   /* ---------- state ---------- */
   function fresh() {
     return { first: '', period: '', step: 'start', level: 2, startLevel: 2, peak: 2, up: 0, down: 0, lastTick: 0, active: 0,
-      ready: { done: false, i: 0, score: 0, mask: 0, missed: [] }, pred: '', predTest: null, surprise: '',
+      ready: { done: false, i: 0, score: 0, mask: 0, missed: [], t0: 0, last: 0, times: [], timedOut: false, skipped: 0, secs: 0 }, pred: '', predTest: null, surprise: '',
       sim: { m: 1, b: 0, done: false, runs: [], lvl: 0 }, huddleOK: false, solo: false,
       build: { i: 0, done: false, log: [], cur: null }, practice: { i: 0, done: false, log: [], used: [], cur: null },
       mastery: { form: '', attempt: 0, i: 0, results: [], recovery: false, done: false, passed: false, correct: 0, concept: false },
-      notes: { corner: '', words: '', summary: '', questions: '' }, traps: [], stats: { items: 0, clean: 0, assisted: 0, hints: 0 }, doneAt: '', flagged: false };
+      notes: { corner: '', words: '', summary: '', questions: '' }, traps: [], stats: { items: 0, clean: 0, assisted: 0, hints: 0 }, doneAt: '', flagged: false, max: 0, ended: false, endIdx: 0, home: false, more: { i: 0, clean: 0, log: [] } };
   }
   var S = fresh();
   function load() { try { var r = localStorage.getItem(STORE); if (r) { var o = JSON.parse(r); if (o && o.sim && o.mastery) S = Object.assign(fresh(), o); } } catch (e) {} }
@@ -114,7 +132,7 @@
     }
     return false;
   }
-  function reachable() { if (PREVIEW) return STEPS.length - 1; var r = 0; for (var i = 0; i < STEPS.length - 1; i++) { if (canLeave(STEPS[i])) r = i + 1; else break; } return r; }
+  function reachable() { if (PREVIEW || S.ended) return STEPS.length - 1; var r = 0; for (var i = 0; i < STEPS.length - 1; i++) { if (canLeave(STEPS[i])) r = i + 1; else break; } return r; }
   function cur() { return STEPS.indexOf(S.step) < 0 ? 'start' : S.step; }
   function goto(step) {
     if (STEPS.indexOf(step) > reachable()) return;
@@ -145,7 +163,7 @@
       var item = getItem(i), qh = el('div');
       host.appendChild(qh);
       var opt = Object.assign({}, item.opt || {});
-      opt.seed = (item.q.id || 'q') + '|' + S.first + '|' + S.period;
+      opt.seed = (item.q.id || 'q') + '|' + S.first + '|' + S.period; if (KEY) opt.key = true;
       opt.onDone = function (res) {
         onResult(i, res, item); save();
         nextBtn(qh, i + 1 < total ? 'Next' : 'Finish', function () { i++; if (i < total) show(); else onFinish(); });
@@ -160,7 +178,7 @@
     var h = $('step-start'); h.innerHTML = '';
     h.appendChild(el('h2', null, 'Before you start'));
     h.appendChild(el('div', 'bigq', '<b>The question for today.</b> Two quantities are both changing, and a third is made by multiplying them. How fast does the product change?'));
-    h.appendChild(el('p', null, 'This lesson has two parts of about half an hour each. Part A: a warm-up, a prediction, and a guided experiment with a growing rectangle. Part B: you turn the rule into a skill, then show you own it. You write your own notes as you go and print them as a PDF at the end.'));
+    h.appendChild(el('p', null, 'First a timed warm-up, a prediction, and a guided experiment with a growing rectangle. Then you turn the rule into a skill and show you own it. Keep working until Mr. D calls time: there is always another problem ready. You write your own notes as you go and print them as a PDF at the end.'));
     h.appendChild(el('p', null, 'The questions adjust to your work. Fast, accurate answers lead to harder problems; a stumble brings a closer look at the idea. Every route ends at the same understanding.'));
     var row = el('div', 'row');
     row.innerHTML = '<label>First name <input type="text" id="who-first" autocomplete="given-name"></label> <label>Period <input type="text" id="who-period" maxlength="6"></label>';
@@ -172,25 +190,42 @@
   }
 
   /* ---------- step 2: warm-up ---------- */
+  var WARM_MS = 300000, warmTimer = 0;
+  function finishWarm() {
+    var sc = S.ready.score;
+    S.startLevel = sc <= 2 ? 1 : sc <= 5 ? 2 : (S.ready.missed.length === 0 ? 3 : 2);
+    S.level = S.startLevel; S.peak = S.level; S.ready.done = true;
+    S.ready.secs = Math.min(300, Math.round((Date.now() - S.ready.t0) / 1000)); save(); renderAll();
+  }
   function renderWarm() {
-    var h = $('step-warm'); h.innerHTML = '';
+    var h = $('step-warm'); h.innerHTML = ''; clearInterval(warmTimer);
     h.appendChild(el('h2', null, 'Warm-up'));
-    h.appendChild(el('p', 'hint', 'Six quick ones on derivatives you already know. Two tries each, no hints. This tells the lesson where to start you, so answer honestly.'));
+    h.appendChild(el('p', 'hint', 'Six quick ones on derivatives you already know. You have 5 minutes on the clock. Two tries each, no hints. This tells the lesson where to start you, so answer honestly and keep moving.'));
     if (S.ready.done) { renderWarmDone(h); return; }
+    if (!S.ready.t0) { S.ready.t0 = Date.now(); S.ready.last = S.ready.t0; save(); }
+    var clock = el('div', 'warmclock'); h.appendChild(clock);
     var box = el('div'); h.appendChild(box);
+    function left() { return WARM_MS - (Date.now() - S.ready.t0); }
+    function showClock() {
+      var ms = left();
+      clock.textContent = 'Time left: ' + MrD.bell.fmtClock(Math.max(0, ms)); clock.classList.toggle('low', ms < 60000);
+      if (ms <= 0 && !KEY) {
+        clearInterval(warmTimer);
+        for (var k = S.ready.i; k < C.READY.length; k++) { S.ready.mask |= (1 << k); S.ready.missed.push(k); S.ready.skipped++; }
+        S.ready.timedOut = true; finishWarm();
+      }
+    }
+    showClock(); warmTimer = setInterval(showClock, 1000);
     runSeq(box, S.ready.i, C.READY.length, function (i) { return { q: C.READY[i], opt: { noHints: true, maxTries: 2 } }; },
       function (i, res) {
+        var n = Date.now(); S.ready.times[i] = Math.round((n - (S.ready.last || S.ready.t0)) / 1000); S.ready.last = n;
         S.ready.i = i + 1;
         if (!res.assisted) S.ready.score++; else { S.ready.mask |= (1 << i); S.ready.missed.push(i); }
       },
-      function () {
-        var sc = S.ready.score;
-        S.startLevel = sc <= 2 ? 1 : sc <= 5 ? 2 : (S.ready.missed.length === 0 ? 3 : 2);
-        S.level = S.startLevel; S.peak = S.level; S.ready.done = true; save(); renderAll();
-      });
+      function () { clearInterval(warmTimer); finishWarm(); });
   }
   function renderWarmDone(h) {
-    h.appendChild(el('div', 'fb ok', '<p>Warm-up done: <b>' + S.ready.score + ' of 6</b>.</p>'));
+    h.appendChild(el('div', 'fb ok', '<p>Warm-up done: <b>' + S.ready.score + ' of 6</b>' + (S.ready.timedOut ? ' (time ran out with ' + S.ready.skipped + ' not reached)' : '') + '.</p>'));
     if (S.ready.missed.length) {
       var d = el('details', 'toolbox'); d.open = true;
       d.appendChild(el('summary', null, 'Quick refreshers for the ones that slipped'));
@@ -231,7 +266,7 @@
       ta.oninput = function () { S.surprise = ta.value; b.disabled = S.surprise.trim().length < 10; save(); renderNav(); };
       return;
     }
-    LAST = Q.render(tbox, C.PREDICT.test, { seed: 'pt|' + S.first, onDone: function (res) { stat(res); S.predTest = { clean: res.clean }; save(); renderAll(); } });
+    LAST = Q.render(tbox, C.PREDICT.test, { key: KEY, seed: 'pt|' + S.first, onDone: function (res) { stat(res); S.predTest = { clean: res.clean }; save(); renderAll(); } });
   }
 
   /* ---------- step 4: the experiment ---------- */
@@ -329,7 +364,7 @@
       if (lvl <= 2) return [{ t: 'setup', id: 'guided', text: 'Set the sliders to <b>f = 2, g = 5, f\u2032 = 3, g\u2032 = \u22121</b>.', check: function (R) { return R.f === 2 && R.g === 5 && R.fp === 3 && R.gp === -1; } },
         { t: 'q', q: M.m3.guidedQ }, { t: 'grow', dt: 0.01, text: 'Set \u0394t to 0.01 and Grow. Is \u0394A/\u0394t close to your prediction?' }, fr, { t: 'grow', dt: 0.01, text: 'Grow with \u0394t = 0.01. The area should barely move.' }, { t: 'q', q: M.m3.freezeQ }];
       return [fr, { t: 'grow', dt: 0.01, text: 'Grow with \u0394t = 0.01. Is \u0394A close to 0?' }, { t: 'q', q: M.m3.freezeQ },
-        { t: 'setup', id: 'accident', text: '<b>Stretch.</b> The false rule says the rate is f\u2032g\u2032. Find a rectangle (all of f, g, f\u2032, g\u2032 nonzero) where f\u2032g\u2032 <i>happens to equal</i> the true rate f\u2032g + fg\u2032.', check: function (R) { return R.f > 0 && R.g > 0 && R.fp !== 0 && R.gp !== 0 && Math.abs(R.fp * R.gp - (R.fp * R.g + R.f * R.gp)) < 1e-9; } },
+        { t: 'setup', id: 'accident', text: '<b>Try this.</b> The false rule says the rate is f\u2032g\u2032. Find a rectangle (all of f, g, f\u2032, g\u2032 nonzero) where f\u2032g\u2032 <i>happens to equal</i> the true rate f\u2032g + fg\u2032.', check: function (R) { return R.f > 0 && R.g > 0 && R.fp !== 0 && R.gp !== 0 && Math.abs(R.fp * R.gp - (R.fp * R.g + R.f * R.gp)) < 1e-9; } },
         { t: 'q', q: M.m3.accidentQ }];
     }
     return [{ t: 'q', q: lvl <= 1 ? M.m4.steps : M.m4.single }];
@@ -355,7 +390,7 @@
     $('grow').disabled = beat.t !== 'grow';
     $('growhint').textContent = beat.t === 'grow' ? '' : 'Grow turns on when a step asks for it. Compute first, then reveal.';
     if (beat.t === 'q') {
-      var opt = { seed: beat.q.id + '|' + S.first, onDone: function (res) { stat(res); nextBtn(bx, 'Continue', next); } };
+      var opt = { key: KEY, seed: beat.q.id + '|' + S.first, onDone: function (res) { stat(res); nextBtn(bx, 'Continue', next); } };
       if (beat.note) { opt.onText = function (id, v) { S.notes.corner = v; save(); }; opt.initial = { a: S.notes.corner }; }
       LAST = Q.render(bx, beat.q, opt);
     } else if (beat.t === 'grow') {
@@ -387,27 +422,28 @@
   }
 
   /* ---------- step 5: huddle ---------- */
+  function gated() { return MrD.bell.gatesOn() && !KEY; }
   function renderHuddle() {
     var h = $('step-huddle'); h.innerHTML = '';
     h.appendChild(el('h2', null, 'Huddle'));
-    h.appendChild(el('div', 'huddle', '<p><b>Stop here.</b> Mr. D leads a two-minute huddle: where did the rule\u2019s two terms come from in the picture, and what happened to the corner?</p>'));
-    var codeRow = el('div', 'row');
-    codeRow.innerHTML = '<label>Class code <input type="text" id="code-huddle" inputmode="numeric" maxlength="4" autocomplete="off"></label>';
-    var cb = el('button', 'btn', 'Enter code'); cb.type = 'button'; codeRow.appendChild(cb);
-    var msg = el('p', 'hint'); h.appendChild(codeRow); h.appendChild(msg);
-    cb.onclick = function () {
-      if ($('code-huddle').value.trim() === C.codeFor('huddle')) { S.huddleOK = true; S.solo = false; save(); renderAll(); }
-      else msg.textContent = 'That code is not right. Ask Mr. D.';
-    };
-    var solo = el('details'); solo.innerHTML = '<summary class="hint">Working on your own, without a class code?</summary><p class="hint">You can continue without the huddle. Your hand-in code will show that you worked solo.</p>';
-    var sb = el('button', 'btn small', 'Continue on my own'); sb.type = 'button'; sb.onclick = function () { S.huddleOK = true; S.solo = true; save(); renderAll(); }; solo.appendChild(sb); h.appendChild(solo);
-    if (S.huddleOK) {
-      msg.textContent = S.solo ? 'Continuing solo.' : 'Code accepted.';
-      var w = el('div'); w.innerHTML = '<p>Now say the rule in your own words, in a full sentence. It goes into your notes.</p>';
-      var ta = document.createElement('textarea'); ta.value = S.notes.words; ta.rows = 3; ta.placeholder = 'The derivative of a product is ...'; w.appendChild(ta); h.appendChild(w);
-      var nb = nextBtn(h, 'Start building', function () { advance('huddle'); }, S.notes.words.trim().length < 20);
-      ta.oninput = function () { S.notes.words = ta.value; nb.disabled = S.notes.words.trim().length < 20; save(); renderNav(); };
+    if (!gated() && !S.huddleOK) { S.huddleOK = true; S.home = !KEY && !MrD.bell.gatesOn(); save(); }
+    if (!S.huddleOK) {
+      h.appendChild(el('div', 'huddle', '<p><b>Stop here.</b> Mr. D leads a two-minute huddle: where did the rule\u2019s two terms come from in the picture, and what happened to the corner?</p>'));
+      var codeRow = el('div', 'row');
+      codeRow.innerHTML = '<label>Class code <input type="text" id="code-huddle" inputmode="numeric" maxlength="4" autocomplete="off"></label>';
+      var cb = el('button', 'btn', 'Enter code'); cb.type = 'button'; codeRow.appendChild(cb);
+      var msg = el('p', 'hint'); h.appendChild(codeRow); h.appendChild(msg);
+      cb.onclick = function () {
+        if ($('code-huddle').value.trim() === MrD.codes.gate(LESSON_ID, 'h1')) { S.huddleOK = true; save(); renderAll(); }
+        else msg.textContent = 'That code is not right. Ask Mr. D.';
+      };
+      return;
     }
+    h.appendChild(el('p', 'hint', KEY ? 'Teacher view: the class code is skipped.' : S.home ? 'No class code needed outside school hours.' : 'Code accepted.'));
+    var w = el('div'); w.innerHTML = '<p>Now say the rule in your own words, in a full sentence. It goes into your notes.</p>';
+    var ta = document.createElement('textarea'); ta.value = S.notes.words; ta.rows = 3; ta.placeholder = 'The derivative of a product is ...'; w.appendChild(ta); h.appendChild(w);
+    var nb = nextBtn(h, 'Start building', function () { advance('huddle'); }, S.notes.words.trim().length < 20);
+    ta.oninput = function () { S.notes.words = ta.value; nb.disabled = S.notes.words.trim().length < 20; save(); renderNav(); };
   }
 
   /* ---------- step 6: build ---------- */
@@ -526,14 +562,15 @@
       cornellRow('Watch out', rich('Do not multiply the derivatives: $(fg)\'\\ne f\'g\'$. Each term uses one derivative and one original function.') + (traps.length ? '<p class="small"><b>Traps I hit:</b></p>' + traps.map(function (t) { return '<p class="small">\u2022 ' + Q.inline(t) + '</p>'; }).join('') : '')) +
       cornellRow('Check yourself', S.mastery.done ? 'Check result: <b>' + S.mastery.correct + ' of 4</b>' + (S.mastery.passed ? ' \u2713' : ' (see Mr. D)') : '<span class="blank">(after the Check step)</span>') +
       '</table><h2>Summary in my own words</h2><div class="box">' + mineHTML(S.notes.summary, 'Summary') + '</div>' +
-      '<h2>Questions I still have</h2><div class="box">' + mineHTML(S.notes.questions, 'Optional') + '</div>' +
+      '<h2>Questions I still have</h2><div class="box">' + mineHTML(S.notes.questions, 'Questions I still have') + '</div>' +
       (S.doneAt ? '<p class="small">Hand-in code: <b>' + handIn() + '</b></p>' : '') + '</div>';
   }
 
   /* ---------- hand-in code ---------- */
   function handIn() {
-    var m = S.mastery, flags = (S.solo ? 1 : 0) + (S.flagged ? 2 : 0);
-    return C.encodeHandIn(S.first, [2, S.startLevel, S.peak, S.ready.mask, m.correct, m.concept ? 1 : 0, m.attempt, S.stats.assisted, S.stats.hints, Math.round(S.active / 60000), flags, S.stats.clean, S.stats.items]);
+    var m = S.mastery, flags = (S.flagged ? 2 : 0) + (S.home ? 4 : 0);
+    return C.encodeHandIn(S.first, [3, S.startLevel, S.peak, S.ready.mask, m.correct, m.concept ? 1 : 0, m.attempt, S.stats.assisted, S.stats.hints, Math.round(S.active / 60000), flags, S.stats.clean, S.stats.items,
+      S.ready.secs, S.ready.timedOut ? 1 : 0, S.ready.skipped, reachedIdx() + 1, S.more.i, S.more.clean]);
   }
 
   /* ---------- LaTeX export ---------- */
@@ -565,7 +602,7 @@
       row('Watch out', 'Do not multiply the derivatives: $(fg)\'\\neq f\'g\'$. Each term uses one derivative and one original function.' + (traps.length ? '\\par ' + traps.map(function (t) { return '$\\bullet$ ' + texRich(t); }).join('\\par ') : '')) +
       row('Check yourself', S.mastery.done ? 'Check result: ' + S.mastery.correct + ' of 4' + (S.mastery.passed ? ' (passed)' : ' (see Mr.\\ D)') : '\\textit{(after the Check step)}') +
       '\\end{tabular}\n\\par\\bigskip\\textbf{Summary in my own words}\\par\\fbox{\\parbox{6.4in}{' + mine(S.notes.summary, 'Summary') + '}}\n' +
-      '\\par\\bigskip\\textbf{Questions I still have}\\par\\fbox{\\parbox{6.4in}{' + mine(S.notes.questions, 'Optional') + '}}\n' +
+      '\\par\\bigskip\\textbf{Questions I still have}\\par\\fbox{\\parbox{6.4in}{' + mine(S.notes.questions, 'Questions I still have') + '}}\n' +
       (S.doneAt ? '\\par\\bigskip{\\small Hand-in code: \\texttt{' + handIn() + '}}\n' : '') + '\\end{document}\n';
   }
   function download(name, text, type) {
@@ -597,18 +634,43 @@
   $('reset').onclick = function () { if (confirm('Erase your progress and notes on this device and start over?')) { try { localStorage.removeItem(STORE); } catch (e) {} S = fresh(); anim = null; renderAll(); } };
 
   /* ---------- step 9: wrap-up ---------- */
+  function reachedIdx() { return S.ended ? S.endIdx : Math.max(S.max || 0, STEPS.indexOf(cur())); }
+  var finBtn = null, finWrapBox = null;
+  function canFinish() { return S.notes.summary.trim().length >= 30 && !S.doneAt && (clk().canEnd || KEY); }
+  function updFin() { if (finBtn) finBtn.disabled = !canFinish(); if (finWrapBox) finWrapBox.hidden = clk().canEnd || KEY || !!S.doneAt; }
+  /* endless practice: a fresh problem at the student's level, until the end mark */
+  function morePractice(host) {
+    var box = el('div', 'morebox'); host.appendChild(box);
+    function show() {
+      box.innerHTML = '';
+      box.appendChild(el('p', 'qlabel', 'Keep practicing · problem ' + (S.more.i + 1)));
+      var qh = el('div'); box.appendChild(qh);
+      LAST = Q.render(qh, C.more(S.more.i, S.level, S.first + '|' + S.period), { key: KEY, seed: 'more' + S.more.i + '|' + S.first, onDone: function (res) {
+        stat(res); adapt(res); S.more.i++; if (res.clean) S.more.clean++; S.more.log.push({ clean: !!res.clean, level: S.level }); save();
+        nextBtn(qh, 'Next problem', show);
+      } });
+    }
+    show();
+  }
   function renderWrap() {
     var h = $('step-wrap'); h.innerHTML = '';
     h.appendChild(el('h2', null, 'Wrap-up'));
-    if (S.mastery.passed) h.appendChild(el('p', null, 'You showed you can do it. Finish your notes and print them for your binder.'));
+    if (S.ended) h.appendChild(el('div', 'warn-box', '<p>You got to step ' + (S.endIdx + 1) + ' of ' + STEPS.length + ' (' + LABELS[STEPS[S.endIdx]] + '). Write your summary below to finish your notes.</p>'));
+    else if (S.mastery.passed) h.appendChild(el('p', null, 'You showed you can do it. Finish your notes and print them for your binder.'));
     else h.appendChild(el('div', 'warn-box', '<p>Finish your notes. Mr. D will check in with you about the product rule.</p>'));
     var d = el('div'); d.innerHTML = '<p class="qlabel">Summary in my own words (required)</p><p class="hint">What is the rule, where do its two terms come from, and what is the one mistake to avoid?</p>';
     var ta = document.createElement('textarea'); ta.rows = 4; ta.value = S.notes.summary; d.appendChild(ta);
-    var d2 = el('div'); d2.innerHTML = '<p class="qlabel">Questions I still have (optional)</p>'; var tb = document.createElement('textarea'); tb.rows = 2; tb.value = S.notes.questions; d2.appendChild(tb);
+    var d2 = el('div'); d2.innerHTML = '<p class="qlabel">Questions I still have</p>'; var tb = document.createElement('textarea'); tb.rows = 2; tb.value = S.notes.questions; d2.appendChild(tb);
     h.appendChild(d); h.appendChild(d2);
-    var fin = nextBtn(h, S.doneAt ? 'Finished' : 'Finish and get my code', function () { S.doneAt = new Date().toISOString(); save(); renderAll(); }, S.notes.summary.trim().length < 30 || !!S.doneAt);
-    ta.oninput = function () { S.notes.summary = ta.value; fin.disabled = S.notes.summary.trim().length < 30 || !!S.doneAt; save(); };
+    finBtn = nextBtn(h, S.doneAt ? 'Finished' : 'Finish and get my code', function () { S.doneAt = new Date().toISOString(); save(); recordProfile(); renderAll(); }, !canFinish());
+    ta.oninput = function () { S.notes.summary = ta.value; updFin(); save(); };
     tb.oninput = function () { S.notes.questions = tb.value; save(); };
+    finWrapBox = el('div', 'card flat');
+    finWrapBox.appendChild(el('p', null, '<b>Keep going until Mr. D calls time.</b> Your notes can finish at ' + (clk().session ? MrD.bell.fmtTime(clk().session.endMark) : 'the end mark') + '. Until then, here is more practice at your level.'));
+    if (!S.doneAt) h.appendChild(finWrapBox);
+    finWrapBox.hidden = clk().canEnd || KEY || !!S.doneAt;
+    if (!clk().canEnd && !KEY && !S.doneAt) morePractice(finWrapBox);
+    if (KEY && !S.doneAt) { var kb = el('div', 'card flat'); kb.appendChild(el('p', 'qlabel', 'Teacher view: the keep-practicing stream students see before the end mark')); morePractice(kb); h.appendChild(kb); }
     if (S.doneAt) {
       var out = el('div', 'card flat');
       out.innerHTML = '<p><span class="stamp">PRODUCT RULE ' + (S.mastery.passed ? '\u2713' : '\u2022') + '</span></p><p>Show Mr. D this code:</p><p class="code" id="hcode">' + handIn() + '</p>';
@@ -621,6 +683,49 @@
       h.appendChild(out);
     }
   }
+
+  /* ---------- scores for the review portal ---------- */
+  function recordProfile() {
+    var items = [];
+    C.READY.forEach(function (q, i) { if (S.ready.i > i || S.ready.timedOut) items.push({ skill: 'calc.warmup.' + (q.id || i), title: q.skill, band: 1, firstTry: !(S.ready.mask & (1 << i)), ok: !(S.ready.mask & (1 << i)) }); });
+    S.build.log.concat(S.practice.log).forEach(function (l) { items.push({ skill: 'calc.product-rule', title: 'Product rule', band: l.level || S.level, firstTry: !!l.clean, ok: !!l.clean }); });
+    S.more.log.forEach(function (l) { items.push({ skill: 'calc.product-rule', title: 'Product rule', band: l.level, firstTry: !!l.clean, ok: !!l.clean }); });
+    S.mastery.results.forEach(function (r, i) { items.push({ skill: i === 0 ? 'calc.product-rule.idea' : 'calc.product-rule.mastery', title: i === 0 ? 'Product rule: the idea' : 'Product rule: check', band: 4, firstTry: !!r.ok, ok: !!r.ok }); });
+    MrD.profile.record({ course: 'calc', lesson: LESSON_ID, title: C.TITLE, first: S.first, period: S.period, day: MrD.bell.dayKey(), reached: reachedIdx() + 1, of: STEPS.length, items: items });
+  }
+
+  /* ---------- end banner: guided notes end at the end mark, wherever the student got to ---------- */
+  function updateEndBar() {
+    var bar = $('endbar'), c = clk();
+    var show = c.needsEnd && !S.doneAt && !S.ended && cur() !== 'wrap' && !KEY && !!S.first;
+    bar.hidden = !show; if (!show) return;
+    bar.innerHTML = '';
+    bar.appendChild(el('span', null, c.mode === 'class' ? '<b>Time to end your guided notes.</b> Finish the problem you are on, then press the button.' : '<b>You can finish your notes now.</b>'));
+    var b = el('button', 'btn primary', 'End my guided notes'); b.type = 'button';
+    b.onclick = function () { S.ended = true; S.endIdx = Math.max(S.max || 0, STEPS.indexOf(cur())); S.step = 'wrap'; save(); renderAll(); window.scrollTo(0, 0); };
+    bar.appendChild(b);
+  }
+  function liveSnap() {
+    var i = STEPS.indexOf(cur()), q = LAST && LAST.q ? LAST.q : null;
+    return { step: LABELS[STEPS[i]], stepIdx: i + 1, stepCount: STEPS.length, band: S.level, answered: S.stats.items, misses: S.stats.items - S.stats.clean, prompt: '', exits: S.hid || 0, secs: Math.round(S.active / 1000), done: !!S.doneAt, stuck: S.stats.assisted >= 3 };
+  }
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') { S.hid = (S.hid || 0) + 1; save(); } });
+  setInterval(function () { if (!S.first) return; updateEndBar(); updFin(); }, 1000);
+
+  /* ---------- concept key ---------- */
+  function renderConcepts() {
+    var b = $('concepts-body'); b.innerHTML = '';
+    var unlocked = { 'product-rule': KEY || S.sim.done || S.max >= STEPS.indexOf('huddle') };
+    var last = '';
+    CONCEPTS.forEach(function (c) {
+      if (c.after && !unlocked[c.after]) return;
+      if (c.unit !== last) { b.appendChild(el('h3', null, c.unit)); last = c.unit; }
+      var d = el('details', 'toolbox'); d.appendChild(el('summary', null, Q.esc(c.title)));
+      d.appendChild(el('div', 'inner', rich(c.body))); b.appendChild(d);
+    });
+  }
+  $('open-concepts').onclick = function () { renderConcepts(); $('drawer2').hidden = false; };
+  $('close-concepts').onclick = function () { $('drawer2').hidden = true; };
 
   /* ---------- teacher preview (#preview): jump anywhere, pick a level path ---------- */
   function resetStep(step) {
@@ -639,15 +744,15 @@
   }
   function renderPreviewBar() {
     var bar = $('pvbar'); if (!bar) return;
-    bar.hidden = !PREVIEW; if (!PREVIEW) return;
-    bar.innerHTML = '<b>Teacher preview.</b> Every step is open. Path: ';
-    [['1', 'Build'], ['2', 'Apply'], ['3', 'Stretch'], ['4', 'Extend']].forEach(function (l) {
-      var b = el('button', 'btn small' + (S.level === +l[0] ? ' primary' : ''), l[0] + ' ' + l[1]); b.type = 'button';
-      b.onclick = function () { S.level = S.startLevel = S.peak = +l[0]; S.sim.lvl = +l[0]; resetStep(cur()); renderAll(); }; bar.appendChild(b);
+    bar.hidden = !KEY; if (!KEY) return;
+    var extra = [];
+    [['1', 'most support'], ['2', 'core'], ['3', 'less support'], ['4', 'least support']].forEach(function (l) {
+      var b = el('button', null, 'Path ' + l[0] + ' (' + l[1] + ')'); b.type = 'button'; if (S.level === +l[0]) b.style.fontWeight = '800';
+      b.onclick = function () { S.level = S.startLevel = S.peak = +l[0]; S.sim.lvl = +l[0]; resetStep(cur()); renderAll(); }; extra.push(b);
     });
-    var rs = el('button', 'btn small', 'Restart this step'); rs.type = 'button'; rs.onclick = function () { resetStep(cur()); renderAll(); }; bar.appendChild(rs);
-    if (cur() === 'sim') [1, 2, 3, 4].forEach(function (m) { var b = el('button', 'btn small', 'Mission ' + m); b.type = 'button'; b.onclick = function () { S.sim.m = m; S.sim.b = 0; S.sim.done = false; save(); renderAll(); }; bar.appendChild(b); });
-    bar.appendChild(el('span', 'muted', ' Class code today: <b>' + C.codeFor('huddle') + '</b>'));
+    var rs = el('button', null, 'Restart this step'); rs.type = 'button'; rs.onclick = function () { resetStep(cur()); renderAll(); }; extra.push(rs);
+    if (cur() === 'sim') [1, 2, 3, 4].forEach(function (m) { var b = el('button', null, 'Mission ' + m); b.type = 'button'; b.onclick = function () { S.sim.m = m; S.sim.b = 0; S.sim.done = false; save(); renderAll(); }; extra.push(b); });
+    MrD.teacherBar(bar, { course: 'calc', lessonId: LESSON_ID, gates: [{ key: 'h1', label: 'Huddle code' }], teacher: '2-7-product-rule-teacher.html', root: '../../', extra: extra });
   }
 
   /* ---------- router ---------- */
@@ -655,13 +760,16 @@
   function renderAll() {
     var c = cur();
     STEPS.forEach(function (s) { $('step-' + s).hidden = s !== c; });
-    renderNav(); renderPreviewBar();
+    S.max = Math.max(S.max || 0, STEPS.indexOf(c));
+    clearInterval(warmTimer);
+    renderNav(); renderPreviewBar(); updateEndBar();
     RENDER[c]();
   }
   if (PREVIEW && !S.first) { S.first = 'Preview'; S.period = '0'; }
   if (DEBUG) window.__pr = { S: function () { return S; }, goto: goto, last: function () { return LAST; }, solve: function (ok) { if (LAST) { LAST.autofill(ok); LAST.check(); } },
     reachable: reachable, render: renderAll, level: function () { return S.level; }, setup: function () { if (window.__pr_setup) window.__pr_setup(); } };
   renderAll();
+  MrD.live.attach({ course: 'calc', lessonId: LESSON_ID, who: function () { return { first: S.first, period: S.period }; }, snap: liveSnap });
 })();
 </script>
 </body>
