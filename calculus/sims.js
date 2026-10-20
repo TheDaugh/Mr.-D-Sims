@@ -8,6 +8,19 @@ window.UNITS = [
     entries: [
       {
         type: "lesson",
+        icon: "〰️",
+        title: "2.5 Derivatives of Sine and Cosine",
+        href: "unit-2-differentiation/2-5-sine-cosine.html",
+        blurb: "A guided lesson that adjusts to each student. Slide a tangent along sine and cosine, let the measured slopes draw a new curve, zoom in on secants to see why, then build the two rules and show you own them. Notes print as a PDF.",
+        tags: ["sine and cosine", "adaptive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher page + key", href: "unit-2-differentiation/2-5-sine-cosine-teacher.html" },
+          { label: "Teacher view (#key)", href: "unit-2-differentiation/2-5-sine-cosine.html#key" },
+          { label: "Outline", href: "unit-2-differentiation/2-5-sine-cosine-outline.md" }
+        ]
+      },
+      {
+        type: "lesson",
         icon: "📐",
         title: "2.7 The Product Rule",
         href: "unit-2-differentiation/2-7-product-rule.html",
