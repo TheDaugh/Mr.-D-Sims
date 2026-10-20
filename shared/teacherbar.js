@@ -20,7 +20,7 @@
   "use strict";
   var MrD = (window.MrD = window.MrD || {});
 
-  MrD.isKey = function () { return /(?:^|[#&])(key|preview)\b/.test(String(location.hash || "")); };
+  MrD.isKey = function () { return /(?:^|[#&])(key|preview)\b/.test(String(location.hash || "")) && !!(MrD.access && MrD.access.unlocked()); };
 
   var css = ".mrd-tb{position:sticky;top:0;z-index:50;background:#7a1f12;color:#fff;font:600 14px/1.35 system-ui,sans-serif;padding:8px 12px;margin:0 0 12px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;border-radius:0 0 8px 8px}" +
     ".mrd-tb b.tag{background:#fff;color:#7a1f12;border-radius:4px;padding:1px 7px;letter-spacing:.04em}" +

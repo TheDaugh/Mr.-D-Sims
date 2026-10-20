@@ -41,7 +41,7 @@
     function topbar() {
       var t = e("nav", "hub-top"), a = e("a", null, "← All classes"); a.href = root + "index.html"; t.append(a, e("span", "sp"));
       var p = e("a", null, "Review portal"); p.href = root + "portal/index.html"; t.append(p);
-      var th = e("a", null, "Teacher page"); th.href = o.teacher || (root + "teacher/index.html"); t.append(th);
+      var th = e("a", "tonly", "Teacher page"); th.href = o.teacher || (root + "teacher/index.html"); t.append(th);
       return t;
     }
     function hero() {
@@ -64,7 +64,7 @@
       if (x.tags && x.tags.length) { var pl = e("div", "pills"); x.tags.forEach(function (t) { pl.append(e("span", "pill", t)); }); b.append(pl); }
       a.append(art, b); c.append(a);
       if (x.teacher && x.teacher.length) {
-        var ex = e("div", "extras"); x.teacher.forEach(function (l) { var la = e("a", null, l.label); la.href = l.href; ex.append(la); });
+        var ex = e("div", "extras tonly"); x.teacher.forEach(function (l) { var la = e("a", null, l.label); la.href = l.href; ex.append(la); });
         c.append(ex);
       }
       return c;

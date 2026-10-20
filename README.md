@@ -90,6 +90,10 @@ A lesson is a content file (`*.content.js`, all questions and answers), the stud
 
 **Teacher access.** Add `#key` to a lesson's address (the same switch as physics and chemistry). The course teacher page and the all-classes page (`teacher/index.html`) hold the codes. Students finish with a hand-in code; paste it into the decoder on the teacher page. Progress and notes live in the student's browser on that device; scores for the review portal are saved there too.
 
+## Teacher access (PIN)
+
+Every teacher page, `#key` view and teacher link is hidden from students and locked behind one PIN (`shared/config.js` holds only its hash; the default PIN is `mrd-sub`). Open `teacher/index.html` (bookmark it), type the PIN once per device, and the hubs then show the teacher links and `#key` works. The **Sub sheet** at the top of that page lists every lesson with today's codes, student links and key links, and can be printed or copied as text for a substitute. A link ending `#pin=...` unlocks without typing. On a public static site this is a deterrent, not a vault: change the PIN with the box at the bottom of the teacher page, and treat real security as the school's job. New teacher pages must call `MrD.access.guard()` in their head (see `docs/LESSON-STANDARD.md`).
+
 ## One clock for every class
 
 `shared/bell.js` knows the periods (physics 9:00; chemistry 10:40 and 1:50; calculus 12:10; Friday 40-minute periods). Huddle codes are asked for only on weekdays 7:00 AM to 3:00 PM; after 3:00 PM, or at home, none. Today's codes are readable from 7:00 AM. Guided notes end at the 42-minute mark Monday to Thursday and at the bell on Friday. To change a time, edit the SCHEDULE block in that one file. Read `docs/LESSON-STANDARD.md` before building the next lesson.

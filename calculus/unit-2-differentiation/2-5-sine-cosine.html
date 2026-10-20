@@ -53,6 +53,7 @@
 </div>
 <div id="print-root" aria-hidden="true"></div>
 
+<script src="../../shared/config.js"></script>
 <script src="../shared/katex/katex.min.js"></script>
 <script src="../shared/mathcheck.js"></script>
 <script src="../shared/qkit.js"></script>
@@ -64,8 +65,8 @@
   var C = SC, Q = QKIT, STORE = 'mrd.calc.sc.v1';
   var STEPS = ['start', 'warm', 'predict', 'sim', 'huddle', 'build', 'practice', 'mastery', 'wrap'];
   var LABELS = { start: 'Start', warm: 'Warm-up', predict: 'Predict', sim: 'Explore', huddle: 'Huddle', build: 'Build', practice: 'Practice', mastery: 'Check', wrap: 'Wrap-up' };
-  if (/(^|[#&])key\b/.test(location.hash)) { location.replace('2-5-sine-cosine-teacher.html'); return; }
-  var DEBUG = /debug/.test(location.hash), PREVIEW = /preview/.test(location.hash), LAST = null;
+  if (/(^|[#&])key\b/.test(location.hash) && window.MrD && MrD.access && MrD.access.unlocked()) { location.replace('2-5-sine-cosine-teacher.html'); return; }
+  var DEBUG = /debug/.test(location.hash), PREVIEW = /preview/.test(location.hash) && !!(window.MrD && MrD.access && MrD.access.unlocked()), LAST = null;
   var PI = Math.PI;
 
   function $(id) { return document.getElementById(id); }

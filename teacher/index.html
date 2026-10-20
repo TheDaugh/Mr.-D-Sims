@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta name="robots" content="noindex,nofollow">
+<script src="../shared/config.js"></script>
+<script>MrD.access.guard();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Teacher · Mr. D's Sims</title>
@@ -23,6 +26,7 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
 #fs{position:fixed;inset:0;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:50}
 #fs[hidden]{display:none}#fsc{font:800 20vw ui-monospace,monospace;letter-spacing:.1em}
+@media print{section:not(#sub),.grid,#fs,a[href="../index.html"]{display:none!important}#sub .hint,#sub .row{display:none!important}}
 </style>
 </head>
 <body>
@@ -30,6 +34,13 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
   <a href="../index.html">← Mr. D's Sims</a>
   <h1>Teacher</h1>
   <p class="sub" id="now"></p>
+
+  <section class="card" id="sub" style="margin-bottom:14px"><h2>Sub sheet (today)</h2>
+    <p class="hint">Everything a substitute needs in one place: each lesson, its student link, its teacher key link, and today's codes. She opens this page, types the PIN once on her device, and everything below works. Print it or copy it into an email. The PIN is not printed.</p>
+    <div class="row"><button id="sub-print" type="button">Print sub sheet</button><button id="sub-copy" type="button">Copy as text</button><button id="sub-link" type="button">Copy teacher page link</button><span class="hint" id="sub-msg"></span></div>
+    <table id="subtab"></table>
+    <p class="hint">Unlock-any-student code today: <b class="code" id="sub-ov" style="font-size:1.1rem"></b></p>
+  </section>
 
   <div class="grid">
     <section class="card" id="status"><h2>Right now</h2><div id="status-body"></div></section>
@@ -58,6 +69,9 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
   </section>
 
   <section class="card"><h2>More</h2>
+    <p><b>Teacher PIN</b> <span class="hint">(this device is unlocked)</span></p>
+    <div class="row"><button id="pin-lock" type="button">Lock this device now</button><input id="pin-new" type="text" placeholder="New PIN" style="width:140px" aria-label="New PIN"><button id="pin-make" type="button">Make hash</button><code id="pin-out"></code></div>
+    <p class="hint">Default PIN is <code>mrd-sub</code>. To change it, type a new PIN, press Make hash, and paste the result as <code>pinHash</code> in <code>shared/config.js</code>. Students never see any teacher link, but the PIN is a deterrent on a public static site, not a vault.</p>
     <p><a href="../portal/index.html">Review portal</a>: load a class's scores files to see standards by student, or hand the link to students.</p>
     <p><a href="../physics/lessons/teacher.html">Physics teacher page</a> · <a href="../chemistry/teacher.html">Chemistry teacher page</a> · <a href="../calculus/unit-2-differentiation/2-7-product-rule-teacher.html">Calculus teacher page</a></p>
     <p class="hint">Add <code>#key</code> to any guided lesson's address to see exactly what students see, with every step open and the answers marked.</p></section>
@@ -67,6 +81,7 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
 <script src="../shared/bell.js"></script>
 <script src="../shared/codes.js"></script>
 <script src="../shared/lessons.js"></script>
+<script src="../calculus/shared/lessoncore.js"></script>
 <script>
 (function(){
   var $=function(i){return document.getElementById(i)},B=MrD.bell,L=MrD.lessons,COURSE={physics:"physics",chem:"chem",calc:"calc"};
@@ -122,6 +137,29 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
   }
   $("lv-go").onclick=function(){try{localStorage.setItem("mrd.teacher.live",JSON.stringify({url:$("lv-url").value.trim(),tok:$("lv-tok").value,les:$("lv-les").value}))}catch(e){}clearInterval(timer);poll();timer=setInterval(poll,8000)};
   $("lv-stop").onclick=function(){clearInterval(timer);$("lv-msg").textContent="Stopped."};
+  /* sub sheet */
+  function abs(h){return new URL("../"+h,location.href).href}
+  function subRows(){
+    var out=L.map(function(l){var cs=l.gates.map(function(g){return g.label+": "+MrD.codes.gate(l.id,g.key)}).join(" · ");
+      return {c:cname[l.course],t:l.title,s:abs(l.href),k:abs(l.href)+"#key",p:abs(l.teacher),code:cs}});
+    var sc=window.LC?LC.forLesson("sin-cos-v2","SC2").codeFor("huddle"):"";
+    out.push({c:"Calculus",t:"2.5 Derivatives of Sine and Cosine",s:abs("calculus/unit-2-differentiation/2-5-sine-cosine.html"),k:abs("calculus/unit-2-differentiation/2-5-sine-cosine.html")+"#key",p:abs("calculus/unit-2-differentiation/2-5-sine-cosine-teacher.html"),code:"Huddle: "+sc});
+    return out;
+  }
+  function subPaint(){
+    $("sub-ov").textContent=MrD.codes.override();
+    $("subtab").innerHTML="<tr><th>Lesson</th><th>Today's codes</th><th>Links</th></tr>"+subRows().map(function(r){
+      return "<tr><td>"+esc(r.c+": "+r.t)+"</td><td>"+esc(r.code)+'</td><td><a href="'+esc(r.s)+'">Student page</a> · <a href="'+esc(r.k)+'">Teacher key view</a> · <a href="'+esc(r.p)+'">Answer key + codes page</a></td></tr>'}).join("");
+  }
+  subPaint();setInterval(subPaint,30000);
+  function subText(){return "Sub sheet for "+new Date().toLocaleDateString([],{weekday:"long",month:"long",day:"numeric"})+"\nTeacher page (needs the PIN once): "+location.href.split("#")[0]+"\nUnlock-any-student code: "+MrD.codes.override()+"\n\n"+subRows().map(function(r){return r.c+": "+r.t+"\n  Codes: "+r.code+"\n  Student: "+r.s+"\n  Key view: "+r.k}).join("\n\n")+"\n\nHuddle codes are asked for only 7:00 AM to 3:00 PM on weekdays. On Fridays the lessons stay locked the whole period."}
+  function say(t){$("sub-msg").textContent=t;setTimeout(function(){$("sub-msg").textContent=""},3000)}
+  function copy(t,m){(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){say(m)},function(){window.prompt("Copy this:",t)})}
+  $("sub-copy").onclick=function(){copy(subText(),"Copied.")};
+  $("sub-link").onclick=function(){copy(location.href.split("#")[0],"Copied. She will need the PIN.")};
+  $("sub-print").onclick=function(){window.print()};
+  $("pin-lock").onclick=function(){MrD.access.lock();location.reload()};
+  $("pin-make").onclick=function(){$("pin-out").textContent=$("pin-new").value.trim()?MrD.access.hash($("pin-new").value):""};
 })();
 </script>
 </body>

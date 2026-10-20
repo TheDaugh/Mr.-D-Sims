@@ -75,3 +75,12 @@ Before this change `#key` redirected to the teacher page, the huddle had a solo 
 - "Real view" of a student's page is the live view: step, level, answers, misses, times they left. It cannot show their screen, and by design cannot see anything outside the lesson page.
 - Chemistry progress survives a refresh only inside locked mode (the lock saves a snapshot). Physics and calculus save to the device automatically.
 - Heating-curve virtual-lab records and the calculus accumulation lab are not wired to the portal.
+
+
+## Teacher access
+
+- Load `shared/config.js` first on every page. It defines `MrD.access` (PIN unlock stored per device).
+- A teacher-only page puts `<script src="…/shared/config.js"></script><script>MrD.access.guard();</script>` as the first thing in `<head>`, plus `<meta name="robots" content="noindex,nofollow">`.
+- Teacher links on student pages get the class `tonly`; the stylesheet in config.js hides them until the device is unlocked.
+- `MrD.isKey()` is true only when `#key` is in the address and the device is unlocked, so a student typing `#key` gets the normal student page.
+- Add each new lesson to the sub sheet in `teacher/index.html` (`subRows`) so the substitute sees its codes and links.
