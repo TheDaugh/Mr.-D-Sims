@@ -2,17 +2,21 @@
 // State lives in S.scat (plain JSON, so it saves and restores). The checks are exported pure functions so a test can run them.
 import { h, mulberry32 } from "./dom.js";
 import * as FM from "../engine/foil.js";
+import { createAtomScope, newScope } from "./atomscope.js";
+import { ELEMENTS, element } from "../engine/coulomb.js";
+export const DEFAULT = { target: "Au", thick: 1, E: 5 };
 
 export const GROUPS = ["straight", "deflected", "rebound"];
 const MODEL = { plum: "plum", real: "nuc", mine: "nuc", ch: "nuc" };
 const LABEL = { plum: "Plum-pudding model", real: "Real gold foil", mine: "Your nucleus model", ch: "Challenge foil" };
 const fmt = (n) => Number(n).toLocaleString("en-US");
 
-export const newScat = () => ({ runs: {}, key: "plum", rate: 2000, firing: false, answers: {}, match: {}, size: 0, ch: { pick: null, pred: null, key: null, done: false }, finished: false });
+export const newScat = () => ({ runs: {}, key: "plum", rate: 2000, firing: false, answers: {}, match: {}, size: 0, ch: { sel: { ...DEFAULT }, pred: null, key: null, done: false }, scope: newScope(), finished: false });
 
+export function fixScat(sc) { if (!sc.scope) sc.scope = newScope(); if (!sc.ch.sel) sc.ch.sel = { ...DEFAULT }; return sc; }
 export function newRun(seed, key, cfg) {
   const r = mulberry32(seed * 7 + { plum: 1, real: 2, mine: 3, ch: 4 }[key]);
-  return { key, model: MODEL[key], target: cfg.target || "Au", thick: cfg.thick || 1, n: 0, hist: new Array(FM.BINS).fill(0), stream: { i: 0, r1: r(), r2: r() }, done: false };
+  return { key, model: MODEL[key], target: cfg.target || "Au", thick: cfg.thick || 1, E: cfg.E || 5, n: 0, hist: new Array(FM.BINS).fill(0), stream: { i: 0, r1: r(), r2: r() }, done: false };
 }
 export const groupSum = (run, g) => FM.sum(run.hist, g);
 export function parseNum(s) { const t = String(s).replace(/,/g, "").replace(/\s/g, "").replace(/%/g, "").replace(/^1(in|\/|:)/i, ""); const v = parseFloat(t); return Number.isFinite(v) ? v : null; }
@@ -48,7 +52,7 @@ export function evidenceItems(sc) {
 }
 export function per100(run) { const t = run.n / 100, hh = run.hist, s = (a, b) => hh.slice(a, b).reduce((x, y) => x + y, 0) / t; return { A: s(0, 1), B: s(1, 3), C: s(3, 9), D: s(9, 18), E: 0 }; }
 export function summary(sc) {
-  const runs = {}; for (const [k, r] of Object.entries(sc.runs)) runs[k] = { target: r.target, thick: r.thick, n: r.n, done: r.done, hist: r.hist, straight: groupSum(r, "straight"), deflected: groupSum(r, "deflected"), rebound: groupSum(r, "rebound") };
+  const runs = {}; for (const [k, r] of Object.entries(sc.runs)) runs[k] = { target: r.target, thick: r.thick, E: r.E, n: r.n, done: r.done, hist: r.hist, straight: groupSum(r, "straight"), deflected: groupSum(r, "deflected"), rebound: groupSum(r, "rebound") };
   return { runs, answers: sc.answers, match: sc.match, size: sc.size, challenge: sc.ch };
 }
 
@@ -68,7 +72,7 @@ function histCanvas(c, run, ghost, logScale) {
 export function createScatter(ctx) {
   const { lab, S, log, say } = ctx, A = lab.apparatus, seed = ctx.seed, sc = () => S.scat;
   const notify = () => { refresh(); ctx.onChange && ctx.onChange(); };
-  const cfgFor = (key) => (key === "ch" ? { target: sc().ch.cfg.target, thick: sc().ch.cfg.thick } : {});
+  const cfgFor = (key) => (key === "ch" ? { ...sc().ch.cfg } : { ...DEFAULT });
   function run(key) { return sc().runs[key]; }
   function ensure(key) { if (!run(key)) sc().runs[key] = newRun(seed, key, cfgFor(key)); return run(key); }
   const need = (key) => ({ plum: A.plumNeeded, real: A.realNeeded, mine: A.cap, ch: A.cap }[key]);
@@ -90,19 +94,20 @@ export function createScatter(ctx) {
     if (key === "real" && !realUnlocked()) return;
     sc().firing = !sc().firing; if (sc().firing) log.add("scat_fire", { model: key }); notify();
   }
-  function startOver() { const key = sc().key; sc().firing = false; delete sc().runs[key]; if (key === "ch") sc().ch.done = false; log.add("scat_reset", { model: key }); say(`${LABEL[key]} cleared. Fire again for a fresh run.`); notify(); }
+  function startOver() { const key = sc().key; sc().firing = false; delete sc().runs[key]; if (key === "ch") Object.assign(sc().ch, { key: null, done: false, result: null, cfg: null }); log.add("scat_reset", { model: key }); say(`${LABEL[key]} cleared. Fire again for a fresh run.`); notify(); }
   function choose(key) { if (sc().firing) sc().firing = false; sc().key = key; ensure(key); notify(); }
 
   function step(dt) {
+    scope.tick(dt);
     const s = sc(); if (!s.firing) return;
     const r = ensure(s.key); carry += s.rate * dt; const k = Math.min(Math.floor(carry), A.cap - r.n); carry -= Math.floor(carry);
     if (k > 0) {
-      let j = 0; const out = FM.fire(r.stream, k, r.model, r.target, r.thick, (a) => { j++; if (a > 10 || j % 40 === 0) flights.push({ a, side: j % 2 ? 1 : -1, born: performance.now() }); });
+      let j = 0; const out = FM.fire(r.stream, k, r.model, r.target, r.thick, (a) => { j++; if (a > 10 || j % 40 === 0) flights.push({ a, side: j % 2 ? 1 : -1, born: performance.now() }); }, r.E);
       out.hist.forEach((c, i) => { r.hist[i] += c; }); r.n += k;
       if (flights.length > 70) flights.splice(0, flights.length - 70);
     }
     const goal = need(s.key); let changed = false;
-    if (r.n >= goal && !r.marked) { r.marked = true; r.done = true; log.add("scat_done", { model: s.key, target: r.target, thick: String(r.thick), n: r.n, straight: groupSum(r, "straight"), deflected: groupSum(r, "deflected"), rebound: groupSum(r, "rebound") }); say(`${LABEL[s.key]}: ${fmt(r.n)} particles fired.`, "obs"); changed = true; if (s.key === "ch") s.ch.done = true; if (s.key === "real") say("The real foil is done. Open Find the pattern below.", "obs"); }
+    if (r.n >= goal && !r.marked) { r.marked = true; r.done = true; log.add("scat_done", { model: s.key, target: r.target, thick: String(r.thick), E: r.E, n: r.n, straight: groupSum(r, "straight"), deflected: groupSum(r, "deflected"), rebound: groupSum(r, "rebound") }); say(`${LABEL[s.key]}: ${fmt(r.n)} particles fired.`, "obs"); changed = true; if (s.key === "ch") s.ch.done = true; if (s.key === "real") say("The real foil is done. Open Find the pattern below.", "obs"); }
     if (r.n >= A.cap) { s.firing = false; changed = true; }
     if (changed) notify();
   }
@@ -115,12 +120,12 @@ export function createScatter(ctx) {
     g.strokeStyle = sc().firing ? "#7fd6ff" : "#2c4d68"; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(36, fy); g.lineTo(fx - 5, fy); g.stroke(); g.setLineDash([]);
     const col = r && r.model === "plum" ? "#c7a9ff" : "#ffd23f";
     g.fillStyle = col; for (let k = -4; k <= 4; k++) g.fillRect(fx - 3, fy + k * 14 - 2, 6, 4);
-    g.fillStyle = "#cfe3f5"; g.fillText(r ? (r.model === "plum" ? "plum-pudding foil" : r.target === "Al" ? "aluminum foil" : "gold foil") : "foil", fx, 142);
+    g.fillStyle = "#cfe3f5"; g.fillText(r ? (r.model === "plum" ? "plum-pudding foil" : FM.TARGETS[r.target].name.toLowerCase() + " foil") : "foil", fx, 142);
     for (let i = flights.length - 1; i >= 0; i--) { const f = flights[i], age = (now - f.born) / 700; if (age > 1) { flights.splice(i, 1); continue; }
       const th = (f.a * Math.PI) / 180 * f.side, len = 66; g.strokeStyle = `rgba(127,214,255,${1 - age})`; g.lineWidth = f.a > 10 ? 2 : 1; g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx + len * Math.cos(th), fy - len * Math.sin(th)); g.stroke(); }
     g.lineWidth = 1;
     const run0 = sc().key === "mine" ? run("real") : null;
-    histCanvas(histC, r, run0, logCk.checked);
+    histCanvas(histC, r, run0, logCk.checked); scope.draw();
   }
 
   // ---- section 1: pick the model ----
@@ -193,21 +198,34 @@ export function createScatter(ctx) {
     rebuildNote.textContent = !unlocked ? "Locked until the match is right." : m && m.done ? "Your nucleus model is done. In the histogram, the red lines are the real foil's counts; the blue bars are your model's. Do they agree?" : small ? "Run it. The detector will use your nucleus." : "Squeeze the positive charge smaller. The pudding is too soft to push an alpha particle hard, so keep going until it is a tiny dot.";
   }
 
-  // ---- section 5: challenge ----
+  // ---- section 5: challenge: set up your own experiment ----
   const chBox = h("div");
+  const same = (a, b) => a.target === b.target && a.thick === b.thick && a.E === b.E;
+  const factor = (c) => FM.A(c.target, c.thick, c.E) / FM.A(DEFAULT.target, DEFAULT.thick, DEFAULT.E);
+  function whyText(c) {
+    const t = FM.TARGETS[c.target], d = FM.TARGETS[DEFAULT.target], f = (v) => (v >= 10 ? v.toFixed(0) : v.toFixed(2)).replace(/\.?0+$/, "");
+    return `Large deflections scale as (protons)² × (atoms per area) × (thickness) ÷ (alpha energy)². Against 5 MeV gold at normal thickness: charge (${t.Z}/${d.Z})² = ×${f(Math.pow(t.Z / d.Z, 2))}; atoms per cm³ ×${f(t.n / d.n)}; thickness ×${f(c.thick / DEFAULT.thick)}; energy (5/${c.E})² = ×${f(Math.pow(5 / c.E, 2))}. Together: ×${f(factor(c))}.`;
+  }
   function renderChallenge() {
-    const C = lab.challenge, ch = sc().ch; chBox.replaceChildren(h("p", {}, C.prompt));
+    const C = lab.challenge, ch = sc().ch, sel = ch.sel || (ch.sel = { ...DEFAULT }); chBox.replaceChildren(h("p", {}, C.prompt));
     if (!(run("mine") && run("mine").done)) return chBox.append(h("p", { class: "hint" }, "Opens after you have rebuilt the atom."));
     const locked = !!ch.key;
-    const pick = h("div", { class: "opts" }, C.change.map((c) => h("label", { class: "ck" }, h("input", { type: "radio", name: "chp", checked: ch.pick === c.id ? "" : null, disabled: locked, onchange: () => { ch.pick = c.id; refresh(); } }), c.text)));
-    const pred = h("div", { class: "opts" }, C.predictions.map((c) => h("label", { class: "ck" }, h("input", { type: "radio", name: "chq", checked: ch.pred === c.id ? "" : null, disabled: locked, onchange: () => { ch.pred = c.id; refresh(); } }), c.text)));
-    const go = h("button", { class: "primary", disabled: locked || !ch.pick || !ch.pred, onclick: () => { const c = C.change.find((x) => x.id === ch.pick); ch.key = ch.pick; ch.cfg = { target: c.target, thick: c.thick }; delete sc().runs.ch; sc().key = "ch"; ensure("ch"); sc().firing = true; log.add("scat_predict_ch", { change: ch.pick, pred: ch.pred }); log.add("scat_fire", { model: "ch" }); notify(); el.closest(".body").scrollTop = 0; } }, "Lock in my prediction and fire");
-    chBox.append(h("h4", {}, "1. What do you change?"), pick, h("h4", {}, "2. What happens to the number of large deflections (10° and up) compared with the normal gold foil?"), pred, go);
+    const elSel = h("select", { disabled: locked, "aria-label": "Foil element", onchange: () => { sel.target = elSel.value; refresh(); } }, Object.entries(FM.TARGETS).map(([k, t]) => h("option", { value: k, selected: sel.target === k ? "" : null }, `${t.name} (Z = ${t.Z})`)));
+    const eIn = h("input", { type: "range", min: 3, max: 10, step: 0.5, value: sel.E, disabled: locked, "aria-label": "Alpha energy", oninput: () => { sel.E = +eIn.value; eOut.textContent = sel.E.toFixed(1) + " MeV"; renderChallengeBtn(); } }), eOut = h("b", {}, sel.E.toFixed(1) + " MeV");
+    const thSel = h("select", { disabled: locked, "aria-label": "Foil thickness", onchange: () => { sel.thick = +thSel.value; refresh(); } }, [0.5, 1, 2].map((t) => h("option", { value: t, selected: sel.thick === t ? "selected" : null }, t === 1 ? "normal (about 0.4 µm)" : t < 1 ? "half as thick" : "twice as thick")));
+    const pred = h("div", { class: "opts" }, C.predictions.map((c) => h("label", { class: "ck" }, h("input", { type: "radio", name: "chq", checked: ch.pred === c.id ? "" : null, disabled: locked, onchange: () => { ch.pred = c.id; renderChallengeBtn(); } }), c.text)));
+    const go = h("button", { class: "primary", onclick: () => { ch.key = "set"; ch.cfg = { target: sel.target, thick: sel.thick, E: sel.E }; delete sc().runs.ch; sc().key = "ch"; ensure("ch"); sc().firing = true; log.add("scat_predict_ch", { target: sel.target, thick: String(sel.thick), E: sel.E, pred: ch.pred }); log.add("scat_fire", { model: "ch" }); notify(); el.closest(".body").scrollTop = 0; } }, "Lock in my prediction and fire");
+    function renderChallengeBtn() { go.disabled = locked || !ch.pred || same(sel, DEFAULT); hintBtn.textContent = same(sel, DEFAULT) ? "Change at least one setting from the normal setup (gold, 5 MeV, normal thickness)." : ""; }
+    const hintBtn = h("p", { class: "hint" });
+    chBox.append(h("div", { class: "controls" }, h("label", {}, "Foil element ", elSel), h("label", {}, "Alpha energy ", eOut, " ", eIn), h("label", {}, "Foil thickness ", thSel)),
+      h("p", { class: "hint" }, "The real source (radon's decay products) gave about 7.7 MeV, and Rutherford's team also tried other metals and thicknesses. Alpha particles are particles, not light: the knob that matters is their energy, which sets their speed. At 5 MeV the de Broglie wavelength is about 1 fm, smaller than a nucleus, so treating them as small charged balls is fair."),
+      h("h4", {}, "What happens to the number of large deflections (10° and up) compared with the normal setup?"), pred, go, hintBtn);
+    renderChallengeBtn();
     const r = run("ch"), real = realRun(sc());
     if (ch.done && r && real) {
       const big = (x) => groupSum(x, "deflected") + groupSum(x, "rebound"), ratio = big(r) / Math.max(1, big(real)), actual = ratio > 1.3 ? "more" : ratio < 0.7 ? "fewer" : "same";
       const ok = actual === ch.pred; ch.result = { ratio: +ratio.toFixed(2), actual, ok };
-      chBox.append(h("div", { class: "fb show " + (ok ? "ok" : "no") }, `You predicted: ${C.predictions.find((x) => x.id === ch.pred).text}. Result: ${fmt(big(r))} large deflections in ${fmt(r.n)} particles, against ${fmt(big(real))} in ${fmt(real.n)} for the normal gold foil (${ratio.toFixed(2)} times as many). ${ok ? "Your prediction held." : "Your prediction missed."} ${C.why[ch.pick]}`));
+      chBox.append(h("div", { class: "fb show " + (ok ? "ok" : "no") }, `You predicted: ${C.predictions.find((x) => x.id === ch.pred).text}. Result: ${fmt(big(r))} large deflections in ${fmt(r.n)} particles, against ${fmt(big(real))} in ${fmt(real.n)} for the normal setup (${ratio.toFixed(2)} times as many). ${ok ? "Your prediction held." : "Your prediction missed."} ${whyText(r)}`));
     }
   }
 
@@ -221,17 +239,20 @@ export function createScatter(ctx) {
       h("div", { style: "min-width:200px" }, runLbl, h("div", {}, "Fired: ", counter), h("label", { class: "hint", style: "display:block" }, "Beam rate ", rate), rateOut, h("div", { class: "controls" }, fireBtn, resetBtn), h("label", { class: "ck hint" }, logCk, "Log scale on the bars"))), note);
   const sec = (t, ...kids) => h("details", { open: true }, h("summary", {}, h("b", {}, t)), ...kids);
   const secRun = sec("1 · Run it", h("p", {}, "Run the plum-pudding model first. Then the real gold foil unlocks. The detector files every hit under its angle."), seg, unlockNote, reveal);
+  const scope = createAtomScope({ state: () => S.scat.scope, onShot: (d) => { log.add("scat_shot", d); ctx.onChange && ctx.onChange(); } });
+  const matchBtn = h("button", { onclick: () => { const r = run(sc().key), c = r ? element(r.target) : element("Au"); scope.sync({ model: r && r.model === "plum" ? "plum" : "nuc", Z: c.Z, N: c.A - c.Z, E: r ? r.E : 5 }); } }, "Match the foil in the beam");
+  const secScope = sec("Atom microscope: what one alpha particle does inside the foil", h("p", {}, "Zoom into one atom of the foil. Click the black field to fire an alpha at that height, or fire a beam. Try the nuclear scale and aim close to the nucleus's centerline. Change the protons, the neutrons and the alpha energy and watch the forces."), matchBtn, scope.el);
   const secTable = sec("Detector table", tableBox);
   const secTally = sec("2 · Find the pattern", tallyBox), secMatch = sec("3 · What each result showed", matchBox);
   const secRebuild = sec("4 · Rebuild the atom", h("div", { style: "display:flex;gap:18px;flex-wrap:wrap;align-items:center" }, atomSvg, h("div", {}, h("p", {}, "Slide to pull the positive charge together. The electrons stay where they are."), sizeIn, sizeOut, runMine, rebuildNote)));
   const secCh = sec("Challenge (optional, for the gold badge)", chBox);
-  const el = h("div", {}, top, secRun, secTable, secTally, secMatch, secRebuild, secCh, h("div", { class: "controls foot" }, finishBtn, finishNote));
+  const el = h("div", {}, top, secRun, secScope, secTable, secTally, secMatch, secRebuild, secCh, h("div", { class: "controls foot" }, finishBtn, finishNote));
 
   function refresh() {
     const s = sc(), r = run(s.key), key = s.key;
     seg.replaceChildren(...["plum", "real"].map((k) => h("button", { class: key === k ? "on" : "", disabled: k === "real" && !realUnlocked(), onclick: () => choose(k) }, k === "plum" ? "Plum pudding" : "Real gold foil")));
     unlockNote.textContent = realUnlocked() ? "" : `The real foil unlocks when the plum-pudding run reaches ${fmt(A.plumNeeded)} particles.`;
-    runLbl.textContent = LABEL[key] + (r && r.model === "nuc" && key !== "mine" ? (r.target === "Al" ? " · aluminum" : "") + (r.thick > 1 ? " · double thickness" : "") : "");
+    runLbl.textContent = LABEL[key] + (key === "ch" && r ? ` · ${FM.TARGETS[r.target].name}, ${r.E} MeV, ${r.thick === 1 ? "normal" : r.thick + "×"} thickness` : "");
     counter.textContent = `${fmt(r ? r.n : 0)} / ${fmt(key === "plum" || key === "real" || key === "mine" || key === "ch" ? (key === "plum" ? A.cap : need(key)) : A.cap)}`;
     const full = r && r.n >= A.cap;
     fireBtn.textContent = s.firing ? "Pause" : r && r.n > 0 && !full ? "Resume" : "Fire"; fireBtn.disabled = !!full || (key === "real" && !realUnlocked());
@@ -242,5 +263,5 @@ export function createScatter(ctx) {
     draw();
   }
   refresh();
-  return { el, refresh, step, draw, needDone, stop() { sc().firing = false; } };
+  return { el, refresh, step, draw, needDone, scope, focusScope() { secScope.open = true; secScope.scrollIntoView(); }, stop() { sc().firing = false; scope.stop(); } };
 }

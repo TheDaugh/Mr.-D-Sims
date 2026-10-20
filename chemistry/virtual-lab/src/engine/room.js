@@ -4,7 +4,7 @@ export function parseRoom(def) {
   for (const r of rows) if (r.length !== w) throw new Error("Room rows are not all the same width");
   for (const ch of new Set(rows.join(""))) if (!def.legend[ch]) throw new Error(`No legend entry for '${ch}'`);
   const doorRow = rows.findIndex((r) => r.includes("D"));
-  return { w, h, rows, legend: def.legend, start: def.start, doorRow };
+  return { w, h, rows, legend: def.legend, start: def.start, doorRow, theme: def.theme || null };
 }
 export function tileAt(room, x, y) {
   return x < 0 || y < 0 || x >= room.w || y >= room.h ? null : room.legend[room.rows[y][x]];

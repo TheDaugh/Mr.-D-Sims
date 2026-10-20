@@ -5,23 +5,29 @@
   "badgeTitle": "Gold Foil",
   "minActiveMin": 15,
   "noDemo": true,
-  "intro": "In 1909 Ernest Rutherford's team fired alpha particles at a sheet of gold foil thinner than a hair. You run the same experiment on a virtual bench. First you decide what the plum-pudding atom predicts. Then you collect the data, find the pattern in it, and rebuild the atom so the data makes sense.",
+  "intro": "Manchester, 1909. Hans Geiger and Ernest Marsden sit in a darkened room counting faint flashes of light, one at a time, while Rutherford waits for the numbers. You take their place. You fire alpha particles from a radon source at a sheet of gold leaf and count where they land, then look inside the foil at one atom to see the forces that sent each particle where it went.",
   "introSteps": [
-    "Do the pre-lab: three short questions, then place 100 alpha particles where you think they will land and give a reason. You get no feedback on the placement yet. The lab door stays locked until you finish.",
-    "Suit up, go through the door and step up to the bench (press E at it) to open the foil apparatus.",
-    "Run the plum-pudding model first, then the real gold foil. The detector records hit counts for every 10° of angle.",
+    "Do the pre-lab: three short questions, then place 100 alpha particles where you think they will land and give a reason. You get no feedback on the placement yet. The dark-room curtain stays shut until you finish.",
+    "Walk through the curtain into the dark room and press E at the foil apparatus. Click the objects around you to read about the real 1909 experiment.",
+    "Run the plum-pudding model first, then the real gold foil. The detector counts hits for every 10° of angle, like Marsden counting flashes.",
+    "Open the atom microscope. Fire alpha particles at one atom, watch the repulsive forces, and find an aim that sends one back.",
     "Find the pattern in your own counts, match each result to what it showed, then rebuild the atom with a nucleus.",
-    "Write the revision: a claim, evidence and reasoning that starts \"The plum-pudding model fails because…\" and cites a count from your own run. Hand-in opens after the minimum active lab time."
+    "Write the revision: a claim, evidence and reasoning that starts \"The plum-pudding model fails because…\" and cites a count from your own run. Challenge: change the metal, the thickness or the alpha energy and predict first."
   ],
   "introKeys": [
-    ["Notebook (N)", "Opens the foil apparatus, the detector table, and your answers."],
-    ["E at the bench", "Same thing: stand at the bench and press E."]
+    [
+      "Notebook (N)",
+      "Opens the foil apparatus: runs, detector table, questions."
+    ],
+    [
+      "Atom scope (M)",
+      "Opens the atom microscope."
+    ],
+    [
+      "E at the apparatus",
+      "Same as Notebook: stand at the apparatus and press E."
+    ]
   ],
-  "roomText": {
-    "shelf_unknown": "Nothing here is needed for this lab. The alpha source is built into the apparatus.",
-    "shelf_liquids": "Nothing here is needed for this lab.",
-    "shelf_known": "Nothing here is needed for this lab."
-  },
   "theory": [
     {
       "title": "The plum-pudding atom (J. J. Thomson, 1904)",
@@ -35,6 +41,14 @@
       "body": [
         "An alpha particle is a helium nucleus: two protons and two neutrons. It carries a positive charge and weighs about 7,300 times as much as an electron. Radioactive atoms shoot them out at about 5% of the speed of light.",
         "Like charges repel. A fast, heavy, positive alpha particle is pushed sideways only when it passes close to a lot of positive charge. How hard it gets pushed tells you how concentrated that charge is."
+      ]
+    },
+    {
+      "title": "The 1909 apparatus",
+      "body": [
+        "Radon gas sealed in a glass tube sits inside a lead block. A narrow slit lets a thin beam of alpha particles out. The beam crosses a vacuum chamber (air would scatter and stop alpha particles) and hits a gold foil about 0.0004 mm thick.",
+        "Beyond the foil is a screen coated with zinc sulfide, which flashes when an alpha particle hits it. A microscope on a swinging arm lets the counter watch the screen at any angle. The flashes are faint, so Geiger and Marsden counted in the dark, for hours, and wrote each count in a log book.",
+        "In the sim the foil can be any of six metals, the foil thickness can change, and the alpha energy can change. The source itself gave about 7.7 MeV. The sim default is 5 MeV so the rare events show up in a few minutes."
       ]
     },
     {
@@ -56,21 +70,36 @@
       {
         "id": "r1",
         "q": "An alpha particle is…",
-        "options": ["A helium nucleus: positive and about 7,300 times heavier than an electron", "A fast electron", "A particle of light", "A hydrogen atom with no electron"],
+        "options": [
+          "A helium nucleus: positive and about 7,300 times heavier than an electron",
+          "A fast electron",
+          "A particle of light",
+          "A hydrogen atom with no electron"
+        ],
         "correct": 0,
         "explain": "Two protons plus two neutrons, so it is positive and heavy. An electron is thousands of times too light to shove it much."
       },
       {
         "id": "r2",
         "q": "In the plum-pudding model, where is the positive charge?",
-        "options": ["In a tiny hard core at the center", "Spread evenly through the whole atom, with electrons embedded in it", "On the outside surface of the atom", "There is none; atoms have only electrons"],
+        "options": [
+          "In a tiny hard core at the center",
+          "Spread evenly through the whole atom, with electrons embedded in it",
+          "On the outside surface of the atom",
+          "There is none; atoms have only electrons"
+        ],
         "correct": 1,
         "explain": "Thomson's positive charge is diffuse, like pudding. No part of the atom is dense or concentrated."
       },
       {
         "id": "r3",
         "q": "Which makes an alpha particle swerve more?",
-        "options": ["Passing near a lot of positive charge packed into a small space", "Passing through a large soft region of weak positive charge", "Passing an electron", "Passing through empty space"],
+        "options": [
+          "Passing near a lot of positive charge packed into a small space",
+          "Passing through a large soft region of weak positive charge",
+          "Passing an electron",
+          "Passing through empty space"
+        ],
         "correct": 0,
         "explain": "Repulsion grows steeply as distance shrinks, so a concentrated charge pushes harder than the same charge spread thin. That difference is the whole experiment."
       }
@@ -78,11 +107,26 @@
     "placement": {
       "prompt": "This is the plum-pudding gold atom. The foil is a few thousand atoms thick. Place where you think 100 alpha particles will land when fired at it, then give a one-sentence reason. The numbers must add to 100. There is no feedback on this part yet. You will see your prediction again after the real run.",
       "zones": [
-        { "id": "A", "label": "Straight through (under 10°)" },
-        { "id": "B", "label": "Bent a little (10° to 30°)" },
-        { "id": "C", "label": "Bent a lot (30° to 90°)" },
-        { "id": "D", "label": "Bounced back (over 90°)" },
-        { "id": "E", "label": "Stopped inside the foil" }
+        {
+          "id": "A",
+          "label": "Straight through (under 10°)"
+        },
+        {
+          "id": "B",
+          "label": "Bent a little (10° to 30°)"
+        },
+        {
+          "id": "C",
+          "label": "Bent a lot (30° to 90°)"
+        },
+        {
+          "id": "D",
+          "label": "Bounced back (over 90°)"
+        },
+        {
+          "id": "E",
+          "label": "Stopped inside the foil"
+        }
       ],
       "minReason": 10
     }
@@ -91,13 +135,14 @@
     "cap": 20000,
     "plumNeeded": 10000,
     "realNeeded": 20000,
-    "rate": { "min": 500, "max": 6000, "step": 500, "start": 2000 },
+    "rate": {
+      "min": 500,
+      "max": 6000,
+      "step": 500,
+      "start": 2000
+    },
     "bins": 18,
-    "targets": [
-      { "id": "Au", "name": "Gold" },
-      { "id": "Al", "name": "Aluminum (lighter atom)" }
-    ],
-    "thicknesses": [1, 2]
+    "targets": []
   },
   "data": [
     {
@@ -127,41 +172,86 @@
   ],
   "match": {
     "meanings": [
-      { "id": "empty", "text": "The atom is mostly empty space" },
-      { "id": "concentrated", "text": "The positive charge is concentrated in a tiny region" },
-      { "id": "dense", "text": "The center is heavy and dense" }
+      {
+        "id": "empty",
+        "text": "The atom is mostly empty space"
+      },
+      {
+        "id": "concentrated",
+        "text": "The positive charge is concentrated in a tiny region"
+      },
+      {
+        "id": "dense",
+        "text": "The center is heavy and dense"
+      }
     ],
     "rows": [
-      { "id": "straight", "result": "Nearly all went straight through", "answer": "empty", "hint": "Most particles felt almost no push at all. What does that say about most of the volume of the atom?" },
-      { "id": "deflected", "result": "A few were deflected sharply", "answer": "concentrated", "hint": "A sharp swerve needs a big repulsive push. In the pudding model no part of the atom could do that. What would have to exist inside the atom?" },
-      { "id": "rebound", "result": "A very few bounced back", "answer": "dense", "hint": "Something that bounces back has hit something much heavier than itself, like a ball off a wall. What must the thing it hit be like?" }
+      {
+        "id": "straight",
+        "result": "Nearly all went straight through",
+        "answer": "empty",
+        "hint": "Most particles felt almost no push at all. What does that say about most of the volume of the atom?"
+      },
+      {
+        "id": "deflected",
+        "result": "A few were deflected sharply",
+        "answer": "concentrated",
+        "hint": "A sharp swerve needs a big repulsive push. In the pudding model no part of the atom could do that. What would have to exist inside the atom?"
+      },
+      {
+        "id": "rebound",
+        "result": "A very few bounced back",
+        "answer": "dense",
+        "hint": "Something that bounces back has hit something much heavier than itself, like a ball off a wall. What must the thing it hit be like?"
+      }
     ]
   },
   "challenge": {
-    "prompt": "Optional challenge: change one thing about the foil, then predict what happens to the number of large deflections before you run it.",
-    "change": [
-      { "id": "thick", "text": "Use a foil twice as thick (Gold, thickness 2)", "target": "Au", "thick": 2 },
-      { "id": "light", "text": "Use a lighter target atom (Aluminum, thickness 1)", "target": "Al", "thick": 1 }
-    ],
+    "prompt": "Optional challenge for the gold badge: design your own experiment. Change the metal, the foil thickness or the alpha energy (any combination), then predict what happens to the number of large deflections before you fire.",
     "predictions": [
-      { "id": "more", "text": "More particles are deflected sharply than with the normal gold foil" },
-      { "id": "same", "text": "About the same number" },
-      { "id": "fewer", "text": "Fewer particles are deflected sharply" }
-    ],
-    "expect": { "thick": "more", "light": "fewer" },
-    "why": {
-      "thick": "A thicker foil gives each particle about twice as many chances to pass close to a nucleus, so about twice as many large deflections.",
-      "light": "Aluminum nuclei have fewer protons (13 against 79), so each pushes less. Large deflections drop sharply."
-    }
+      {
+        "id": "more",
+        "text": "More particles are deflected sharply than with the normal setup"
+      },
+      {
+        "id": "same",
+        "text": "About the same number"
+      },
+      {
+        "id": "fewer",
+        "text": "Fewer particles are deflected sharply"
+      }
+    ]
   },
   "postlab": {
     "prompt": "Write the revision. Your claim must start with \"The plum-pudding model fails because…\". Support it with counts from your own real-foil run, then explain what each result showed about the atom.",
-    "minWords": { "claim": 8, "evidence": 8, "reasoning": 35 },
-    "starters": {
-      "claim": ["The plum-pudding model fails because "],
-      "reasoning": ["The straight-through result showed ", "The large deflections showed ", "The rebounds showed ", "So the atom must be built like "]
+    "minWords": {
+      "claim": 8,
+      "evidence": 8,
+      "reasoning": 35
     },
-    "wordBank": ["alpha particle", "positive charge", "nucleus", "empty space", "deflected", "rebounded", "plum-pudding", "dense", "concentrated"],
+    "starters": {
+      "claim": [
+        "The plum-pudding model fails because "
+      ],
+      "reasoning": [
+        "The straight-through result showed ",
+        "The large deflections showed ",
+        "The rebounds showed ",
+        "So the atom must be built like "
+      ]
+    },
+    "wordBank": [
+      "alpha particle",
+      "positive charge",
+      "nucleus",
+      "empty space",
+      "deflected",
+      "rebounded",
+      "plum-pudding",
+      "dense",
+      "concentrated"
+    ],
     "checklist": [
       "My claim starts with \"The plum-pudding model fails because\".",
       "I quote at least one count from my own run, with its angle range.",
@@ -169,21 +259,122 @@
       "I say what the plum-pudding model predicted instead."
     ],
     "rubric": [
-      { "key": "claim", "name": "Claim", "levels": ["Missing", "Vague or wrong", "States the failure but not why", "States that the model cannot produce large deflections or rebounds"] },
-      { "key": "evidence", "name": "Evidence", "levels": ["None", "No numbers", "A count not tied to an angle range", "Specific counts from own run, tied to angle ranges"] },
-      { "key": "reasoning", "name": "Reasoning", "levels": ["None", "Restates evidence", "Links one result to a feature of the atom", "Links all three results (empty space, concentrated charge, heavy core) and what the pudding predicted"] }
+      {
+        "key": "claim",
+        "name": "Claim",
+        "levels": [
+          "Missing",
+          "Vague or wrong",
+          "States the failure but not why",
+          "States that the model cannot produce large deflections or rebounds"
+        ]
+      },
+      {
+        "key": "evidence",
+        "name": "Evidence",
+        "levels": [
+          "None",
+          "No numbers",
+          "A count not tied to an angle range",
+          "Specific counts from own run, tied to angle ranges"
+        ]
+      },
+      {
+        "key": "reasoning",
+        "name": "Reasoning",
+        "levels": [
+          "None",
+          "Restates evidence",
+          "Links one result to a feature of the atom",
+          "Links all three results (empty space, concentrated charge, heavy core) and what the pudding predicted"
+        ]
+      }
     ]
   },
   "quests": [
-    { "id": "gear", "text": "Put on goggles and an apron", "hint": "Walk to the blue LOCKER (bottom left) and press E. Choose Put on for the goggles and the apron.", "state": "ppe" },
-    { "id": "door", "text": "Go through the door into the lab", "hint": "The light on the DOOR turns green when you are geared up. Walk up through it.", "state": "entered_lab" },
-    { "id": "bench", "text": "Step up to the bench to open the foil apparatus", "hint": "Face the long BENCH and press E, or press N.", "event": "scat_open" },
-    { "id": "plum", "text": "Run the plum-pudding model (10,000 particles or more)", "hint": "In the apparatus, keep the model on Plum pudding, press Fire, and let the counter pass 10,000.", "event": "scat_done", "where": { "model": "plum" } },
-    { "id": "real", "text": "Run the real gold foil (20,000 particles)", "hint": "The real foil unlocks once the plum-pudding run has 10,000 particles. Choose Real gold foil, then Fire.", "event": "scat_done", "where": { "model": "real", "target": "Au", "thick": "1" } },
-    { "id": "tally", "text": "Answer the three data questions from your table", "hint": "Open the Find the pattern section of the apparatus. Use the Real foil column of the detector table.", "state": "scat_tally" },
-    { "id": "match", "text": "Match each result to what it showed", "hint": "Open the Match section of the apparatus. Choose a meaning for each result.", "state": "scat_match" },
-    { "id": "rebuild", "text": "Rebuild the atom with a nucleus and run it", "hint": "Open the Rebuild section. Place the nucleus, then run your model. Compare it with the real foil.", "event": "scat_done", "where": { "model": "mine" } },
-    { "id": "cer", "text": "Write and submit your claim, evidence and reasoning", "hint": "Press the Write CER button at the top. It opens once the apparatus work is finished.", "state": "cer_done" },
-    { "id": "challenge", "text": "Challenge: change the foil, predict, then run it", "hint": "Open the Challenge section. Pick a change, choose your prediction, then run it.", "state": "scat_challenge", "optional": true }
-  ]
+    {
+      "id": "door",
+      "text": "Go through the curtain into the dark room",
+      "hint": "The dark-room CURTAIN is on the back wall of the office. Walk up through it.",
+      "state": "entered_lab"
+    },
+    {
+      "id": "bench",
+      "text": "Step up to the foil apparatus",
+      "hint": "Face the apparatus on the table and press E, or press N.",
+      "event": "scat_open"
+    },
+    {
+      "id": "plum",
+      "text": "Run the plum-pudding model (10,000 particles or more)",
+      "hint": "In the apparatus, keep the model on Plum pudding, press Fire, and let the counter pass 10,000.",
+      "event": "scat_done",
+      "where": {
+        "model": "plum"
+      }
+    },
+    {
+      "id": "real",
+      "text": "Run the real gold foil (20,000 particles)",
+      "hint": "The real foil unlocks once the plum-pudding run has 10,000 particles. Choose Real gold foil, then Fire.",
+      "event": "scat_done",
+      "where": {
+        "model": "real",
+        "target": "Au",
+        "thick": "1"
+      }
+    },
+    {
+      "id": "scope",
+      "text": "Look inside the foil: fire 5 alpha particles in the atom microscope",
+      "hint": "Press M or the Atom scope button. Click the black field to fire an alpha at that height. Try the nuclear scale.",
+      "event": "scat_shot",
+      "count": 5
+    },
+    {
+      "id": "rebound",
+      "text": "Aim an alpha so it bounces back (more than 90°)",
+      "hint": "Nuclear scale, nuclear atom model. Click very close to the level of the nucleus. The closer the aim, the bigger the bend.",
+      "event": "scat_shot",
+      "where": {
+        "rebound": "true"
+      }
+    },
+    {
+      "id": "tally",
+      "text": "Answer the three data questions from your table",
+      "hint": "Open Find the pattern in the apparatus. Use the Real foil column of the detector table.",
+      "state": "scat_tally"
+    },
+    {
+      "id": "match",
+      "text": "Match each result to what it showed",
+      "hint": "Open the Match section of the apparatus. Choose a meaning for each result.",
+      "state": "scat_match"
+    },
+    {
+      "id": "rebuild",
+      "text": "Rebuild the atom with a nucleus and run it",
+      "hint": "Open the Rebuild section. Place the nucleus, then run your model. Compare it with the real foil.",
+      "event": "scat_done",
+      "where": {
+        "model": "mine"
+      }
+    },
+    {
+      "id": "cer",
+      "text": "Write and submit your claim, evidence and reasoning",
+      "hint": "Press the Write CER button at the top. It opens once the apparatus work is finished.",
+      "state": "cer_done"
+    },
+    {
+      "id": "challenge",
+      "text": "Challenge: choose your own foil, energy and thickness, predict, then run it",
+      "hint": "Open the Challenge section. Change a setting, choose your prediction, then fire.",
+      "state": "scat_challenge",
+      "optional": true
+    }
+  ],
+  "roomFile": "manchester-lab",
+  "noPPE": true
 }

@@ -9,7 +9,7 @@ import { createMicroView } from "./micro.js";
 import { microModel, legend } from "../engine/micro.js";
 import { renderIntro, renderPrelab, renderCER, renderCERHeat, renderCERScatter, theoryNodes } from "./stages.js";
 import { fire as FMfire, sum as FMsum } from "../engine/foil.js";
-import { createScatter, newScat, summary as scatSummary, tallyDone, matchDone, per100, GROUPS, groupSum } from "./scatter.js";
+import { createScatter, newScat, fixScat, summary as scatSummary, tallyDone, matchDone, per100, GROUPS, groupSum } from "./scatter.js";
 import { createHeatBook, drawGraph, goodRows } from "./heatbook.js";
 import { profile, stateAt, reading, assign } from "../engine/heating.js";
 import { runDemo } from "./demo.js";
@@ -36,8 +36,9 @@ async function boot() {
   try {
     const params = new URLSearchParams(location.search), labFile = LABS[params.get("lab")] || LABS["unknown-solids"];
     const getJSON = (u) => (window.__CONTENT__ && window.__CONTENT__[u] ? Promise.resolve(structuredClone(window.__CONTENT__[u])) : fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); }));
-    const urls = ["content/species.json", "content/reactions.json", "content/labs/" + labFile, "content/rooms/main-lab.json", "content/hazards.json", "content/config.json"];
-    const [species, reactions, lab, roomDef, hazardData, config] = await Promise.all(urls.map(getJSON));
+    const lab = await getJSON("content/labs/" + labFile);
+    const urls = ["content/species.json", "content/reactions.json", "content/rooms/" + (lab.roomFile || "main-lab") + ".json", "content/hazards.json", "content/config.json"];
+    const [species, reactions, roomDef, hazardData, config] = await Promise.all(urls.map(getJSON));
     const modeInfo = await resolveMode(params, config), key = "vlab:" + lab.id;
     let saved = null; try { saved = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) { saved = null; }
     if (saved && (saved.lab !== lab.id || saved.version !== 1)) saved = null;
@@ -58,7 +59,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   $("#boot").hidden = true;
   const world = buildWorld(speciesData, reactionData);
   const EL = speciesData.electrolytes;
-  const HEAT = lab.kind === "heating", SCAT = lab.kind === "scatter";
+  const HEAT = lab.kind === "heating", SCAT = lab.kind === "scatter", NOPPE = !!lab.noPPE;
   for (const [id, txt] of Object.entries(lab.roomText || {})) for (const e of Object.values(roomDef.legend)) if (e.id === id) e.text = txt;
   const solids = speciesData.species.filter((s) => s.phase === "s").map((s) => s.id);
   const params = new URLSearchParams(location.search);
@@ -432,6 +433,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     h("div", { class: "controls foot" }, h("button", { id: "nbToCer", class: "primary", onclick: () => finishData() }, "I'm done with the data → write the CER")));
   const scat = SCAT ? createScatter({ lab, S, log, say, seed, onChange: () => { if (ready) { renderQuests(); autosave(); } }, onFinish: () => finishData() }) : null;
   if (SCAT) $("#sheet").replaceChildren(h("button", { class: "x", "data-close": "" }, "Close ✕"), h("h2", {}, "Foil apparatus and notebook"), h("details", {}, h("summary", {}, h("b", {}, "Steps")), h("ol", {}, lab.introSteps.map((t) => h("li", {}, t)))), scat.el);
+  function openScope() { if (!["lab", "postlab", "done"].includes(S.stage)) return; openScatter(); scat.focusScope(); }
   function openScatter() { if (!["lab", "postlab", "done"].includes(S.stage) && !S.demo) return; log.add("scat_open"); say("You step up to the foil apparatus."); scat.refresh(); openDlg("dlgNotebook"); }
   // ---------- the room ----------
   const room = parseRoom(roomDef), P = { x: room.start.x, y: room.start.y, face: room.start.face || "u" };
@@ -491,9 +493,9 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function walk(dx, dy) {
     if (!S.demo && !["lab", "postlab", "done"].includes(S.stage)) return;
     const now = performance.now(); if (now - lastMove < 110) return false; lastMove = now;
-    const r = step(room, P, dx, dy, S.mode === "guided" ? S.ppe : { goggles: true, apron: true });
+    const r = step(room, P, dx, dy, S.mode === "guided" && !NOPPE ? S.ppe : { goggles: true, apron: true });
     if (r.blocked && now - lastBlock > 1500) { lastBlock = now; hazard("no_ppe_door", "Stop. The lab door will not open. You need goggles and an apron, and they are in the locker."); }
-    if (r.moved) { closePanel(); if (r.tile.type === "door" && !visited.has("entered_lab")) { visited.add("entered_lab"); log.add("door", { outcome: hasPPE(S.ppe) ? "entered" : "entered_without_ppe" }); say(hasPPE(S.ppe) ? "You step into the lab." : "You walk into the lab with no goggles or apron. That is a mistake.", hasPPE(S.ppe) ? "info" : "warn"); } }
+    if (r.moved) { closePanel(); if (r.tile.type === "door" && !visited.has("entered_lab")) { visited.add("entered_lab"); log.add("door", { outcome: NOPPE || hasPPE(S.ppe) ? "entered" : "entered_without_ppe" }); say(NOPPE ? "You push through the curtain into the dark room." : hasPPE(S.ppe) ? "You step into the lab." : "You walk into the lab with no goggles or apron. That is a mistake.", hasPPE(S.ppe) ? "info" : "warn"); } }
     return !!r.moved;
   }
   const DIRS = { arrowup: [0, -1], w: [0, -1], arrowdown: [0, 1], s: [0, 1], arrowleft: [-1, 0], a: [-1, 0], arrowright: [1, 0], d: [1, 0] };
@@ -508,7 +510,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (!["lab", "postlab", "done"].includes(S.stage)) return;
     if (k === "j") return toggleTasks();
     if (/^[0-9]$/.test(k)) return selectInv(k === "0" ? 9 : +k - 1);
-    if (k === "n") return openNotebook(); if (k === "t") return openDlg("dlgTheory"); if (k === "m") return SCAT ? undefined : openMicro();
+    if (k === "n") return openNotebook(); if (k === "t") return openDlg("dlgTheory"); if (k === "m") return SCAT ? openScope() : openMicro();
     if (HEAT && S.view === "bench" && k === " ") { e.preventDefault(); togglePause(); return; }
     if (S.view !== "room" || e.target.tagName === "BUTTON") return;
     if (DIRS[k]) { e.preventDefault(); walk(...DIRS[k]); }
@@ -516,7 +518,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   });
   // click to run: floor tiles walk there; a cabinet, bench or door is walked to and used on arrival
   const route = { steps: [], then: null, next: 0 };
-  const canPass = () => (S.mode === "guided" ? S.ppe : { goggles: true, apron: true });
+  const canPass = () => (S.mode === "guided" && !NOPPE ? S.ppe : { goggles: true, apron: true });
   const walkable = (x, y) => { const t = tileAt(room, x, y); return t && !t.solid && !(t.type === "door" && !hasPPE(canPass())); };
   function findRoute(goal) { // BFS over tiles; goal(x,y) says where to stop
     const key = (x, y) => x + "," + y, prev = new Map([[key(P.x, P.y), null]]), q = [[P.x, P.y]];
@@ -599,7 +601,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     { const stEl = $("#student"); if (stEl) stEl.value = sn.student || ""; }
     table.querySelectorAll("select").forEach((x) => { const v = (sn.notebook[x.dataset.u] || {})[x.dataset.t]; if (v) x.value = v; });
     if (!HEAT) $("#plate").value = S.plateC; if (book) book.refresh(); syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
-    if (SCAT) { S.scat.firing = false; scat.refresh(); }
+    if (SCAT) { fixScat(S.scat); S.scat.firing = false; scat.scope.sync(S.scat.scope); scat.refresh(); }
     lockTable(); if (!quiet) { log.add("resume", { savedAt: sn.savedAt }); say("Welcome back. Your saved lab is restored."); }
   }
   $("#fullscreen").addEventListener("click", () => { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch (e) { /* ignore */ } });
@@ -721,14 +723,14 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     onDemo: () => demoStart(),
     onIntroDone: (name) => { S.student = name; S.stage = "prelab"; log.add("stage", { to: "prelab", name }); closeDlg("dlgIntro"); renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); },
     onAnswer: (id, choice, correct) => log.add("prelab_answer", { q: id, choice, correct }),
-    onPrelabDone: () => { S.stage = "lab"; log.add("prelab_done", { prediction: S.prelab.prediction, placement: S.prelab.placement }); closeDlg("dlgPrelab"); renderQuests(); say("Pre-lab done. The lab door will open once you have goggles and an apron."); },
+    onPrelabDone: () => { S.stage = "lab"; log.add("prelab_done", { prediction: S.prelab.prediction, placement: S.prelab.placement }); closeDlg("dlgPrelab"); renderQuests(); say(NOPPE ? "Pre-lab done. The dark-room curtain is open." : "Pre-lab done. The lab door will open once you have goggles and an apron."); },
     onCerDone: (c) => { if (!gateOk()) return showGate(); S.cer = c; S.cerDone = true; S.stage = "done"; log.add("cer", c); closeDlg("dlgCER"); openDone(); },
     onCerClose: () => closeDlg("dlgCER"), onFinish: () => finishData()
   };
   $("#theoryBody").replaceChildren(...theoryNodes(lab));
   $("#btnTheory").addEventListener("click", () => openDlg("dlgTheory")); $("#btnTasks").addEventListener("click", toggleTasks); $("#btnTasks").classList.add("on"); $("#btnNotebook").addEventListener("click", openNotebook);
-  if (SCAT) { $("#btnMicro").hidden = true; $("#btnDemo").hidden = true; $("#btnNotebook").firstChild.textContent = "📓 Apparatus"; }
-  $("#btnMicro").addEventListener("click", () => openMicro()); $("#btnDemo").addEventListener("click", () => demoStart());
+  if (SCAT) { $("#btnDemo").hidden = true; $("#btnNotebook").firstChild.textContent = "📓 Apparatus"; $("#btnMicro").textContent = "🔬 Atom scope"; $("#btnMicro").title = "Atom microscope (M)"; $("#ppe").hidden = true; $("#modeLine").hidden = true; }
+  $("#btnMicro").addEventListener("click", () => (SCAT ? openScope() : openMicro())); $("#btnDemo").addEventListener("click", () => demoStart());
   $("#btnMenu").addEventListener("click", () => openDlg("dlgMenu")); $("#btnCER").addEventListener("click", () => (S.stage === "done" ? openDone() : openCER()));
   $("#donePrint").addEventListener("click", () => $("#print").click());
   $("#doneDl").addEventListener("click", () => $("#download").click());
@@ -859,8 +861,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function renderKey() {
     const rows = [];
     if (SCAT) {
-      const fm = (m, t, th) => { const st = { i: 0, r1: 0.3, r2: 0.7 }, o = FMfire(st, 20000, m, t, th); return { s: FMsum(o.hist, "straight"), d: FMsum(o.hist, "deflected"), r: FMsum(o.hist, "rebound") }; };
-      for (const [name, m, t, th] of [["Plum pudding", "plum", "Au", 1], ["Real gold foil", "nuc", "Au", 1], ["Challenge: gold, 2× thick", "nuc", "Au", 2], ["Challenge: aluminum", "nuc", "Al", 1]]) { const x = fm(m, t, th); rows.push(h("tr", {}, h("th", {}, name), h("td", {}, `20,000 fired: ${x.s} straight (${(x.s / 200).toFixed(2)}%), ${x.d} deflected (${(x.d / 200).toFixed(2)}%), ${x.r} rebound${x.r ? ` (1 in ${Math.round(20000 / x.r)})` : ""}`), h("td", {}, name === "Plum pudding" ? "Each student's seed shifts the particle stream, so counts differ slightly (rebound is about 5 ± 3 in 20,000). Accepted: percents ±0.3, 1-in-N ±12%." : ""))); }
+      const fm = (m, t, th, E) => { const st = { i: 0, r1: 0.3, r2: 0.7 }, o = FMfire(st, 20000, m, t, th, null, E); return { s: FMsum(o.hist, "straight"), d: FMsum(o.hist, "deflected"), r: FMsum(o.hist, "rebound") }; };
+      for (const [name, m, t, th, E] of [["Plum pudding", "plum", "Au", 1, 5], ["Real gold foil", "nuc", "Au", 1, 5], ["Challenge: gold, 2× thick", "nuc", "Au", 2, 5], ["Challenge: gold at 3 MeV", "nuc", "Au", 1, 3], ["Challenge: gold at 10 MeV", "nuc", "Au", 1, 10], ["Challenge: aluminum", "nuc", "Al", 1, 5], ["Challenge: lead", "nuc", "Pb", 1, 5]]) { const x = fm(m, t, th, E); rows.push(h("tr", {}, h("th", {}, name), h("td", {}, `20,000 fired: ${x.s} straight (${(x.s / 200).toFixed(2)}%), ${x.d} deflected (${(x.d / 200).toFixed(2)}%), ${x.r} rebound${x.r ? ` (1 in ${Math.round(20000 / x.r)})` : ""}`), h("td", {}, name === "Plum pudding" ? "Each student's seed shifts the particle stream, so counts differ slightly (rebound is about 5 ± 3 in 20,000). Accepted: percents ±0.3, 1-in-N ±12%." : ""))); }
       rows.push(h("tr", {}, h("th", {}, "Match"), h("td", {}, lab.match.rows.map((r) => `${r.result} → ${lab.match.meanings.find((x) => x.id === r.answer).text}`).join("; ")), h("td", {}, "")));
       rows.push(h("tr", {}, h("th", {}, "Prediction"), h("td", {}, "Plum pudding: about 100 of 100 straight through (under 10°). The real foil also sends about 97 of 100 straight, so the surprise is the few that are not."), h("td", {}, "")));
     } else if (HEAT) {
@@ -880,7 +882,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   ready = true;
   syncUnit(); renderPPE(); renderControls(); renderFeed(); renderInv(); renderSafety(); setView("room");
   if (modeInfo.rejected) { log.add("mode_rejected", { asked: modeInfo.rejected }); say("This link's mode could not be verified, so you are in Guided mode.", "warn"); }
-  say("Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
+  say(SCAT ? "Manchester, 1909. Read the chalkboard if you like, then go through the curtain to the dark room and press E at the foil apparatus." : "Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
   if (resume) restore(resume);
   renderQuests();
   if (TEACHER) { $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
@@ -898,7 +900,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     stepAll(sdt); tickIncident(now);
     if (HEAT && S.stepTo != null) { const c = cur(); if (!c.heat || c.loc !== "hotplate" || !S.plateOn) S.stepTo = null; else if (c.heat.E / hsub(c).power >= S.stepTo - 1e-6) { S.stepTo = null; S.paused = true; say(`Paused at ${mmss(c.heat.E / hsub(c).power)}. Write the reading down.`); } }
     if (SCAT) { scat.step(dt); scat.draw(); }
-    if (S.view === "room") roomR.draw(P, S.ppe, hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
+    if (S.view === "room") roomR.draw(P, S.ppe, NOPPE || hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
     ACT.tick(now / 1000, !document.hidden, (S.stage === "lab" || S.stage === "postlab") && !S.demo && !TEACHER, (HEAT && S.plateOn && !S.paused) || (SCAT && S.scat.firing));
     tickRoute(now);
     if (now - lastCtl > 250) { renderControls(); renderQuests(); renderTimer(now / 1000); lastCtl = now; }

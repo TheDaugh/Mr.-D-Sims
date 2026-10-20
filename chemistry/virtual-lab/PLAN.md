@@ -227,3 +227,9 @@ Every action appends one small JSON event. The log is the grading record, the te
 - Prelab swaps the free-text prediction for a 100-particle placement across five zones plus a one-sentence reason (no feedback). The CER (`renderCERScatter`) needs the stem "The plum-pudding model fails because", one ticked count, and a typed number that matches a count from the student's own runs.
 - Teacher: key view lists expected counts; `teacher.html` has a gold-foil roster (prediction, real-run counts, tries, challenge, rubric).
 - The guided lesson `unit-3-atoms-ions/rutherford-gold-foil.html` stays as a separate, shorter version.
+
+### Lab 3 update: real lab room and atom microscope
+- Room: `content/rooms/manchester-lab.json` (`lab.roomFile`, `lab.noPPE`): Manchester 1909, dark room behind a curtain, radon source, vacuum pump, foil apparatus table (station `foil_rig`), chalkboard, log book. `room.theme` recolors the renderer; new art keyed by tile id in `roomview.js`.
+- `src/engine/coulomb.js`: real Coulomb dynamics (d0 = 2Z·1.44 MeV·fm / E, tan(θ/2) = d0/2b); `test/coulomb.test.js` checks the integrator against Rutherford's formula.
+- `src/ui/atomscope.js`: PhET-style microscope: nuclear or atomic scale, nuclear atom or plum pudding, protons, neutrons, alpha energy, traces, force arrows (red on the alpha, blue on the nucleus), click to aim. Logs `scat_shot` events (quests: fire 5, aim a rebound).
+- Detector model now scales with element (Z² and atom density), foil thickness and 1/E². Free challenge: pick metal, thickness and energy, predict, fire. De Broglie wavelength (about 1 fm at 5 MeV) is shown so the particle picture is justified.

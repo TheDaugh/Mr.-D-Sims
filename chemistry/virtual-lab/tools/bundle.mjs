@@ -10,7 +10,7 @@ const rd = (p) => readFileSync(join(root, p), "utf8");
 const js = buildSync({ entryPoints: [join(root, "src/ui/app.js")], bundle: true, format: "iife", minify: true, write: false }).outputFiles[0].text;
 const content = {};
 for (const f of ["species", "reactions", "hazards", "config"]) content[`content/${f}.json`] = JSON.parse(rd(`content/${f}.json`));
-content["content/rooms/main-lab.json"] = JSON.parse(rd("content/rooms/main-lab.json"));
+for (const f of readdirSync(join(root, "content/rooms"))) if (f.endsWith(".json")) content[`content/rooms/${f}`] = JSON.parse(rd(`content/rooms/${f}`));
 for (const f of readdirSync(join(root, "content/labs"))) if (f.endsWith(".json")) content[`content/labs/${f}`] = JSON.parse(rd(`content/labs/${f}`));
 const safe = (s) => s.replace(/<\/(script)/gi, "<\\/$1");
 let html = rd("index.html");

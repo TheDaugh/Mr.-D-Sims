@@ -1,0 +1,33 @@
+{
+  "id": "manchester-lab",
+  "theme": { "wall": "#8a5a44", "wallBack": "#7a4d3a", "darkFloorA": "#4b4237", "darkFloorB": "#443c32", "floorA": "#c9b48e", "floorB": "#bfa97f", "bg": "#1d1a17", "dark": true },
+  "start": { "x": 4, "y": 10, "face": "u" },
+  "rows": [
+    "############",
+    "#Z.S..P..V.#",
+    "#..........#",
+    "#...XXX....#",
+    "#..........#",
+    "#..........#",
+    "#.G......M.#",
+    "####D#######",
+    "#N.T.......#",
+    "#..........#",
+    "#..........#",
+    "############"
+  ],
+  "legend": {
+    "#": { "type": "wall", "solid": true },
+    ".": { "type": "floor" },
+    "D": { "type": "door", "id": "door", "label": "DARK ROOM", "name": "Dark-room curtain", "text": "The heavy curtain to the dark room. Scintillations are faint, so the experiment is watched in the dark." },
+    "X": { "type": "station", "solid": true, "id": "foil_rig", "label": "FOIL APPARATUS", "name": "Foil apparatus", "text": "The scattering apparatus: radon source, lead slit, gold foil in a vacuum chamber, a zinc-sulfide screen and a microscope." },
+    "Z": { "type": "info", "solid": true, "id": "chalkboard", "label": "BOARD", "name": "Chalkboard", "text": "Chalkboard: 'Geiger and Marsden, 1909. Alpha particles from radon. Do any come back?' Underneath, in Rutherford's hand: 'Almost as incredible as if you fired a 15-inch shell at a piece of tissue paper and it came back and hit you.'" },
+    "S": { "type": "info", "solid": true, "id": "radon", "label": "RADON", "name": "Radon source in lead", "text": "A sealed glass tube of radon gas inside a lead block. Its decay products (radium C) throw out alpha particles at about 7.7 MeV. A narrow slit lets a thin beam out." },
+    "P": { "type": "info", "solid": true, "id": "pump", "label": "PUMP", "name": "Vacuum pump", "text": "The vacuum pump. Air would scatter and stop alpha particles, so the chamber is pumped empty." },
+    "V": { "type": "info", "solid": true, "id": "valves", "label": "GLASSWORK", "name": "Glassware and valves", "text": "Spare glass tubing, stopcocks and a jar of mercury for the pump. Everything is hand-made." },
+    "G": { "type": "info", "solid": true, "id": "gold_leaf", "label": "GOLD LEAF", "name": "Gold leaf", "text": "Gold beaten to leaf about 0.0004 mm thick: only a few thousand atoms. It is the thinnest metal sheet anyone can make." },
+    "M": { "type": "info", "solid": true, "id": "marsden_desk", "label": "LOG BOOK", "name": "Counting log book", "text": "The log book. Marsden counted flashes on the screen by eye, one at a time, for hours in the dark, and wrote each count here." },
+    "N": { "type": "info", "solid": true, "id": "notice", "label": "NOTICE", "name": "Notice board", "text": "Physical Laboratories, Victoria University of Manchester. 'Silence while counting.'" },
+    "T": { "type": "info", "solid": true, "id": "tea", "label": "TEA", "name": "Tea tray", "text": "Tea. The team started most days with it, and stopped counting only because their eyes gave out." }
+  }
+}
