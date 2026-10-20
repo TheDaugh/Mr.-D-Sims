@@ -219,3 +219,11 @@ Every action appends one small JSON event. The log is the grading record, the te
 - **Inventory keys**: 1-9 and 0 pick the carried item in that hotbar slot; slots show pictures and can be clicked.
 - **Heating challenge Z (iodine)**: `profile()` supports `sub` substances (solid, sublime plateau, gas; no liquid). `lab.fixed` pins Z to iodine; X and Y come from the other three. A Cold glass button over the hot plate collects crystals while Z sublimes (deposition) and logs a `deposit` event. CER has an optional Z note. Challenge needs both the plot and the deposit for the gold badge.
 - Lab 1 unchanged.
+
+## Lab 3: Rutherford's Gold Foil (`?lab=rutherford`)
+- `content/labs/03-rutherford-gold-foil.json`, `kind: "scatter"`. Same room, PPE gate, door, quests, stages, active-time gate, hand-in badge and record as the other labs. No jars or beakers; the bench station opens the foil apparatus (the Notebook dialog).
+- `src/engine/foil.js` is an ES copy of `chemistry/shared/foil-model.js` (the guided lesson's model); `test/scatter.test.js` checks the two agree.
+- `src/ui/scatter.js`: beam canvas, log-scale histogram, detector table, three data questions (checked against the student's own run, hints point at the table), match, nucleus rebuild, challenge (predict, then change foil thickness or target). State is `S.scat` (saved and restored).
+- Prelab swaps the free-text prediction for a 100-particle placement across five zones plus a one-sentence reason (no feedback). The CER (`renderCERScatter`) needs the stem "The plum-pudding model fails because", one ticked count, and a typed number that matches a count from the student's own runs.
+- Teacher: key view lists expected counts; `teacher.html` has a gold-foil roster (prediction, real-run counts, tries, challenge, rubric).
+- The guided lesson `unit-3-atoms-ions/rutherford-gold-foil.html` stays as a separate, shorter version.

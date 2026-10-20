@@ -22,6 +22,7 @@ const [species, reactions, lab, hazardData] = await Promise.all(["content/specie
   $("#boot").textContent = "This page has to be opened from the web (GitHub Pages) or a local server. " + e.message; throw e;
 });
 const lab2 = await J("content/labs/02-heating-curves.json").catch(() => null);
+const lab3 = await J("content/labs/03-rutherford-gold-foil.json").catch(() => null);
 const world = buildWorld(species, reactions), H = Object.fromEntries(hazardData.hazards.map((x) => [x.id, x]));
 const truth = {}; for (const s of species.species) if (s.phase === "s") truth[s.id] = fingerprint(world, species.electrolytes, s.id, lab.standard);
 $("#boot").hidden = true; $("#app").hidden = false;
@@ -43,8 +44,9 @@ function summarize(e) {
     default: return e.type + (e.id ? " " + e.id : "") + (e.outcome ? " " + e.outcome : "");
   }
 }
-let heat = [];
+let heat = [], foil = [];
 function addRecord(rec, file) {
+  if (lab3 && rec.lab === lab3.id && rec.scat) { const x = { rec, file, scores: {} }; try { x.scores = JSON.parse(localStorage.getItem(`vlab-rubric:${lab3.id}:${rec.student}:${rec.started}`)) || {}; } catch (e) {} foil.push(x); return null; }
   if (lab2 && rec.lab === lab2.id && rec.samples) { const x = { rec, file, scores: {} }; try { x.scores = JSON.parse(localStorage.getItem(hkey(x))) || {}; } catch (e) {} heat.push(x); return null; }
   if (rec.cont) return `${file}: that is a save file, not a turned-in record.`;
   if (!rec.events || !rec.unknowns || rec.lab !== lab.id) return `${file}: not a record from this lab.`;
@@ -59,6 +61,24 @@ const cerTotal = (x) => rubric.reduce((a, c) => a + (+x.scores[c.key] || 0), 0);
 const hkey = (x) => `vlab-rubric:${lab2.id}:${x.rec.student}:${x.rec.started}`;
 const hTotal = (x) => lab2.postlab.rubric.reduce((a, c) => a + (+x.scores[c.key] || 0), 0);
 function hStats(x, k) { const m = x.rec.samples[k]; if (!m) return null; const sub = lab2.substances.find((q) => q.id === m.substance); return { sub, m, ...checkData(sub, sub.mass, sub.power, m.rows, 3) }; }
+function renderFoil() {
+  $("#foilCard").hidden = !foil.length; if (!foil.length) { $("#foilRoster").replaceChildren(); $("#foilDetail").replaceChildren(); return; }
+  foil.sort((a, b) => a.rec.student.localeCompare(b.rec.student));
+  const z = lab3.prelab.placement.zones, tot = (x) => lab3.postlab.rubric.reduce((a, c) => a + (+x.scores[c.key] || 0), 0);
+  $("#foilRoster").replaceChildren(h("thead", {}, h("tr", {}, ["Student", "Submitted", "Pre-lab", "Prediction (A/B/C/D/E of 100)", "Real run: straight / deflected / rebound", "Data tries", "Match tries", "Challenge", "Active time", "Rubric /" + lab3.postlab.rubric.length * 3, ""].map((t) => h("th", {}, t)))),
+    h("tbody", {}, foil.map((x) => { const r = x.rec, s = r.scat, rr = s.runs.real, pl = r.prelab.placement || {};
+      return h("tr", {}, h("td", {}, r.student), h("td", {}, r.submitted ? "yes" : "no"), h("td", {}, `${r.prelab.correct}/${r.prelab.total}`), h("td", {}, z.map((q) => pl[q.id] ?? 0).join(" / ")),
+        h("td", {}, rr ? `${rr.n}: ${rr.straight} / ${rr.deflected} / ${rr.rebound}` : "—"), h("td", {}, lab3.data.map((q) => (s.answers[q.id] || {}).tries ?? "—").join(" / ")), h("td", {}, lab3.match.rows.map((q) => (s.match[q.id] || {}).tries ?? "—").join(" / ")),
+        h("td", {}, s.challenge && s.challenge.result ? `${s.challenge.key}: predicted ${s.challenge.pred}, got ${s.challenge.result.actual}` : "—"), h("td", {}, activeTag(r)), h("td", {}, String(tot(x))), h("td", {}, h("button", { onclick: () => foilDetail(x) }, "Open"))); })));
+}
+function foilDetail(x) {
+  const r = x.rec, cer = r.cer || {}, z = lab3.prelab.placement.zones, pl = r.prelab.placement || {};
+  $("#foilDetail").replaceChildren(h("h3", {}, `${r.student}: gold foil`),
+    h("p", {}, h("b", {}, "Prediction: "), z.map((q) => `${q.label} ${pl[q.id] ?? 0}`).join("; ")), h("p", {}, h("b", {}, "Reason: "), r.prelab.prediction || "(none)"),
+    h("p", {}, h("b", {}, "Claim: "), cer.claim || "(not submitted)"), h("p", {}, h("b", {}, "Evidence:")), h("ul", {}, (cer.evidence || []).map((e) => h("li", {}, e)), cer.note ? h("li", {}, cer.note) : null),
+    h("p", {}, h("b", {}, "Reasoning: "), cer.reasoning || ""), h("p", { class: "hint" }, cer.cites ? "The text quotes a count from the student's own runs." : "No count from the student's runs found in the text."),
+    h("div", { class: "controls" }, lab3.postlab.rubric.map((c) => h("label", { title: c.levels.join("\n") }, c.name + " ", h("select", { onchange: (e) => { x.scores[c.key] = +e.target.value; try { localStorage.setItem(`vlab-rubric:${lab3.id}:${r.student}:${r.started}`, JSON.stringify(x.scores)); } catch (er) {} renderFoil(); } }, [0, 1, 2, 3].map((n) => h("option", { value: n, selected: (x.scores[c.key] || 0) === n ? "" : null }, `${n}: ${c.levels[n]}`)))))));
+}
 function renderHeat() {
   $("#heatCard").hidden = !heat.length; heat.sort((a, b) => a.rec.student.localeCompare(b.rec.student));
   const ref = (id) => (lab2.reference.find((r) => r.id === id) || {}).name || "—";
@@ -120,14 +140,14 @@ async function load(files) {
   const msgs = [];
   for (const f of files) { try { const m = addRecord(JSON.parse(await f.text()), f.name); if (m) msgs.push(m); } catch (e) { msgs.push(`${f.name}: could not be read.`); } }
   $("#msg").textContent = msgs.join(" ");
-  render(); renderHeat();
+  render(); renderHeat(); renderFoil();
 }
 $("#files").addEventListener("change", (e) => load([...e.target.files]));
 const drop = $("#drop");
 drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
 drop.addEventListener("dragleave", () => drop.classList.remove("over"));
 drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); load([...e.dataTransfer.files]); });
-$("#clear").addEventListener("click", () => { rows = []; heat = []; $("#heatDetail").replaceChildren(); renderHeat(); $("#detail").replaceChildren(); render(); });
+$("#clear").addEventListener("click", () => { rows = []; heat = []; foil = []; renderFoil(); $("#heatDetail").replaceChildren(); renderHeat(); $("#detail").replaceChildren(); render(); });
 $("#csv").addEventListener("click", () => {
   const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
   const lines = [["student", "mode", "identified", "wrong_cells", "goggles_before_chemicals", "apron_before_chemicals", "incidents", "prelab_correct", "prelab_total", "cer_claim", "cer_evidence", "cer_reasoning", "rubric_claim", "rubric_evidence", "rubric_reasoning", "safety_points", "seconds"].join(",")];
@@ -138,4 +158,4 @@ $("#portal").addEventListener("click", () => {
   const records = rows.map(({ r }) => window.PortalAdapters.vlabRecord(r, ""));
   const a = h("a", { href: URL.createObjectURL(new Blob([window.PortalAdapters.bundle(records)], { type: "application/json" })), download: "virtual-lab-scores.json" }); document.body.append(a); a.click(); a.remove();
 });
-window.__teacher = { load, rows: () => rows, heat: () => heat };
+window.__teacher = { load, rows: () => rows, heat: () => heat, foil: () => foil };

@@ -7,6 +7,9 @@ const STATE = {
   challenge: (s, q) => (s.challengeFilled || 0) >= (q.count || 1),
   submitted: (s) => !!s.submitted,
   cer_done: (s) => !!s.cerDone,
+  scat_tally: (s) => !!(s.scat && s.scat.tally),
+  scat_match: (s) => !!(s.scat && s.scat.match),
+  scat_challenge: (s) => !!(s.scat && s.scat.challenge),
   heat_rows: (s, q) => ((s.heat || {}).rows || {})[q.sample] >= q.count,
   heat_plot: (s, q) => ((s.heat || {}).plot || {})[q.sample] >= q.count,
   heat_lines: (s, q) => ((s.heat || {}).lines || {})[q.sample] >= q.count

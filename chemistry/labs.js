@@ -67,6 +67,14 @@ window.UNITS = [
         blurb: "Predict where alpha particles will land, fire them at a gold foil, count the angles, and rewrite the plum-pudding atom with your own numbers.",
         tags: ["Rutherford", "nuclear atom", "claim-evidence-reasoning"],
         teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/rutherford-gold-foil.html#key" }]
+      },
+      {
+        title: "Virtual Lab: Rutherford's Gold Foil (BETA)",
+        type: "lab",
+        icon: "🥽",
+        href: "virtual-lab/index.html?lab=rutherford",
+        blurb: "Suit up, walk to the bench, and fire alpha particles at the plum-pudding atom and at real gold foil. Tally the counts by angle, match each result to what it showed, rebuild the atom with a nucleus, and write a CER that cites your own numbers.",
+        tags: ["beta", "Rutherford", "nuclear atom", "CER"]
       }
     ]
   }
