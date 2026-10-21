@@ -7,7 +7,9 @@ window.UNITS = [
     blurb: "Guided online lessons: predict, investigate with a job, name the rule, then try questions that adjust to each student. Students build their own printable notes as they work.",
     entries: [
       { type: "lesson", icon: "🧊", title: "Newton’s First Law", href: "lessons/newtons-first-law.html", blurb: "Six surfaces, a mass test, a cruising task and a force-balancing task, with four hidden difficulty levels from middle school to first-year college. Practice keeps going until the end of class.", tags: ["Newton’s First Law", "guided lesson", "adaptive"],
-        teacher: [{ label: "Teacher key (#key)", href: "lessons/newtons-first-law.html#key" }, { label: "Teacher page", href: "lessons/teacher.html" }] }
+        teacher: [{ label: "Teacher key (#key)", href: "lessons/newtons-first-law.html#key" }, { label: "Teacher page", href: "lessons/teacher.html" }] },
+      { type: "lesson", icon: "🛒", title: "Newton’s Second Law", href: "lessons/newtons-second-law.html", blurb: "A fan cart on a track: push harder, load it up, fight friction, hang a mass over a pulley. Four hidden difficulty levels, notes that build as students work, and practice that continues until the end of class.", tags: ["Newton’s Second Law", "guided lesson", "adaptive"],
+        teacher: [{ label: "Teacher key (#key)", href: "lessons/newtons-second-law.html#key" }, { label: "Teacher page", href: "lessons/teacher.html" }] }
     ]
   },
   {

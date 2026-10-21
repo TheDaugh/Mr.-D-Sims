@@ -23,6 +23,27 @@
       "needsReview": true,
       "practice": { "gens": ["physics:S4", "physics:S5"], "lesson": { "label": "Newton's First Law lesson", "href": "../physics/lessons/newtons-first-law.html" } }
     },
+    "PHYS-N2-A": {
+      "course": "physics", "title": "Net force and acceleration: a = F/m",
+      "can": "I can use a = F/m to find acceleration, force or mass, and say how each change affects the others.",
+      "codes": [{ "framework": "NGSS", "code": "HS-PS2-1", "title": "Analyze data to support the claim that Newton's second law of motion describes the mathematical relationship among the net force on a macroscopic object, its mass, and its acceleration.", "note": "Direct match for the second-law lesson; confirm against your district's documents." }],
+      "needsReview": true,
+      "practice": { "gens": ["physics:N2-calc", "physics:N2-solve"], "lesson": { "label": "Newton's Second Law lesson", "href": "../physics/lessons/newtons-second-law.html" } }
+    },
+    "PHYS-N2-B": {
+      "course": "physics", "title": "Weight, falling and hanging masses",
+      "can": "I can find weight from mass, and find the acceleration of falling or connected objects.",
+      "codes": [{ "framework": "NGSS", "code": "HS-PS2-1", "title": "Analyze data to support the claim that Newton's second law of motion describes the mathematical relationship among the net force on a macroscopic object, its mass, and its acceleration.", "note": "Direct match for the second-law lesson; confirm against your district's documents." }],
+      "needsReview": true,
+      "practice": { "gens": ["physics:N2-weight", "physics:N2-fall"], "lesson": { "label": "Newton's Second Law lesson", "href": "../physics/lessons/newtons-second-law.html" } }
+    },
+    "PHYS-N2-C": {
+      "course": "physics", "title": "Motion with a net force, friction included",
+      "can": "I can find the net force when friction acts and link it to how an object moves.",
+      "codes": [{ "framework": "NGSS", "code": "HS-PS2-1", "title": "Analyze data to support the claim that Newton's second law of motion describes the mathematical relationship among the net force on a macroscopic object, its mass, and its acceleration.", "note": "Direct match for the second-law lesson; confirm against your district's documents." }],
+      "needsReview": true,
+      "practice": { "gens": ["physics:N2-motion", "physics:N2-friction"], "lesson": { "label": "Newton's Second Law lesson", "href": "../physics/lessons/newtons-second-law.html" } }
+    },
     "CHEM-ATOM-1": {
       "course": "chem", "title": "Atoms as an evidence-based model",
       "can": "I can tell what is argument and what is evidence, from Democritus to Dalton, and what a solid-ball atom cannot explain.",
@@ -86,6 +107,17 @@
     "physics/newtons-first-law/predict-3": "PHYS-N1-A",
     "physics/newtons-first-law/check-c1": "PHYS-N1-A",
     "physics/newtons-first-law/check-c2": "PHYS-N1-B",
+    "physics/newtons-second-law/N2-calc": "PHYS-N2-A",
+    "physics/newtons-second-law/N2-solve": "PHYS-N2-A",
+    "physics/newtons-second-law/N2-weight": "PHYS-N2-B",
+    "physics/newtons-second-law/N2-motion": "PHYS-N2-C",
+    "physics/newtons-second-law/N2-friction": "PHYS-N2-C",
+    "physics/newtons-second-law/N2-fall": "PHYS-N2-B",
+    "physics/newtons-second-law/predict-1": "PHYS-N2-A",
+    "physics/newtons-second-law/predict-2": "PHYS-N2-A",
+    "physics/newtons-second-law/predict-3": "PHYS-N2-A",
+    "physics/newtons-second-law/check-c1": "PHYS-N2-C",
+    "physics/newtons-second-law/check-c2": "PHYS-N2-A",
     "chem/chem.atom-idea": "CHEM-ATOM-1",
     "chem/chem.dalton-model": "CHEM-ATOM-1",
     "chem/chem.model-limits": "CHEM-ATOM-1",

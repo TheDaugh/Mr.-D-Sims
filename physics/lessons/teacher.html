@@ -19,7 +19,7 @@
   <section class="card" id="codes"><h2>Today’s codes</h2><div id="codeHost"></div></section>
 
   <section class="card"><h2>Check a stamp</h2>
-    <p class="hint">A student shows a stamp like NFL-1234 at the end. Type their first name and period to see what it should be today.</p>
+    <p class="hint">A student shows a stamp like NFL-1234 or N2L-1234 at the end. Type their first name and period to see what it should be today.</p>
     <div class="row"><label>First name <input id="sn" type="text"></label> <label>Period <input id="sp" type="text" style="width:5em"></label> <button class="btn" id="sgo" type="button">Show stamp</button> <b class="stamp" id="sout" style="font-size:1.1rem" hidden></b></div>
   </section>
 
@@ -46,12 +46,17 @@
 <script src="../../portal/adapters.js"></script>
 <script src="engine/lesson.js"></script>
 <script src="engine/ice-sim.js"></script>
+<script src="engine/cart-sim.js"></script>
 <script src="content/nfl-items.js"></script>
 <script src="content/nfl-invest.js"></script>
+<script src="content/n2l-items.js"></script>
+<script src="content/n2l-invest.js"></script>
 <script src="content/newtons-first-law.js"></script>
+<script src="content/newtons-second-law.js"></script>
 <script>
 (function () {
-  var LE = window.LE, NFL = window.NFL, el = LE.el, ID = 'newtons-first-law', REG = window.LESSONS_REG;
+  var LE = window.LE, NFL = window.NFL, N2L = window.N2L, el = LE.el, REG = window.LESSONS_REG;
+  var LIBS = { 'newtons-first-law': { lib: NFL, preds: ['P1 puck on ice', 'P2 frictionless graph', 'P3 steady push'] }, 'newtons-second-law': { lib: N2L, preds: ['P1 steady push, v–t graph', 'P2 double the force', 'P3 double the mass'] } };
   function plain(h) { var d = document.createElement('div'); d.innerHTML = String(h == null ? '' : h); return d.textContent.replace(/\s+/g, ' ').trim(); }
   /* codes */
   var host = document.getElementById('codeHost');
@@ -65,23 +70,24 @@
   var ov = el('div', 'cell'); ov.innerHTML = '<b>Unlock any locked student</b><br><span class="codebig">' + MrD.codes.override() + '</span><br><span class="hint">One code for every lesson and every student, until 7:00 AM tomorrow. Physics lessons only lock if you turn locked mode on for them.</span>'; host.appendChild(ov);
   host.appendChild(el('p', 'hint', 'Codes are readable from 7:00 AM and change at 7:00 AM each school day (' + MrD.bell.dayKey() + '). Students are asked for a huddle code only on weekdays 7:00 AM to 3:00 PM. After 3:00 PM, or at home, no code is asked.'));
   /* stamp */
-  document.getElementById('sgo').onclick = function () { var o = document.getElementById('sout'); o.hidden = false; o.textContent = NFL.stamp({ first: document.getElementById('sn').value, period: document.getElementById('sp').value }); };
+  document.getElementById('sgo').onclick = function () { var o = document.getElementById('sout'); o.hidden = false; var who = { first: document.getElementById('sn').value, period: document.getElementById('sp').value }; o.textContent = 'First Law ' + NFL.stamp(who) + '   ·   Second Law ' + N2L.stamp(who); };
   /* report reader */
   var STEPS = ['start', 'warmup', 'predict', 'investigate', 'huddle', 'name', 'try', 'check', 'notes'];
   document.getElementById('rgo').onclick = function () {
     var out = document.getElementById('repOut'); out.textContent = '';
     var lines = document.getElementById('rep').value.split(/\n+/).map(function (s) { return s.trim(); }).filter(Boolean);
     if (!lines.length) return;
-    var rows = [], bad = [], records = [], predCounts = [[0, 0], [0, 0], [0, 0]], certWrong = [0, 0, 0], tot = 0;
+    var rows = [], bad = [], records = [], snap = {};
     lines.forEach(function (ln) {
-      var r = LE.decodeReport(ID, ln); if (!r || !r.ok || r.fields.length < 13) { bad.push(ln.slice(0, 40)); return; }
-      var rec = PortalAdapters.physicsReport(ln, LE, NFL); if (rec) records.push(rec);
+      var hit = PortalAdapters.physicsLesson(ln, LE, NFL, N2L); if (!hit) { bad.push(ln.slice(0, 40)); return; }
+      var r = hit.r, lid = hit.def.id, sn = snap[lid] || (snap[lid] = { n: 0, pc: [[0, 0], [0, 0], [0, 0]], cw: [0, 0, 0] });
+      var rec = PortalAdapters.physicsReport(ln, LE, NFL, N2L); if (rec) records.push(rec);
       var f = r.fields, preds = f[7].split(''), conf = f[8].split('-'), chk = f[9].split('-'), secs = f[10].split('-').map(Number), total = secs.reduce(function (a, b) { return a + b; }, 0);
-      preds.forEach(function (p, i) { var ok = p === 'A'; predCounts[i][ok ? 0 : 1]++; if (!ok && conf[i] === '3') certWrong[i]++; });
-      tot++;
+      preds.forEach(function (p, i) { var ok = p === 'A'; sn.pc[i][ok ? 0 : 1]++; if (!ok && conf[i] === '3') sn.cw[i]++; });
+      sn.n++;
       var pr = preds.map(function (p, i) { return (p === 'A' ? '✓' : '✗') + (conf[i] || ''); }).join(' ');
       var rub = (chk[2] || '').split('').join('');
-      rows.push([f[1], f[2], f[3], f[4].split('-').join(' → '), f[5].split('-').join(' '), f[6], pr, (chk[0] === '1' ? '✓' : '✗') + ' ' + (chk[1] === '1' ? '✓' : '✗') + ' ' + rub, (Math.round(secs[3] / 6) / 10) + ' min', (Math.round(total / 6) / 10) + ' min', f[13] ? f[13] + ' of 9' + (f[14] === 't' ? ' (ended at the mark)' : '') : '', f[15] ? f[15].split('-')[1] + ' of ' + f[15].split('-')[0] + ' clean' : '', f[12]]);
+      rows.push([hit.def.id === 'newtons-second-law' ? '2nd · ' + f[1] : '1st · ' + f[1], f[2], f[3], f[4].split('-').join(' → '), f[5].split('-').join(' '), f[6], pr, (chk[0] === '1' ? '✓' : '✗') + ' ' + (chk[1] === '1' ? '✓' : '✗') + ' ' + rub, (Math.round(secs[3] / 6) / 10) + ' min', (Math.round(total / 6) / 10) + ' min', f[13] ? f[13] + ' of 9' + (f[14] === 't' ? ' (ended at the mark)' : '') : '', f[15] ? f[15].split('-')[1] + ' of ' + f[15].split('-')[0] + ' clean' : '', f[12]]);
     });
     if (bad.length) out.appendChild(el('p', 'msg bad', bad.length + ' code(s) could not be read (typo or cut off): ' + bad.join(' | ')));
     if (!rows.length) return;
@@ -89,12 +95,17 @@
     var tb = el('tbody'); rows.forEach(function (r) { var tr = el('tr'); r.forEach(function (v) { tr.appendChild(el('td', null, v)); }); tb.appendChild(tr); }); t.appendChild(tb); var sc = el('div', 'scroll'); sc.appendChild(t); out.appendChild(sc);
     var ex = el('button', 'btn', 'Download these scores for the review portal (JSON)'); ex.type = 'button'; ex.onclick = function () { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([PortalAdapters.bundle(records)], { type: 'application/json' })); a.download = 'physics-scores.json'; document.body.appendChild(a); a.click(); a.remove(); }; out.appendChild(el('div', 'row')).appendChild(ex);
     out.appendChild(el('p', 'hint', 'The report code carries predictions, the final check and one result per skill. Students\u2019 own devices keep a fuller record (every practice question by skill); ask them to save it from the review portal if you want that detail.'));
-    out.appendChild(el('h3', null, 'Class snapshot (' + tot + ' students)'));
-    var ul = el('ul'); ['P1 puck on ice', 'P2 frictionless graph', 'P3 steady push'].forEach(function (n, i) { ul.appendChild(el('li', null, n + ': ' + predCounts[i][0] + ' right, ' + predCounts[i][1] + ' wrong; Certain and wrong: ' + certWrong[i])); }); out.appendChild(ul);
+    Object.keys(snap).forEach(function (lid) {
+      var sn = snap[lid]; out.appendChild(el('h3', null, 'Class snapshot: ' + REG[lid].title + ' (' + sn.n + ' students)'));
+      var ul = el('ul'); LIBS[lid].preds.forEach(function (n, i) { ul.appendChild(el('li', null, n + ': ' + sn.pc[i][0] + ' right, ' + sn.pc[i][1] + ' wrong; Certain and wrong: ' + sn.cw[i])); }); out.appendChild(ul);
+    });
   };
-  /* answer key */
   var kh = document.getElementById('keyHost');
   function sect(t) { kh.appendChild(el('h3', null, t)); }
+  function optp(o) { return plain(typeof o === 'string' ? o : (o.label || o.html || '')); }
+  /* answer key: First Law */
+  function keyNFL() {
+  kh.appendChild(el('h2', null, 'Newton’s First Law'));
   sect('Warm-up'); NFL.warm.forEach(function (q) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + q.prompt + '</p><p class="good"><b>' + q.options[q.answer] + '</b></p>'; kh.appendChild(d); });
   sect('Predictions'); NFL.preds.forEach(function (P) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + P.title + '</p><p class="good"><b>' + (typeof P.options[P.correct] === 'string' ? P.options[P.correct] : P.options[P.correct].label + ' (flat line)') + '</b></p>'; kh.appendChild(d); });
   sect('Investigate: formulas');
@@ -109,6 +120,25 @@
   });
   sect('Check'); [NFL.check.c1, NFL.check.c2].forEach(function (q) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + q.prompt + '</p><p class="good"><b>Answer: ' + plain(typeof q.options[q.answer] === 'string' ? q.options[q.answer] : q.options[q.answer].label) + '</b></p><p class="hint">' + q.worked + '</p>'; kh.appendChild(d); });
   var c3 = el('div', 'keyitem'); c3.innerHTML = '<p>' + NFL.check.c3.prompt + '</p><p class="good"><b>Looks for:</b> friction named, an unbalanced external (net) force, and a clear statement that the first law is not violated.</p>'; kh.appendChild(c3);
+  }
+  function keyN2L() {
+    kh.appendChild(el('h2', null, 'Newton’s Second Law'));
+    sect('Warm-up'); N2L.warm.forEach(function (q) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + q.prompt + '</p><p class="good"><b>' + optp(q.options[q.answer]) + '</b></p>'; kh.appendChild(d); });
+    sect('Predictions'); N2L.preds.forEach(function (P) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + P.title + '</p><p class="good"><b>' + optp(P.options[P.correct]) + '</b></p>'; kh.appendChild(d); });
+    sect('Investigate: formulas');
+    var inv = el('div', 'keyitem'); inv.innerHTML = '<p><b>Part A.</b> a = F/m, so the a–F graph is a line through the origin with slope 1/m. F ÷ a gives the mass. A newton is the force that gives 1 kg an acceleration of 1 m/s².</p><p><b>Part B.</b> At fixed F, a = F/m; m × a is constant and equals F. a against 1/m is a line with slope F.</p><p><b>Part C.</b> Fan force needed F = μmg + ma. Passing: |a − target| ≤ 0.04 m/s².</p><p><b>Part D.</b> a = m<sub>h</sub>g/(M + m<sub>h</sub>); tension T = m<sub>h</sub>(g − a). The acceleration is always less than g because the cart is dragged along too.</p>'; kh.appendChild(inv);
+    sect('Try it: sample numbers by band');
+    [1, 2, 3, 4].forEach(function (b) {
+      kh.appendChild(el('h3', null, 'Band ' + b + ' · ' + ['foundation', 'core', 'honors', 'advanced'][b - 1]));
+      N2L.skills.forEach(function (sk) {
+        var q = sk.gen(b, LE.rng('KEY:' + sk.id + ':' + b)), ans = q.type === 'choice' ? optp(q.options[q.answer]) : LE.fmt(q.answer, 3) + (q.unit ? ' ' + q.unit : '');
+        var d = el('div', 'keyitem'); d.innerHTML = '<p><span class="pill">' + sk.title + '</span> ' + q.prompt + '</p><p class="good"><b>Answer: ' + ans + '</b></p><p class="hint">' + q.worked + '</p>'; kh.appendChild(d);
+      });
+    });
+    sect('Check'); [N2L.check.c1, N2L.check.c2].forEach(function (q) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + q.prompt + '</p><p class="good"><b>Answer: ' + optp(q.options[q.answer]) + '</b></p><p class="hint">' + q.worked + '</p>'; kh.appendChild(d); });
+    var c3 = el('div', 'keyitem'); c3.innerHTML = '<p>' + N2L.check.c3.prompt + '</p><p class="good"><b>Looks for:</b> ' + N2L.teacherInfo.c3Note + '</p>'; kh.appendChild(c3);
+  }
+  keyNFL(); keyN2L();
 })();
 </script>
 </body>

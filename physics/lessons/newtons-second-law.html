@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Newton’s Second Law · Mr. D</title>
+<meta name="description" content="Newton’s Second Law. Online lesson with a cart track and questions that adjust to each student.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="engine/lesson.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <a class="back" href="../index.html">&larr; Physics</a>
+      <h1 id="title">Newton’s Second Law</h1>
+      <p class="sub" id="subtitle"></p>
+    </div>
+    <div class="row"><button id="btn-notes" class="btn" type="button" title="A study sheet the page writes from your own work. Print it or save it as a PDF.">My notes (print or PDF)</button></div>
+  </div>
+  <div id="keybar" hidden></div>
+  <div id="endbar" hidden role="status" aria-live="polite"></div>
+  <nav id="steps" aria-label="Lesson steps"></nav>
+  <div id="stage"></div>
+  <div id="notes-print-root" hidden></div>
+  <footer>Mr. D’s physics · progress saves in this browser · g = 9.8 m/s²</footer>
+</div>
+<script src="../../shared/config.js"></script>
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
+<script src="../../shared/teacherbar.js"></script>
+<script src="../../shared/live.js"></script>
+<script src="../../shared/profile.js"></script>
+<script src="engine/lesson.js"></script>
+<script src="engine/cart-sim.js"></script>
+<script src="content/n2l-items.js"></script>
+<script src="content/n2l-invest.js"></script>
+<script src="content/newtons-second-law.js"></script>
+<script>LE.start(window.LESSONS_REG['newtons-second-law']);</script>
+</body>
+</html>
