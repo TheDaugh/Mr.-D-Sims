@@ -1,6 +1,6 @@
 /* Every template spec must be valid data: pacing passes, generators return gradeable items at every band, bands get harder. */
 const test = require('node:test'), assert = require('node:assert'), fs = require('fs'), path = require('path');
-const pace = require('../../shared/pace.js');
+const pace = require('../../shared/pace.js'); require('../../calculus/shared/mathcheck.js'); const MC = globalThis.MC;
 const root = path.resolve(__dirname, '../..');
 const specs = fs.readdirSync(path.join(root, 'templates')).filter(d => fs.existsSync(path.join(root, 'templates', d, 'spec.js')))
   .map(d => ({ d, spec: require(path.join(root, 'templates', d, 'spec.js')) }));
@@ -11,8 +11,10 @@ for (const { d, spec } of specs) {
   test(d + ': every generator gives a checkable item at every band, many seeds', () => {
     for (const sk of spec.skills || []) for (let b = 1; b <= 4; b++) for (let s = 0; s < 40; s++) {
       const q = sk.gen(b, rng(s * 7 + b)); const where = `${sk.id} band ${b} seed ${s}`;
-      assert.ok(q.prompt && typeof q.answer === 'number' && isFinite(q.answer), where);
-      assert.ok(q.worked && q.hint, where);
+      assert.ok(q.prompt, where);
+      if (q.type === 'expr') { assert.strictEqual(typeof q.answer, 'string', where); assert.doesNotThrow(() => MC.parse(q.answer, q.vars || ['x']), where + ' answer ' + q.answer); assert.ok(q.hints && q.hints.length, where); }
+      else { assert.ok(typeof q.answer === 'number' && isFinite(q.answer), where); assert.ok(q.hint, where); }
+      assert.ok(q.worked, where);
     }
   });
   test(d + ': predictions have one correct option in range', () => (spec.predicts || []).forEach(p => { assert.ok(p.answer >= 0 && p.answer < p.options.length); assert.ok(p.why); }));

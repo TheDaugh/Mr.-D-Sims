@@ -1,0 +1,60 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small The Power Rule (template)}\fancyhead[R]{\small Teacher key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{The Power Rule (template) --- teacher key}
+\textbf{Question:} How fast does x? change, for any n?\par
+\subsection*{Outline and pacing (42 min)}\begin{tabular}{@{}llll@{}}\toprule Tab & Priority & Minutes & If behind\\\midrule
+start & 1 & 2 & never trimmed\\
+warmup & 1 & 4 & never trimmed\\
+predict & 1 & 4 & never trimmed\\
+explore & 3 & 8 & skipped first\\
+build & 2 & 8 & shrinks to 2 of 4\\
+practice & 1 & 8 & never trimmed\\
+check & 1 & 4 & never trimmed\\
+Huddle h1 & clock & minute 18 & pulled in by the clock\\
+\bottomrule\end{tabular}
+\subsection*{Targets}\begin{itemize}\item I can state the power rule in words.
+\item I can differentiate a polynomial term by term.
+\item I can find the slope at a point.\end{itemize}
+\subsection*{Predictions}\begin{itemize}
+\item The derivative of $x^2$ is $2x$. What do you expect for $x^3$? \A{$3x^2$.} Bring the 3 down and lower the power: $3x^2$.
+\item What is the slope of the flat line $y=7$? \A{0.} A flat line does not rise: the derivative is 0.
+\end{itemize}
+\section*{Huddle script (answers in green)}
+\subsection*{Definitions}\begin{itemize}
+\item \textbf{Derivative:} The \A{slope} of the tangent line at a point.
+\item \textbf{Power rule:} Bring the \A{power} down, then \A{subtract 1} from it.
+\end{itemize}
+\subsection*{Worked example}
+Differentiate f(x) = 4x\textsuperscript{3}.\\
+\begin{itemize}
+\item Bring down the power: 3 $\cdot$ 4x
+\item Lower the power by 1: 12x\A{2}
+\item So f?(x) = \A{12x\textsuperscript{2}}
+\end{itemize}
+\subsection*{Label the slope}
+\begin{enumerate}
+\item The \A{point} where we measure the slope.
+\item The \A{tangent line}; its slope is f?.
+\end{enumerate}
+\section*{Every level, with answers}
+\subsection*{Differentiate}
+\noindent\textbf{Level 1.} Differentiate.\\ \A{Answer: $4 x^{3}$} \quad Bring down 4 and lower the power: $4x^{3}$.\par\medskip
+\noindent\textbf{Level 2.} Differentiate.\\ \A{Answer: $12 x^{1}$} \quad Multiply 6 by 2 to get 12, then lower the power: $12x^{1}$.\par\medskip
+\noindent\textbf{Level 3.} Differentiate term by term.\\ \A{Answer: $10 x^{4} + 5$} \quad $10x^{4}+5+0$. The constant 1 disappears.\par\medskip
+\noindent\textbf{Level 4.} Differentiate. Rewrite the root as a power if that helps.\\ \A{Answer: $\frac{6}{2 \sqrt{x}}$} \quad $6x^{1/2}$ becomes $\tfrac{6}{2}x^{-1/2}=\dfrac{6}{2\sqrt{x}}$.\par\medskip
+\subsection*{Slope at a point}
+\noindent\textbf{Level 1.} Let $f(x)=x^{2}$. Find the slope of the curve at $x=2$.\\ \A{Answer: 4} \quad $f'(x)=2x^{1}$, so $f'(2)=4$.\par\medskip
+\noindent\textbf{Level 2.} Let $f(x)=4x^{2}$. Find the slope of the curve at $x=3$.\\ \A{Answer: 24} \quad $f'(x)=8x^{1}$, so $f'(3)=24$.\par\medskip
+\noindent\textbf{Level 3.} Let $f(x)=2x^{4}$. Find the slope of the curve at $x=3$.\\ \A{Answer: 216} \quad $f'(x)=8x^{3}$, so $f'(3)=216$.\par\medskip
+\noindent\textbf{Level 4.} Let $f(x)=4x^{4}$. Find the slope of the curve at $x=1$.\\ \A{Answer: 16} \quad $f'(x)=16x^{3}$, so $f'(1)=16$.\par\medskip
+\section*{Common misconceptions}\begin{tabularx}{\textwidth}{@{}X X@{}}\toprule Students say & Say instead\\\midrule
+Differentiate x\textsuperscript{3} and get 3x\textsuperscript{3}. & The power drops by 1 as well as coming down.\\
+The derivative of 7 is 7. & A constant does not change, so its slope is 0.\\
+Differentiate 5x\textsuperscript{2} and get 5$\cdot$2x$\cdot$... & Multiply the 5 by the power once: 10x.\\
+\bottomrule\end{tabularx}
+\end{document}

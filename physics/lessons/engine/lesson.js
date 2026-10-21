@@ -170,7 +170,7 @@
   function optHtml(o) { return typeof o === 'string' ? o : (o.svg ? o.svg + (o.label ? '<span>' + o.label + '</span>' : '') : o.html); }
   function finish(q, st, box, solved) {
     st.done = true; st.ok = !!solved; st.secs = st.secs || Math.round((Date.now() - st.t0) / 1000);
-    if (q.worked) {
+    if (q.worked && q.type !== 'expr') {
       var w = box.querySelector('.worked'); if (!w) { w = el('p', 'msg ' + (solved ? 'ok' : '')); w.className += ' worked'; box.appendChild(w); }
       html(w, (q.type === 'text' ? '' : (solved ? 'Correct. ' : 'Here is the reasoning. ')) + q.worked);
     }
@@ -186,13 +186,27 @@
     LE.debug.qs[q.id] = q;
     var box = el('div', 'q'); box.dataset.qid = q.id; parent.appendChild(box);
     if (q.head) box.appendChild(el('p', 'qhead', q.head));
-    if (q.prompt) { var qt = el('p', 'qtext'); html(qt, q.prompt); box.appendChild(qt); }
+    if (q.prompt) { var qt = el('p', 'qtext'); html(qt, (window.QKIT && (q.type === 'expr' || q.math)) ? QKIT.inline(q.prompt) : q.prompt); box.appendChild(qt); }
     if (q.type === 'choice') askChoice(box, q, st);
     else if (q.type === 'num') askNum(box, q, st);
     else if (q.type === 'cloze') askCloze(box, q, st);
     else if (q.type === 'text') askText(box, q, st);
+    else if (q.type === 'expr') askExpr(box, q, st);
     return box;
   };
+
+  /* Typed math (calculus): hands the box to calculus/shared/qkit.js, which grades by numeric equivalence and shows a KaTeX preview.
+     Needs katex, mathcheck.js and qkit.js on the page. q = { type:'expr', answer:'5x^4', vars:['x'], label:'$f\'(x)=$', hints:[], traps:[], worked } */
+  function askExpr(box, q, st) {
+    if (!window.QKIT) { box.appendChild(el('p', 'msg bad', 'This question needs qkit.js on the page.')); return; }
+    if (st.done) { var dn = el('div', 'msg worked ' + (st.ok ? 'ok' : '')); dn.innerHTML = (st.ok ? 'Correct. ' : 'Here is the reasoning. ') + 'Answer: ' + QKIT.tex(window.MC ? MC.toLatex(String(q.answer), q.vars || ['x']) : String(q.answer)) + (q.worked ? QKIT.rich(q.worked) : ''); box.appendChild(dn); return; }
+    var slot = el('div'); box.appendChild(slot);
+    var field = { id: 'a', type: 'expr', label: q.label || '', answer: q.answer, vars: q.vars || ['x'], traps: q.traps };
+    var spec = { id: q.id, fields: [field], hints: q.hints || [], worked: q.worked, why: q.why };
+    var opt = { keypad: true, key: KEY, seed: q.id + '|' + S.first, noHints: !!q.noHints, maxTries: q.maxMiss ? q.maxMiss : 0,
+      onDone: function (res) { st.misses = res.misses; st.hints = res.hints; st.traps = res.traps; st.assisted = res.assisted; finish(q, st, box, !res.assisted); } };
+    QKIT.render(slot, spec, opt);
+  }
 
   function askChoice(box, q, st) {
     var order = q.options.map(function (_, i) { return i; });

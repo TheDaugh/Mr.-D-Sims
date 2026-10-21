@@ -15,18 +15,27 @@ function rng(seed) { let a = seed; return () => { a |= 0; a = a + 0x6D2B79F5 | 0
 const strip = s => String(s ?? '').replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim();
 const stripKeep = s => String(s ?? '').replace(/<[^>]+>/g, '');   // keeps the spaces at the edges, for text that sits next to a blank
 export function tex(s) {
-  return stripKeep(s).replace(/\\/g, '\\textbackslash{}').replace(/([&%$#_{}])/g, '\\$1').replace(/\^/g, '\\textasciicircum{}').replace(/~/g, '\\textasciitilde{}')
+  const raw = stripKeep(s);
+  if (raw.includes('$') && !/^[^$]*\$[^$]*$/.test(raw)) {                 // text with $math$ segments: math goes through as TeX, text is escaped
+    return raw.split(/(\$[^$]+\$)/).map(seg => /^\$[^$]+\$$/.test(seg) ? seg.replace(/[‘’]/g, "'").replace(/′/g, "'") : texText(seg)).join('');
+  }
+  return texText(raw);
+}
+function texText(raw) {
+  return raw.replace(/\\/g, '\\textbackslash{}').replace(/([&%$#_{}])/g, '\\$1').replace(/\^/g, '\\textasciicircum{}').replace(/~/g, '\\textasciitilde{}')
     .replace(/²/g, '\\textsuperscript{2}').replace(/³/g, '\\textsuperscript{3}').replace(/⁻¹/g, '\\textsuperscript{-1}').replace(/₀/g, '\\textsubscript{0}').replace(/₁/g, '\\textsubscript{1}').replace(/₂/g, '\\textsubscript{2}')
     .replace(/[−–]/g, '--').replace(/—/g, '---').replace(/×/g, '$\\times$').replace(/÷/g, '$\\div$').replace(/π/g, '$\\pi$').replace(/Δ/g, '$\\Delta$').replace(/Σ/g, '$\\Sigma$')
     .replace(/≤/g, '$\\le$').replace(/≥/g, '$\\ge$').replace(/≈/g, '$\\approx$').replace(/→/g, '$\\rightarrow$').replace(/°/g, '$^\\circ$').replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
     .replace(/…/g, '...').replace(/·/g, '$\\cdot$').replace(/[^\x00-\x7e]/g, '?');
 }
-const ans = q => typeof q.answer === 'number' ? String(+q.answer.toFixed(4)) + (q.unit ? ' ' + q.unit : '') : strip(q.answer) + (q.unit ? ' ' + q.unit : '');
+let MC = null; try { require('../calculus/shared/mathcheck.js'); MC = globalThis.MC; } catch (e) {}
+const ans = q => q.type === 'expr' && MC ? '$' + MC.toLatex(String(q.answer), q.vars || ['x']) + '$'
+  : typeof q.answer === 'number' ? String(+q.answer.toFixed(4)) + (q.unit ? ' ' + q.unit : '') : strip(q.answer) + (q.unit ? ' ' + q.unit : '');
 const sentenceOnly = t => tex(t);
 
 function head(spec, kind) {
   return String.raw`\documentclass[11pt]{article}
-\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
 \setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
 \fancyhead[L]{\small ` + tex(spec.title) + String.raw`}\fancyhead[R]{\small ` + (kind === 'makeup' ? 'Make-up key' : 'Teacher key') + String.raw`}\fancyfoot[C]{\small\thepage}
 \definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}

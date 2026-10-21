@@ -10,7 +10,15 @@
 (function () {
   'use strict';
   var LE = window.LE, el = LE.el, LK = window.LK = {};
-  function plain(h) { var d = document.createElement('div'); d.innerHTML = String(h == null ? '' : h); return d.textContent.replace(/\s+/g, ' ').trim(); }
+  /* $TeX$ in a prompt becomes readable plain text for notes and reports: \dfrac{a}{b} -> (a)/(b), x^{2} -> x^2, \sqrt{x} -> sqrt(x). */
+  function plainMath(t) {
+    return t.replace(/\$([^$]+)\$/g, function (_, m) {
+      var r = m.replace(/\\[dt]?frac\{([^{}]*)\}\{([^{}]*)\}/g, '($1)/($2)').replace(/\\sqrt\{([^{}]*)\}/g, 'sqrt($1)').replace(/\^\{([^{}]*)\}/g, '^$1')
+        .replace(/\\(cdot|times)/g, '*').replace(/\\(Delta)/g, 'Δ').replace(/\\(to)/g, '->').replace(/\\[,;! ]/g, ' ').replace(/\\(left|right|big|Big)/g, '').replace(/[{}]/g, '');
+      return r.replace(/\s+/g, ' ').trim();
+    });
+  }
+  function plain(h) { var d = document.createElement('div'); d.innerHTML = String(h == null ? '' : h); var t = d.textContent.replace(/\s+/g, ' ').trim(); return t.indexOf('$') >= 0 ? plainMath(t) : t; }
   function optText(o) { return typeof o === 'string' ? plain(o) : plain((o.label || o.html || '') + (o.desc ? ' (' + o.desc + ')' : '')); }
   function f2(x) { return Number(x).toFixed(2); }
   function qdone(id) { var s = LE.qs(id); return !!(s && s.done); }
