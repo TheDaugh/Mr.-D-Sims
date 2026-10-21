@@ -79,3 +79,33 @@ Before this change `#key` redirected to the teacher page, the huddle had a solo 
 ## Shared kit and tests
 
 Physics lessons build on `physics/lessons/engine/lesson-kit.js` (`LK.for(...)`) for the code box, endless practice, notes/stamp step and portal record, and are checked with `tests/validate-items.js` and `tests/e2e-lesson.js`. See `tests/README.md` for the checklist.
+
+## Standard v2: what new lessons add
+
+New lessons start from a template (`templates/README.md`) and get all of the following. Older lessons (Newton's First and Second Law, Atom Discovery, Rutherford, Counting Particles, calculus 2.7) are untouched and keep working; move them over when you next rebuild them.
+
+12. **Student IDs, no names.** `shared/ids.js`. Each student has a 7-character ID (`K7Q-4M2`) made from name and period with a secret that stays on the teacher's device (`teacher/index.html`, "Student IDs"). The last character is a check character, so a typo is caught on the page. A lesson with `identity: 'id'` asks for the ID instead of a name; the ID is stored where the first name used to be, so stamps, seeds, live view and portal records carry the ID. Grade by ID, and decode only when you need to.
+13. **Standard tab names, in this order:** Start, Warm-up, Predict, Explore, Huddle, Build, Practice, Check, Wrap-up (`LK.TABS`). Every tab opens with one line of **Target** (`I can ...`) and one line of **Up next**. No paragraph longer than a sentence; no student writes more than a sentence.
+14. **Warm-up places the student.** `shared/place.js`: start at the most basic band, a first-try right moves up, two misses at a band stop, at most 8 items, placed at the highest band cleared. Last lesson's band (from the profile) seeds the start one band lower.
+15. **Hints stop early on Cold Open and Predict** (one try, then the reasoning is shown). The full hint ladder belongs to Build, Practice and Check.
+16. **Pace plan.** A lesson declares `pacing` once: `{ budgetMin, steps:[{id, prio, min, minItems, parts}], huddles:[{key, atMin}] }` (`shared/pace.js`). Priority 1 never trims, priority 2 shrinks to `minItems`, priority 3 skips first. Priority 1 minutes must total at most 60% of the budget (the tests enforce it). Once a class is 20% of the budget behind, the plan trims what is left to fit the time that remains. Skipped tabs go into the student's notes as "do at home" and into the report code. Pacing applies only in a real class period: `#key` and home mode never trim.
+17. **Timed huddle.** The huddle is called by the clock at `atMin`, not by progress. Every student is pulled to the Huddle tab, writes on it (`shared/huddle.js`: definitions, a worked example with write-on blanks, a labeled figure), and Continue returns them to where they were. The same spec produces the make-up key.
+18. **Concepts button** (`shared/concepts-panel.js`) on every lesson: one-line points and one equation per concept.
+19. **Math input.** `shared/keypad.js` draws a restrained keypad under the answer box: digits for numbers; fraction, power, root, pi, brackets, times, divide and delete for expressions. Typed expressions are graded by numeric equivalence (`calculus/shared/mathcheck.js`) with a live KaTeX preview, so bracket and order-of-operations mistakes are visible before the student checks. (`qkit.js` already had a small insert row; `opt.keypad` swaps it for the shared keypad.)
+20. **Keys from one spec.** A lesson's teaching lives in `spec.js` (plain data). The page, the key PDFs and the tests all read it. `node tools/build-keys.mjs <spec>` writes `keys/<course>/<id>-makeup.pdf` (what an absent student copies into their notes; no personal time needed) and `-teacher.pdf` (outline and pacing, huddle script, every level with answers, common misconceptions). The teacher dashboard links both.
+21. **Teacher hub** is `teacher/index.html` (linked from the front page): codes, lock desk, live view, lessons with `#key` links and key PDFs, and the Student IDs tool.
+
+### New files
+
+| File | Purpose |
+|---|---|
+| `shared/ids.js` | ID derivation, check character, roster parsing, the student's ID field. |
+| `shared/pace.js`, `shared/place.js` | Pacing/trim decisions and the placement ladder (pure logic, unit tested). |
+| `shared/keypad.js`, `shared/huddle.js`, `shared/concepts-panel.js` | The keypad, the writable huddle, the Concepts panel. |
+| `physics/lessons/engine/standard.js` | `LK.standard(SPEC, opts)`: builds every standard tab from a spec. Used by all three course templates (chemistry and calculus load the same engine). |
+| `templates/<course>/` | `spec.js`, `content.js` (only the Explore picture), `lesson.html`. Runnable examples. |
+| `tools/new-lesson.mjs` | Copies a template into the right folder and registers the lesson. |
+| `tools/build-keys.mjs` | Spec to PDF keys (needs `pdflatex`). |
+| `tests/unit/`, `tests/template.e2e.js`, `tests/smoke.js` | Unit tests, a simulated class period for each template, and a load check of every page. |
+
+The shared engine still lives in `physics/lessons/engine/` for history; chemistry and calculus lessons load it from there. Moving it is a later cleanup.

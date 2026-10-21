@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared/hub.css">
 <style>
+.hero{position:relative}.tlink{position:absolute;top:12px;right:clamp(16px,4vw,56px);font:700 .85rem var(--mono);color:#cfdbe7;text-decoration:none;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:3px 14px}.tlink:hover,.tlink:focus-visible{color:#fff;border-color:#fff}
 .classes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px;padding:18px clamp(16px,4vw,56px) 40px}
 .class{display:flex;flex-direction:column;min-height:min(46vh,380px);border-radius:14px;overflow:hidden;text-decoration:none;border:1px solid var(--hub-line);background:linear-gradient(160deg,var(--c1),var(--hub-surface) 70%);transition:transform .15s,border-color .15s}
 .class:hover,.class:focus-visible{transform:scale(1.02);border-color:#fff}
@@ -20,7 +21,7 @@
 </style>
 </head>
 <body class="hub">
-<header class="hero"><h1>Mr. D’s Sims</h1><p>Guided lessons, virtual labs and simulations. Pick your class.</p><span class="now off" id="now"><i></i><span id="nowtxt"></span></span></header>
+<header class="hero"><a class="tlink" href="teacher/index.html">Teacher</a><h1>Mr. D’s Sims</h1><p>Guided lessons, virtual labs and simulations. Pick your class.</p><span class="now off" id="now"><i></i><span id="nowtxt"></span></span></header>
 <main class="classes" id="classes"></main>
 <footer class="hubfoot"><a href="portal/index.html">Review portal</a> · <a href="teacher/index.html">Teacher dashboard</a>
 <script src="shared/bell.js"></script>

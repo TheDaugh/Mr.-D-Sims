@@ -21,6 +21,10 @@ button{cursor:pointer}button.p{background:var(--accent);color:#fff;border-color:
 .on{color:var(--ok);font-weight:700}.off{color:var(--muted)}
 tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done td{background:rgba(35,112,63,.13)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+@media print{body.printing>*:not(#cards-print){display:none!important}#cards-print{display:grid!important}}
+#cards-print{display:none;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px;background:#fff;color:#000}
+.idcard{border:1.5px dashed #555;border-radius:8px;padding:10px 12px;text-align:center;break-inside:avoid;page-break-inside:avoid}
+.idcard b{display:block;font:800 1.7rem ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;margin:4px 0}
 #fs{position:fixed;inset:0;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:50}
 #fs[hidden]{display:none}#fsc{font:800 20vw ui-monospace,monospace;letter-spacing:.1em}
 </style>
@@ -44,6 +48,20 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
   <section class="card" style="margin-bottom:14px"><h2>Today's huddle codes</h2>
     <p class="hint" id="gate-note"></p>
     <table id="codes"></table>
+  </section>
+
+  <section class="card" style="margin-bottom:14px"><h2>Lessons, keys and make-up PDFs</h2>
+    <p class="hint">Student page, teacher view (the same page with <code>#key</code>: every tab open, answers marked), and the two PDFs for lessons built from a spec. Absent students get the make-up key and copy it into their notes; they do not need to do the lesson at home.</p>
+    <div style="overflow-x:auto"><table id="keys"></table></div>
+  </section>
+
+  <section class="card" style="margin-bottom:14px"><h2>Student IDs</h2>
+    <p class="hint">Paste your roster, one student per line: <code>Name, period</code> (or paste two spreadsheet columns). Each ID is made from the name and period with a secret that stays in this browser, so nobody can work an ID back to a name without it. Print the cards, hand them out, and grade by ID. <b>Download the backup</b> and keep it somewhere safe: without it you cannot read IDs back.</p>
+    <div class="row"><textarea id="ids-in" rows="5" style="width:min(420px,100%)" placeholder="Jane Smith, 3&#10;Sam Lee, 3" aria-label="Roster"></textarea></div>
+    <div class="row"><button class="p" id="ids-make" type="button">Make IDs</button><button id="ids-csv" type="button" disabled>Download CSV</button><button id="ids-print" type="button" disabled>Print ID cards</button><button id="ids-backup" type="button">Download backup</button><label class="hint">Restore backup <input id="ids-restore" type="file" accept="application/json"></label></div>
+    <p class="hint" id="ids-msg" role="status"></p>
+    <div style="overflow-x:auto"><table id="ids-out" hidden></table></div>
+    <div class="row"><input id="ids-q" type="text" placeholder="Look up an ID, e.g. K7Q-4M2" style="width:240px" aria-label="ID to look up"><button id="ids-find" type="button">Who is this?</button><span id="ids-who" class="hint"></span></div>
   </section>
 
   <section class="card" style="margin-bottom:14px"><h2>Live view</h2>
@@ -70,11 +88,13 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
     <p><a href="../physics/lessons/teacher.html">Physics teacher page</a> · <a href="../chemistry/teacher.html">Chemistry teacher page</a> · <a href="../calculus/unit-2-differentiation/2-7-product-rule-teacher.html">Calculus teacher page</a></p>
     <p class="hint">Add <code>#key</code> to any guided lesson's address to see exactly what students see, with every step open and the answers marked.</p></section>
 </div>
+<div id="cards-print" aria-hidden="true"></div>
 <div id="fs" hidden><div id="fsc"></div><div id="fsd" class="hint"></div><button id="fsx" type="button">Close</button></div>
 <script src="../shared/config.js"></script>
 <script src="../shared/bell.js"></script>
 <script src="../shared/codes.js"></script>
 <script src="../shared/lessons.js"></script>
+<script src="../shared/ids.js"></script>
 <script>
 (function(){
   var $=function(i){return document.getElementById(i)},B=MrD.bell,L=MrD.lessons,COURSE={physics:"physics",chem:"chem",calc:"calc"};
@@ -130,6 +150,43 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
   }
   $("lv-go").onclick=function(){try{localStorage.setItem("mrd.teacher.live",JSON.stringify({url:$("lv-url").value.trim(),tok:$("lv-tok").value,les:$("lv-les").value}))}catch(e){}clearInterval(timer);poll();timer=setInterval(poll,8000)};
   $("lv-stop").onclick=function(){clearInterval(timer);$("lv-msg").textContent="Stopped."};
+})();
+</script>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)},L=MrD.lessons||[],ID=MrD.ids;
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  /* lessons and keys */
+  $("keys").innerHTML="<tr><th>Lesson</th><th>Student</th><th>Teacher view</th><th>Make-up key</th><th>Teacher key</th></tr>"+L.map(function(l){
+    var pdf=l.spec?'<a href="../keys/'+l.course+'/'+l.id+'-makeup.pdf">PDF</a>':'<span class="hint">no spec</span>',tk=l.spec?'<a href="../keys/'+l.course+'/'+l.id+'-teacher.pdf">PDF</a>':'<span class="hint">no spec</span>';
+    return "<tr><td>"+esc(l.title)+' <span class="hint">'+esc(l.unit||"")+'</span></td><td><a href="../'+l.href+'">Open</a></td><td><a href="../'+l.href+'#key">#key</a></td><td>'+pdf+"</td><td>"+tk+"</td></tr>";
+  }).join("");
+  /* student ids */
+  var table=[];
+  function show(){
+    var t=$("ids-out");t.hidden=!table.length;
+    t.innerHTML="<tr><th>Name</th><th>Period</th><th>ID</th></tr>"+table.map(function(r){return"<tr><td>"+esc(r.name)+"</td><td>"+esc(r.period)+'</td><td><b style="font-family:ui-monospace,monospace;letter-spacing:.1em">'+r.id+"</b></td></tr>"}).join("");
+    $("ids-csv").disabled=$("ids-print").disabled=!table.length;
+  }
+  table=ID.getRoster();show();
+  function msg(t,bad){$("ids-msg").textContent=t;$("ids-msg").style.color=bad?"var(--bad)":""}
+  $("ids-make").onclick=function(){
+    var rows=ID.parseRoster($("ids-in").value);if(!rows.length){msg("Add at least one line like: Jane Smith, 3",true);return}
+    var had=!!ID.getSecret(),sec=ID.ensureSecret();
+    ID.deriveRoster(rows,sec).then(function(t){table=t;ID.setRoster(t);show();msg(t.length+" IDs made."+(had?"":" A new secret was created in this browser. Download the backup now."))})
+      .catch(function(e){msg(e.message,true)});
+  };
+  function save(name,text,type){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+  $("ids-csv").onclick=function(){save("student-ids.csv","name,period,id\n"+table.map(function(r){return'"'+r.name.replace(/"/g,'""')+'",'+r.period+","+r.id}).join("\n"),"text/csv")};
+  $("ids-backup").onclick=function(){if(!ID.getSecret()){msg("Nothing to back up yet. Make IDs first.",true);return}save("mrd-ids-backup.json",ID.backup(),"application/json");msg("Backup downloaded. Keep it off the school drive students can see.")};
+  $("ids-restore").onchange=function(){var f=this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var o=ID.restore(r.result);table=ID.getRoster();show();msg("Restored "+o.students+" students.")}catch(e){msg(e.message,true)}};r.readAsText(f)};
+  $("ids-print").onclick=function(){
+    $("cards-print").innerHTML=table.map(function(r){return'<div class="idcard"><div>'+esc(r.name)+'</div><div class="hint">Period '+esc(r.period)+"</div><b>"+r.id+"</b><div class=\"hint\">Type this on every lesson. No names.</div></div>"}).join("");
+    document.body.classList.add("printing");window.print();setTimeout(function(){document.body.classList.remove("printing")},500);
+  };
+  $("ids-find").onclick=function(){var v=ID.validate($("ids-q").value);if(!v.ok){$("ids-who").textContent=v.why==="check"?"That ID has a typo.":"Not an ID (7 letters and numbers).";return}
+    var w=ID.decode(v.id,table);$("ids-who").textContent=w?w.name+", period "+w.period:"Not on the current roster."};
 })();
 </script>
 </body>
