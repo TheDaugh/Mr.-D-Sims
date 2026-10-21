@@ -8,3 +8,5 @@ All images are public domain or CC0 from Wikimedia Commons. Each was reduced to 
 - **proust**: Portrait de Louis-Joseph Proust (1754-1826), chimiste, S447.jpg · CC0 · David d'Angers, Pierre-Jean (Angers, 12–03–1788 - Paris, 05–01–1856), sculpteur · https://commons.wikimedia.org/wiki/File:Portrait_de_Louis-Joseph_Proust_(1754-1826),_chimiste,_S447.jpg
 - **goldstm**: Atomic resolution Au100.JPG · Public domain · Erwinrossen · https://commons.wikimedia.org/wiki/File:Atomic_resolution_Au100.JPG
 - **h2o2**: Hydrogen peroxide.jpg · Public domain · User:Yanachka · https://commons.wikimedia.org/wiki/File:Hydrogen_peroxide.jpg
+
+**otzi** (Counting Particles hook, `img/otzi.png`): not yet added. The lesson shows a labeled placeholder until a Wikimedia Commons photo of the Iceman (Ötzi) with a free license is placed here and credited in this line.

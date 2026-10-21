@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counting Particles: Projector Page</title>
+<link rel="stylesheet" href="../shared/lab.css">
+<style>
+  body{font-size:20px}
+  .wrap{max-width:1200px;margin:0 auto;padding:16px clamp(12px,3vw,40px)}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}
+  .bar button,.tally button{font:inherit;font-size:1rem;padding:8px 18px;border-radius:10px;border:2px solid var(--accent);background:var(--panel);color:var(--ink);cursor:pointer;min-height:44px}
+  .bar button.on{background:var(--accent);color:var(--accent-ink)}
+  .panel{display:none}.panel.on{display:block}
+  .sy{display:inline-flex;align-items:center;font-family:ui-serif,Georgia,serif;font-size:6rem;line-height:1}
+  .sy .sn{display:inline-flex;flex-direction:column;font-size:.5em;line-height:1.1;text-align:right;margin-right:4px}
+  .sy .sn sup,.sy .sn sub{position:static;vertical-align:baseline;font-size:1em}
+  .sy .sc{position:static;vertical-align:baseline;font-size:.5em;align-self:flex-start}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .three div{border:3px solid var(--line);border-radius:12px;padding:12px;background:var(--panel)}
+  .three b{display:block;font-size:1.3rem}
+  dl{display:grid;grid-template-columns:max-content 1fr;gap:8px 18px}dt{font-weight:700}dd{margin:0}
+  .tally{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0}
+  .tally .col{text-align:center}
+  .tally .bar2{height:140px;display:flex;align-items:flex-end;justify-content:center}
+  .tally .bar2 i{display:block;width:70%;background:var(--accent);border-radius:6px 6px 0 0;min-height:2px}
+  .tally .n{font-size:2rem;font-weight:800}
+  .small{font-size:.9rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">← Chemistry</a>
+  <h1>Counting Particles: Atoms, Ions, Isotopes</h1>
+  <p class="lead"><b>Target:</b> I can find the protons, neutrons and electrons of any atom, ion or isotope from its symbol, and write the symbol from the counts.</p>
+  <div class="bar" role="tablist">
+    <button class="on" data-p="main">Today</button>
+    <button data-p="vocab">Vocabulary</button>
+    <button data-p="core">Core ideas</button>
+    <button data-p="tally">Class tally</button>
+  </div>
+
+  <section class="panel on" id="main">
+    <div style="text-align:center"><span class="sy"><span class="sn"><sup style="color:#1f5fa8">23</sup><sub style="color:#b83b24">11</sub></span>Na<sup class="sc" style="color:#23703f">+</sup></span></div>
+    <div class="three">
+      <div><b>Protons</b>= atomic number (bottom left)</div>
+      <div><b>Neutrons</b>= mass number − atomic number</div>
+      <div><b>Electrons</b>= atomic number − charge</div>
+    </div>
+    <p class="small">Top left: mass number. Bottom left: atomic number. Top right: charge. No charge written means neutral.</p>
+  </section>
+
+  <section class="panel" id="vocab">
+    <h2>Vocabulary</h2>
+    <dl>
+      <dt>Proton</dt><dd>Positive particle in the nucleus. The proton count names the element.</dd>
+      <dt>Neutron</dt><dd>Neutral particle in the nucleus. It adds mass.</dd>
+      <dt>Electron</dt><dd>Negative particle outside the nucleus.</dd>
+      <dt>Atomic number (Z)</dt><dd>The number of protons.</dd>
+      <dt>Mass number (A)</dt><dd>Protons plus neutrons.</dd>
+      <dt>Ion</dt><dd>A particle with unequal protons and electrons, so it has a charge.</dd>
+      <dt>Cation / anion</dt><dd>Positive ion (lost electrons) / negative ion (gained electrons).</dd>
+      <dt>Isotopes</dt><dd>Atoms of the same element with different numbers of neutrons.</dd>
+    </dl>
+  </section>
+
+  <section class="panel" id="core">
+    <h2>Core ideas</h2>
+    <ol>
+      <li>The number of protons decides which element an atom is.</li>
+      <li>Neutrons change the mass, not the element.</li>
+      <li>Only electrons are gained or lost when a particle becomes an ion.</li>
+      <li>Charge = protons − electrons. More electrons than protons is negative.</li>
+      <li>Carbon-14 means mass number 14. It has 8 neutrons, not 14.</li>
+    </ol>
+  </section>
+
+  <section class="panel" id="tally">
+    <h2>Huddle 1 pulse tally</h2>
+    <p class="small">Click a letter once for each student who chose it. Counts stay on this screen only. The live view shows the same split if it is switched on.</p>
+    <div class="tally" id="pulse"></div>
+    <button id="reset" style="font:inherit;padding:6px 14px">Reset</button>
+    <h2 style="margin-top:24px">Whiteboard symbol check: wrong answers by type</h2>
+    <div class="tally" id="errs"></div>
+    <button id="reset2" style="font:inherit;padding:6px 14px">Reset</button>
+    <p class="small">The two biggest columns become tomorrow's warm-up.</p>
+  </section>
+</div>
+<script>
+document.querySelectorAll(".bar button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".bar button").forEach(x=>x.classList.toggle("on",x===b));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.p));
+});
+function tally(id,labels,key){
+  const host=document.getElementById(id);let n=labels.map(()=>0);
+  try{n=JSON.parse(sessionStorage.getItem(key))||n}catch(e){}
+  const draw=()=>{const m=Math.max(1,...n);host.replaceChildren(...labels.map((l,i)=>{
+    const c=document.createElement("div");c.className="col";
+    c.innerHTML=`<div class="bar2"><i style="height:${n[i]/m*100}%"></i></div><div class="n">${n[i]}</div>`;
+    const b=document.createElement("button");b.textContent=l;b.onclick=()=>{n[i]++;try{sessionStorage.setItem(key,JSON.stringify(n))}catch(e){}draw()};c.append(b);return c}))};
+  draw();return()=>{n=labels.map(()=>0);try{sessionStorage.removeItem(key)}catch(e){}draw()};
+}
+const r1=tally("pulse",["A","B","C","D"],"cp.pulse"),r2=tally("errs",["Swapped A and Z","Charge sign","Isotope = new element","Other"],"cp.errs");
+document.getElementById("reset").onclick=r1;document.getElementById("reset2").onclick=r2;
+</script>
+</body>
+</html>

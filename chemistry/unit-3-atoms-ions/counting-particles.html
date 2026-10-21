@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counting Particles: Atoms, Ions, Isotopes</title>
+<meta name="description" content="Read an atom, ion or isotope symbol and count its protons, neutrons and electrons. Then write the symbol from the counts.">
+<link rel="stylesheet" href="../shared/lab.css">
+<style>
+  .wrap{max-width:none;padding-inline:clamp(12px,3vw,40px)}
+  #chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+  .chip{padding:2px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:.85rem;color:var(--muted)}
+  .chip.on{border-color:var(--accent);color:var(--accent);font-weight:700}
+  .chip.done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+  .keyline{margin-top:10px;padding:8px 10px;border-left:4px solid var(--ok);background:rgba(60,160,90,.1);font-size:.9rem}
+  .endbar{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:center;padding:10px 14px;margin:0 0 12px;background:#fff4d6;border:2px solid #d9a400;border-radius:8px;color:#3a2c00}
+  .endbar[hidden]{display:none}
+  .sub{color:var(--muted);margin:0 0 14px;max-width:68ch}
+  .btn{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btn.ghost,.ghost{background:var(--panel);color:var(--ink);border-color:var(--line)}
+  .btn.big{font-size:1.05rem;min-height:46px;padding:8px 22px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .stamp{border:3px solid var(--ok);border-radius:14px;text-align:center;padding:14px;margin:10px 0;color:var(--ok);background:var(--ok-bg)}
+  .stamp .big{font-size:1.6rem;font-weight:800;letter-spacing:.04em}
+  table.sum{margin:10px 0}
+  .card.final h2{font-size:1.4rem}
+  .task{display:flex;gap:8px;align-items:flex-start;padding:3px 0;font-size:.93rem}
+  .task.ok{color:var(--ok)}
+  .task .bx{width:18px;height:18px;border:2px solid var(--line);border-radius:4px;flex:none;margin-top:2px;text-align:center;line-height:14px;font-size:13px}
+  .task.ok .bx{background:var(--ok);border-color:var(--ok);color:#fff}
+  textarea{width:100%;min-height:90px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}
+  .figs{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  figure.pix{margin:0;flex:1 1 200px;max-width:300px;text-align:center}
+  figure.pix canvas{width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;border:2px solid var(--line);border-radius:6px;background:#111;cursor:pointer}
+  figure.pix figcaption{font-size:.82rem;color:var(--muted);margin-top:6px;text-align:left}
+  figure.pix .cr{font-size:.72rem;opacity:.8}
+  .ph{border:2px dashed var(--line);border-radius:6px;background:repeating-linear-gradient(45deg,var(--panel),var(--panel) 10px,var(--note-bg) 10px,var(--note-bg) 20px);min-height:150px;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-size:.88rem;color:var(--muted)}
+  .scene text{font-family:system-ui,sans-serif}
+  /* the symbol: mass number over atomic number on the left, charge on the top right */
+  .sy{display:inline-flex;align-items:center;font-family:ui-serif,Georgia,serif;font-size:1.55em;line-height:1;vertical-align:middle;white-space:nowrap}
+  .sy .sn{display:inline-flex;flex-direction:column;font-size:.5em;line-height:1.1;text-align:right;margin-right:2px}
+  .sy .sn sup,.sy .sn sub{position:static;vertical-align:baseline;font-size:1em}
+  .sy .sc{position:static;vertical-align:baseline;font-size:.5em;align-self:flex-start;margin-left:1px}
+  .sy.huge{font-size:5rem}
+  .sy .A{color:#1f5fa8}.sy .Z{color:#b83b24}.sy .sc.C{color:#23703f}
+  svg.nuc{width:100%;max-width:270px;height:auto;display:block;margin:0 auto}
+  .diags{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+  .diags figure{margin:0;flex:1 1 200px;max-width:290px;text-align:center}
+  .diags figcaption{font-size:.85rem;color:var(--muted)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-size:.82rem;color:var(--muted);margin:4px 0}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+  .tabs button{padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;font:inherit}
+  .tabs button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .step{display:inline-flex;align-items:center;gap:6px}
+  .step button{width:36px;height:36px;font-size:1.2rem;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+  .step output{min-width:2.2ch;text-align:center;font-weight:700;font-size:1.2rem}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:center}
+  .cnt{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0}
+  .cnt label{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted)}
+  .cnt input{width:90px}
+  .chipz{display:flex;gap:4px;flex-wrap:wrap;font-size:.8rem}
+  .chipz span{border:1px solid var(--line);border-radius:6px;padding:1px 6px;background:var(--panel)}
+  details.look summary{cursor:pointer;color:var(--accent);font-size:.9rem;margin:6px 0}
+  .rule3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:10px 0}
+  .rule3 div{border:2px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel)}
+  .rule3 b{display:block;font-size:1.05rem}
+  .kt table{border-collapse:collapse;width:100%;margin:6px 0;font-size:.9rem}.kt td,.kt th{border:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top}
+  .cer label{display:block;margin:8px 0 2px;font-weight:700}
+  .conf{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0}
+  .conf label{border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer;background:var(--panel)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="back" href="../index.html">← Chemistry</a>
+    <span class="crumb">Unit 3 · Atoms and Ions · Day 4</span>
+    <button type="button" class="ghost" id="open-notes" style="margin-left:auto" title="Your own notes for this lesson. They fill in as you work, and you print them as a PDF at the end.">My notes</button>
+  </header>
+  <h1>Counting Particles: Atoms, Ions, Isotopes</h1>
+  <p class="lead">Every atom wears a name tag. Read it right and you know exactly what is inside.</p>
+  <div class="mrd-tb" id="tb" hidden></div>
+  <div id="desk"></div>
+  <div id="endbar" class="endbar" hidden></div>
+  <div id="chips" aria-label="Progress"></div>
+  <main id="app"></main>
+</div>
+
+<script src="../../shared/config.js"></script>
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
+<script src="../../shared/teacherbar.js"></script>
+<script src="../../shared/live.js"></script>
+<script src="../../shared/profile.js"></script>
+<script src="../../shared/notes.js"></script>
+<script src="../../shared/lock.js"></script>
+<script src="../shared/particles.js"></script>
+<script>
+const P=ChemParticles,EL=P.EL,C=P.counts,SYM=P.symHTML,ST_=P.symText;
+const cls=(p,e)=>p===e?0:(p>e?1:2);                       // 0 neutral atom, 1 positive ion, 2 negative ion
+const sgn=q=>q===0?"0":(q>0?"+":"−")+Math.abs(q);
+
+/* ============ DATA: every answer below is computed from Z, A and charge by ChemParticles.counts ============ */
+const DATA={parts:[
+{title:"Same Element, Different Weight",sub:"Two kinds of carbon. One of them dated a mummy. First, how to read the name tag.",blocks:[
+ {type:"info",html:"In 1991 two hikers found a body in the ice of the Alps. Scientists named him <b>Ötzi</b> and dated him at about 5,300 years old with <b>carbon-14</b>, a heavier version of carbon. Heavier, yet still carbon."},
+ {type:"figure",items:[{src:"img/otzi.png",cap:"Ötzi the Iceman, found in the Ötztal Alps in 1991. Radiocarbon dating put his age near 5,300 years.",alt:"Photograph of the Iceman mummy",credit:"Placeholder · photo to be added from Wikimedia Commons",ph:"Photo placeholder: Ötzi the Iceman"}]},
+ {type:"mcq",predict:true,reason:true,q:"Ordinary carbon atoms have a mass of 12 units. Carbon-14 atoms have a mass of 14 units. Both are carbon. What is different inside the heavier atom?",opts:[{t:"It has 2 more protons"},{t:"It has 2 more neutrons"},{t:"It has 2 more electrons"},{t:"It is a different element hiding as carbon"}],note:"Now compare the two nuclei."},
+ {type:"nuc2",items:[{p:6,n:6,e:6,label:"Carbon-12 (ordinary carbon)"},{p:6,n:8,e:6,label:"Carbon-14 (the dating atom)"}],html:"Count the red and gray balls in each nucleus. <b>Protons are red. Neutrons are gray. Electrons are the blue dots.</b> The extra mass is neutrons. The proton count did not move, so both are carbon."},
+ {type:"anat",Z:11,A:23,q:1},
+ {type:"num",q:"Sodium's <b>atomic number is 11</b>. How many protons does every sodium atom have?",ans:11,tol:.01,unit:"protons",why:"The atomic number <i>is</i> the proton count. Every atom with 11 protons is sodium. No exceptions.",hint:"The bottom number of the symbol is the number of protons."},
+ {type:"num",q:"An atom has 8 protons and 8 neutrons. What is its <b>mass number</b>?",ans:16,tol:.01,unit:"(mass number)",why:"Mass number = protons + neutrons = 8 + 8 = 16.",hint:"Mass number counts the particles in the nucleus."},
+ {type:"num",q:"This atom is written "+SYM(13,27,0)+". How many <b>neutrons</b> does it have?",ans:C(13,27,0).n,tol:.01,unit:"neutrons",why:"Neutrons = mass number − atomic number = 27 − 13 = 14.",hint:"Top number minus bottom number.",m:{Z:13,A:27,q:0,ask:"n"}},
+ {type:"num",q:"A <b>neutral</b> atom of fluorine has 9 protons. How many electrons does it have?",ans:9,tol:.01,unit:"electrons",why:"Neutral means the charges cancel, so electrons = protons = 9.",hint:"Neutral atoms have equal protons and electrons."},
+ {type:"num",q:"A magnesium ion is written "+SYM(12,24,2)+". It has 12 protons. How many <b>electrons</b> does it have?",ans:C(12,24,2).e,tol:.01,unit:"electrons",why:"The 2+ charge means 2 more protons than electrons. 12 − 2 = 10 electrons. Mg lost 2 electrons.",hint:"A positive charge means electrons were lost. Start at 12 and take away.",m:{Z:12,A:24,q:2,ask:"e"}},
+ {type:"mcq",q:"A chloride ion is written "+SYM(17,35,-1)+". Which statement is true?",opts:[{t:"It has 17 electrons"},{t:"It has 18 electrons: it gained one",ok:1},{t:"It has 16 electrons: it lost one"},{t:"It has 18 protons"}],why:"The charge is 1−, so there is one extra electron: 17 + 1 = 18. The proton count (17) never changes in an ion.",hint:"Negative means extra electrons. What stays fixed in an ion: protons or electrons?",m:{Z:17,A:35,q:-1,ask:"e"}}
+]},
+{title:"Symbol Builder",sub:"Build particles, decode symbols, write symbols. Try everything before you answer questions.",blocks:[
+ {type:"info",html:"<b>Explore</b> lets you add and remove particles and watch the symbol change. <b>Decode</b> gives you a symbol and asks for the counts. <b>Write</b> gives you the counts and asks for the symbol. Finish all five tasks."},
+ {type:"widget",id:"builder",tasks:["Make a neutral carbon atom with 8 neutrons.","Make a sodium ion with a 1+ charge (11 protons).","Make an oxide ion with a 2− charge (8 protons).","Decode 3 symbols correctly.","Write 3 symbols correctly."]},
+ {type:"rows",q:"From what you saw in Explore: what does each change do?",choices:["Mass number only","Charge only","Which element it is"],rows:[
+  {q:"Add one neutron.",ans:0,why:"One more nucleon means a mass number one higher. Protons and electrons are untouched."},
+  {q:"Remove one electron.",ans:1,why:"Fewer electrons than protons gives a positive charge. The nucleus is untouched."},
+  {q:"Change the number of protons.",ans:2,why:"Protons name the element. (It also moves the mass number and charge, but identity is what changes.)"}],hint:"Which particles sit in the nucleus? Which one decides the element?"},
+ {type:"mcq",predict:true,pulse:true,fixed:true,q:"An ion is written "+SYM(16,32,-2)+". Which set of counts is right?",
+  opts:[{t:"16 protons, 16 neutrons, 18 electrons",ok:1},{t:"16 protons, 16 neutrons, 14 electrons"},{t:"16 protons, 18 neutrons, 16 electrons"},{t:"32 protons, 16 neutrons, 18 electrons"}],
+  meaning:["Correct: 16 p, 32−16 = 16 n, 16+2 = 18 e.","Charge-sign error: treated 2− like 2+ (lost electrons instead of gaining).","Charge confusion: put the charge into the neutrons.","Atomic vs mass number: used 32 as the proton count."],
+  note:"Locked in. Stop here and look up for the huddle."},
+ {type:"gate",id:1,say:"Huddle 1 (at the board). Put the four pulse answers A to D on the board with the class split from the live view or the projector tally. Ask a B voter, a C voter and a D voter to say what they did. Name each error without shaming it: B flipped the charge sign, C added the charge to the neutrons, D used the mass number as the proton count. Then have everyone state the three rules aloud: protons = Z, neutrons = A − Z, electrons = Z − charge. Run symbol cards 1 and 2 on whiteboards if time allows."},
+ {type:"info",html:"<b>Huddle answer:</b> A. 16 protons (the 16 at the bottom), 32 − 16 = 16 neutrons, and a 2− charge means <b>two extra</b> electrons: 16 + 2 = 18. B flipped the sign. C pushed the charge into the neutrons. D used the mass number as the proton count."}
+]},
+{title:"Read the Diagram",sub:"Each picture is a particle. Count what you see, then write its symbol.",blocks:[
+ {type:"sym",diag:{p:3,n:4,e:3},q:"Count the particles in the diagram. Write its symbol.",ans:{Z:3,A:7,q:0},why:"3 protons: lithium. Mass number 3 + 4 = 7. Charge 3 − 3 = 0. It is "+ST_(3,7,0)+".",hint:"Element from protons. Mass number is protons + neutrons. Charge is protons − electrons."},
+ {type:"pick",v:[
+  {type:"sym",diag:{p:11,n:12,e:10},q:"Count the particles. Write its symbol.",ans:{Z:11,A:23,q:1},why:"11 protons: sodium. 11 + 12 = 23. 11 − 10 = +1. It is "+ST_(11,23,1)+".",hint:"Compare the red balls with the blue dots for the charge."},
+  {type:"sym",diag:{p:13,n:14,e:10},q:"Count the particles. Write its symbol.",ans:{Z:13,A:27,q:3},why:"13 protons: aluminum. 13 + 14 = 27. 13 − 10 = +3. It is "+ST_(13,27,3)+".",hint:"Three more protons than electrons is a 3+ charge."},
+  {type:"sym",q:"A particle has <b>26 protons</b>, <b>30 neutrons</b> and <b>23 electrons</b>. Write its symbol.",ans:{Z:26,A:56,q:3},why:"26 protons: iron. 26 + 30 = 56. 26 − 23 = +3. It is "+ST_(26,56,3)+".",hint:"Same three steps. No picture this time."}
+ ]},
+ {type:"pick",v:[
+  {type:"mcq",diag:[{p:6,n:6,e:6,label:"Particle X"},{p:6,n:8,e:6,label:"Particle Y"}],q:"How are particles X and Y related?",opts:[{t:"Isotopes of the same element",ok:1},{t:"The same element with different charges"},{t:"Two different elements"},{t:"The exact same particle"}],why:"Both have 6 protons, so both are carbon. They differ only in neutrons, so they are isotopes.",hint:"Compare the red balls first. Then compare what is different."},
+  {type:"mcq",diag:[{p:17,n:18,e:18,label:"Particle X"},{p:17,n:20,e:17,label:"Particle Y"}],q:"How are particles X and Y related?",opts:[{t:"Different elements"},{t:"Same element, different in neutrons and in electrons",ok:1},{t:"Same element, different only in neutrons"},{t:"Same element, different only in charge"}],why:"Both have 17 protons: chlorine. X has 18 neutrons and 18 electrons (a 1− ion). Y has 20 neutrons and 17 electrons (a neutral atom). Two things differ.",hint:"Make a table: protons, neutrons, electrons for each. Which columns match?"},
+  {type:"mcq",diag:[{p:8,n:8,e:10,label:"Particle X"},{p:9,n:10,e:10,label:"Particle Y"}],q:"X and Y have the same number of electrons. Are they the same element?",opts:[{t:"Yes. Same electrons means same element."},{t:"No. X has 8 protons and Y has 9, so they are different elements.",ok:1},{t:"Yes, they are isotopes."},{t:"No, but they have the same mass number."}],why:"Electrons do not decide the element. Protons do. X (8 p) is oxygen as O²⁻. Y (9 p) is fluorine as F⁻.",hint:"Which count names an element?"}
+ ]},
+ {type:"rows",q:"Decide what each particle is.",choices:["Neutral atom","Positive ion","Negative ion"],rows:[[7,7],[12,10],[9,10],[20,18],[16,18]].map(([p,e])=>({q:p+" protons and "+e+" electrons",ans:cls(p,e),why:p+" − "+e+" = "+sgn(p-e)+". "+["Equal counts, so neutral.","More protons than electrons: positive.","More electrons than protons: negative."][cls(p,e)]})),hint:"Compare protons with electrons. Which is bigger?"}
+]},
+{title:"Close the Gaps",sub:"The three mix-ups that cost the most points: the two numbers, the charge sign, and isotope names.",blocks:[
+ {type:"num",q:"<b>Atomic vs mass number.</b> An atom has <b>20 neutrons</b> and a <b>mass number of 37</b>. What is its atomic number?",ans:17,tol:.01,unit:"(atomic number)",why:"Mass number = protons + neutrons, so protons = 37 − 20 = 17. Atomic number 17 is chlorine.",hint:"Mass number minus neutrons gives the protons.",save:"azAns"},
+ {type:"mcq",q:"A student writes oxygen-16 as <span class='sy'><span class='sn'><sup>8</sup><sub>16</sub></span><span class='se'>O</span></span>. What is the mistake?",opts:[{t:"The mass number and atomic number are swapped. It should be <span class='sy'><span class='sn'><sup>16</sup><sub>8</sub></span><span class='se'>O</span></span>.",ok:1},{t:"Oxygen should always have a 2− charge."},{t:"The 16 should be the number of electrons."},{t:"Nothing. Both numbers mean the same thing."}],why:"Mass number goes on top and is the larger number here (16). Atomic number goes on the bottom (8 protons).",hint:"Which number is bigger: protons, or protons plus neutrons?"},
+ {type:"pick",v:[
+  {type:"num",q:"<b>Charge sign.</b> An ion has <b>16 protons</b> and <b>18 electrons</b>. What is its charge? Type it with its sign (like 2 or -2).",ans:-2,tol:.01,unit:"(charge)",why:"Charge = protons − electrons = 16 − 18 = −2. More electrons than protons is negative.",hint:"Protons minus electrons. If the answer is negative, so is the charge.",save:"chgAns"},
+  {type:"mcq",q:"<b>Charge sign.</b> Which of these ions has <b>more electrons than protons</b>?",opts:[{t:SYM(12,24,2)},{t:SYM(13,27,3)},{t:SYM(16,32,-2),ok:1},{t:SYM(19,39,1)}],why:"Only a negative charge means extra electrons. S²⁻ has 18 electrons and 16 protons. The others lost electrons.",hint:"Which sign means electrons were gained?"},
+  {type:"num",q:"<b>Charge sign.</b> An ion of "+SYM(26,56,0)+" (iron-56) has <b>23 electrons</b>. What is its charge? Type it with its sign.",ans:3,tol:.01,unit:"(charge)",why:"Charge = protons − electrons = 26 − 23 = +3. Iron lost three electrons, so it is Fe³⁺.",hint:"Iron has 26 protons. Compare with 23 electrons.",save:"chgAns"}
+ ]},
+ {type:"pick",v:[
+  {type:"num",q:"<b>Isotope names.</b> Carbon-14 is the dating atom. How many <b>neutrons</b> does one carbon-14 atom have?",ans:8,tol:.01,unit:"neutrons",why:"The 14 in the name is the mass number. Neutrons = 14 − 6 = 8.",hint:"The number in the name is the mass number, not the neutrons.",save:"c14"},
+  {type:"mcq",q:"<b>Isotope names.</b> Which two particles are <b>isotopes</b> of each other?",opts:[{t:SYM(6,14,0)+" and "+SYM(7,14,0)},{t:SYM(8,16,0)+" and "+SYM(8,18,0),ok:1},{t:SYM(12,24,0)+" and "+SYM(13,27,0)},{t:SYM(9,19,0)+" and "+SYM(10,20,0)}],why:"Isotopes have the same protons and different neutrons. O-16 and O-18 both have 8 protons. The others have different protons, so they are different elements.",hint:"Same element means the same bottom number. Then the top numbers must differ.",save:"c14"},
+  {type:"sym",q:"<b>Isotope names.</b> Write the symbol for a <b>tin-120</b> ion that has lost <b>4 electrons</b>. (Tin has 50 protons.)",ans:{Z:50,A:120,q:4},why:"The 120 in the name is the mass number. Tin has 50 protons, so it has 70 neutrons. Losing 4 electrons leaves 46 electrons, so the charge is 50 − 46 = +4. "+ST_(50,120,4)+".",hint:"Mass number from the name. Atomic number from the element. Charge from the lost electrons.",save:"c14"}
+ ]},
+ {type:"cer",q:"A student says: “Chlorine-35 and chlorine-37 must be different elements, because their masses are different.” Use particle counts to judge this claim.",save:"cer"}
+]}
+]};
+const TAKEAWAYS=[
+ {type:"rows",flag:"rules",q:"Match each count to the rule that gives it.",choices:["Atomic number (the bottom number)","Mass number − atomic number","Atomic number − charge"],rows:[{q:"Protons",ans:0,why:"Protons = atomic number. It never changes for an element."},{q:"Neutrons",ans:1,why:"Neutrons = A − Z. Charge does not touch them."},{q:"Electrons",ans:2,why:"Electrons = Z − charge. A 2− ion has two more than its protons."}],hint:"Which of these three counts depends on the charge?"},
+ {type:"mcq",flag:"iso",q:"Two isotopes of the same element always differ in their number of…",opts:[{t:"protons"},{t:"neutrons",ok:1},{t:"electrons"},{t:"atomic number"}],why:"Same protons (same element). Different neutrons gives a different mass number.",hint:"Isotopes keep the same element, so which count must stay put?"},
+ {type:"journal",flag:"journal"}
+];
+const SKILLS=[["chem.particles.read","Reading the symbol"],["chem.particles.builder","Symbol builder"],["chem.particles.diagram","Reading diagrams"],["chem.particles.confusions","Closing the gaps"]];
+</script>
+<script>
+/* ============ ENGINE (same shape as atom-discovery.html) ============ */
+function h(tag,attrs,...kids){const e=document.createElement(tag);for(const k in(attrs||{})){if(k==="class")e.className=attrs[k];else if(k==="html")e.innerHTML=attrs[k];else if(k.startsWith("on"))e.addEventListener(k.slice(2),attrs[k]);else e.setAttribute(k,attrs[k])}kids.flat().forEach(c=>{if(c==null)return;e.append(c.nodeType?c:document.createTextNode(c))});return e}
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,attrs,...kids){const e=document.createElementNS(SVGNS,tag);for(const k in(attrs||{}))e.setAttribute(k,attrs[k]);kids.flat().forEach(c=>{if(c==null)return;e.append(c.nodeType?c:document.createTextNode(c))});return e}
+const KEY=MrD.isKey(),clk=()=>MrD.bell.clock("chem");
+const LESSON_ID="counting-particles";
+const ST={name:"",period:"",t0:0,q:0,qFirst:0,retries:0,tasks:0,tasksDone:0,partIdx:0,partsDone:[],preds:[],between:false,screen:"part",keep:{},log:[],max:0,ended:false,endIdx:0,finished:false,tk:{},pulse:null,lvlLog:[],curQ:"",resp:[],dec:[],wr:[],pr:{i:0,band:1,up:0,down:0,clean:0}};
+let inProgress=false,uid=0,LOCK_ON=false;
+const app=document.getElementById("app"),chipsEl=document.getElementById("chips");
+window.addEventListener("beforeunload",e=>{if(inProgress){e.preventDefault();e.returnValue=""}});
+const fmtT=s=>{s=Math.floor(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+const DONE_TYPES=["mcq","num","rows","widget","open","gate","sym","cer","journal","pick"];
+LessonLock.init({id:LESSON_ID,root:document.querySelector(".wrap"),onChange:()=>chips()});
+const NOLOCK=(/nolock=(\d+)/.exec(location.hash)||[])[1]===LessonLock.offCode();
+const lockSnap=()=>JSON.parse(JSON.stringify(ST));
+const lockTxt=()=>{if(!LOCK_ON)return"";const L=LessonLock.stats();return` · left the lesson ${L.total}× · away ${fmtT(L.awaySec)}`};
+const strip=s=>String(s==null?"":s).replace(/<[^>]+>/g,"");
+
+/* ---------- every typed response is logged on this device for the teacher key (#key shows them) ---------- */
+const RESP_KEY="mrd.resp."+LESSON_ID;
+function logResp(b,a,ok){
+  ST.resp.push({part:CUR.title,q:strip(b.q||b.title||"").slice(0,140),a:String(a).slice(0,800),ok:ok==null?null:!!ok,t:Date.now()});
+  if(KEY||!ST.name)return;
+  try{const day=MrD.bell.dayKey(),all=JSON.parse(localStorage.getItem(RESP_KEY)||"[]").filter(x=>!(x.name===ST.name&&x.period===ST.period&&x.day===day));
+    all.push({name:ST.name,period:ST.period,day,resp:ST.resp});localStorage.setItem(RESP_KEY,JSON.stringify(all))}catch(e){}
+}
+
+/* ---------- the particle picture: nucleus (red protons, gray neutrons) and electron shells ---------- */
+function nucleus(p,n,e,label){
+  const N=p+n;if(e>20||N>48||p<1)return null;
+  const rr=N<=12?9:N<=28?7:5.6,R0=rr*1.75*Math.sqrt(N)+14,svg=sv("svg",{class:"nuc",viewBox:"0 0 300 300",role:"img","aria-label":`${label||"Particle"} diagram: ${p} protons, ${n} neutrons, ${e} electrons`});
+  const seq=[];let pc=0;for(let i=0;i<N;i++){const want=Math.round((i+1)*p/N);if(pc<want){seq.push(1);pc++}else seq.push(0)}
+  const caps=[2,8,8,2];let left=e;
+  for(let k=0;k<4&&left>0;k++){const c=Math.min(caps[k],left);left-=c;const r=R0+18*k+10;
+    svg.append(sv("circle",{cx:150,cy:150,r:r,fill:"none",stroke:"#9aa7b5","stroke-width":1,"stroke-dasharray":"3 4",opacity:.7}));
+    for(let j=0;j<c;j++){const a=2*Math.PI*j/c+k*.7;svg.append(sv("circle",{cx:(150+r*Math.cos(a)).toFixed(1),cy:(150+r*Math.sin(a)).toFixed(1),r:4.8,fill:"#2f6fb3",stroke:"#14375f","stroke-width":.8}))}}
+  for(let i=0;i<N;i++){const d=rr*1.75*Math.sqrt(i+.5),a=i*2.39996,x=150+d*Math.cos(a),y=150+d*Math.sin(a);
+    svg.append(sv("circle",{cx:x.toFixed(1),cy:y.toFixed(1),r:(rr*.95).toFixed(1),fill:seq[i]?"#d9482b":"#8c96a3",stroke:seq[i]?"#7a2110":"#4d5662","stroke-width":.9}));
+    if(seq[i]&&rr>=7)svg.append(sv("text",{x:x.toFixed(1),y:(y+3.5).toFixed(1),"text-anchor":"middle","font-size":rr*1.1,fill:"#fff","font-weight":700},"+"))}
+  return svg;
+}
+const legend=()=>h("div",{class:"legend"},h("span",{html:'<i style="background:#d9482b"></i>proton'}),h("span",{html:'<i style="background:#8c96a3"></i>neutron'}),h("span",{html:'<i style="background:#2f6fb3"></i>electron'}));
+function diagEl(d){
+  const items=[].concat(d);
+  return h("div",{},h("div",{class:"diags"},items.map(it=>{const s=nucleus(it.p,it.n,it.e,it.label);
+    return h("figure",{},s||h("div",{class:"note",html:`<b>Count card</b><br>${it.p} protons<br>${it.n} neutrons<br>${it.e} electrons`}),it.label?h("figcaption",{},it.label):null)})),legend());
+}
+
+/* ---------- symbol entry: element, mass number, charge ---------- */
+function lookup(){
+  const zs=P.ZS;
+  return h("details",{class:"look"},h("summary",{},"Element list (look up an element from its protons)"),h("div",{class:"chipz"},zs.map(z=>h("span",{},z+" "+EL[z].s+" "+EL[z].n))));
+}
+function symEntry(){
+  const sel=h("select",{"aria-label":"Element"},h("option",{value:""},"Element…"),P.ZS.slice().sort((a,b)=>EL[a].s<EL[b].s?-1:1).map(z=>h("option",{value:z},EL[z].s+" – "+EL[z].n)));
+  const A=h("input",{type:"number",min:1,"aria-label":"Mass number",placeholder:"mass no.",style:"width:100px"});
+  const q=h("select",{"aria-label":"Charge"},h("option",{value:""},"Charge…"),[-3,-2,-1,0,1,2,3,4].map(x=>h("option",{value:x},x===0?"0 (neutral)":sgn(x))));
+  const el=h("div",{class:"row"},sel,A,q);
+  return {el,get(){if(!sel.value||!A.value||q.value==="")return null;return{Z:+sel.value,A:+A.value,q:+q.value}},
+    text(){const v=this.get();return v?ST_(v.Z,v.A,v.q):""},off(){sel.disabled=A.disabled=q.disabled=true},reset(){sel.value="";A.value="";q.value="";sel.disabled=A.disabled=q.disabled=false}};
+}
+function symHints(v,a){
+  const m=[];
+  if(v.Z!==a.Z)m.push("Check the element: the <b>protons</b> name it.");
+  if(v.A!==a.A)m.push(v.A===a.Z?"That is the atomic number. The mass number is protons <b>+ neutrons</b>.":"Mass number = protons + neutrons.");
+  if(v.q!==a.q)m.push(v.q===-a.q&&a.q!==0?"The charge sign is flipped. More <b>protons</b> than electrons is positive.":"Charge = protons − electrons.");
+  return m.join(" ");
+}
+
+/* ---------- widgets ---------- */
+const WIDGET={};
+const BANK_DEC=[[7,14,0],[17,35,-1],[12,24,2],[6,13,0],[9,19,-1],[13,27,3],[1,2,0],[8,18,-2],[19,39,1],[20,40,2],[16,34,-2],[10,22,0]];
+const BANK_WR=[[3,7,0],[11,23,1],[8,16,-2],[6,14,0],[13,27,3],[17,37,-1],[20,40,2],[9,19,-1],[12,26,2],[7,15,0],[16,32,-2],[19,40,1]];
+function seededShuffle(arr,seed){const r=P.seeded(seed),a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+WIDGET.builder=(tick)=>{
+  const S={tab:"explore",p:6,n:6,e:6,di:0,wi:0,decOK:0,wrOK:0};
+  const box=h("div"),panel=h("div"),tabs=h("div",{class:"tabs"});
+  const decList=seededShuffle(BANK_DEC,ST.name+"|"+ST.period+"|dec"),wrList=seededShuffle(BANK_WR,ST.name+"|"+ST.period+"|wr");
+  const logW=(first,t)=>{ST.q++;if(first)ST.qFirst++;ST.log.push({skill:"chem.particles.builder",title:t,band:null,first})};
+  function setTab(t){S.tab=t;tabs.replaceChildren(...[["explore","Explore"],["decode","Decode"],["write","Write"]].map(([k,l])=>h("button",{class:S.tab===k?"on":"",onclick:()=>setTab(k)},l)));panel.replaceChildren();({explore,decode,write})[t]()}
+  function stepper(label,key,min,max,after){
+    const out=h("output",{},String(S[key]));
+    const b=d=>h("button",{"aria-label":(d>0?"More ":"Fewer ")+label.toLowerCase(),onclick:()=>{const v=S[key]+d;if(v<min||v>max)return;S[key]=v;out.textContent=v;after()}},d>0?"+":"−");
+    return h("div",{class:"step"},h("b",{style:"min-width:6.5em"},label),b(-1),out,b(1));
+  }
+  function explore(){
+    const view=h("div"),draw=()=>{
+      const{p,n,e}=S,A=p+n,q=p-e,el=EL[p];
+      view.replaceChildren(h("div",{class:"grid2"},
+        h("div",{},nucleus(p,n,e,"Your particle")||h("p",{class:"note"},"Too many particles to draw. The counting rules still work."),legend()),
+        h("div",{},h("div",{style:"text-align:center;margin:6px 0",html:SYM(p,A,q)}),
+          h("p",{html:`<b>${P.cap(el.n)}.</b> Mass number <b>${A}</b> (${p} + ${n}). Atomic number <b>${p}</b>. Charge <b>${q===0?"0":sgn(q)}</b> (${p} − ${e}).`}),
+          h("p",{class:"hint"},q===0?"Neutral atom: protons equal electrons.":q>0?`Positive ion: lost ${q} electron${q>1?"s":""}.`:`Negative ion: gained ${-q} electron${q<-1?"s":""}.`),
+          el.a.includes(A)?null:h("p",{class:"hint"},"This mass number is not found in nature for "+el.n+", but the counting works the same."))));
+      if(p===6&&n===8&&e===6)mark(0);if(p===11&&e===10)mark(1);if(p===8&&e===10)mark(2);
+    };
+    panel.append(h("div",{class:"row",style:"gap:18px"},stepper("Protons","p",1,20,draw),stepper("Neutrons","n",0,30,draw),stepper("Electrons","e",0,20,draw)),view);draw();
+  }
+  const marked=[];const mark=i=>{if(marked[i])return;marked[i]=true;tick(i)};
+  function decode(){
+    if(S.decOK>=decList.length){panel.append(h("p",{class:"note"},"You have decoded every symbol in this set."));return}
+    const [Z,A,q]=decList[S.di%decList.length],c=C(Z,A,q);
+    const ip=h("input",{type:"number",min:0,"aria-label":"Protons"}),inn=h("input",{type:"number",min:0,"aria-label":"Neutrons"}),ie=h("input",{type:"number",min:0,"aria-label":"Electrons"});
+    const fb=h("div",{class:"fb"});let failed=false;
+    const btn=h("button",{class:"btn",onclick:()=>{
+      if(ip.value===""||inn.value===""||ie.value==="")return;
+      const v={p:+ip.value,n:+inn.value,e:+ie.value},ok={p:v.p===c.p,n:v.n===c.n,e:v.e===c.e};
+      [[ip,ok.p],[inn,ok.n],[ie,ok.e]].forEach(([x,o])=>x.style.outline="2px solid var(--"+(o?"ok":"bad")+")");
+      logResp({q:"Decode "+ST_(Z,A,q)},`p=${v.p}, n=${v.n}, e=${v.e}`,ok.p&&ok.n&&ok.e);
+      if(ok.p&&ok.n&&ok.e){logW(!failed,"Decode");ST.dec.push([ST_(Z,A,q),c.p,c.n,c.e]);[ip,inn,ie,btn].forEach(x=>x.disabled=true);S.decOK++;
+        fb.className="fb show ok";fb.textContent="✔ "+c.p+" protons, "+c.n+" neutrons ("+A+" − "+Z+"), "+c.e+" electrons ("+Z+(q>0?" − ":q<0?" + ":" − ")+Math.abs(q)+").";
+        panel.append(h("div",{style:"margin:8px 0"},nucleus(c.p,c.n,c.e,"Decoded")||""));
+        if(S.decOK>=3)mark(3);
+        panel.append(h("button",{class:"btn ghost",onclick:()=>{S.di++;panel.replaceChildren();decode()}},"Next symbol →"));
+      }else{failed=true;ST.retries++;const hs=[];
+        if(!ok.p)hs.push("Protons are the <b>bottom</b> number.");if(!ok.n)hs.push(v.n===A?"The top number is protons <b>plus</b> neutrons. Subtract the protons.":"Neutrons = top − bottom.");
+        if(!ok.e)hs.push(q!==0&&v.e===Z+q?"Charge sign: a positive ion has <b>fewer</b> electrons than protons.":"Electrons = protons − charge.");
+        fb.className="fb show no";fb.innerHTML="Not yet. "+hs.join(" ")}
+    }},"Check");
+    panel.append(h("p",{},"Decode this symbol (",S.decOK+" of 3 needed):"),h("div",{style:"margin:6px 0",html:SYM(Z,A,q)}),
+      h("div",{class:"cnt"},h("label",{},"Protons",ip),h("label",{},"Neutrons",inn),h("label",{},"Electrons",ie)),h("div",{class:"row"},btn),fb);
+  }
+  function write(){
+    if(S.wrOK>=wrList.length){panel.append(h("p",{class:"note"},"You have written every symbol in this set."));return}
+    const [Z,A,q]=wrList[S.wi%wrList.length],c=C(Z,A,q),en=symEntry(),fb=h("div",{class:"fb"});let failed=false;
+    const btn=h("button",{class:"btn",onclick:()=>{const v=en.get();if(!v)return;const ok=v.Z===Z&&v.A===A&&v.q===q;
+      logResp({q:"Write the symbol for "+c.p+"p "+c.n+"n "+c.e+"e"},en.text(),ok);
+      if(ok){logW(!failed,"Write");ST.wr.push([c.p+" / "+c.n+" / "+c.e,ST_(Z,A,q)]);en.off();btn.disabled=true;S.wrOK++;fb.className="fb show ok";fb.innerHTML="✔ "+SYM(Z,A,q);if(S.wrOK>=3)mark(4);
+        panel.append(h("button",{class:"btn ghost",onclick:()=>{S.wi++;panel.replaceChildren();write()}},"Next set of counts →"))}
+      else{failed=true;ST.retries++;fb.className="fb show no";fb.innerHTML="Not yet. "+symHints(v,{Z,A,q})}}},"Check");
+    panel.append(h("p",{},"Write the symbol (",S.wrOK+" of 3 needed):"),h("p",{html:`<b>${c.p}</b> protons · <b>${c.n}</b> neutrons · <b>${c.e}</b> electrons`}),
+      h("div",{class:"grid2"},nucleus(c.p,c.n,c.e,"Counts")||h("span"),h("div",{},en.el,h("div",{class:"row",style:"margin-top:8px"},btn),fb)),lookup());
+  }
+  box.append(tabs,panel);setTab("explore");return box;
+};
+
+/* ---------- blocks ---------- */
+const BLOCK={};
+function feedback(){return h("div",{class:"fb"})}
+function show(fb,ok,html){fb.className="fb show "+(ok?"ok":"no");fb.innerHTML=html}
+const logq=first=>ST.log.push({skill:CUR.skill,title:CUR.title,band:CUR.band,first:!!first});
+function qCard(b,...k){const d=b&&b.diag?diagEl(b.diag):null;return h("div",{class:"card"},h("div",{class:"q"},k[0],d,...k.slice(1)))}
+
+BLOCK.info=(b)=>h("div",{class:"card"},h("div",{class:"note",html:b.html}));
+
+BLOCK.figure=(b)=>{
+  const wrap=h("div",{class:"figs"});
+  b.items.forEach(it=>{
+    const img=new Image(),cv=h("canvas",{role:"img","aria-label":it.alt||it.cap,title:"Click to replay"}),ctx=cv.getContext("2d"),fig=h("figure",{class:"pix"});
+    let run=0;const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function frame(step){const W=cv.width,H=cv.height,sw=Math.max(1,Math.round(W/step)),sh=Math.max(1,Math.round(H/step));const t=document.createElement("canvas");t.width=sw;t.height=sh;const tc=t.getContext("2d");tc.imageSmoothingEnabled=true;tc.drawImage(img,0,0,sw,sh);ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,W,H);ctx.drawImage(t,0,0,sw,sh,0,0,W,H)}
+    function play(){const id=++run;if(reduce){frame(1);return}[32,16,8,4,2,1].forEach((st,i)=>setTimeout(()=>{if(id===run)frame(st)},i*170))}
+    img.onload=()=>{cv.width=img.width;cv.height=img.height;frame(1);if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();play()}},{threshold:.4});frame(32);io.observe(cv)}else play()};
+    img.onerror=()=>{cv.replaceWith(h("div",{class:"ph",role:"img","aria-label":it.alt||it.cap},it.ph||"Image placeholder"))};
+    img.src=it.src;cv.addEventListener("click",play);
+    fig.append(cv,h("figcaption",{},it.cap,h("div",{class:"cr"},it.credit||"")));wrap.append(fig);
+  });
+  return h("div",{class:"card"},wrap);
+};
+BLOCK.nuc2=(b)=>h("div",{class:"card"},diagEl(b.items),h("div",{class:"note",html:b.html}));
+BLOCK.anat=(b)=>{
+  const{Z,A,q}=b,sym=h("span",{class:"sy huge",html:`<span class="sn"><sup class="A">${A}</sup><sub class="Z">${Z}</sub></span><span class="se">${EL[Z].s}</span><sup class="sc C">${P.chg(q)}</sup>`});
+  return h("div",{class:"card"},h("h3",{},"How to read the name tag"),h("div",{class:"grid2"},h("div",{style:"text-align:center"},sym),
+    h("div",{html:`<p><b style="color:#1f5fa8">Top left, ${A}: mass number.</b> Protons + neutrons.</p><p><b style="color:#b83b24">Bottom left, ${Z}: atomic number.</b> Protons. It names the element.</p><p><b style="color:#23703f">Top right, ${P.chg(q)}: charge.</b> Protons − electrons. No number there means neutral.</p>`})),
+    h("div",{class:"rule3"},h("div",{html:"<b>Protons</b>= atomic number"}),h("div",{html:"<b>Neutrons</b>= mass number − atomic number"}),h("div",{html:"<b>Electrons</b>= atomic number − charge"})),
+    h("p",{class:"hint"},"Try them on this one: sodium-23 with a 1+ charge has 11 protons, 12 neutrons and 10 electrons."));
+};
+
+BLOCK.mcq=(b,done)=>{
+  const name="q"+(++uid);let failed=false,counted=false;const fb=feedback(),extra=h("div");
+  const opts=b.predict||b.fixed?b.opts:shuffle(b.opts);
+  const box=h("div",{class:"opts"},opts.map((o,i)=>h("label",{},h("input",{type:"radio",name}),h("span",{html:(b.fixed?String.fromCharCode(65+i)+". ":"")+o.t}))));
+  const btn=h("button",{class:"btn",onclick:()=>{
+    const i=[...box.querySelectorAll("input")].findIndex(x=>x.checked);if(i<0)return;const o=opts[i];
+    if(b.predict){
+      ST.preds.push({q:b.q,choice:o.t});box.querySelectorAll("input").forEach(x=>x.disabled=true);btn.disabled=true;
+      if(b.pulse){ST.pulse=String.fromCharCode(65+i);ST.q++;if(o.ok)ST.qFirst++;logq(!!o.ok);logResp(b,String.fromCharCode(65+i)+": "+strip(o.t),!!o.ok)}
+      if(b.reason){const ta=h("textarea",{"aria-label":"Why do you think so?",placeholder:"I think this because ...",style:"min-height:70px"}),sv2=h("button",{class:"btn",disabled:"",onclick:()=>{ST.keep.coldReason=ta.value.trim();logResp({q:"Why? "+b.q},ta.value.trim(),null);ta.disabled=true;sv2.disabled=true;show(fb,true,"🔒 Locked in. "+(b.note||"Now test it."));done()}},"Save my reason");
+        ta.addEventListener("input",()=>{sv2.disabled=ta.value.trim().length<10});extra.append(h("p",{},"In a sentence, why do you think so?"),ta,h("div",{class:"row",style:"margin-top:8px"},sv2));return}
+      show(fb,true,"🔒 "+(b.note||"Locked in. Now test it."));done();return}
+    if(!counted){counted=true;ST.q++}
+    if(o.ok){if(!failed)ST.qFirst++;logq(!failed);box.querySelectorAll("input").forEach(x=>x.disabled=true);btn.disabled=true;show(fb,true,"✔ "+b.why);done()}
+    else{failed=true;ST.retries++;show(fb,false,"Not quite. "+(b.hint||"Look again."))}
+  }},b.predict?"Lock in my answer":"Check");
+  return qCard(b,h("p",{html:b.q}),box,h("div",{class:"row",style:"margin-top:8px"},btn),extra,fb);
+};
+
+BLOCK.num=(b,done)=>{
+  let failed=false,counted=false;const fb=feedback();
+  const inp=h("input",{type:"number",step:"any",inputmode:"decimal","aria-label":"Your answer",style:"width:140px"});
+  const btn=h("button",{class:"btn",onclick:()=>{
+    const v=parseFloat(inp.value);if(isNaN(v))return;
+    if(!counted){counted=true;ST.q++}
+    const ok=[].concat(b.ans).some(a=>Math.abs(v-a)<=b.tol);logResp(b,inp.value,ok);
+    if(ok){if(!failed)ST.qFirst++;logq(!failed);if(b.save)ST.keep[b.save]=v;inp.disabled=true;btn.disabled=true;show(fb,true,"✔ "+b.why);done()}
+    else{failed=true;ST.retries++;show(fb,false,"Not quite. "+(b.hint||"Check your work."))}
+  }},"Check");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  return qCard(b,h("p",{html:b.q}),h("div",{class:"row"},inp,h("span",{},b.unit||""),btn),fb);
+};
+
+BLOCK.sym=(b,done)=>{
+  let failed=false,counted=false;const fb=feedback(),en=symEntry();
+  const btn=h("button",{class:"btn",onclick:()=>{const v=en.get();if(!v)return;if(!counted){counted=true;ST.q++}
+    const ok=v.Z===b.ans.Z&&v.A===b.ans.A&&v.q===b.ans.q;logResp(b,en.text(),ok);
+    if(ok){if(!failed)ST.qFirst++;logq(!failed);if(b.save)ST.keep[b.save]=en.text();en.off();btn.disabled=true;show(fb,true,"✔ "+b.why);done()}
+    else{failed=true;ST.retries++;show(fb,false,"Not yet. "+symHints(v,b.ans))}}},"Check");
+  return qCard(b,h("p",{html:b.q}),en.el,h("div",{class:"row",style:"margin-top:8px"},btn),fb,lookup());
+};
+
+BLOCK.rows=(b,done)=>{
+  let counted=false,anyFail=false;const fb=feedback();
+  const sels=b.rows.map(r=>h("select",{"aria-label":r.q},h("option",{value:""},"Choose…"),b.choices.map((c,i)=>h("option",{value:i},c))));
+  const per=b.rows.map(()=>({first:true}));
+  const lines=b.rows.map((r,i)=>h("div",{class:"row",style:"margin:8px 0;justify-content:space-between"},h("span",{style:"flex:1 1 300px"},r.q),sels[i]));
+  const btn=h("button",{class:"btn",onclick:()=>{
+    if(sels.some(s=>s.value===""))return;
+    if(!counted){counted=true;ST.q+=b.rows.length}
+    let bad=0;
+    b.rows.forEach((r,i)=>{const ok=+sels[i].value===r.ans;if(ok){if(per[i].first&&!anyFail)ST.qFirst++;sels[i].disabled=true;sels[i].style.outline="2px solid var(--ok)"}else{bad++;per[i].first=false;sels[i].style.outline="2px solid var(--bad)"}});
+    if(bad){anyFail=true;ST.retries++;show(fb,false,bad+" not right yet. "+b.hint)}
+    else{btn.disabled=true;per.forEach(x=>logq(x.first&&!anyFail));show(fb,true,"✔ All correct.<br>"+b.rows.map(r=>"• "+r.why).join("<br>"));done()}
+  }},"Check");
+  return qCard(b,h("p",{html:b.q}),...lines,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+
+BLOCK.widget=(b,done)=>{
+  const marks=b.tasks.map(()=>false),els=b.tasks.map(t=>h("div",{class:"task"},h("span",{class:"bx"}),h("span",{},t)));
+  ST.tasks+=b.tasks.length;
+  const tick=i=>{if(marks[i])return;marks[i]=true;ST.tasksDone++;els[i].classList.add("ok");els[i].querySelector(".bx").textContent="✓";if(marks.every(Boolean))done()};
+  const w=WIDGET[b.id](tick);
+  return h("div",{class:"card"},h("div",{style:"margin-bottom:8px"},h("b",{},"Sim tasks"),els),w);
+};
+
+BLOCK.gate=(b,done)=>{
+  /* Huddle codes are asked for only on weekdays 7:00 AM to 3:00 PM, and never in #key. At home the stop is a quiet note. */
+  if(KEY||!MrD.bell.gatesOn()){
+    setTimeout(done,0);
+    return h("div",{class:"card",style:"border:2px dashed var(--accent);text-align:center"},h("p",{style:"margin:0"},KEY?"✋ Class huddle here. The code is skipped in the teacher view.":"✋ In class there is a huddle here. Outside school hours, keep going."));
+  }
+  const fb=feedback(),inp=h("input",{type:"text",inputmode:"numeric",maxlength:4,autocomplete:"off","aria-label":"Code from Mr. D",style:"width:120px;font-size:1.3rem;text-align:center"});
+  const btn=h("button",{class:"btn",onclick:()=>{if(inp.value.trim()===MrD.codes.gate(LESSON_ID,"h"+b.id)){inp.disabled=true;btn.disabled=true;show(fb,true,"✔ Unlocked.");done()}else show(fb,false,"Not the code. Eyes up and wait for Mr. D.")}},"Unlock");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  return h("div",{class:"card",style:"border:2px dashed var(--accent);text-align:center"},h("h2",{},"✋ Eyes up. Mr. D has the code."),h("p",{style:"margin:0 auto 10px;max-width:46ch"},"Stop here. Class talk comes first. Don’t go on until you have the code."),h("div",{class:"row",style:"justify-content:center"},inp,btn),fb);
+};
+
+BLOCK.open=(b,done)=>{
+  const key=b.save||"open",ta=h("textarea",{"aria-label":"Your response",placeholder:b.frame}),cnt=h("span",{class:"hint"},"0 / "+b.min+" characters");const fb=feedback();
+  const btn=h("button",{class:"btn",disabled:"",onclick:()=>{ST.keep[key]=ta.value.trim();logResp(b,ta.value.trim(),null);ta.disabled=true;btn.disabled=true;show(fb,true,"✔ Saved to your notes.");done()}},"Save my answer");
+  ta.addEventListener("input",()=>{cnt.textContent=ta.value.trim().length+" / "+b.min+" characters";btn.disabled=ta.value.trim().length<b.min});
+  return qCard(b,h("p",{html:b.q}),ta,h("div",{class:"row",style:"margin-top:8px"},btn,cnt),fb);
+};
+
+BLOCK.cer=(b,done)=>{
+  CUR.skill="chem.particles.cer";CUR.title="Claim, evidence, reasoning";
+  const F=[["Claim","c",12,"Are chlorine-35 and chlorine-37 the same element or different elements?"],["Evidence","e",30,"Give the protons, neutrons and electrons for each atom (both neutral). Chlorine has atomic number 17."],["Reasoning","r",30,"Say which count decides the element, and what the difference in mass actually comes from."]];
+  const tas=F.map(f=>h("textarea",{"aria-label":f[0],placeholder:f[3],style:"min-height:70px"})),fb=feedback();
+  const btn=h("button",{class:"btn",disabled:"",onclick:()=>{ST.keep.cer={c:tas[0].value.trim(),e:tas[1].value.trim(),r:tas[2].value.trim()};
+    logResp({q:"CER claim"},ST.keep.cer.c,null);logResp({q:"CER evidence"},ST.keep.cer.e,null);logResp({q:"CER reasoning"},ST.keep.cer.r,null);
+    tas.forEach(t=>t.disabled=true);btn.disabled=true;
+    show(fb,true,"✔ Saved to your notes. Check yourself:<br>• Claim: did you answer the question (same element)?<br>• Evidence: did you use numbers for <i>both</i> atoms (17 p, 18 n, 17 e and 17 p, 20 n, 17 e)?<br>• Reasoning: did you say protons decide the element, and that the extra neutrons add mass only?");ST.log.push({skill:"chem.particles.cer",title:"Claim, evidence, reasoning",band:null,first:true});done()}},"Save my answer");
+  const upd=()=>{btn.disabled=!tas.every((t,i)=>t.value.trim().length>=F[i][2])};tas.forEach(t=>t.addEventListener("input",upd));
+  return h("div",{class:"card cer"},h("div",{class:"q"},h("p",{html:"<b>Claim, evidence, reasoning.</b> "+b.q}),...F.flatMap((f,i)=>[h("label",{},f[0]),tas[i]]),h("div",{class:"row",style:"margin-top:8px"},btn),fb));
+};
+
+BLOCK.journal=(b,done)=>{
+  const fb=feedback(),before=h("textarea",{"aria-label":"What I believed before"}),now=h("textarea",{"aria-label":"What I think now"}),test=h("textarea",{"aria-label":"One thing I would test",style:"min-height:60px"});
+  before.value=ST.keep.coldReason||"";let conf=0;
+  const radios=[1,2,3,4].map(n=>h("label",{},h("input",{type:"radio",name:"conf",onchange:()=>{conf=n;upd()}})," "+n+" · "+["guessing","shaky","mostly sure","could teach it"][n-1]));
+  const btn=h("button",{class:"btn",disabled:"",onclick:()=>{ST.keep.journal={before:before.value.trim(),now:now.value.trim(),conf,test:test.value.trim()};
+    ["before","now","test"].forEach(k=>logResp({q:"Atom journal: "+k},ST.keep.journal[k],null));logResp({q:"Atom journal: confidence"},String(conf),null);
+    [before,now,test,btn].forEach(x=>x.disabled=true);radios.forEach(r=>r.querySelector("input").disabled=true);show(fb,true,"✔ Saved to your notes.");done()}},"Save my journal");
+  const upd=()=>{btn.disabled=!(before.value.trim().length>=10&&now.value.trim().length>=10&&test.value.trim().length>=10&&conf)};
+  [before,now,test].forEach(t=>t.addEventListener("input",upd));upd();
+  return h("div",{class:"card"},h("div",{class:"q"},h("h3",{},"Atom journal"),h("label",{},h("b",{},"What I believed before today about what is inside an atom of one element:")),before,h("label",{},h("b",{},"What I think now:")),now,
+    h("p",{},h("b",{},"How sure am I that I can read any symbol? (1 to 4)")),h("div",{class:"conf"},radios),h("label",{},h("b",{},"One thing I would test to find out more:")),test,h("div",{class:"row",style:"margin-top:8px"},btn),fb));
+};
+
+/* ---------- hidden difficulty ladder: students never see a label ---------- */
+function lvl(){
+  if(ST.q<8)return 0;const acc=ST.qFirst/ST.q;
+  const v=acc>=.88&&ST.retries<=3?2:acc>=.72&&ST.retries<=8?1:0;
+  ST.lvlLog.push(v);return v;
+}
+
+/* ---------- part runner ---------- */
+const NP=DATA.parts.length;
+const CUR={skill:"",title:"",band:null};
+const stepName=i=>i<NP?`Part ${i+1}: ${DATA.parts[i].title}`:i===NP?"Keep practicing":"Takeaways";
+function mk(b,done){
+  if(b.type==="pick"){
+    if(KEY){const w=h("div");b.v.forEach((x,i)=>{w.append(h("div",{class:"keyline",html:`<b>KEY ladder ${i+1} of ${b.v.length}</b> ${["Default. Everyone starts here.","Shown to a student at 72% or better on first tries (after 8 answered).","Hardest rung. Shown at 88% or better with 3 or fewer retries. Carries the unusual ions and isotope naming."][i]}`}),mk(x,done))});return w}
+    const L=lvl(),vb=b.v[Math.min(L,b.v.length-1)];CUR.band=L+1;const vc=mk(vb,done);vc._v=vb;return vc;
+  }
+  ST.curQ=strip(b.q||b.html||b.title||"").slice(0,150);
+  const c=BLOCK[b.type](b,done);if(KEY)keyMark(c,b);return c;
+}
+function chips(){
+  const el=[...DATA.parts.map((p,i)=>h("span",{class:"chip"+(ST.partsDone[i]?" done":ST.screen==="part"&&i===ST.partIdx?" on":""),onclick:KEY?()=>showPart(i):null,style:KEY?"cursor:pointer":""},(ST.partsDone[i]?"✓ ":"")+(i+1))),
+    h("span",{class:"chip"+(ST.screen==="practice"?" on":""),onclick:KEY?()=>showPractice():null,style:KEY?"cursor:pointer":""},"Practice"),
+    h("span",{class:"chip"+(ST.screen==="takeaways"?" on":ST.finished?" done":""),onclick:KEY?()=>showTakeaways():null,style:KEY?"cursor:pointer":""},"Notes")];
+  if(LOCK_ON&&inProgress)el.push(h("span",{class:"chip",style:"margin-left:auto"},"🔒 exits "+LessonLock.stats().total));
+  chipsEl.replaceChildren(...el);
+}
+function enterScreen(screen,idx){ST.screen=screen;ST.max=Math.max(ST.max,idx);ST.between=screen!=="part";if(LOCK_ON&&screen!=="final")LessonLock.save(screen==="part"?idx:NP,screen!=="part",lockSnap());chips();app.replaceChildren();window.scrollTo(0,0);updateEndBar()}
+
+function showPart(i){
+  ST.partIdx=i;enterScreen("part",i);
+  const Pt=DATA.parts[i];CUR.skill=SKILLS[i][0];CUR.title=SKILLS[i][1];CUR.band=null;
+  app.append(h("h2",{},`Part ${i+1} of ${NP}: ${Pt.title}`),h("p",{class:"sub"},Pt.sub));
+  const last=i===NP-1;
+  const advance=()=>{ST.partsDone[i]=true;if(last)afterParts();else showPart(i+1)};
+  const nextBtn=h("button",{class:"btn big",disabled:"",onclick:advance},last?"Keep going →":"Next part →");
+  const nextWrap=h("div",{class:"row",style:"justify-content:center;margin:20px 0"},nextBtn);
+  const needed=Pt.blocks.filter(b=>DONE_TYPES.includes(b.type)).length;let got=0,idx=0;const cards=[];
+  const unlock=()=>{if(got===needed||KEY){nextBtn.disabled=false;nextBtn.removeAttribute("disabled")}};
+  const reveal=()=>{
+    while(idx<Pt.blocks.length){
+      const b=Pt.blocks[idx++];let fin=false;
+      const card=mk(b,()=>{if(fin)return;fin=true;got++;unlock();reveal()});
+      card._b=card._v||b;cards.push(card);app.append(card);
+      if(DONE_TYPES.includes(b.type)&&!fin&&!KEY)break;
+    }
+    app.append(nextWrap);unlock();
+  };
+  reveal();window.__cards=cards;
+}
+function afterParts(){ if(clk().canEnd&&!KEY)showTakeaways(); else showPractice() }
+
+const practiceSpec=(n,band,seed)=>P.spec(n,band,seed);
+function showPractice(){
+  enterScreen("practice",NP);
+  app.append(h("h2",{},"Keep practicing"),h("p",{class:"sub"},"Fresh particle-counting problems at your level. Keep going until Mr. D calls time. There is always another one ready."));
+  const box=h("div");app.append(box);
+  if(KEY)app.append(h("div",{class:"row",style:"justify-content:center;margin:16px 0"},h("button",{class:"ghost",onclick:()=>showTakeaways()},"Teacher: go to the takeaways")));
+  const next=()=>{
+    box.replaceChildren();const spec=practiceSpec(ST.pr.i,ST.pr.band,ST.name+"|"+ST.period);
+    CUR.skill=spec.skill;CUR.title=spec.title;CUR.band=spec.band;const before=ST.qFirst;
+    box.append(h("p",{class:"hint"},`Problem ${ST.pr.i+1}`));
+    const card=mk(spec,()=>{
+      const first=ST.qFirst>before;ST.pr.i++;if(first){ST.pr.clean++;ST.pr.up++;ST.pr.down=0;if(ST.pr.up>=2&&ST.pr.band<4){ST.pr.band++;ST.pr.up=0}}else{ST.pr.down++;ST.pr.up=0;if(ST.pr.down>=2&&ST.pr.band>1){ST.pr.band--;ST.pr.down=0}}
+      box.append(h("div",{class:"row",style:"justify-content:center;margin:12px 0"},h("button",{class:"btn big",onclick:next},"Next problem →")));
+    });
+    box.append(card);
+  };
+  next();
+}
+
+/* ---------- the end mark ---------- */
+function updateEndBar(){
+  const bar=document.getElementById("endbar");if(!bar)return;const c=clk();
+  const sh=c.needsEnd&&inProgress&&!KEY&&ST.screen!=="takeaways"&&ST.screen!=="final";
+  bar.hidden=!sh;if(!sh){bar.replaceChildren();return}
+  if(bar.firstChild)return;
+  bar.append(h("span",{html:c.mode==="class"?"<b>Time to end your guided notes.</b> Finish the question you are on, then press the button.":"<b>You can finish your notes now.</b>"}),
+    h("button",{class:"btn",onclick:()=>{ST.ended=true;ST.endIdx=ST.max;if(LOCK_ON)LessonLock.finish();showTakeaways()}},"End my guided notes"));
+}
+setInterval(()=>{if(ST.name)updateEndBar()},1000);
+
+/* ---------- takeaways and the journal ---------- */
+function showTakeaways(){
+  enterScreen("takeaways",NP+1);if(LOCK_ON&&ST.ended)LessonLock.finish();CUR.skill="chem.particles.takeaways";CUR.title="Takeaways";CUR.band=null;
+  app.append(h("h2",{},"Takeaways"),h("p",{class:"sub"},"These go straight into your notes."));
+  let got=0;const fin=h("button",{class:"btn big",disabled:"",onclick:showFinal},"Get my stamp and notes");
+  TAKEAWAYS.forEach(t=>{const b=Object.assign({},t);let f=false;app.append(mk(b,()=>{if(f)return;f=true;ST.tk[b.flag]=true;got++;if(got===TAKEAWAYS.length||KEY){fin.disabled=false;fin.removeAttribute("disabled")}}))});
+  app.append(h("div",{class:"row",style:"justify-content:center;margin:20px 0"},fin,h("button",{class:"ghost",onclick:openNotes},"My notes")));
+  if(KEY){fin.disabled=false;fin.removeAttribute("disabled")}
+}
+
+/* ---------- notes (print, PDF, LaTeX) ---------- */
+function notesModel(){
+  const k=ST.keep,tk=ST.tk,f=(c,v)=>c?v:"",cold=ST.preds[0],cer=k.cer||{},jr=k.journal||{};
+  return {title:"Counting Particles: Atoms, Ions, Isotopes",unit:"Unit 3 · Atoms and Ions",name:ST.name,period:ST.period,date:new Date().toLocaleDateString(),sections:[
+   {h:"Cold open: carbon-12 and carbon-14",rows:[["My prediction",cold?strip(cold.choice):""],["Why I thought so",k.coldReason||""]]},
+   {h:"The three counting rules",lines:tk.rules?["Protons = atomic number (bottom number).","Neutrons = mass number − atomic number.","Electrons = atomic number − charge."]:["","",""]},
+   {h:"Symbols I decoded",table:{head:["Symbol","Protons","Neutrons","Electrons"],rows:ST.dec.map(r=>[r[0],String(r[1]),String(r[2]),String(r[3])])}},
+   {h:"Symbols I wrote",table:{head:["Protons / neutrons / electrons","Symbol"],rows:ST.wr.map(r=>[r[0],r[1]])}},
+   {h:"Closing items",rows:[["Atomic number when A = 37 and n = 20",k.azAns!=null?String(k.azAns):""],["Charge of the ion with 16 p and 18 e",k.chgAns!=null?String(k.chgAns):""],["Isotope question",k.c14!=null?String(k.c14):""]]},
+   {h:"Claim, evidence, reasoning: chlorine-35 and chlorine-37",rows:[["Claim",cer.c||""],["Evidence",cer.e||""],["Reasoning",cer.r||""]]},
+   {h:"Isotopes",text:f(tk.iso,"Isotopes of one element have the same number of protons and different numbers of neutrons, so their mass numbers differ.")},
+   {h:"Atom journal",rows:[["What I believed before",jr.before||""],["What I think now",jr.now||""],["My confidence (1 to 4)",jr.conf?String(jr.conf):""],["One thing I would test",jr.test||""]]}
+  ]};
+}
+function openNotes(){MrD.notes.open(notesModel,"counting-particles-notes-"+(ST.name||"student").toLowerCase().replace(/[^a-z0-9]/g,""))}
+
+/* ---------- the stamp ---------- */
+function recordProfile(){
+  const items=ST.log.map(l=>({skill:l.skill,title:l.title,band:l.band,firstTry:l.first,ok:true}));
+  MrD.profile.record({course:"chem",lesson:LESSON_ID,title:"Counting Particles: Atoms, Ions, Isotopes",first:ST.name,period:ST.period,day:MrD.bell.dayKey(),reached:(ST.ended?ST.endIdx:ST.max)+1,of:NP+2,items});
+}
+function summaryText(label){
+  const when=new Date(),jr=ST.keep.journal;
+  let t=`${ST.name} · Period ${ST.period} · Counting Particles · ${label} · time ${fmtT((Date.now()-ST.t0)/1000)} · questions right on the first try ${ST.qFirst}/${ST.q} · retries ${ST.retries} · sim tasks ${ST.tasksDone}/${ST.tasks} · pulse ${ST.pulse||"–"} · practice problems ${ST.pr.i} (${ST.pr.clean} first try)${lockTxt()} · ${when.toLocaleDateString()} ${when.toLocaleTimeString()}`;
+  if(jr)t+=` · Confidence ${jr.conf}/4 · Would test: "${jr.test.slice(0,200)}"`;
+  return t;
+}
+function showFinal(){
+  ST.finished=true;ST.screen="final";inProgress=false;if(LOCK_ON)LessonLock.finish();chips();app.replaceChildren();window.scrollTo(0,0);updateEndBar();
+  recordProfile();
+  const reachedI=ST.ended?ST.endIdx:ST.max,label="got to "+stepName(reachedI)+" ("+(reachedI+1)+" of "+(NP+2)+")",when=new Date(),txt=summaryText(label);
+  const stamp="COUNT-"+MrD.codes.stamp(LESSON_ID,ST.name,ST.period);
+  const st=h("div",{class:"stamp"},h("div",{class:"big"},"✔ "+stamp),h("div",{style:"font-size:24px;margin:4px 0"},ST.name),h("div",{},`${when.toLocaleDateString()} · ${when.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}`));
+  const tbl=h("table",{class:"sum"},
+    h("tr",{},h("th",{},"How far you got"),h("td",{},`${stepName(reachedI)} (${reachedI+1} of ${NP+2})`)),
+    h("tr",{},h("th",{},"Time"),h("td",{},fmtT((Date.now()-ST.t0)/1000))),
+    h("tr",{},h("th",{},"Sim tasks finished"),h("td",{},`${ST.tasksDone} of ${ST.tasks}`)),
+    h("tr",{},h("th",{},"Questions right on the first try"),h("td",{},`${ST.qFirst} of ${ST.q}`)),
+    h("tr",{},h("th",{},"Practice problems"),h("td",{},String(ST.pr.i))),
+    LOCK_ON?h("tr",{},h("th",{},"Times you left the lesson"),h("td",{},String(LessonLock.stats().total))):null);
+  const copy=h("button",{class:"ghost",onclick:async()=>{try{await navigator.clipboard.writeText(txt);copy.textContent="Copied ✔"}catch(e){copy.textContent="Select and copy the line below"}}},"Copy summary");
+  app.append(h("div",{class:"card final"},h("h2",{},"Your guided notes are done 🎉"),h("p",{},"Show Mr. D this screen. The stamp is your proof that you finished, and it says how far you got."),st,tbl,
+    h("div",{class:"row",style:"justify-content:center"},h("button",{class:"btn big",onclick:openNotes},"My notes (print or save as PDF)"),copy),
+    h("p",{class:"hint"},"Your notes hold your prediction, your symbols, your claim, evidence and reasoning, and your journal. Choose “Save as PDF” in the print window to keep a copy."),
+    h("p",{class:"hint",style:"word-break:break-word"},txt)));
+}
+
+function start(){ST.t0=Date.now();inProgress=true;MrD.live.attach({course:"chem",lessonId:LESSON_ID,who:()=>({first:ST.name,period:ST.period}),snap:liveSnap});showPart(0)}
+function liveSnap(){const i=ST.screen==="part"?ST.partIdx:ST.screen==="practice"?NP:NP+1;return{step:stepName(i).slice(0,30),stepIdx:i+1,stepCount:NP+2,band:ST.screen==="practice"?ST.pr.band:(ST.lvlLog.length?ST.lvlLog[ST.lvlLog.length-1]+1:null),answered:ST.q,misses:ST.retries,prompt:(ST.pulse?"Pulse "+ST.pulse+" · ":"")+ST.curQ,exits:LOCK_ON?LessonLock.stats().total:0,secs:Math.round((Date.now()-ST.t0)/1000),done:!!ST.finished,stuck:ST.retries>=6}}
+
+function showResume(rec){
+  chips();const fb=feedback(),n=LessonLock.lockNo();
+  const inp=h("input",{type:"text",inputmode:"numeric",maxlength:4,autocomplete:"off","aria-label":"Unlock code from Mr. D",style:"width:130px;font-size:1.4rem;text-align:center"});
+  const btn=h("button",{class:"btn big",onclick:async()=>{const r=await LessonLock.resume(inp.value);
+    if(r==="ok"){Object.assign(ST,rec.snap||{},{name:rec.name});if(!rec.snap)ST.t0=Date.now();inProgress=true;rec.between?afterParts():showPart(rec.part||0)}
+    else if(r==="wrong")show(fb,false,"Not the code. Hand up and wait for Mr. D.");
+    else show(fb,false,"Fullscreen did not start. Click again.")}},"Unlock");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  app.append(h("div",{class:"card",style:"border:3px solid var(--hot);text-align:center"},h("h2",{},"🔒 Locked. Hand up, eyes forward."),
+    h("p",{},"You closed this lesson before you finished. Your work is saved up to the start of the part you were on. Mr. D needs to see you and give you a code."),
+    h("p",{},h("b",{},"Name: "),rec.name,"   ",h("b",{},"Lock number: "),String(n)),h("div",{class:"row",style:"justify-content:center"},inp,btn),fb));
+}
+
+/* ---------- teacher key (#key): the real student page, answers marked, codes skipped ---------- */
+const WIDGET_KEY={builder:"Symbol Builder. Explore: steppers for protons (1 to 20), neutrons, electrons; symbol, charge and a particle picture update live. Tasks tick when the build matches: C with 8 n and 6 e; 11 p and 10 e; 8 p and 10 e. Decode and Write: three correct each (12 shuffled symbols per mode, a different order for each student). Wrong answers get a hint aimed at the specific confusion (swapped numbers, flipped sign)."};
+function keyMark(card,b){
+  const note=html=>card.append(h("div",{class:"keyline",html}));
+  if(b.type==="mcq"){
+    if(b.predict){return note(b.pulse?"<b>KEY</b> Pulse question. First answer is saved and sent to the live view. What each choice means:<br>"+b.opts.map((o,i)=>String.fromCharCode(65+i)+" → "+b.meaning[i]).join("<br>"):"<b>KEY</b> Prediction: any answer is accepted. Expect “2 more neutrons”. The reason is saved to the student’s notes.")}
+    const ok=b.opts.find(o=>o.ok);note(`<b>KEY ✔</b> ${ok.t}<br><i>${b.why}</i>`);
+    card.querySelectorAll(".opts label").forEach(l=>{if(l.textContent.trim()===strip(ok.t).trim())l.style.outline="2px solid var(--ok)"});
+  }
+  if(b.type==="num")note(`<b>KEY ✔</b> ${[].concat(b.ans).join(" or ")} ${b.unit||""}<br><i>${b.why}</i>`);
+  if(b.type==="rows")note("<b>KEY ✔</b> "+b.rows.map(r=>`${strip(r.q)} → <b>${b.choices[r.ans]}</b>`).join("<br>"));
+  if(b.type==="sym"){const a=b.ans,c=C(a.Z,a.A,a.q);note(`<b>KEY ✔</b> ${ST_(a.Z,a.A,a.q)} (${EL[a.Z].n}; ${c.p} p, ${c.n} n, ${c.e} e)<br><i>${b.why}</i>`)}
+  if(b.type==="widget")note(`<b>KEY</b> ${WIDGET_KEY[b.id]}`);
+  if(b.type==="open")note("<b>KEY</b> Open response, checked for length only.");
+  if(b.type==="cer")note("<b>KEY</b> Scale, 2-1-0 each. <b>Claim:</b> same element (2); different element (0). <b>Evidence:</b> 17 p, 18 n, 17 e for Cl-35 and 17 p, 20 n, 17 e for Cl-37, both (2), one only (1). <b>Reasoning:</b> protons decide the element and the extra neutrons add mass only (2); mentions protons without the mass link (1). Common miss: calling them “different atoms” and stopping.");
+  if(b.type==="journal")note("<b>KEY</b> Read for the belief shift. Confidence 1 or 2 plus a vague “test” item flags a student for tomorrow’s warm-up.");
+  if(b.type==="gate")note(`<b>KEY</b> Huddle ${b.id}. Today’s code: <b>${MrD.codes.gate(LESSON_ID,"h"+b.id)}</b>. Students see this stop only on weekdays 7:00 AM to 3:00 PM.<br>${b.say}`);
+  if(b.diag)note("<b>KEY</b> Diagram counts: "+[].concat(b.diag).map(d=>`${d.label?d.label+": ":""}${d.p} p, ${d.n} n, ${d.e} e`).join(" · "));
+  if(b.type==="nuc2")note("<b>KEY</b> "+b.items.map(d=>`${d.label}: ${d.p} p, ${d.n} n, ${d.e} e`).join(" · "));
+}
+function lockDesk(){
+  const host=document.getElementById("desk");if(!host)return;
+  const nm=h("input",{type:"text","aria-label":"Student name",placeholder:"Name as the student typed it",style:"width:240px"}),no=h("input",{type:"number",min:1,value:2,"aria-label":"Lock number",style:"width:80px"}),res=h("b",{style:"font-size:1.4rem;margin-left:10px"});
+  const calc=()=>{res.textContent=nm.value.trim()?LessonLock.unlockCode(nm.value,no.value):""};nm.addEventListener("input",calc);no.addEventListener("input",calc);
+  const stu=location.pathname.split("/").pop()||"counting-particles.html",off=stu+"#nolock="+LessonLock.offCode();
+  host.append(h("details",{class:"card"},h("summary",{},h("b",{},"🔒 Lock desk")," (a locked student’s screen shows a name and a lock number)"),
+    h("p",{html:`<b>Unlock any locked student today:</b> <b style="font-size:1.4rem">${MrD.codes.override()}</b> (works for every student and every lock until 7:00 AM tomorrow)`}),
+    h("p",{},"Or get one student’s own code: type the name and lock number shown on their screen."),h("div",{class:"row"},nm,no,res),
+    h("p",{class:"hint"},"Exit 1 only warns. From exit 2 the screen locks. Locked mode runs only during chemistry’s period: until the 42-minute mark Monday to Thursday, and the whole period on Friday."),
+    h("p",{class:"hint"},"Link with locked mode off (an accommodation, or a device without fullscreen): ",h("a",{href:off},off))));
+}
+
+/* ---------- the six whiteboard symbol cards ---------- */
+const CARDS=[
+ {k:"Atom",Z:9,A:19,q:0,err:"Writes 19 protons (reads the mass number as the proton count) or 10 electrons."},
+ {k:"Atom",Z:13,A:27,q:0,err:"Says 27 neutrons, or gives 14 protons."},
+ {k:"Ion",Z:12,A:24,q:2,err:"14 electrons (added the charge) is the classic. Correct: 10."},
+ {k:"Ion",Z:17,A:35,q:-1,err:"16 electrons (flipped the sign). Correct: 18."},
+ {k:"Isotope",Z:8,A:16,q:0,err:"Says 16 neutrons (the mass number)."},
+ {k:"Isotope",Z:8,A:18,q:0,err:"Says 18 neutrons, or says it is a different element. Correct: 10 neutrons, still oxygen."}
+];
+function printCards(){
+  const w=window.open("","_blank");if(!w)return;
+  const sym=c=>`<span class="sy"><span class="sn"><sup>${c.A}</sup><sub>${c.Z}</sub></span><span class="se">${EL[c.Z].s}</span>${c.q?`<sup class="sc">${P.chg(c.q)}</sup>`:""}</span>`;
+  const css=`body{font-family:system-ui,sans-serif;margin:0}.page{page-break-after:always;padding:.4in}.g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.2in}.c{border:3px solid #000;border-radius:14px;height:3.6in;display:flex;flex-direction:column;align-items:center;justify-content:center}.c small{font-size:16px;letter-spacing:.1em}
+  .sy{display:inline-flex;align-items:center;font-family:Georgia,serif;font-size:110px;line-height:1}.sy .sn{display:inline-flex;flex-direction:column;font-size:.42em;line-height:1.1;text-align:right;margin-right:4px}.sy .sn sup,.sy .sn sub{position:static;vertical-align:baseline;font-size:1em}.sy .sc{position:static;vertical-align:baseline;font-size:.42em;align-self:flex-start;margin-left:3px}
+  table{border-collapse:collapse;width:100%}td,th{border:1px solid #000;padding:6px 8px;text-align:left;font-size:14px;vertical-align:top}@page{size:letter landscape;margin:.3in}`;
+  const cards=CARDS.map((c,i)=>`<div class="c"><small>CARD ${i+1}</small>${sym(c)}</div>`).join("");
+  const rows=CARDS.map((c,i)=>{const n=C(c.Z,c.A,c.q);return`<tr><td>${i+1}</td><td>${c.k}</td><td>${ST_(c.Z,c.A,c.q)} (${EL[c.Z].n}${c.k==="Isotope"?"-"+c.A:""})</td><td>${n.p}</td><td>${n.n}</td><td>${n.e}</td><td>${c.err}</td></tr>`}).join("");
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Symbol cards</title><style>${css}</style></head><body><div class="page"><h2 style="margin:0 0 .15in">Symbol cards: show one at a time. Students hold up protons / neutrons / electrons.</h2><div class="g">${cards}</div></div><div class="page"><h2>Answer key (teacher copy)</h2><table><tr><th>#</th><th>Type</th><th>Symbol</th><th>p</th><th>n</th><th>e</th><th>Likely wrong answer</th></tr>${rows}</table><p>Run order: 1, 2 as a warm check; 3 and 4 for the sign; 5 then 6 together (same protons, different neutrons). Tally the top two wrong answers: tomorrow’s warm-up. Tomorrow: isotopes, average atomic mass, mass spectra.</p></div></body></html>`);
+  w.document.close();setTimeout(()=>w.print(),400);
+}
+
+function keyDesk(){
+  const host=document.getElementById("desk");if(!host)return;
+  const tim=[["0–3","Name card, fullscreen, settle"],["3–11","Part 1: hook, prediction, symbol anatomy, six simple questions"],["11–19","Part 2: Symbol Builder (Explore, Decode, Write) and the reflection rows"],["19–24","Pulse question, then <b>Huddle 1</b> (about 4 minutes of class talk)"],["24–32","Part 3: diagram work (the first adaptive rung appears)"],["32–40","Part 4: the three confusions and the claim-evidence-reasoning item"],["40–42","Practice generator until the 42-minute mark (Mon–Thu); Friday runs to the bell"],["42–50","Takeaways and atom journal (3 min), then the whiteboard symbol check with cards 1 to 6 (6 min)"]];
+  const conf=[["Atomic number vs mass number","Reads the larger number as the protons, or swaps the two.","Say it every time: the bottom number is how many protons, so it names the element. Top minus bottom is neutrons.","Part 4 items 1–2 and the oxygen-16 swap question."],["Charge sign","Adds the charge to the electrons (Mg²⁺ with 14 e) or flips the sign.","Positive means electrons were lost. Protons minus electrons gives the charge, so more electrons gives a negative.","Part 4 charge item, the “more electrons than protons” rung, and Huddle 1."],["Isotope notation","Reads carbon-14 as 14 neutrons, or thinks isotopes are different elements.","The number in the name is the mass number. Same bottom number means the same element.","Part 4 isotope item, the isotope-pair item in Part 3, and CER."]];
+  const keyTbl=(head,rows)=>h("table",{},h("tr",{},head.map(x=>h("th",{},x))),rows.map(r=>h("tr",{},r.map(c=>h("td",{html:c})))));
+  host.append(h("details",{class:"card kt",open:""},h("summary",{},h("b",{},"Teacher key: timings, confusions, huddle")),
+    h("h3",{},"Minute timings (50-minute period)"),keyTbl(["Minutes","What"],tim),
+    h("h3",{},"The three commonest confusions and where the hard items aim"),keyTbl(["Confusion","What it looks like","Fix","Aimed at"],conf),
+    h("h3",{},"Huddle 1 script"),
+    h("p",{html:"Open the projector page (<a href='counting-particles-board.html'>counting-particles-board.html</a>) and tally the A to D pulse answers, or read the split from the live view if <code>liveUrl</code> is set. Then: (1) “Hands up for each letter.” (2) Ask one B, one C and one D voter what they did, and name the error without shaming it (B flipped the sign, C put the charge in the neutrons, D used the mass number as the protons). (3) Whole class says the three rules aloud: <b>protons = Z, neutrons = A − Z, electrons = Z − charge</b>. (4) Give the code, and they go on."}),
+    h("h3",{},"Adaptive ladder"),h("p",{html:"After 8 answered questions the page checks each student’s first-try rate. At 72% or better the next three ladder items step up; at 88% or better with 3 or fewer retries they step up again, to unusual ions and isotope naming (carbon-14, tin-120). Nothing on the student page is labeled. The profile records the level as the band."}),
+    h("h3",{},"Whiteboard symbol check"),h("div",{class:"row"},h("button",{class:"btn",onclick:printCards},"Print the six symbol cards and answer key")),
+    CARDS.map((c,i)=>h("p",{html:`Card ${i+1} (${c.k.toLowerCase()}): ${SYM(c.Z,c.A,c.q)} → ${C(c.Z,c.A,c.q).p} p / ${C(c.Z,c.A,c.q).n} n / ${C(c.Z,c.A,c.q).e} e. <i>${c.err}</i>`})),
+    h("p",{html:"The top two wrong answers from the cards become tomorrow’s warm-up. Tomorrow: isotopes, average atomic mass, mass spectra."})));
+  host.append(h("details",{class:"card kt"},h("summary",{},h("b",{},"Worksheet answer key")," (30 points)"),h("p",{},"1. ¹⁹₉F → 9/10/9; ³⁷₁₇Cl⁻ → 17/20/18; ²⁷₁₃Al³⁺ → 13/14/10; ¹⁴₆C → 6/8/6 (1 pt each)"),h("p",{},"2. 3/4/3 → ⁷₃Li; 12/14/10 → ²⁶₁₂Mg²⁺; 16/16/18 → ³²₁₆S²⁻; 20/20/18 → ⁴⁰₂₀Ca²⁺ (1 pt each)"),h("p",{},"3. Atomic number 18, argon (1 + 1)"),h("p",{},"4. Charge +3; lost 3 electrons (1 + 1)"),h("p",{},"5. 7 neutrons; one more neutron than carbon-12 (1 + 1)"),h("p",{},"6. Charge sign flipped (2− not 2+); correct symbol ³²₁₆S²⁻; 18 electrons (1 + 1 + 1)"),h("p",{},"7. ¹²C and ¹⁴C; same protons (6), different neutrons (1 + 1)"),h("p",{},"8. ⁵⁶₂₆Fe³⁺ → 26 p / 30 n / 23 e (1 each)"),h("p",{},"9. oxygen-18 (element 1, mass number 1)"),h("p",{},"10. Claim: same element, chlorine. Evidence: X 17 p, 18 n, 18 e; Y 17 p, 20 n, 17 e. Reasoning: protons decide the element; neutrons change mass and electrons change charge. 2-1-0 each, 6 points. Total 30.")));
+  const logbox=h("details",{class:"card kt"},h("summary",{},h("b",{},"Student responses logged on this device")," (every typed answer, plus misses)"));
+  let all=[];try{all=JSON.parse(localStorage.getItem(RESP_KEY)||"[]")}catch(e){}
+  if(!all.length)logbox.append(h("p",{class:"hint"},"None yet. Students’ responses are saved on the device they used, so open this #key page on that device, or use the portal export."));
+  all.forEach(s=>logbox.append(h("details",{},h("summary",{},`${s.name} · Period ${s.period} · ${s.day} · ${s.resp.length} responses · ${s.resp.filter(r=>r.ok===false).length} misses`),keyTbl(["Part","Question","Response","OK"],s.resp.map(r=>[r.part,r.q,r.a,r.ok==null?"typed":r.ok?"✔":"✘"])))));
+  host.append(logbox);
+}
+
+/* ---------- boot ---------- */
+if(KEY){
+  MrD.teacherBar(document.getElementById("tb"),{course:"chem",lessonId:LESSON_ID,gates:[{key:"h1",label:"Huddle 1"}],teacher:"../teacher.html",root:"../../"});
+  lockDesk();keyDesk();inProgress=true;ST.name="Preview";ST.period="0";ST.t0=Date.now();showPart(0);
+}else{
+  LOCK_ON=!NOLOCK&&clk().lockOn;
+  const REC=LOCK_ON?LessonLock.pending():null;
+  if(REC)showResume(REC);
+  else{
+    chips();
+    const i=h("input",{type:"text",id:"nm",placeholder:"First and last name",autocomplete:"off"}),pd=h("input",{type:"text",id:"pd",placeholder:"Period",maxlength:6,style:"width:90px"});
+    const fsMsg=h("p",{class:"hint",style:"color:var(--bad)"});
+    const b=h("button",{class:"btn big",style:"margin-top:12px",onclick:async()=>{const v=i.value.trim(),p=pd.value.trim();if(!v){i.focus();return}if(!p){pd.focus();return}ST.name=v;ST.period=p;LOCK_ON=!NOLOCK&&clk().lockOn;if(LOCK_ON&&!(await LessonLock.enter(v))){fsMsg.textContent="Fullscreen did not start. This lesson needs Chrome on your Chromebook. Tell Mr. D.";return}start()}},"Start →");
+    i.addEventListener("keydown",e=>{if(e.key==="Enter")pd.focus()});pd.addEventListener("keydown",e=>{if(e.key==="Enter")b.click()});
+    const c0=clk();
+    app.append(h("div",{class:"card",id:"start"},h("h2",{},"Counting Particles"),
+      h("p",{},"Read a symbol, count the particles, and write a symbol from the counts. A wrong answer gives a hint and you try again. Please don’t refresh the page."),
+      h("p",{},"Work through the parts at your own pace. When you finish them, keep practicing until Mr. D calls time. Then you will finish your notes and get your stamp. Your notes print as a PDF."),
+      c0.lockOn?h("p",{class:"note"},"🔒 Locked mode. This lesson runs in fullscreen while class is on. Leaving it (Esc, a new tab, another window, closing the page) is recorded on your stamp. The second time, your screen locks until Mr. D gives you a code."):null,
+      c0.mode==="home"?h("p",{class:"note"},"You are working outside class time. No class codes are needed."):null,
+      h("p",{},h("b",{},"Your name and period:")),h("div",{class:"row"},i,pd),h("div",{},b),fsMsg));
+  }
+}
+document.getElementById("open-notes").onclick=openNotes;
+window.__qa={ST,DATA,TAKEAWAYS,WIDGET,BLOCK,practiceSpec,CARDS,cards:()=>window.__cards||[]};
+</script>
+</body>
+</html>

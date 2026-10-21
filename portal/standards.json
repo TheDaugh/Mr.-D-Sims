@@ -70,6 +70,13 @@
       "codes": [], "needsReview": true,
       "practice": { "gens": [], "lesson": { "label": "Rutherford's Gold Foil lesson", "href": "../chemistry/unit-3-atoms-ions/rutherford-gold-foil.html" } }
     },
+    "CHEM-ATOM-5": {
+      "course": "chem", "title": "Counting particles in atoms, ions and isotopes",
+      "can": "I can find the protons, neutrons and electrons of any atom, ion or isotope from its symbol, and write the symbol from the counts.",
+      "codes": [{ "framework": "NGSS", "code": "HS-PS1-1", "note": "Foundation skill. HS-PS1-1 uses electron patterns to predict properties; this lesson builds the particle counts it rests on. Confirm." }, { "framework": "NGSS", "code": "HS-PS1-2", "note": "Foundation skill for predicting reaction outcomes from electrons. Confirm." }],
+      "needsReview": true,
+      "practice": { "gens": [], "lesson": { "label": "Counting Particles lesson", "href": "../chemistry/unit-3-atoms-ions/counting-particles.html" } }
+    },
     "CHEM-LAB-1": {
       "course": "chem", "title": "Working safely in the lab",
       "can": "I put on protective equipment before handling chemicals and avoid hazards.",
@@ -128,7 +135,8 @@
     "chem/chem.atom-mass-ratios": "CHEM-ATOM-3",
     "chem/chem.practice.peroxide": "CHEM-ATOM-3",
     "chem/chem.practice.nitrogen-oxides": "CHEM-ATOM-3",
-    "chem/chem.foil-predict": "CHEM-ATOM-4", "chem/chem.foil-run": "CHEM-ATOM-4", "chem/chem.foil-data": "CHEM-ATOM-4", "chem/chem.foil-meaning": "CHEM-ATOM-4", "chem/chem.foil-cer": "CHEM-ATOM-4", "chem/chem.foil-thickness": "CHEM-ATOM-4", "chem/chem.foil-takeaways": "CHEM-ATOM-4", "chem/chem.practice.foil": "CHEM-ATOM-4",
+    "chem/chem.particles*": "CHEM-ATOM-5",
+"chem/chem.foil-predict": "CHEM-ATOM-4", "chem/chem.foil-run": "CHEM-ATOM-4", "chem/chem.foil-data": "CHEM-ATOM-4", "chem/chem.foil-meaning": "CHEM-ATOM-4", "chem/chem.foil-cer": "CHEM-ATOM-4", "chem/chem.foil-thickness": "CHEM-ATOM-4", "chem/chem.foil-takeaways": "CHEM-ATOM-4", "chem/chem.practice.foil": "CHEM-ATOM-4",
     "chem/chem.lab-safety": "CHEM-LAB-1",
     "chem/chem.lab-procedure": "CHEM-LAB-2",
     "chem/chem.lab-data": "CHEM-LAB-2",

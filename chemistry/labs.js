@@ -75,6 +75,16 @@ window.UNITS = [
         href: "virtual-lab/index.html?lab=rutherford",
         blurb: "Suit up, walk to the bench, and fire alpha particles at the plum-pudding atom and at real gold foil. Tally the counts by angle, match each result to what it showed, rebuild the atom with a nucleus, and write a CER that cites your own numbers.",
         tags: ["beta", "Rutherford", "nuclear atom", "CER"]
+      },
+      {
+        title: "Counting Particles: Atoms, Ions, Isotopes",
+        type: "lesson",
+        day: 4,
+        icon: "🔢",
+        href: "unit-3-atoms-ions/counting-particles.html",
+        blurb: "Read a symbol and count its protons, neutrons and electrons. Build particles, decode symbols, write them from counts, and untangle the three classic mix-ups.",
+        tags: ["atomic number", "mass number", "ions", "isotopes"],
+        teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/counting-particles.html#key" }, { label: "Projector page", href: "unit-3-atoms-ions/counting-particles-board.html" }, { label: "Teacher page", href: "teacher.html" }]
       }
     ]
   }
