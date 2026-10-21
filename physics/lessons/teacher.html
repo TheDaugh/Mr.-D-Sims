@@ -45,6 +45,7 @@
 <script src="../../shared/profile.js"></script>
 <script src="../../portal/adapters.js"></script>
 <script src="engine/lesson.js"></script>
+<script src="engine/lesson-kit.js"></script>
 <script src="engine/ice-sim.js"></script>
 <script src="engine/cart-sim.js"></script>
 <script src="content/nfl-items.js"></script>
@@ -56,7 +57,9 @@
 <script>
 (function () {
   var LE = window.LE, NFL = window.NFL, N2L = window.N2L, el = LE.el, REG = window.LESSONS_REG;
-  var LIBS = { 'newtons-first-law': { lib: NFL, preds: ['P1 puck on ice', 'P2 frictionless graph', 'P3 steady push'] }, 'newtons-second-law': { lib: N2L, preds: ['P1 steady push, v–t graph', 'P2 double the force', 'P3 double the mass'] } };
+  /* First Law predates the registry fields; every newer lesson declares predNames and stamp itself. */
+  var LIBS = { 'newtons-first-law': { preds: ['P1 puck on ice', 'P2 frictionless graph', 'P3 steady push'] } };
+  Object.keys(REG).forEach(function (id) { if (REG[id].predNames) LIBS[id] = { preds: REG[id].predNames }; });
   function plain(h) { var d = document.createElement('div'); d.innerHTML = String(h == null ? '' : h); return d.textContent.replace(/\s+/g, ' ').trim(); }
   /* codes */
   var host = document.getElementById('codeHost');
@@ -70,7 +73,7 @@
   var ov = el('div', 'cell'); ov.innerHTML = '<b>Unlock any locked student</b><br><span class="codebig">' + MrD.codes.override() + '</span><br><span class="hint">One code for every lesson and every student, until 7:00 AM tomorrow. Physics lessons only lock if you turn locked mode on for them.</span>'; host.appendChild(ov);
   host.appendChild(el('p', 'hint', 'Codes are readable from 7:00 AM and change at 7:00 AM each school day (' + MrD.bell.dayKey() + '). Students are asked for a huddle code only on weekdays 7:00 AM to 3:00 PM. After 3:00 PM, or at home, no code is asked.'));
   /* stamp */
-  document.getElementById('sgo').onclick = function () { var o = document.getElementById('sout'); o.hidden = false; var who = { first: document.getElementById('sn').value, period: document.getElementById('sp').value }; o.textContent = 'First Law ' + NFL.stamp(who) + '   ·   Second Law ' + N2L.stamp(who); };
+  document.getElementById('sgo').onclick = function () { var o = document.getElementById('sout'); o.hidden = false; var who = { first: document.getElementById('sn').value, period: document.getElementById('sp').value }; o.textContent = ['First Law ' + NFL.stamp(who)].concat(Object.keys(REG).filter(function (id) { return REG[id].stamp; }).map(function (id) { return REG[id].title + ' ' + REG[id].stamp(who); })).join('   ·   '); };
   /* report reader */
   var STEPS = ['start', 'warmup', 'predict', 'investigate', 'huddle', 'name', 'try', 'check', 'notes'];
   document.getElementById('rgo').onclick = function () {
@@ -121,24 +124,25 @@
   sect('Check'); [NFL.check.c1, NFL.check.c2].forEach(function (q) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + q.prompt + '</p><p class="good"><b>Answer: ' + plain(typeof q.options[q.answer] === 'string' ? q.options[q.answer] : q.options[q.answer].label) + '</b></p><p class="hint">' + q.worked + '</p>'; kh.appendChild(d); });
   var c3 = el('div', 'keyitem'); c3.innerHTML = '<p>' + NFL.check.c3.prompt + '</p><p class="good"><b>Looks for:</b> friction named, an unbalanced external (net) force, and a clear statement that the first law is not violated.</p>'; kh.appendChild(c3);
   }
-  function keyN2L() {
-    kh.appendChild(el('h2', null, 'Newton’s Second Law'));
-    sect('Warm-up'); N2L.warm.forEach(function (q) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + q.prompt + '</p><p class="good"><b>' + optp(q.options[q.answer]) + '</b></p>'; kh.appendChild(d); });
-    sect('Predictions'); N2L.preds.forEach(function (P) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + P.title + '</p><p class="good"><b>' + optp(P.options[P.correct]) + '</b></p>'; kh.appendChild(d); });
-    sect('Investigate: formulas');
-    var inv = el('div', 'keyitem'); inv.innerHTML = '<p><b>Part A.</b> a = F/m, so the a–F graph is a line through the origin with slope 1/m. F ÷ a gives the mass. A newton is the force that gives 1 kg an acceleration of 1 m/s².</p><p><b>Part B.</b> At fixed F, a = F/m; m × a is constant and equals F. a against 1/m is a line with slope F.</p><p><b>Part C.</b> Fan force needed F = μmg + ma. Passing: |a − target| ≤ 0.04 m/s².</p><p><b>Part D.</b> a = m<sub>h</sub>g/(M + m<sub>h</sub>); tension T = m<sub>h</sub>(g − a). The acceleration is always less than g because the cart is dragged along too.</p>'; kh.appendChild(inv);
+  /* Any lesson that declares lib, predNames, stamp and investKey (see content/newtons-second-law.js) is listed here with no page edit. */
+  function keyGeneric(cfg) {
+    var lib = cfg.lib;
+    kh.appendChild(el('h2', null, cfg.title));
+    sect('Warm-up'); lib.warm.forEach(function (q) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + q.prompt + '</p><p class="good"><b>' + optp(q.options[q.answer]) + '</b></p>'; kh.appendChild(d); });
+    sect('Predictions'); lib.preds.forEach(function (P) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + P.title + '</p><p class="good"><b>' + optp(P.options[P.correct]) + '</b></p>'; kh.appendChild(d); });
+    sect('Investigate: formulas'); var inv = el('div', 'keyitem'); inv.innerHTML = cfg.investKey || '<p>See the teacher panel on the lesson page (#key).</p>'; kh.appendChild(inv);
     sect('Try it: sample numbers by band');
     [1, 2, 3, 4].forEach(function (b) {
       kh.appendChild(el('h3', null, 'Band ' + b + ' · ' + ['foundation', 'core', 'honors', 'advanced'][b - 1]));
-      N2L.skills.forEach(function (sk) {
+      lib.skills.forEach(function (sk) {
         var q = sk.gen(b, LE.rng('KEY:' + sk.id + ':' + b)), ans = q.type === 'choice' ? optp(q.options[q.answer]) : LE.fmt(q.answer, 3) + (q.unit ? ' ' + q.unit : '');
         var d = el('div', 'keyitem'); d.innerHTML = '<p><span class="pill">' + sk.title + '</span> ' + q.prompt + '</p><p class="good"><b>Answer: ' + ans + '</b></p><p class="hint">' + q.worked + '</p>'; kh.appendChild(d);
       });
     });
-    sect('Check'); [N2L.check.c1, N2L.check.c2].forEach(function (q) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + q.prompt + '</p><p class="good"><b>Answer: ' + optp(q.options[q.answer]) + '</b></p><p class="hint">' + q.worked + '</p>'; kh.appendChild(d); });
-    var c3 = el('div', 'keyitem'); c3.innerHTML = '<p>' + N2L.check.c3.prompt + '</p><p class="good"><b>Looks for:</b> ' + N2L.teacherInfo.c3Note + '</p>'; kh.appendChild(c3);
+    sect('Check'); [lib.check.c1, lib.check.c2].forEach(function (q) { var d = el('div', 'keyitem'); d.innerHTML = '<p>' + q.prompt + '</p><p class="good"><b>Answer: ' + optp(q.options[q.answer]) + '</b></p><p class="hint">' + q.worked + '</p>'; kh.appendChild(d); });
+    var c3 = el('div', 'keyitem'); c3.innerHTML = '<p>' + lib.check.c3.prompt + '</p><p class="good"><b>Looks for:</b> ' + (lib.teacherInfo && lib.teacherInfo.c3Note || 'see rubric') + '</p>'; kh.appendChild(c3);
   }
-  keyNFL(); keyN2L();
+  keyNFL(); Object.keys(REG).forEach(function (id) { if (REG[id].lib) keyGeneric(REG[id]); });
 })();
 </script>
 </body>

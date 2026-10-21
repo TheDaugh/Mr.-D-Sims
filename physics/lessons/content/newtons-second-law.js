@@ -3,20 +3,7 @@
   'use strict';
   var LE = window.LE, N2L = window.N2L, el = LE.el, ID = 'newtons-second-law', G = 9.8;
   var L = 'ABCDEFG';
-  function plain(h) { var d = document.createElement('div'); d.innerHTML = String(h == null ? '' : h); return d.textContent.replace(/\s+/g, ' ').trim(); }
-  function optText(o) { return typeof o === 'string' ? plain(o) : plain((o.label || o.html || '') + (o.desc ? ' (' + o.desc + ')' : '')); }
-  function f2(x) { return Number(x).toFixed(2); }
-  function codeBox(card, c, key, label) {
-    var S = c.S, wrap = el('div');
-    if (!S.huddle[key] && !LE.gatesOn()) { S.huddle[key] = LE.isKey() ? 'key' : 'open'; LE.save(); }   // 3 PM to 7 AM, weekends, and #key: no code
-    if (S.huddle[key]) { if (S.huddle[key] === true) wrap.appendChild(el('p', 'msg ok', 'Code accepted.')); card.appendChild(wrap); return; }
-    wrap.appendChild(el('p', null, 'Look up. Mr. D has the code. Enter it to continue.'));
-    var row = el('div', 'row'), inp = el('input'); inp.type = 'text'; inp.inputMode = 'numeric'; inp.maxLength = 4; inp.setAttribute('aria-label', label); inp.style.width = '6em';
-    var btn = el('button', 'btn', 'Enter code'); btn.type = 'button'; row.appendChild(inp); row.appendChild(btn); wrap.appendChild(row);
-    var msg = el('p', 'msg bad', 'That code is not right. Ask Mr. D to check it.'); msg.hidden = true; wrap.appendChild(msg); card.appendChild(wrap);
-    btn.onclick = function () { if (inp.value.trim() === LE.codeFor(ID, key)) { S.huddle[key] = true; LE.save(); LE.render(); } else msg.hidden = false; };
-  }
-  function qdone(id) { var s = LE.qs(id); return !!(s && s.done); }
+  var K = LK.for({ id: ID, prefix: 'N2L', title: 'Newton’s Second Law', lib: N2L }), plain = LK.plain, optText = LK.optText, f2 = LK.f2, qdone = LK.qdone, codeBox = K.codeBox;
 
   /* ================= steps ================= */
   var steps = [];
@@ -216,66 +203,8 @@
       LE.reached().idx + 1, S.ended ? 't' : 'f', mlog.length + '-' + mlog.filter(function (x) { return x.misses === 0; }).length];
   }
   N2L.reportFields = reportFields;
-  /* One record for the review portal (shared/profile.js): every question the student worked, by skill. */
-  N2L.profileRecord = function (S) {
-    var all = ((S.d.try && S.d.try.log) || []).concat((S.d.more && S.d.more.log) || []), items = all.map(function (x) { return { skill: x.skill, title: x.title, band: x.band, firstTry: x.misses === 0, ok: !!x.ok }; });
-    var P = S.d.pred || [];
-    N2L.preds.forEach(function (pr, i) { var st = P[i]; if (st && st.pick != null) items.push({ skill: 'predict-' + (i + 1), band: S.band0 || 2, firstTry: st.pick === pr.correct, ok: st.pick === pr.correct }); });
-    ['C1', 'C2'].forEach(function (k) { var q = LE.qs(k); if (q && q.done) items.push({ skill: 'check-' + k.toLowerCase(), band: 2, firstTry: q.ok && q.misses === 0, ok: !!q.ok }); });
-    return { course: 'physics', lesson: ID, title: 'Newton’s Second Law', first: S.first, period: S.period, day: LE.today(), reached: LE.reached().idx + 1, of: LE.reached().of, items: items };
-  };
-  N2L.stamp = function (S) { return 'N2L-' + MrD.codes.stamp(ID, S.first, S.period); };
-
-  /* Practice that never runs out. It shows on the last step until guided-notes time ends, so finishing early does not end the lesson.
-     Each question is one of the six skills at the student's current hidden level, with fresh numbers. */
-  function morePractice(host, c) {
-    var S = c.S, M = S.d.more = S.d.more || { n: 0, log: [] };
-    var n = M.n, sk = N2L.skills[n % N2L.skills.length], b = LE.band();
-    var q = sk.gen(b, LE.seedRng('more:' + n + ':' + b)); q.id = 'more.' + n + '.' + b; q.head = 'Practice ' + (n + 1) + ' · ' + sk.title;
-    var box = el('div'); host.appendChild(box);
-    function nextBtn() {
-      if (box.querySelector('.nextq')) return;
-      var row = el('div', 'row nextq'), nb = el('button', 'btn primary', 'Next question'); nb.type = 'button'; row.appendChild(nb); box.appendChild(row);
-      nb.onclick = function () {
-        var st = LE.qs(q.id), m = st.misses, nbd = m === 0 ? b + 1 : (m === 1 ? b : b - 1);
-        var ans = q.type === 'choice' ? optText(q.options[q.answer]) : (LE.fmtN(q.answer) + (q.unit ? ' ' + q.unit : ''));
-        M.log.push({ skill: sk.id, title: sk.title, band: b, misses: m, ok: !!st.ok, secs: st.secs || 0, p: plain(q.prompt), a: ans, w: plain(q.worked) });
-        LE.setBand(nbd, 'more'); M.n++; LE.save(); LE.render();
-      };
-    }
-    q.onDone = nextBtn; LE.ask(box, q); if (qdone(q.id)) nextBtn();
-  }
-
-  steps.push({ id: 'notes', label: 'Notes',
-    render: function (card, c) {
-      var S = c.S; card.appendChild(el('h2', null, 'Notes and stamp'));
-      var ex = el('div', 'prose');
-      ex.innerHTML = '<p><b>My notes</b> is a study sheet the page writes from your own work today: your predictions, your data, your rule, your definitions and the problems you solved. It fills in as you go, so it is never blank. Print it or save it as a PDF to study from.</p>' +
-        '<p><b>The stamp</b> is your proof for Mr. D that you did today’s lesson. It is a four-digit code built from your name, your period and today’s date, so nobody else’s stamp matches yours.</p>';
-      card.appendChild(ex);
-      var row = el('div', 'row'); var v = el('button', 'btn primary', 'View my notes'); v.type = 'button'; v.onclick = function () { LE.setViewNotes(true); LE.render(); window.scrollTo(0, 0); };
-      var pr = el('button', 'btn', 'Print or save as PDF'); pr.type = 'button'; pr.onclick = function () { LE.print(); };
-      var tx = el('button', 'btn', 'Download LaTeX (.tex)'); tx.type = 'button'; tx.onclick = function () { LE.downloadTex(); }; row.appendChild(v); row.appendChild(pr); row.appendChild(tx); card.appendChild(row);
-
-      if (!LE.canEnd()) {
-        card.appendChild(el('h3', null, 'Keep practicing'));
-        card.appendChild(el('p', 'hint', 'You have done every step. Your stamp appears when time for guided notes ends. Until then the questions keep coming at your level, and each one goes into your notes.'));
-        morePractice(card, c);
-        return;
-      }
-
-      var rc = LE.reached();
-      card.appendChild(el('h3', null, 'Show this to Mr. D'));
-      var p = el('p'); var sp = el('span', 'stamp', N2L.stamp(S)); p.appendChild(sp); card.appendChild(p);
-      card.appendChild(el('p', 'hint', 'Name: ' + S.first + ' · Period ' + S.period + ' · You got to step ' + (rc.idx + 1) + ' of ' + rc.of + ' (' + rc.label + ')' + (S.d.more && S.d.more.log.length ? ' · ' + S.d.more.log.length + ' practice questions' : '')));
-      var code = LE.encodeReport(ID, reportFields(S));
-      card.appendChild(el('h3', null, 'Report code (paste into Classroom if Mr. D asks)'));
-      var lc = el('div', 'longcode', code); card.appendChild(lc);
-      var cp = el('button', 'btn small', 'Copy report code'); cp.type = 'button'; cp.onclick = function () { try { navigator.clipboard.writeText(code); cp.textContent = 'Copied'; } catch (e) { var r = document.createRange(); r.selectNodeContents(lc); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); cp.textContent = 'Selected: press Ctrl+C'; } }; card.appendChild(el('div', 'row')).appendChild(cp);
-      if (window.MrD && MrD.profile) MrD.profile.record(N2L.profileRecord(S));
-    },
-    canLeave: function () { return true; },
-    teacher: function (c) { return '<p>The stamp is a 4-digit code from name + period + today’s date. Check it on the Teacher page (type the name and period). Stamp for this device: <b>' + N2L.stamp(c.S) + '</b>.</p><p><b>End rule.</b> Mon–Thu guided notes end at the 42-minute mark (9:42 for first-period physics); the red “End my guided notes” bar appears then. On Friday classes are 40 minutes, so there is no early end: the stamp is available at the bell. A student who finishes every step early lands here and keeps getting practice at their level until the end mark; the stamp appears at the end mark. After 3:00 PM (home) the stamp appears as soon as a student gets here. The stamp and report code record how far each student got.</p><p>The long report code carries each student’s starting band, band at each question, misses, predictions and confidence, check results, seconds per step, the step reached and practice counts; paste any number into the Teacher page to see them in a table.</p>'; } });
+  N2L.profileRecord = K.profileRecord; N2L.stamp = K.stamp;
+  steps.push(K.notesStep({ reportFields: reportFields, teacher: function (c) { return '<p>The stamp is a 4-digit code from name + period + today’s date. Check it on the Teacher page (type the name and period). Stamp for this device: <b>' + N2L.stamp(c.S) + '</b>.</p><p><b>End rule.</b> Mon–Thu guided notes end at the 42-minute mark (9:42 for first-period physics); the red “End my guided notes” bar appears then. On Friday classes are 40 minutes, so there is no early end: the stamp is available at the bell. A student who finishes every step early lands here and keeps getting practice at their level until the end mark; the stamp appears at the end mark. After 3:00 PM (home) the stamp appears as soon as a student gets here. The stamp and report code record how far each student got.</p><p>The long report code carries each student’s starting band, band at each question, misses, predictions and confidence, check results, seconds per step, the step reached and practice counts; paste any number into the Teacher page to see them in a table.</p>'; } }));
 
   /* ================= notes document ================= */
   function notesDoc(c) {
@@ -315,6 +244,9 @@
   }
 
   var cfg = { id: ID, course: 'physics', version: 1, title: 'Newton’s Second Law', subtitle: 'Online lesson · questions adjust to you', steps: steps, notes: notesDoc,
-    gates: [{ key: 'h1', label: 'Huddle 1' }, { key: 'h2', label: 'Huddle 2' }] };
+    gates: [{ key: 'h1', label: 'Huddle 1' }, { key: 'h2', label: 'Huddle 2' }],
+    /* read by teacher.html: nothing there needs editing when a lesson follows this shape */
+    lib: N2L, stamp: K.stamp, predNames: ['P1 steady push, v–t graph', 'P2 double the force', 'P3 double the mass'],
+    investKey: '<p><b>Part A.</b> a = F/m, so the a–F graph is a line through the origin with slope 1/m. F ÷ a gives the mass. A newton is the force that gives 1 kg an acceleration of 1 m/s².</p><p><b>Part B.</b> At fixed F, a = F/m; m × a is constant and equals F. a against 1/m is a line with slope F.</p><p><b>Part C.</b> Fan force needed F = μmg + ma. Passing: |a − target| ≤ 0.04 m/s².</p><p><b>Part D.</b> a = m<sub>h</sub>g/(M + m<sub>h</sub>); tension T = m<sub>h</sub>(g − a). The acceleration is always less than g because the cart is dragged along too.</p>' };
   (window.LESSONS_REG = window.LESSONS_REG || {})[ID] = cfg;
 })();
