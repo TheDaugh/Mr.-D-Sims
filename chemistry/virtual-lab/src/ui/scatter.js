@@ -79,8 +79,8 @@ export function createScatter(ctx) {
   const realUnlocked = () => !!(run("plum") && run("plum").n >= A.plumNeeded);
 
   // ---- the beam ----
-  const beam = h("canvas", { width: 460, height: 170, style: "width:460px;height:170px;border:1px solid var(--line);border-radius:8px;background:#0f1822" });
-  const histC = h("canvas", { width: 440, height: 170, style: "width:440px;height:170px;border:1px solid var(--line);border-radius:8px" });
+  const beam = h("canvas", { width: 460, height: 190, style: "width:460px;height:190px;border:1px solid var(--line);border-radius:8px;background:#0f1822" });
+  const histC = h("canvas", { width: 440, height: 190, style: "width:440px;height:190px;border:1px solid var(--line);border-radius:8px" });
   const flights = []; let carry = 0;
   const logCk = h("input", { type: "checkbox", checked: true, onchange: () => draw() });
   const rate = h("input", { type: "range", min: A.rate.min, max: A.rate.max, step: A.rate.step, value: A.rate.start, "aria-label": "Beam rate", oninput: () => { sc().rate = +rate.value; rateOut.textContent = fmt(rate.value) + " per second"; } });
@@ -113,44 +113,64 @@ export function createScatter(ctx) {
   }
   function draw() {
     if (!el.isConnected || !el.closest("dialog") || !el.closest("dialog").open) return;
-    const g = beam.getContext("2d"), W = 460, H = 170, now = performance.now(), r = run(sc().key), plum = r && r.model === "plum";
-    const ox = 190, oy = 122, P = (x, d, z) => [ox + x + 0.42 * d, oy + 0.3 * d - z], poly = (pts, fill, stroke) => { g.beginPath(); pts.forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.stroke(); } };
-    const ring = (R, z, a0 = 0, a1 = Math.PI * 2, n = 48) => { const o = []; for (let k = 0; k <= n; k++) { const t = a0 + ((a1 - a0) * k) / n; o.push(P(R * Math.cos(t), R * Math.sin(t), z)); } return o; };
-    g.fillStyle = "#0b121a"; g.fillRect(0, 0, W, H);
-    poly([P(-170, -60, 0), P(190, -60, 0), P(190, 70, 0), P(-170, 70, 0)], "#6b4a2e", "#3d2a19");                       // table top
-    poly([P(-170, 70, 0), P(190, 70, 0), P(190, 70, -9), P(-170, 70, -9)], "#4c3320");
+    const g = beam.getContext("2d"), W = 460, H = 190, SH = 158, now = performance.now(), r = run(sc().key), plum = r && r.model === "plum";
+    // A small 3D camera: world x right, y away, z up. Yaw 0.5 rad, pitch 0.55 rad, orthographic. Visible box faces: top, -y, +x.
+    const cy = Math.cos(0.5), sy = Math.sin(0.5), cp = Math.cos(0.42), sp = Math.sin(0.42), S = 0.74, ox = 232, oy = 108;
+    const P = (x, y, z) => { const u = x * cy + y * sy, v = -x * sy + y * cy; return [ox + u * S, oy - (z * cp + v * sp) * S]; };
+    const poly = (pts, fill, stroke) => { g.beginPath(); pts.forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = 1; g.stroke(); } };
+    const shade = (c, f) => { const n = parseInt(c.slice(1), 16); return `rgb(${Math.min(255, ((n >> 16) & 255) * f) | 0},${Math.min(255, ((n >> 8) & 255) * f) | 0},${Math.min(255, (n & 255) * f) | 0})`; };
+    const box = (x, y, z, w, d, hh, c, edge) => { const e = edge || "rgba(0,0,0,.35)";
+      poly([P(x, y, z), P(x + w, y, z), P(x + w, y, z + hh), P(x, y, z + hh)], shade(c, 0.85), e);                      // front (-y)
+      poly([P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + hh), P(x + w, y, z + hh)], shade(c, 0.6), e);        // right (+x)
+      poly([P(x, y, z + hh), P(x + w, y, z + hh), P(x + w, y + d, z + hh), P(x, y + d, z + hh)], shade(c, 1.15), e); };  // top
+    const ringPts = (R, z, a0, a1, n = 40) => { const o = []; for (let k = 0; k <= n; k++) { const t = a0 + ((a1 - a0) * k) / n; o.push(P(R * Math.cos(t), R * Math.sin(t), z)); } return o; };
+    // which half of a ring is behind the middle? the half with larger depth v (sin(t) > tan(yaw) * cos(t) direction); angles are found by sampling
+    const behind = (t) => -Math.cos(t) * sy + Math.sin(t) * cy > 0;
+    const arcWall = (R, z0, z1, wantBehind, fill) => { const n = 60; for (let k = 0; k < n; k++) { const t0 = (Math.PI * 2 * k) / n, t1 = (Math.PI * 2 * (k + 1)) / n; if (behind((t0 + t1) / 2) !== wantBehind) continue; poly([P(R * Math.cos(t0), R * Math.sin(t0), z0), P(R * Math.cos(t1), R * Math.sin(t1), z0), P(R * Math.cos(t1), R * Math.sin(t1), z1), P(R * Math.cos(t0), R * Math.sin(t0), z1)], fill); } };
+    // backdrop and floor
+    const bg = g.createLinearGradient(0, 0, 0, SH); bg.addColorStop(0, "#161d27"); bg.addColorStop(1, "#0d1219"); g.fillStyle = bg; g.fillRect(0, 0, W, SH);
+    g.fillStyle = "rgba(0,0,0,.35)"; g.beginPath(); g.ellipse(ox + 4, oy + 42, 175, 26, 0, 0, 7); g.fill();
+    // table: four legs, then top slab
+    for (const [lx, ly] of [[-140, -70], [150, -70], [-140, 64], [150, 64]]) box(lx - 6, ly - 6, -30, 12, 12, 30, "#5a3b22");
+    box(-160, -84, -6, 330, 164, 6, "#8a5d36");
+    // vacuum pump on the table's right
+    box(120, -50, 0, 38, 40, 22, "#2f7d4f"); box(126, -44, 22, 26, 28, 6, "#1d2630"); poly([P(120, -30, 12), P(90, -30, 12), P(90, -30, 14), P(120, -30, 14)], "#c9ced6");
+    poly(ringPts(117, 0, 0, Math.PI * 2), "#3a4350", "#69737f"); poly(ringPts(111, 1, 0, Math.PI * 2), "#222a33");   // base plate of the jar
+    // zinc-sulfide screen: back half of the green wall first
+    arcWall(92, 0, 14, true, "#2a8a48");
+    // lead block with a slit, and the foil stand
+    box(-128, -14, 0, 26, 28, 22, "#8b929b"); { const a = P(-102, -2, 8), b = P(-102, 2, 14), c2 = P(-102, 2, 8); poly([a, c2, b, P(-102, -2, 14)], "#0b121a"); }
+    box(-12, -40, 0, 4, 4, 28, "#5d646d"); box(-12, 36, 0, 4, 4, 28, "#5d646d");
+    const foilCol = plum ? "#e8a3c3" : r && r.target !== "Au" ? "#c4ccd4" : "#f0c640";
+    box(-2, -38, 3, 3, 76, 26, foilCol, "rgba(255,255,255,.5)");
+    // beam
+    const [sx, sy2] = P(-102, 0, 11), [fx, fy] = P(0, 0, 11); g.strokeStyle = sc().firing ? "#8fe0ff" : "#2c5d7a"; g.lineWidth = sc().firing ? 2.5 : 1.5; g.setLineDash([6, 3]); g.beginPath(); g.moveTo(sx, sy2); g.lineTo(fx, fy); g.stroke(); g.setLineDash([]);
+    // tracks and flashes
+    for (let k = flights.length - 1; k >= 0; k--) { const f = flights[k], age = (now - f.born) / 900; if (age > 1) { flights.splice(k, 1); continue; }
+      const th = (f.a * Math.PI) / 180, X = 90 * Math.cos(th), Y = 90 * Math.sin(th) * f.side, [ex, ey] = P(X, Y, 11), [tx, ty] = P(X, Y, 7);
+      g.strokeStyle = `rgba(140,225,255,${1 - age})`; g.lineWidth = f.a > 10 ? 2.5 : 1.2; g.beginPath(); g.moveTo(fx, fy); g.lineTo(ex, ey); g.stroke();
+      const gl = g.createRadialGradient(tx, ty, 0, tx, ty, f.a > 10 ? 11 : 7); gl.addColorStop(0, `rgba(210,255,190,${1 - age})`); gl.addColorStop(1, "rgba(120,255,120,0)"); g.fillStyle = gl; g.beginPath(); g.arc(tx, ty, f.a > 10 ? 11 : 7, 0, 7); g.fill(); }
     g.lineWidth = 1;
-    // ZnS screen: a green ring on the table around the foil, flashes where particles land
-    g.strokeStyle = "#3fae5a"; g.lineWidth = 3; g.beginPath(); ring(92, 1).forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke(); g.lineWidth = 1;
-    // lead block with slit, on the left of the ring
-    const lx = -108; poly([P(lx - 14, -14, 0), P(lx + 8, -14, 0), P(lx + 8, -14, 22), P(lx - 14, -14, 22)], "#8b929b"); poly([P(lx + 8, -14, 0), P(lx + 8, 14, 0), P(lx + 8, 14, 22), P(lx + 8, -14, 22)], "#5d646d"); poly([P(lx - 14, -14, 22), P(lx + 8, -14, 22), P(lx + 8, 14, 22), P(lx - 14, 14, 22)], "#aab1ba");
-    g.fillStyle = "#0b121a"; { const [a, b] = P(lx + 8, 0, 11); g.fillRect(a - 1, b - 1, 3, 3); }
-    // incoming beam (source -> foil)
-    const [sx, sy] = P(lx + 8, 0, 11), [fx, fy] = P(0, 0, 11); g.strokeStyle = sc().firing ? "#7fd6ff" : "#2c5d7a"; g.lineWidth = sc().firing ? 2 : 1; g.setLineDash([5, 3]); g.beginPath(); g.moveTo(sx, sy); g.lineTo(fx, fy); g.stroke(); g.setLineDash([]); g.lineWidth = 1;
-    // foil: a thin upright sheet across the beam, with its stand
-    const foilCol = plum ? "#d98fb0" : r && r.target !== "Au" ? "#b9c3cc" : "#e8c24a";
-    poly([P(-1, -34, 0), P(1, -34, 0), P(1, -34, 30), P(-1, -34, 30)], "#4a525b"); poly([P(-1, 34, 0), P(1, 34, 0), P(1, 34, 30), P(-1, 34, 30)], "#4a525b");
-    poly([P(0, -34, 28), P(0, 34, 28), P(0, 34, 2), P(0, -34, 2)], foilCol + "cc", "#fff8");
-    // flashes and tracks: top-down view mapped onto the table ring
-    for (let i = flights.length - 1; i >= 0; i--) { const f = flights[i], age = (now - f.born) / 900; if (age > 1) { flights.splice(i, 1); continue; }
-      const th = (f.a * Math.PI) / 180, [ex, ey] = P(92 * Math.cos(th), 92 * Math.sin(th) * f.side, 11), [tx, ty] = P(92 * Math.cos(th), 92 * Math.sin(th) * f.side, 1);
-      g.strokeStyle = `rgba(127,214,255,${1 - age})`; g.lineWidth = f.a > 10 ? 2 : 1; g.beginPath(); g.moveTo(fx, fy); g.lineTo(ex, ey); g.stroke();
-      g.fillStyle = `rgba(190,255,170,${1 - age})`; g.beginPath(); g.arc(tx, ty, f.a > 10 ? 4 : 2.5, 0, 7); g.fill(); }
-    g.lineWidth = 1;
-    // vacuum jar: translucent glass cylinder with a dome, drawn over everything inside
-    const JR = 118, JH = 64, sideL = P(-JR, 0, 0), sideR = P(JR, 0, 0), topL = P(-JR, 0, JH), topR = P(JR, 0, JH);
-    const grad = g.createLinearGradient(sideL[0], 0, sideR[0], 0); grad.addColorStop(0, "rgba(180,220,255,.22)"); grad.addColorStop(0.5, "rgba(180,220,255,.06)"); grad.addColorStop(1, "rgba(180,220,255,.25)");
-    g.fillStyle = grad; g.beginPath(); g.moveTo(sideL[0], sideL[1]); g.lineTo(topL[0], topL[1]); g.ellipse((topL[0] + topR[0]) / 2, topL[1], (topR[0] - topL[0]) / 2, 34, 0, Math.PI, Math.PI * 2); g.lineTo(sideR[0], sideR[1]); g.ellipse((sideL[0] + sideR[0]) / 2, sideL[1], (sideR[0] - sideL[0]) / 2, 22, 0, 0, Math.PI); g.closePath(); g.fill();
-    g.strokeStyle = "rgba(200,230,255,.7)"; g.beginPath(); ring(JR, 0).forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
-    g.beginPath(); g.moveTo(sideL[0], sideL[1]); g.lineTo(topL[0], topL[1]); g.moveTo(sideR[0], sideR[1]); g.lineTo(topR[0], topR[1]); g.stroke();
-    g.beginPath(); g.ellipse((topL[0] + topR[0]) / 2, topL[1], (topR[0] - topL[0]) / 2, 34, 0, Math.PI, Math.PI * 2); g.stroke();
-    g.strokeStyle = "rgba(255,255,255,.35)"; g.beginPath(); g.moveTo(topL[0] + 14, topL[1] + 6); g.lineTo(sideL[0] + 14, sideL[1] - 6); g.stroke();
-    // labels and counter
-    g.font = "10px sans-serif"; g.textAlign = "center"; g.fillStyle = "#cfe3f5";
-    g.fillText("radon source in lead", sx - 6, sy + 36); g.fillText(plum ? "plum-pudding foil" : (r ? FM.TARGETS[r.target].name.toLowerCase() : "gold") + " foil", fx + 2, fy - 34); g.fillStyle = "#7fe39a"; g.textAlign = "right"; g.fillText("green ring: zinc-sulfide screen (flashes)", W - 8, H - 6); g.textAlign = "center";
-    g.fillStyle = "#cfe3f5"; g.fillText("vacuum jar", P(0, 0, JH + 8)[0] - 40, 12);
-    g.fillStyle = "#1c2b1c"; g.fillRect(W - 92, 8, 84, 22); g.fillStyle = "#9fe870"; g.font = "bold 14px ui-monospace,monospace"; g.textAlign = "right"; g.fillText(String(r ? r.n : 0).padStart(6, "0"), W - 14, 25);
-    g.font = "9px sans-serif"; g.fillStyle = "#cfe3f5"; g.textAlign = "right"; g.fillText("particles fired", W - 14, 40);
+    // front half of the screen wall, with a bright top edge
+    arcWall(92, 0, 14, false, "#38b060"); g.strokeStyle = "#8be8a8"; g.beginPath(); ringPts(92, 14, 0, Math.PI * 2).forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
+    // vacuum jar: base collar, glass body (back wall tint, front tint), dome and rim, highlights
+    const JR = 112, JH = 66, base = ringPts(JR, 0, 0, Math.PI * 2), top = ringPts(JR, JH, 0, Math.PI * 2);
+    const xs = base.map((q) => q[0]), L = Math.min(...xs), Rr = Math.max(...xs), ysb = base.map((q) => q[1]), yst = top.map((q) => q[1]);
+    const gl2 = g.createLinearGradient(L, 0, Rr, 0); gl2.addColorStop(0, "rgba(190,225,255,.30)"); gl2.addColorStop(0.35, "rgba(190,225,255,.07)"); gl2.addColorStop(0.8, "rgba(190,225,255,.10)"); gl2.addColorStop(1, "rgba(190,225,255,.32)");
+    g.fillStyle = gl2; g.beginPath(); g.moveTo(L, base[Math.round(base.findIndex((q) => q[0] === L))][1]); for (const [x, y] of top) g.lineTo(x, y); g.lineTo(Rr, ysb[xs.indexOf(Rr)]); for (let k = base.length - 1; k >= 0; k--) g.lineTo(base[k][0], base[k][1]); g.closePath(); g.fill();
+    g.strokeStyle = "rgba(205,232,255,.75)"; g.lineWidth = 1.5; g.beginPath(); top.forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.stroke();
+    g.beginPath(); base.forEach(([x, y], k) => (k ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.stroke();
+    const tl = top[top.findIndex((q) => q[0] === L)], tr = top[xs.indexOf(Rr) % top.length], bl = base[xs.indexOf(L)], br = base[xs.indexOf(Rr)];
+    g.beginPath(); g.moveTo(tl[0], tl[1]); g.lineTo(bl[0], bl[1]); g.moveTo(tr[0], tr[1]); g.lineTo(br[0], br[1]); g.stroke();
+    // dome cap and highlights
+    const cx0 = (L + Rr) / 2, cyT = (tl[1] + tr[1]) / 2; g.strokeStyle = "rgba(205,232,255,.55)"; g.beginPath(); g.ellipse(cx0, cyT, (Rr - L) / 2, 26, 0, Math.PI, Math.PI * 2); g.stroke(); g.fillStyle = "rgba(190,225,255,.06)"; g.fill();
+    g.strokeStyle = "rgba(255,255,255,.45)"; g.lineWidth = 3; g.beginPath(); g.moveTo(L + 16, tl[1] + 8); g.lineTo(L + 14, bl[1] - 12); g.stroke(); g.lineWidth = 1;
+    // label strip below the scene (kept clear of the picture)
+    g.fillStyle = "#0a0f15"; g.fillRect(0, SH, W, H - SH); g.font = "10px sans-serif"; g.textAlign = "left"; g.textBaseline = "middle";
+    const lg = [["#8b929b", "lead block: radon source"], [foilCol, (plum ? "plum-pudding" : r ? FM.TARGETS[r.target].name.toLowerCase() : "gold") + " foil"], ["#38b060", "green wall: flash screen"]]; let lx0 = 8;
+    for (const [c, t] of lg) { g.fillStyle = c; g.fillRect(lx0, SH + 7, 9, 9); g.fillStyle = "#cfe3f5"; g.fillText(t, lx0 + 13, SH + 12); lx0 += 14 + g.measureText(t).width + 12; }
+    g.fillStyle = "#cfe3f5"; g.fillText("glass jar: vacuum, so air cannot stop the alphas", 8, SH + 26);
+    g.fillStyle = "#1c2b1c"; g.fillRect(W - 96, SH + 14, 88, 18); g.fillStyle = "#9fe870"; g.font = "bold 13px ui-monospace,monospace"; g.textAlign = "right"; g.fillText(String(r ? r.n : 0).padStart(6, "0"), W - 12, SH + 24); g.font = "9px sans-serif"; g.fillStyle = "#cfe3f5"; g.fillText("fired", W - 100, SH + 24); g.textBaseline = "alphabetic";
     const run0 = sc().key === "mine" ? run("real") : null;
     histCanvas(histC, r, run0, logCk.checked); scope.draw();
   }
