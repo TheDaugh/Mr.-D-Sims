@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My lab feedback · Mr. D's Sims</title>
+<meta name="description" content="Type your ID to see how your lab report scored on each scale, what to fix, and where to practice.">
+<link rel="stylesheet" href="../chemistry/shared/lab.css">
+<style>
+.wrap{max-width:860px;margin-inline:auto;padding-inline:clamp(12px,3vw,24px)}
+.idrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.idrow input{font:inherit;font-size:1.2rem;padding:8px 12px;width:14em;max-width:100%;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+.lab{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:14px 16px;margin:14px 0}
+.lab h2{margin:0 0 2px}
+.crit{border-top:1px solid var(--line);padding:10px 0}
+.pips{display:flex;gap:6px;margin:4px 0}
+.pip{min-width:2.2em;text-align:center;padding:2px 8px;border:1px solid var(--line);border-radius:99px;font-weight:700;font-size:.9rem}
+.pip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.status{font-weight:700}.status.good{color:var(--ok)}.status.not{color:var(--bad)}
+.fix{background:var(--note-bg);border-radius:10px;padding:10px 14px;margin-top:10px}
+.chips span{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:2px 10px;margin:2px 4px 2px 0;font-size:.88rem}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.links a{display:inline-block;padding:7px 14px;border-radius:8px;border:1px solid var(--accent);color:var(--accent);text-decoration:none;font-weight:600}
+.links a.main{background:var(--accent);color:var(--accent-ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><a class="back" href="../index.html">← Mr. D's Sims</a><span class="crumb">My lab feedback</span></header>
+  <h1>My lab feedback</h1>
+  <p class="lead">Type your ID to see how each part of your lab report scored, what to do to reach the next level, and where to practice.</p>
+
+  <form class="idrow" id="f">
+    <label for="id"><b>Your ID</b></label>
+    <input id="id" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="the ID you typed in the lab">
+    <button class="btn primary" type="submit">Show my feedback</button>
+  </form>
+  <p class="hint" role="status" id="msg"></p>
+  <div id="out"></div>
+
+  <details class="note" style="margin-top:24px"><summary>Mr. D gave me a feedback file</summary>
+    <p class="hint">If your scores are not here, load the file Mr. D gives you. It stays on this computer, and holds only scale levels, not your work.</p>
+    <label class="btn" style="cursor:pointer">Choose lab-feedback.json<input id="file" type="file" accept=".json,application/json" hidden></label>
+    <button class="btn" type="button" id="forget">Remove loaded feedback from this computer</button>
+  </details>
+  <footer class="hint" style="margin:28px 0">Your scores stay on this computer. Nothing is sent anywhere.</footer>
+</div>
+<script src="../shared/gradebook.js"></script>
+<script>
+(function () {
+  "use strict";
+  var GB = MrD.gradebook, $ = function (i) { return document.getElementById(i); };
+  var BASE = "../chemistry/virtual-lab/", labs = {}, remed = {};
+
+  function e(tag, cls, text) { var x = document.createElement(tag); if (cls) x.className = cls; if (text != null) x.textContent = text; return x; }
+  function link(label, href, main) { var a = e("a", main ? "main" : "", label); a.href = href; return a; }
+
+  var ready = Promise.all(GB.LAB_FILES.map(function (f) {
+    return fetch(BASE + f).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (j) { labs[j.id] = j; }).catch(function () { });
+  })).then(function () { return fetch("lab-remediation.json").then(function (r) { return r.json(); }).then(function (j) { remed = j; }).catch(function () { }); });
+
+  function labCard(entry) {
+    var def = labs[entry.lab]; if (!def) return null;
+    var fb = GB.feedback(def, entry.levels), card = e("section", "lab");
+    card.appendChild(e("h2", null, def.title));
+    card.appendChild(e("p", "hint", (entry.started ? new Date(entry.started).toLocaleDateString() + " · " : "") + fb.total + " of " + fb.max + (fb.complete ? "" : " so far (" + fb.scored + " of " + fb.of + " parts scored)")));
+    fb.criteria.forEach(function (c) {
+      var row = e("div", "crit"), top = e("div"); top.appendChild(e("b", null, c.name + "  "));
+      if (!c.scored) { top.appendChild(e("span", "hint", "not scored yet")); row.appendChild(top); card.appendChild(row); return; }
+      top.appendChild(e("span", "status " + (c.ok ? "good" : "not"), c.ok ? "✔ Got it" : "Not yet"));
+      row.appendChild(top);
+      var pips = e("div", "pips"); pips.setAttribute("aria-label", "Level " + c.level + " of " + c.top);
+      for (var n = 0; n <= c.top; n++) pips.appendChild(e("span", "pip" + (n === c.level ? " on" : ""), String(n)));
+      row.appendChild(pips);
+      row.appendChild(e("div", null, "Level " + c.level + ": " + c.now + "."));
+      if (c.next) { var nx = e("div", "hint"); nx.appendChild(e("b", null, "To reach level " + (c.level + 1) + ": ")); nx.appendChild(document.createTextNode(c.next + ".")); row.appendChild(nx); }
+      card.appendChild(row);
+    });
+    if (fb.need.length) card.appendChild(fixBox(def, fb));
+    else if (fb.complete) card.appendChild(e("p", "status good", "✔ Every part is at level " + GB.SATISFACTORY + " or higher. Nice work."));
+    return card;
+  }
+
+  /* what to do about the parts below level 2: the lab's own checklist and sentence starters, then where to practice */
+  function fixBox(def, fb) {
+    var box = e("div", "fix"), pl = def.postlab || {}, rm = remed[def.id] || {};
+    box.appendChild(e("h3", null, "Fix it: " + fb.need.join(", ")));
+    if (pl.checklist && pl.checklist.length) {
+      box.appendChild(e("p", null, "Check your writing against each line:"));
+      var ul = e("ul"); pl.checklist.forEach(function (t) { ul.appendChild(e("li", null, t)); }); box.appendChild(ul);
+    }
+    var st = pl.starters && (pl.starters.reasoning || pl.starters.claim);
+    if (st && st.length) {
+      box.appendChild(e("p", null, "Sentence starters that help:"));
+      var u2 = e("ul"); st.forEach(function (t) { u2.appendChild(e("li", null, t.trim() + " …")); }); box.appendChild(u2);
+    }
+    if (pl.wordBank && pl.wordBank.length) {
+      box.appendChild(e("p", null, "Words to use:")); var ch = e("div", "chips"); pl.wordBank.forEach(function (w) { ch.appendChild(e("span", null, w)); }); box.appendChild(ch);
+    }
+    var ln = e("div", "links");
+    if (rm.redo) ln.appendChild(link(rm.redo.label, rm.redo.href, true));
+    (rm.practice || []).forEach(function (p) { ln.appendChild(link(p.label, p.href)); });
+    ln.appendChild(link("More practice: review portal", "index.html"));
+    box.appendChild(ln);
+    return box;
+  }
+
+  function show(id) {
+    var out = $("out"); out.textContent = "";
+    if (!id.trim()) { $("msg").textContent = "Type your ID first."; return; }
+    ready.then(function () { return GB.forStudent(id); }).then(function (list) {
+      var cards = list.map(labCard).filter(Boolean);
+      if (!cards.length) { $("msg").textContent = "No scored lab found for that ID on this computer. Check the spelling, or ask Mr. D if your report has been scored."; return; }
+      $("msg").textContent = cards.length + " lab" + (cards.length === 1 ? "" : "s") + " found.";
+      cards.forEach(function (c) { out.appendChild(c); });
+    });
+  }
+  $("f").addEventListener("submit", function (ev) { ev.preventDefault(); show($("id").value); });
+  $("file").addEventListener("change", function () {
+    var f = this.files[0]; if (!f) return;
+    f.text().then(function (t) { var n = GB.slimImport(t); $("msg").textContent = n + " scored lab" + (n === 1 ? "" : "s") + " loaded onto this computer. Now type your ID."; })
+      .catch(function (er) { $("msg").textContent = er.message; });
+  });
+  $("forget").addEventListener("click", function () { GB.slimClear(); $("out").textContent = ""; $("msg").textContent = "Loaded feedback removed from this computer."; });
+  window.__feedback = { show: show };
+})();
+</script>
+</body>
+</html>

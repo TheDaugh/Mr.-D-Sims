@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculus · Teacher hub</title>
+<meta name="robots" content="noindex">
+<style>
+:root{--bg:#f5f3ee;--panel:#fff;--ink:#1c2530;--muted:#566170;--line:#d8d3c6;--accent:#6b3fc4;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--bg:#12181f;--panel:#1b232c;--ink:#e8edf2;--muted:#9aa7b5;--line:#2f3a46;--accent:#b896ff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+.wrap{padding:16px clamp(12px,3vw,40px) 48px}a{color:var(--accent)}h1{margin:6px 0 0}h2{margin:0 0 8px;font-size:1.15rem}
+.sub,.hint{color:var(--muted)}.hint{font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin:14px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.code{font:800 2.4rem ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em}
+.code.sm{font-size:1.5rem}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;font-size:.95rem;vertical-align:top}
+button{font:inherit;padding:5px 12px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+#fs{position:fixed;inset:0;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;z-index:50}
+#fs[hidden]{display:none}#fsc{font:800 20vw ui-monospace,monospace;letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html">← Calculus</a> · <a href="../teacher/index.html">All classes</a>
+  <h1>Calculus · Teacher hub</h1>
+  <p class="sub" id="mode"></p>
+
+  <div class="grid">
+    <section class="card"><h2>Today's huddle code</h2>
+      <div class="code" id="hc"></div>
+      <p class="hint">The same code works in every class and every lesson. It changes at 7:00 AM and is readable from then on. Students are asked for it only on weekdays 7:00 AM to 3:00 PM.</p>
+      <p><button id="proj" type="button">Show it large for the board</button></p></section>
+    <section class="card"><h2>Unlock any locked student</h2>
+      <div class="code sm" id="ov"></div>
+      <p class="hint">Only used by lessons that run in locked mode.</p></section>
+    <section class="card"><h2>Today's calculus periods</h2>
+      <table id="per"></table></section>
+    <section class="card"><h2>More</h2>
+      <p><a href="../portal/index.html">Review portal</a> · <a href="../teacher/index.html">Live view</a> · <a href="../chemistry/virtual-lab/teacher.html">Lab report grading</a></p>
+      <p class="hint">Add <b>#key</b> to any guided lesson's address to see exactly what students see, with every step open and the answers marked.</p></section>
+  </div>
+
+  <section class="card"><h2>Lessons and teacher pages</h2>
+    <table id="lessons"></table>
+    <p class="hint">This list is built from <code>calculus/sims.js</code>, the same file the student hub reads. A new lesson with a <code>teacher</code> list appears here with no other edit.</p></section>
+</div>
+<div id="fs" hidden><div id="fsc"></div><div class="hint">Huddle code · all classes</div><button id="fsx" type="button">Close</button></div>
+<script src="../shared/config.js"></script>
+<script src="../shared/bell.js"></script>
+<script src="../shared/codes.js"></script>
+<script src="sims.js"></script>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)},B=MrD.bell,c=B.clock("calc");
+  function esc(s){return String(s).replace(/[&<>"]/g,function(x){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[x]})}
+  $("hc").textContent=MrD.codes.huddle();$("ov").textContent=MrD.codes.override();
+  $("mode").textContent=(c.mode==="class"?"Calculus is in session. ":"Calculus is not in session. ")+(c.gates?"Huddle codes are required right now.":"Huddle codes are off right now (before 7:00 AM, after 3:00 PM, or a weekend).");
+  $("proj").onclick=function(){$("fsc").textContent=MrD.codes.huddle();$("fs").hidden=false};$("fsx").onclick=function(){$("fs").hidden=true};
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")$("fs").hidden=true});
+  var ps=B.periods("calc"),t=$("per");
+  t.innerHTML=!ps.length?"<tr><td>No calculus periods today.</td></tr>":"<tr><th>Period</th><th>Bell</th><th>Notes end</th><th>Ends</th></tr>"+ps.map(function(p,i){return"<tr><td>"+(i+1)+"</td><td>"+B.fmtTime(p.start)+"</td><td>"+(p.friday?"at the bell":B.fmtTime(p.endMark))+"</td><td>"+B.fmtTime(p.end)+"</td></tr>"}).join("");
+  var rows="<tr><th>Unit</th><th>Lesson</th><th>Student page</th><th>Teacher</th></tr>";
+  (window.UNITS||[]).forEach(function(u){(u.entries||[]).forEach(function(e){
+    rows+="<tr><td>"+esc(u.title)+"</td><td>"+esc(e.title)+"</td><td><a href=\""+esc(e.href)+"\">Open</a></td><td>"+(e.teacher||[]).map(function(l){return"<a href=\""+esc(l.href)+"\">"+esc(l.label)+"</a>"}).join(" · ")+"</td></tr>";
+  })});
+  $("lessons").innerHTML=rows;
+})();
+</script>
+</body>
+</html>

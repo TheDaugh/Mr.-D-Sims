@@ -15,18 +15,27 @@
   .tl { max-height: 320px; overflow: auto; font-size: .85rem; background: var(--note-bg); border-radius: 8px; padding: 8px 12px; margin: 6px 0 12px; }
   .tl div { padding: 2px 0; } .tl .inc { color: var(--bad); font-weight: 600; }
   .scrollx { overflow-x: auto; }
+  .nameBox { width: 9em; margin-left: 6px; font: inherit; padding: 2px 6px; }
+  .scales { margin: 8px 0 14px; } .scale { margin: 8px 0; }
+  .lvls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px; margin-top: 4px; }
+  .lvl { text-align: left; display: flex; gap: 8px; align-items: flex-start; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: inherit; font: inherit; font-size: .85rem; cursor: pointer; }
+  .lvl:hover { border-color: var(--accent); }
+  .lvl.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .lvl b { min-width: 1.1em; }
+  .fbtext { white-space: pre-wrap; font: inherit; font-size: .9rem; background: var(--note-bg); border-radius: 8px; padding: 8px 12px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top"><a class="back" href="../">← Chemistry hub</a><span class="crumb">Virtual Lab · teacher view</span></header>
   <h1>Class records</h1>
-  <p class="lead">Drop the <code>lab-record-….json</code> files students turned in. Nothing is uploaded anywhere; the files are read in this browser tab.</p>
+  <p class="lead">Drop the <code>lab-record-….json</code> files students turned in. Nothing is uploaded anywhere. Records are kept in this browser, filed under each student's ID, so they are here the next time you open this page.</p>
   <div id="boot" class="note">Loading the lab data…</div>
   <div id="app" hidden>
     <section class="card">
       <div id="drop">Drop record files here, or <label class="btnlike" style="display:inline-flex;margin-left:6px">choose files <input id="files" type="file" accept=".json,application/json" multiple hidden></label></div>
       <p class="hint">Records are plain files a student could edit, so treat them as evidence, not proof. The event timeline shows how a student actually worked.</p>
+      <div class="controls"><span id="saved" class="hint" role="status"></span><button id="fbexport" title="A small file with each student's scale levels and no work, to load on the computers students use">Save feedback file for student computers</button><button id="wipe">Delete saved records</button></div>
       <div id="msg" class="hint" role="status"></div>
     </section>
     <section class="card" id="rosterCard" style="margin-top:16px" hidden>
@@ -46,6 +55,7 @@
     </section>
   </div>
 </div>
+<script src="../../shared/gradebook.js"></script>
 <script type="module" src="src/teacher.js"></script>
 </body>
 </html>

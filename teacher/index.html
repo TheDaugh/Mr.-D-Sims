@@ -41,7 +41,8 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
       <p class="hint">The locked screen shows a name and a lock number. Only chemistry's Atom Discovery uses locked mode today; the others have no lock to open.</p></section>
   </div>
 
-  <section class="card" style="margin-bottom:14px"><h2>Today's huddle codes</h2>
+  <section class="card" style="margin-bottom:14px"><h2>Today's huddle code</h2>
+    <p><a href="#" id="hc" class="code" style="font-size:3rem;text-decoration:none"></a></p>
     <p class="hint" id="gate-note"></p>
     <table id="codes"></table>
   </section>
@@ -53,7 +54,7 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
   </section>
 
   <section class="card" style="margin-bottom:14px"><h2>Virtual labs</h2>
-    <p class="hint">Open any lab to check it. The live view above does not see virtual labs: each student's work is saved in their own browser, and they hand in a record file. Load those files on the <a href="../chemistry/virtual-lab/teacher.html">virtual-lab teacher page</a> to see predictions, counts, attempts and CERs.</p>
+    <p class="hint">Open any lab to check it. The live view above does not see virtual labs: each student's work is saved in their own browser, and they hand in a record file. Load those files on the <a href="../chemistry/virtual-lab/teacher.html">virtual-lab teacher page</a> to see predictions, counts, attempts and CERs. They are saved there under each student's ID, you click a scale level for each part, and students type their ID at <a href="../portal/feedback.html">portal/feedback.html</a> to read the feedback.</p>
     <table><tr><th>Lab</th><th>Open</th></tr>
       <tr><td>Rutherford's Gold Foil (Manchester 1909 room, atom microscope)</td><td><a href="../chemistry/virtual-lab/index.html?lab=rutherford">Open</a> · <a href="../chemistry/virtual-lab/index.html?lab=rutherford&resume=0">fresh start</a></td></tr>
       <tr><td>Heating Curves of Unknown Solids</td><td><a href="../chemistry/virtual-lab/index.html?lab=heating">Open</a></td></tr>
@@ -67,7 +68,7 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
 
   <section class="card"><h2>More</h2>
     <p><a href="../portal/index.html">Review portal</a>: load a class's scores files to see standards by student, or hand the link to students.</p>
-    <p><a href="../physics/lessons/teacher.html">Physics teacher page</a> · <a href="../chemistry/teacher.html">Chemistry teacher page</a> · <a href="../calculus/unit-2-differentiation/2-7-product-rule-teacher.html">Calculus teacher page</a></p>
+    <p><a href="../physics/lessons/teacher.html">Physics teacher page</a> · <a href="../chemistry/teacher.html">Chemistry teacher page</a> · <a href="../calculus/teacher.html">Calculus teacher hub</a></p>
     <p class="hint">Add <code>#key</code> to any guided lesson's address to see exactly what students see, with every step open and the answers marked.</p></section>
 </div>
 <div id="fs" hidden><div id="fsc"></div><div id="fsd" class="hint"></div><button id="fsx" type="button">Close</button></div>
@@ -90,11 +91,12 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
     }).join("");
     $("status-body").innerHTML="<table>"+rows+"</table><p class=\"hint\">"+(B.gatesOn()?"Huddle codes are being asked for now (weekdays 7:00 AM to 3:00 PM).":"Huddle codes are off now: students finishing at home are never stopped for a code.")+"</p>";
     $("ov").textContent=MrD.codes.override();
-    $("gate-note").textContent="Codes change at 7:00 AM and are readable from then on. Tap a code to show it large for the board.";
-    $("codes").innerHTML="<tr><th>Lesson</th><th>Codes</th><th>Teacher view</th></tr>"+L.map(function(l){
-      return "<tr><td>"+esc(cname[l.course])+": "+esc(l.title)+"</td><td>"+l.gates.map(function(g){var c=MrD.codes.gate(l.id,g.key);return esc(g.label)+' <a href="#" data-c="'+c+'" data-t="'+esc(l.title+" · "+g.label)+'" class="code" style="font-size:1.2rem;text-decoration:none">'+c+"</a>"}).join(" &nbsp; ")+'</td><td><a href="../'+l.href+'#key">#key view</a> · <a href="../'+l.teacher+'">teacher page</a></td></tr>';
+    var hc=MrD.codes.huddle();$("hc").textContent=hc;
+    $("gate-note").textContent="One code for every class, course and lesson. It changes at 7:00 AM and is readable from then on. Tap it to show it large for the board.";
+    $("hc").onclick=function(e){e.preventDefault();$("fsc").textContent=hc;$("fsd").textContent="Huddle code · all classes";$("fs").hidden=false};
+    $("codes").innerHTML="<tr><th>Lesson</th><th>Teacher view</th></tr>"+L.map(function(l){
+      return "<tr><td>"+esc(cname[l.course])+": "+esc(l.title)+'</td><td><a href="../'+l.href+'#key">#key view</a> · <a href="../'+l.teacher+'">teacher page</a></td></tr>';
     }).join("");
-    [].forEach.call($("codes").querySelectorAll("a[data-c]"),function(a){a.onclick=function(e){e.preventDefault();$("fsc").textContent=a.getAttribute("data-c");$("fsd").textContent=a.getAttribute("data-t");$("fs").hidden=false}});
   }
   $("fsx").onclick=function(){$("fs").hidden=true};
   paint();setInterval(paint,30000);

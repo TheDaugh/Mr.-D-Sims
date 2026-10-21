@@ -1,7 +1,9 @@
 /* MrD.codes: every daily code, computed in one place so the student page, the teacher bar and the
    teacher dashboard can never disagree.  Needs bell.js first (the code day rolls over at 7:00 AM).
 
-   gate(lessonId, key)       huddle code a student types to continue          e.g. gate("newtons-first-law","h1")
+   gate(lessonId, key)       THE huddle code for today. One code for every class, course, lesson and huddle,
+                             so students never have to carry or compare codes. The arguments are kept so every
+                             lesson's existing call still works; they no longer change the result.
    override()                one code per day that unlocks ANY locked student  (shown on every teacher bar)
    lock(lessonId, name, n)   the code for one student's n-th lock               (works for that student only)
    lockOff()                 the code in a #nolock=<code> link
@@ -23,7 +25,8 @@
 
   MrD.codes = {
     fnv: fnv, norm: norm, day: day,
-    gate: function (lessonId, key, d) { return four(lessonId + "|" + key + "|" + day(d)); },
+    huddle: function (d) { return four("huddle|" + day(d)); },
+    gate: function (lessonId, key, d) { return four("huddle|" + day(d)); },
     override: function (d) { return four("override|" + day(d)); },
     lock: function (lessonId, name, n, d) { return four(lessonId + "|" + norm(name) + "|lock" + n + "|" + day(d)); },
     lockOff: function (d) { return four("|off|" + day(d)); },

@@ -11,6 +11,8 @@
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
 .box{border:1px solid var(--line,#ccd);border-radius:10px;padding:12px 16px;background:var(--panel,transparent)}
 table.t{border-collapse:collapse}table.t td,table.t th{border:1px solid var(--line,#ccd);padding:4px 10px;text-align:left}
+#fs{position:fixed;inset:0;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50}
+#fs[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -20,9 +22,8 @@ table.t{border-collapse:collapse}table.t td,table.t th{border:1px solid var(--li
   <p id="mode" class="lead"></p>
 
   <div class="grid">
-    <section class="box"><h2>Atom Discovery · today's codes</h2>
-      <p>Huddle 1 <span class="code" id="h1"></span></p>
-      <p>Huddle 2 <span class="code" id="h2"></span></p>
+    <section class="box"><h2>Today's codes</h2>
+      <p>Huddle code, same for every class and lesson <span class="code" id="h1"></span></p>
       <p>Unlock any locked student <span class="code" id="ov"></span></p>
       <p class="hint">Codes change at 7:00 AM and are available from then on. Students are asked for huddle codes only on weekdays 7:00 AM to 3:00 PM. After 3:00 PM, or at home, no code is needed.</p>
       <p><button class="btn" id="proj" type="button">Show the huddle code large</button></p>
@@ -51,14 +52,14 @@ table.t{border-collapse:collapse}table.t td,table.t th{border:1px solid var(--li
     </section>
   </div>
 </div>
-<div id="fs" hidden style="position:fixed;inset:0;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50"><div id="fsc" style="font:800 22vw ui-monospace,monospace;letter-spacing:.1em"></div><button class="btn" id="fsx" type="button">Close</button></div>
+<div id="fs" hidden><div id="fsc" style="font:800 22vw ui-monospace,monospace;letter-spacing:.1em"></div><button class="btn" id="fsx" type="button">Close</button></div>
 <script src="../shared/config.js"></script>
 <script src="../shared/bell.js"></script>
 <script src="../shared/codes.js"></script>
 <script>
 (function(){
   var L="atom-discovery",$=function(i){return document.getElementById(i)},c=MrD.bell.clock("chem");
-  $("h1").textContent=MrD.codes.gate(L,"h1");$("h2").textContent=MrD.codes.gate(L,"h2");$("ov").textContent=MrD.codes.override();
+  $("h1").textContent=MrD.codes.huddle();$("ov").textContent=MrD.codes.override();
   $("mode").textContent=(c.mode==="class"?"Chemistry is in session. ":"Chemistry is not in session. ")+(c.gates?"Huddle codes are required right now.":"Huddle codes are off right now (before 7:00 AM, after 3:00 PM, or a weekend).");
   function lock(){var n=$("ln").value.trim();$("lc").textContent=n?MrD.codes.fnv?lockCode(n,$("lk").value):"":""}
   function lockCode(n,k){return MrD.codes.lock(L,n,k)}
@@ -68,7 +69,7 @@ table.t{border-collapse:collapse}table.t td,table.t th{border:1px solid var(--li
   var ps=MrD.bell.periods("chem");var t=$("per");
   if(!ps.length)t.innerHTML="<tr><td>No chemistry periods today.</td></tr>";
   else t.innerHTML="<tr><th>Period</th><th>Bell</th><th>Notes end</th><th>Ends</th></tr>"+ps.map(function(p,i){return "<tr><td>"+(i+1)+"</td><td>"+MrD.bell.fmtTime(p.start)+"</td><td>"+(p.friday?"at the bell":MrD.bell.fmtTime(p.endMark))+"</td><td>"+MrD.bell.fmtTime(p.end)+"</td></tr>"}).join("");
-  $("proj").onclick=function(){$("fsc").textContent=MrD.codes.gate(L,"h1");$("fs").hidden=false};$("fsx").onclick=function(){$("fs").hidden=true};
+  $("proj").onclick=function(){$("fsc").textContent=MrD.codes.huddle();$("fs").hidden=false};$("fsx").onclick=function(){$("fs").hidden=true};
 })();
 </script>
 </body>

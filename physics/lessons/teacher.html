@@ -62,13 +62,10 @@
   Object.keys(REG).forEach(function (id) { if (REG[id].predNames) LIBS[id] = { preds: REG[id].predNames }; });
   function plain(h) { var d = document.createElement('div'); d.innerHTML = String(h == null ? '' : h); return d.textContent.replace(/\s+/g, ' ').trim(); }
   /* codes */
-  var host = document.getElementById('codeHost');
+  var host = document.getElementById('codeHost'); host.className = 'grid2';
+  var hb = el('div', 'cell'); hb.innerHTML = '<b>Huddle code</b> <span class="hint">(same for every class and lesson)</span><br><span class="codebig">' + MrD.codes.huddle() + '</span>'; host.appendChild(hb);
   Object.keys(REG).forEach(function (id) {
-    var c = REG[id], box = el('div', 'grid2');
-    var a = el('div', 'cell'); a.innerHTML = '<b>' + c.title + '</b><br><a href="' + id + '.html">Student page</a><br><a href="' + id + '.html#key">Student page with the key on</a>'; box.appendChild(a);
-    var b = el('div', 'cell'); b.innerHTML = '<span class="hint">Huddle 1 code</span><br><span class="codebig">' + LE.codeFor(id, 'h1') + '</span>'; box.appendChild(b);
-    var d = el('div', 'cell'); d.innerHTML = '<span class="hint">Huddle 2 code</span><br><span class="codebig">' + LE.codeFor(id, 'h2') + '</span>'; box.appendChild(d);
-    host.appendChild(box);
+    var c = REG[id], a = el('div', 'cell'); a.innerHTML = '<b>' + c.title + '</b><br><a href="' + id + '.html">Student page</a><br><a href="' + id + '.html#key">Student page with the key on</a>'; host.appendChild(a);
   });
   var ov = el('div', 'cell'); ov.innerHTML = '<b>Unlock any locked student</b><br><span class="codebig">' + MrD.codes.override() + '</span><br><span class="hint">One code for every lesson and every student, until 7:00 AM tomorrow. Physics lessons only lock if you turn locked mode on for them.</span>'; host.appendChild(ov);
   host.appendChild(el('p', 'hint', 'Codes are readable from 7:00 AM and change at 7:00 AM each school day (' + MrD.bell.dayKey() + '). Students are asked for a huddle code only on weekdays 7:00 AM to 3:00 PM. After 3:00 PM, or at home, no code is asked.'));

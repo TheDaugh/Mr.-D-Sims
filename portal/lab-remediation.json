@@ -1,0 +1,22 @@
+{
+  "note": "Where a student goes when a lab scale is below level 2. Keyed by lab id (the id inside each lab JSON). 'redo' reopens the lab with new samples. 'practice' are the lessons and sims that rebuild the idea. Paths are from portal/. Add an entry here when you build a new lab.",
+  "01-unknown-solids": {
+    "redo": { "label": "Run the lab again with new unknowns", "href": "../chemistry/virtual-lab/index.html" },
+    "practice": [
+      { "label": "Counting Particles lesson", "href": "../chemistry/unit-3-atoms-ions/counting-particles.html" }
+    ]
+  },
+  "02-heating-curves": {
+    "redo": { "label": "Run the heating-curve lab again with new samples", "href": "../chemistry/virtual-lab/index.html?lab=heating" },
+    "practice": [
+      { "label": "Heating curve sim", "href": "../chemistry/unit-2-properties-of-matter/heating-curve.html" },
+      { "label": "Specific heat sim", "href": "../chemistry/unit-2-properties-of-matter/specific-heat.html" }
+    ]
+  },
+  "rutherford-gold-foil": {
+    "redo": { "label": "Run the gold foil lab again", "href": "../chemistry/virtual-lab/index.html?lab=rutherford&resume=0" },
+    "practice": [
+      { "label": "Rutherford's Gold Foil lesson", "href": "../chemistry/unit-3-atoms-ions/rutherford-gold-foil.html" }
+    ]
+  }
+}

@@ -41,6 +41,7 @@
     function topbar() {
       var t = e("nav", "hub-top"), a = e("a", null, "← All classes"); a.href = root + "index.html"; t.append(a, e("span", "sp"));
       var p = e("a", null, "Review portal"); p.href = root + "portal/index.html"; t.append(p);
+      if (o.course === "chem") { var fb = e("a", null, "My lab feedback"); fb.href = root + "portal/feedback.html"; t.append(fb); }
       var th = e("a", null, "Teacher page"); th.href = o.teacher || (root + "teacher/index.html"); t.append(th);
       return t;
     }

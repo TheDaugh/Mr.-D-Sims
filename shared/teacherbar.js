@@ -59,9 +59,7 @@
       : (c.gates ? "School hours, not this class's period" : "Home mode: no huddle codes");
     host.append(e("span", "dim", mode));
 
-    (o.gates || []).forEach(function (g) {
-      var w = e("span"); w.append((g.label || g.key) + " "); w.append(e("span", "code", MrD.codes.gate(o.lessonId, g.key))); host.append(w);
-    });
+    var hw = e("span"); hw.append("Huddle code (every class) "); hw.append(e("span", "code", MrD.codes.huddle())); host.append(hw);
     var u = e("span"); u.append("Unlock any locked student "); u.append(e("span", "code", MrD.codes.override())); host.append(u);
     if (!c.gates) host.append(e("span", "dim", "(codes are not asked for right now)"));
 
