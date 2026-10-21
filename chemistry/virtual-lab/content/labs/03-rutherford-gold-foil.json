@@ -4,9 +4,9 @@
   "title": "Rutherford's Gold Foil: Why the Plum-Pudding Atom Had to Go",
   "badgeTitle": "Gold Foil",
   "minActiveMin": 15,
-  "noDemo": true,
   "intro": "Manchester, 1909. Hans Geiger and Ernest Marsden sit in a darkened room counting faint flashes of light, one at a time, while Rutherford waits for the numbers. You take their place. You fire alpha particles from a radon source at a sheet of gold leaf and count where they land, then look inside the foil at one atom to see the forces that sent each particle where it went.",
   "introSteps": [
+    "Watch the demo, or skip it. Then the yellow arrows walk you through every step of the lab.",
     "Do the pre-lab: three short questions, then place 100 alpha particles where you think they will land and give a reason. You get no feedback on the placement yet. The dark-room curtain stays shut until you finish.",
     "Walk through the curtain into the dark room and press E at the foil apparatus. Click the objects around you to read about the real 1909 experiment.",
     "Run the plum-pudding model first, then the real gold foil. The detector counts hits for every 10° of angle, like Marsden counting flashes.",
@@ -296,13 +296,15 @@
       "id": "door",
       "text": "Go through the curtain into the dark room",
       "hint": "The dark-room CURTAIN is on the back wall of the office. Walk up through it.",
-      "state": "entered_lab"
+      "state": "entered_lab",
+      "tutorial": true
     },
     {
       "id": "bench",
       "text": "Step up to the foil apparatus",
       "hint": "Face the apparatus on the table and press E, or press N.",
-      "event": "scat_open"
+      "event": "scat_open",
+      "tutorial": true
     },
     {
       "id": "plum",
@@ -311,7 +313,8 @@
       "event": "scat_done",
       "where": {
         "model": "plum"
-      }
+      },
+      "tutorial": true
     },
     {
       "id": "real",
@@ -322,14 +325,16 @@
         "model": "real",
         "target": "Au",
         "thick": "1"
-      }
+      },
+      "tutorial": true
     },
     {
       "id": "scope",
       "text": "Look inside the foil: fire 5 alpha particles in the atom microscope",
       "hint": "Press M or the Atom scope button. Click the black field to fire an alpha at that height. Try the nuclear scale.",
       "event": "scat_shot",
-      "count": 5
+      "count": 5,
+      "tutorial": true
     },
     {
       "id": "rebound",
@@ -338,19 +343,22 @@
       "event": "scat_shot",
       "where": {
         "rebound": "true"
-      }
+      },
+      "tutorial": true
     },
     {
       "id": "tally",
       "text": "Answer the three data questions from your table",
       "hint": "Open Find the pattern in the apparatus. Use the Real foil column of the detector table.",
-      "state": "scat_tally"
+      "state": "scat_tally",
+      "tutorial": true
     },
     {
       "id": "match",
       "text": "Match each result to what it showed",
       "hint": "Open the Match section of the apparatus. Choose a meaning for each result.",
-      "state": "scat_match"
+      "state": "scat_match",
+      "tutorial": true
     },
     {
       "id": "rebuild",
@@ -359,13 +367,15 @@
       "event": "scat_done",
       "where": {
         "model": "mine"
-      }
+      },
+      "tutorial": true
     },
     {
       "id": "cer",
       "text": "Write and submit your claim, evidence and reasoning",
       "hint": "Press the Write CER button at the top. It opens once the apparatus work is finished.",
-      "state": "cer_done"
+      "state": "cer_done",
+      "tutorial": true
     },
     {
       "id": "challenge",
@@ -376,5 +386,9 @@
     }
   ],
   "roomFile": "manchester-lab",
-  "noPPE": true
+  "noPPE": true,
+  "tutorial": {
+    "scatter": true
+  },
+  "demoSteps": 9
 }

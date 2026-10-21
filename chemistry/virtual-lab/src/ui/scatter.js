@@ -86,7 +86,7 @@ export function createScatter(ctx) {
   const rate = h("input", { type: "range", min: A.rate.min, max: A.rate.max, step: A.rate.step, value: A.rate.start, "aria-label": "Beam rate", oninput: () => { sc().rate = +rate.value; rateOut.textContent = fmt(rate.value) + " per second"; } });
   const rateOut = h("span", { class: "hint" }, fmt(A.rate.start) + " per second");
   const counter = h("b", { style: "font:700 1.4rem ui-monospace,monospace" }), runLbl = h("div", { style: "font-weight:700" }), note = h("p", { class: "hint", role: "status" });
-  const fireBtn = h("button", { class: "primary", onclick: () => toggleFire() }, "Fire");
+  const fireBtn = h("button", { id: "scFire", class: "primary", onclick: () => toggleFire() }, "Fire");
   const resetBtn = h("button", { onclick: () => startOver() }, "Start this run over");
   function toggleFire() {
     const key = sc().key, r = ensure(key);
@@ -230,7 +230,7 @@ export function createScatter(ctx) {
 
   // ---- section 4: rebuild ----
   const SIZES = [100, 50, 20, 5, 1, 0.1, 0.001];
-  const atomSvg = h("div"), sizeIn = h("input", { type: "range", min: 0, max: SIZES.length - 1, step: 1, value: 0, "aria-label": "Size of the positive region", oninput: () => { sc().size = +sizeIn.value; log.add("scat_size", { pct: SIZES[+sizeIn.value] }); refresh(); } });
+  const atomSvg = h("div"), sizeIn = h("input", { id: "scSize", type: "range", min: 0, max: SIZES.length - 1, step: 1, value: 0, "aria-label": "Size of the positive region", oninput: () => { sc().size = +sizeIn.value; log.add("scat_size", { pct: SIZES[+sizeIn.value] }); refresh(); } });
   const sizeOut = h("p"), runMine = h("button", { class: "primary", onclick: () => { sc().key = "mine"; ensure("mine"); sc().firing = true; log.add("scat_fire", { model: "mine" }); notify(); window.scrollTo(0, 0); el.closest(".body").scrollTop = 0; } }, "Run your nucleus model");
   const rebuildNote = h("p", { class: "hint", role: "status" });
   function drawAtom() {
@@ -277,7 +277,7 @@ export function createScatter(ctx) {
   }
 
   // ---- finish ----
-  const finishBtn = h("button", { class: "primary", onclick: () => ctx.onFinish() }, "I'm done with the apparatus → write the CER");
+  const finishBtn = h("button", { id: "scFinish", class: "primary", onclick: () => ctx.onFinish() }, "I'm done with the apparatus → write the CER");
   const finishNote = h("span", { class: "hint" });
   const needDone = () => !!(run("plum") && run("plum").n >= A.plumNeeded && realRun(sc()) && tallyDone(sc(), lab) && matchDone(sc(), lab) && run("mine") && run("mine").done);
 
@@ -297,7 +297,7 @@ export function createScatter(ctx) {
 
   function refresh() {
     const s = sc(), r = run(s.key), key = s.key;
-    seg.replaceChildren(...["plum", "real"].map((k) => h("button", { class: key === k ? "on" : "", disabled: k === "real" && !realUnlocked(), onclick: () => choose(k) }, k === "plum" ? "Plum pudding" : "Real gold foil")));
+    seg.replaceChildren(...["plum", "real"].map((k) => h("button", { id: "scSeg_" + k, class: key === k ? "on" : "", disabled: k === "real" && !realUnlocked(), onclick: () => choose(k) }, k === "plum" ? "Plum pudding" : "Real gold foil")));
     unlockNote.textContent = realUnlocked() ? "" : `The real foil unlocks when the plum-pudding run reaches ${fmt(A.plumNeeded)} particles.`;
     runLbl.textContent = LABEL[key] + (key === "ch" && r ? ` · ${FM.TARGETS[r.target].name}, ${r.E} MeV, ${r.thick === 1 ? "normal" : r.thick + "×"} thickness` : "");
     counter.textContent = `${fmt(r ? r.n : 0)} / ${fmt(key === "plum" || key === "real" || key === "mine" || key === "ch" ? (key === "plum" ? A.cap : need(key)) : A.cap)}`;
@@ -310,5 +310,14 @@ export function createScatter(ctx) {
     draw();
   }
   refresh();
-  return { el, refresh, step, draw, needDone, scope, focusScope() { secScope.open = true; secScope.scrollIntoView(); }, stop() { sc().firing = false; scope.stop(); } };
+  const SEC = { run: secRun, scope: secScope, table: secTable, tally: secTally, match: secMatch, rebuild: secRebuild, challenge: secCh };
+  Object.entries(SEC).forEach(([k, d]) => { d.id = "scSec_" + k; });
+  const demo = {
+    n: (k) => (run(k) ? run(k).n : 0), key: () => sc().key,
+    go(key) { choose(key); sc().rate = 6000; rate.value = 6000; rateOut.textContent = "6,000 per second"; sc().firing = true; refresh(); },
+    stop() { sc().firing = false; refresh(); },
+    scroll(name) { const d = SEC[name]; if (d) { d.open = true; d.scrollIntoView({ block: "start" }); el.closest(".body").scrollTop -= 200; } },
+    top() { el.closest(".body").scrollTop = 0; }
+  };
+  return { el, refresh, step, draw, needDone, scope, demo, focusScope() { secScope.open = true; secScope.scrollIntoView(); }, stop() { sc().firing = false; scope.stop(); } };
 }

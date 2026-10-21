@@ -729,7 +729,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   };
   $("#theoryBody").replaceChildren(...theoryNodes(lab));
   $("#btnTheory").addEventListener("click", () => openDlg("dlgTheory")); $("#btnTasks").addEventListener("click", toggleTasks); $("#btnTasks").classList.add("on"); $("#btnNotebook").addEventListener("click", openNotebook);
-  if (SCAT) { $("#btnDemo").hidden = true; $("#btnNotebook").firstChild.textContent = "📓 Apparatus"; $("#btnMicro").textContent = "🔬 Atom scope"; $("#btnMicro").title = "Atom microscope (M)"; $("#ppe").hidden = true; $("#modeLine").hidden = true; }
+  if (SCAT) { $("#btnNotebook").firstChild.textContent = "📓 Apparatus"; $("#btnMicro").textContent = "🔬 Atom scope"; $("#btnMicro").title = "Atom microscope (M)"; $("#ppe").hidden = true; $("#modeLine").hidden = true; }
   $("#btnMicro").addEventListener("click", () => (SCAT ? openScope() : openMicro())); $("#btnDemo").addEventListener("click", () => demoStart());
   $("#btnMenu").addEventListener("click", () => openDlg("dlgMenu")); $("#btnCER").addEventListener("click", () => (S.stage === "done" ? openDone() : openCER()));
   $("#donePrint").addEventListener("click", () => $("#print").click());
@@ -759,10 +759,10 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     switch (id) {
       case "gear": return S.panel ? E($("#chestAll") || panelBtn(), "Put on goggles and apron (Q)") : T("locker", "Walk to the locker and press E");
       case "tongs": return S.panel ? E(panelBtn(), "Take the tongs") : T("tongs_rack", "Walk to the rack and press E");
-      case "door": return T("door", "Walk through the door");
+      case "door": return T("door", SCAT ? "Walk through the dark-room curtain" : "Walk through the door");
       case "jars": return take("shelf_unknown");
       case "liquids": return take("shelf_liquids");
-      case "bench": return toBench();
+      case "bench": return SCAT ? ["tile", "foil_rig", "Face the foil apparatus and press E"] : toBench();
       case "weigh": return weigh(TS);
       case "weighX": return weigh(TS);
       case "sol": return inRoom ? toBench() : c.loc !== "bench" ? E($("#mvBench"), "Move the container back to the bench") : S.srcKey !== "water" ? E($("#src"), "Choose water") : E($("#btnAdd"), "Add 20 mL, then press Stir");
@@ -771,14 +771,32 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       case "rowsX": return E(document.querySelector("#dlgNotebook[open]") ? btnText("Add row") : $("#btnNotebook"), "Record a row for each step");
       case "plotX": case "lineX": return E(document.querySelector("#dlgNotebook[open]") ? btnText("Graph") : $("#btnNotebook"), "Graph tab: click to plot, then Line to draw");
     }
+    if (SCAT) return scatGuide(id);
+    return null;
+  }
+  function scatGuide(id) {
+    const E = (e, x) => (e ? ["el", e, x] : null), open = !!document.querySelector("#dlgNotebook[open]"), sec = (k, x) => E($("#scSec_" + k + " > summary"), x);
+    const canvas = () => { const c = $("#scopeCanvas"); return c && c.offsetParent ? c : null; };
+    const key = S.scat.key, r = S.scat.runs[key], firing = S.scat.firing;
+    const apparatus = () => E($("#btnNotebook"), "Open the apparatus");
+    switch (id) {
+      case "plum": return !open ? apparatus() : key !== "plum" ? E($("#scSeg_plum"), "Pick the plum-pudding model") : E($("#scFire"), firing ? "Let it run to 10,000 hits" : "Fire the beam");
+      case "real": return !open ? apparatus() : key !== "real" ? E($("#scSeg_real"), "The real gold foil is unlocked: pick it") : E($("#scFire"), firing ? "Let it run to 20,000 hits" : "Fire the beam");
+      case "scope": case "rebound": return !open ? E($("#btnMicro"), "Open the atom microscope (M)") : canvas() ? E(canvas(), id === "scope" ? "Click the black field to fire one alpha particle. Fire five." : "Aim close to the middle line, head on, until one bounces back") : sec("scope", "Open the atom microscope");
+      case "tally": return !open ? apparatus() : sec("tally", "Count each group from your detector table");
+      case "match": return !open ? apparatus() : sec("match", "Match each result to what it showed");
+      case "rebuild": return !open ? apparatus() : sec("rebuild", "Resize the nucleus until your model matches the foil");
+      case "cer": return !open ? apparatus() : E($("#scFinish"), "Finish the apparatus, then write your CER");
+    }
     return null;
   }
   function updateGuide(items) {
     if (!TUT || !guideOn || S.demo || S.stage !== "lab") return guide.hide();
     const it = items.find((i) => i.q.tutorial && !(i.done || (i.prog || 0) >= 1 && i.q.count <= 3 && !["rowsX", "plotX", "lineX"].includes(i.q.id)));
-    if (!it) { guide.hide(); if (!tutAnnounced && items.some((i) => i.q.tutorial)) { tutAnnounced = true; say(`Tutorial done. Repeat these steps for the other samples; the arrows are off from here.`, "obs"); } return; }
+    if (!it) { guide.hide(); if (!tutAnnounced && items.some((i) => i.q.tutorial)) { tutAnnounced = true; say(SCAT ? "Tutorial done. The arrows are off. The challenge is optional and yours to run." : `Tutorial done. Repeat these steps for the other samples; the arrows are off from here.`, "obs"); } return; }
     const open = document.querySelector("#stage dialog[open]"); if (open && open.id !== "dlgNotebook" && open.id !== "dlgChest") return guide.hide();
-    if (open && open.id === "dlgNotebook" && !["rowsX", "plotX", "lineX", "runX"].includes(it.q.id)) return guide.hide();
+    if (open && open.id === "dlgNotebook" && !SCAT && !["rowsX", "plotX", "lineX", "runX"].includes(it.q.id)) return guide.hide();
+    if (open && open.id === "dlgMicro") return guide.hide();
     if (open && open.id === "dlgChest" && !["gear", "tongs", "jars", "liquids"].includes(it.q.id)) return guide.hide();
     let g; try { g = guideFor(it.q.id); } catch (e) { g = null; }
     if (!g) return guide.hide();
@@ -823,7 +841,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
 
   // scripted demo: runs on the real room and bench, then restores the student's own state
   const demoApi = {
-    demo: { running: false, stop() {} }, heat: HEAT,
+    demo: { running: false, stop() {} }, heat: HEAT, scat: SCAT ? scat : null, openScatter: () => openScatter(), closeScatter: () => closeDlg("dlgNotebook"), openScope: () => { openScatter(); }, scope: SCAT ? scat.scope : null,
     freeze() {
       const snap = structuredClone(snapshot()), extra = { feed: S.feed.slice(), view: S.view };
       S.demo = true; demoApi.demo.running = true;
@@ -831,6 +849,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       Object.assign(P, { x: room.start.x, y: room.start.y, face: "u" });
       CONT.forEach((c, i) => { c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; c.loc = "bench"; c.slot = i; c.heat = null; }); S.sel = "b1";
       if (HEAT) { S.heat = Object.fromEntries(unknowns.map((u) => [u.label, { rows: [], items: [], axes: { title: "", x: "", y: "" } }])); Object.assign(S, { speed: 1, paused: false, stepTo: null, interval: 10 }); book.refresh(); }
+      if (SCAT) { S.scat = newScat(); scat.scope.sync(S.scat.scope); scat.refresh(); }
       document.querySelectorAll("dialog[open]").forEach((d) => d.close()); setView("room"); renderPPE(); renderInv(); syncUnit();
       return { snap, extra };
     },
@@ -839,7 +858,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       S.demo = false; demoApi.demo.running = false; $("#demoBar").hidden = true; document.querySelectorAll("dialog[open]").forEach((d) => d.close());
       setView(extra.view); renderPPE(); renderInv(); renderControls(); syncUnit(); qsig = "";
     },
-    caption(n, text) { $("#demoBar").hidden = false; $("#demoText").textContent = `Demo ${n} of ${HEAT ? 10 : 9} · ${text}`; },
+    caption(n, text) { $("#demoBar").hidden = false; $("#demoText").textContent = `Demo ${n} of ${HEAT ? 10 : SCAT ? 9 : 9} · ${text}`; },
     walk: (d) => walk(d[0], d[1]), interact: () => interact(facingTile(room, P)), closePanel, togglePPE, take,
     addPractice() {
       world.species.set("practice", { id: "practice", name: "Practice salt (NaI)", formula: "NaI", phase: "s", solubility: 184, color: "#f4f4f0", heatEvents: [] });

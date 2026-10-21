@@ -13,7 +13,7 @@ export async function runDemo(api) {
   const walk = async (route) => { for (const d of path(route)) { live(); api.walk(d); await wait(230); } };
   const total = 9;
   try {
-    if (api.heat) await heatScript({ say, walk, wait, live, api }); else {
+    if (api.scat) await scatScript({ say, walk, wait, live, api }); else if (api.heat) await heatScript({ say, walk, wait, live, api }); else {
     await say(1, "Welcome. This tour shows every control. None of it counts toward your lab.", 2800);
     await say(2, "Walk with the arrow keys or WASD. The blue locker holds your goggles and apron.", 1400); await walk("ULLUL");
     await say(2, "Press E to use what you are facing. Put on goggles and an apron.", 1500); api.interact(); await wait(900); api.togglePPE("goggles"); await wait(700); api.togglePPE("apron"); await say(2, "Both are on. Now the door light is green.", 1800); api.closePanel();
@@ -51,4 +51,20 @@ async function heatScript({ say, walk, wait, live, api }) {
   await say(9, "Now the graph. It starts blank. You place every point yourself and draw the lines yourself.", 2600); api.act.graph(); await wait(900); api.act.plot(); await wait(2000);
   await say(10, "Name the graph and label both axes with units. When you are done with both samples, write your CER.", 3800);
   await say(10, "That is the tour. In the lab, yellow arrows will walk you through your first sample.", 3200);
+}
+
+// The scattering-lab tour: the curtain, the apparatus, both runs, the atom microscope, the tally, the rebuild.
+async function scatScript({ say, walk, wait, live, api }) {
+  const D = api.scat.demo;
+  await say(1, "Welcome. This tour shows every control of the gold-foil lab. None of it counts toward your lab.", 2800);
+  await say(2, "Walk with the arrow keys or WASD. Go through the dark-room curtain.", 1200); await walk("UUUUUU");
+  await say(3, "Face the foil apparatus and press E to step up to it.", 1200); api.interact(); await wait(1400); D.top();
+  await say(4, "Plum pudding first. Fire sends alpha particles at the model. The picture shows each flight; the histogram counts the hits by angle.", 1800); D.go("plum"); await wait(4200); D.stop(); live();
+  await say(5, "Almost everything goes straight through, as a plum-pudding atom predicts. Now the real gold foil unlocks.", 3400); D.go("real"); await wait(4600); D.stop(); live();
+  await say(6, "Some alphas land at big angles, and a few come straight back. The histogram is on a log scale so the rare hits stay visible.", 4200);
+  await say(7, "The atom microscope zooms into one atom. Click the field to fire at that height. Watch the forces on the alpha particle.", 1600); D.scroll("scope"); await wait(900); api.scope.aim(0.45); await wait(1600); api.scope.aim(0.04); await wait(2600); live();
+  await say(7, "Try a head-on shot. Close to the center line it bounces right back. That needs a tiny, dense, positive nucleus.", 3400); api.scope.aim(0.005); await wait(2800);
+  await say(8, "The detector table counts every hit by group. Tally the straight, deflected and rebounding hits, then match each result to what it showed.", 1400); D.scroll("table"); await wait(2200); D.scroll("tally"); await wait(2200); D.scroll("match"); await wait(2200);
+  await say(8, "Then you rebuild the atom: size a nucleus until your model matches the real foil. The challenge changes the metal, the energy and the foil thickness.", 1400); D.scroll("rebuild"); await wait(2400); D.scroll("challenge"); await wait(2600);
+  await say(9, "Last, write a Claim, Evidence, Reasoning that cites your own counts. That is the tour. In the lab, yellow arrows walk you through each step.", 3600);
 }

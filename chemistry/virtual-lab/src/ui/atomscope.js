@@ -9,7 +9,7 @@ const W = 640, H = 400, ATOMIC_W = 6e5, R_ATOM = 1.0e5;
 const sci = (v) => { if (!(v > 0)) return "0"; const e = Math.floor(Math.log10(v)); return e >= -1 && e <= 3 ? (v >= 100 ? v.toFixed(0) : v.toFixed(1)) : `${(v / Math.pow(10, e)).toFixed(1)}×10^${e}`; };
 
 export function createAtomScope({ state, onShot }) {
-  const st = () => state(), canvas = h("canvas", { width: W * 1, height: H, style: `width:${W}px;height:${H}px;background:#000;border-radius:8px;cursor:crosshair`, "aria-label": "Atom microscope: click to fire an alpha particle at that height" });
+  const st = () => state(), canvas = h("canvas", { id: "scopeCanvas", width: W * 1, height: H, style: `width:${W}px;height:${H}px;background:#000;border-radius:8px;cursor:crosshair`, "aria-label": "Atom microscope: click to fire an alpha particle at that height" });
   const g = canvas.getContext("2d"); let alphas = [], beamOn = false, beamT = 0, last = null, readT = 0, seq = 0;
   const geom = () => {
     const s = st(), Wfm = s.scale === "atomic" || s.model === "plum" ? ATOMIC_W : Math.max(14 * closestApproach(s.Z, s.E), 60), Hfm = (Wfm * H) / W, A = s.Z + s.N, R = nuclearRadius(A);
@@ -107,5 +107,5 @@ export function createAtomScope({ state, onShot }) {
   function sync(cfg) { const s = st(); Object.assign(s, cfg); pZ.inp.value = s.Z; pZ.out.textContent = s.Z; pN.inp.value = s.N; pN.out.textContent = s.N; eIn.value = s.E; eOut.textContent = s.E.toFixed(1) + " MeV"; (s.model === "plum" ? mPlum : mNuc).checked = true; (s.scale === "atomic" ? sAt : sNuc).checked = true; cTr.checked = s.traces; cFo.checked = s.forces; changed(); }
   const el = h("div", { style: "display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start" }, h("div", {}, canvas, read, lastBox), panel);
   renderRead(true);
-  return { el, tick, draw, sync, stop() { beamOn = false; beamBtn.textContent = "Fire a beam"; }, fire, setScale(sc) { st().scale = sc; sync(st()); } };
+  return { el, tick, draw, sync, aim(f) { return fire(f * geom().Hfm); }, stop() { beamOn = false; beamBtn.textContent = "Fire a beam"; }, fire, setScale(sc) { st().scale = sc; sync(st()); } };
 }
