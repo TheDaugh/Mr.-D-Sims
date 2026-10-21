@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free-Body Diagrams: projector page · Mr. D</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Projector page for Slot 4: six situations for the whiteboard check, the class split, common errors, vocabulary.">
+<link rel="stylesheet" href="engine/lesson.css">
+<style>
+ body{font-size:20px}
+ .pj-nav{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bg);padding:8px 0 10px;border-bottom:1px solid var(--line)}
+ .pj-nav .btn{font-size:1rem;padding:9px 16px}.pj-nav .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+ .pj-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:12px}
+ @media (max-width:1000px){.pj-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+ .pj-card h3{margin:0 0 4px;font-size:1.1rem}.pj-card .say{color:var(--muted);margin:0 0 6px}
+ .pj-card .fig{min-height:150px;display:flex;align-items:center;justify-content:center;background:var(--stage);border:1px dashed var(--line);border-radius:6px;margin:6px 0}
+ .pj-card .fig svg{max-height:190px}
+ .pj-card .net{font-weight:600;margin:6px 0}
+ .tally{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+ .tally button{display:flex;justify-content:space-between;align-items:center;gap:6px;font:600 .95rem var(--mono);padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);cursor:pointer}
+ .tally button b{font-size:1.15rem}.tally button.ok{border-color:var(--good)}.tally button.bad{border-color:var(--warn)}
+ .bar{display:flex;height:22px;border-radius:5px;overflow:hidden;background:var(--line);margin:4px 0}
+ .bar i{display:block;height:100%}.k-ok{background:var(--good)}.k-missing{background:var(--warn)}.k-extra{background:var(--gold)}.k-size{background:var(--accent)}
+ .legend span{display:inline-block;margin-right:14px;font:600 .85rem var(--mono)}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+ .err{border-left:5px solid var(--warn);padding:6px 12px;margin:8px 0;background:var(--stage);border-radius:0 6px 6px 0}.err.seen{border-left-color:var(--gold)}.err b{color:var(--warn)}
+ table.data{border-collapse:collapse;width:100%}table.data th,table.data td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+ .big{font-size:1.15em}.pj-two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media (max-width:1000px){.pj-two{grid-template-columns:1fr}}
+ textarea{width:100%;font:600 1rem var(--mono);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">&larr; Physics</a>
+  <h1>Free-Body Diagrams and Net Force</h1>
+  <p class="sub">Projector page for the whiteboard check. Nothing here is sent anywhere; tallies stay in this browser.</p>
+  <div class="pj-nav" role="toolbar" aria-label="Sections">
+    <button class="btn" type="button" data-p="sit">Six situations</button>
+    <button class="btn" type="button" data-p="split">Class split</button>
+    <button class="btn" type="button" data-p="err">Common errors</button>
+    <button class="btn" type="button" data-p="vocab">Vocabulary</button>
+    <button class="btn" type="button" data-p="core">Core ideas</button>
+    <a class="btn" href="fbd-net-force.html#key" style="text-decoration:none">Lesson with key</a>
+  </div>
+
+  <section class="card" id="p-sit">
+    <h2>Whiteboard hold-up: six situations</h2>
+    <p class="hint">Read the situation. Students draw and hold up the diagram. Tap <b>Show diagram</b> to reveal the right one, then tap what you see across the room.</p>
+    <div class="pj-grid" id="grid"></div>
+  </section>
+
+  <section class="card" id="p-split" hidden>
+    <h2>Class split</h2>
+    <p class="hint">Your hold-up tallies, plus any check-in codes students read out (C right, M a force missing, X an extra force, S arrows the wrong size). One code per line, three letters, for rest, steady motion, speeding up.</p>
+    <div class="pj-two"><div><textarea id="codes" rows="5" placeholder="CCS&#10;MCC&#10;CXC"></textarea><div class="row"><button class="btn primary" id="addcodes" type="button">Add these codes</button><button class="btn" id="reset" type="button">Reset all tallies</button></div><p class="hint" id="codemsg"></p></div>
+    <div><div class="legend"><span><i class="k-ok"></i>right</span><span><i class="k-missing"></i>force missing</span><span><i class="k-extra"></i>extra force</span><span><i class="k-size"></i>wrong size</span></div><div id="split"></div></div></div>
+    <h3>What the split says</h3><div id="verdict" class="big"></div>
+  </section>
+
+  <section class="card" id="p-err" hidden>
+    <h2>Common errors</h2>
+    <p class="hint">Tick the errors you saw. They become tomorrow’s warm-up.</p>
+    <div id="errs"></div>
+    <h3>Tomorrow’s warm-up</h3><div id="warm" class="big"></div>
+    <div class="row"><button class="btn" id="copywarm" type="button">Copy warm-up text</button></div>
+  </section>
+
+  <section class="card" id="p-vocab" hidden>
+    <h2>Vocabulary</h2><div id="vocab"></div>
+    <h3>The force catalog</h3><div class="scroll" id="cat"></div>
+  </section>
+
+  <section class="card" id="p-core" hidden>
+    <h2>Core ideas</h2><div id="core"></div>
+  </section>
+  <footer>Mr. D’s physics · Slot 4 projector page</footer>
+</div>
+<script src="content/fbd-net-force.spec.js"></script>
+<script>
+(function () {
+  'use strict';
+  var SP = window.SPECS['fbd-net-force'], KEY = 'fbd-projector.v1', LAB = { ok: 'Right', missing: 'Missing', extra: 'Extra', size: 'Size' }, ORDER = ['ok', 'missing', 'extra', 'size'];
+  function $(id) { return document.getElementById(id); }
+  function el(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+  var st = { tally: {}, seen: {}, shown: {} };
+  try { var raw = JSON.parse(localStorage.getItem(KEY)); if (raw && raw.tally) st = raw; } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  function tally(id) { return st.tally[id] || (st.tally[id] = { ok: 0, missing: 0, extra: 0, size: 0 }); }
+  function total(t) { return ORDER.reduce(function (a, k) { return a + t[k]; }, 0); }
+
+  /* panels */
+  var panels = ['sit', 'split', 'err', 'vocab', 'core'];
+  function show(id) { panels.forEach(function (p) { $('p-' + p).hidden = p !== id; }); document.querySelectorAll('.pj-nav [data-p]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.p === id)); }); if (id === 'split') renderSplit(); if (id === 'err') renderErr(); try { history.replaceState(null, '', '#' + id); } catch (e) {} }
+  document.querySelectorAll('.pj-nav [data-p]').forEach(function (b) { b.onclick = function () { show(b.dataset.p); }; });
+
+  /* six situations */
+  function renderGrid() {
+    var g = $('grid'); g.textContent = '';
+    SP.situations.forEach(function (s) {
+      var card = el('div', 'card pj-card'); card.appendChild(el('h3', null, s.id.slice(1) + '. ' + s.title)); card.appendChild(el('p', 'say', s.say));
+      var fig = el('div', 'fig'); card.appendChild(fig); var net = el('p', 'net'); card.appendChild(net);
+      function draw() { if (st.shown[s.id]) { fig.innerHTML = SP.fbd(s.forces, { alt: s.title }); net.textContent = 'Net force: ' + s.net; sb.textContent = 'Hide diagram'; } else { fig.textContent = 'Students draw. Then reveal.'; net.textContent = ''; sb.textContent = 'Show diagram'; } }
+      var sb = el('button', 'btn primary'); sb.type = 'button'; sb.onclick = function () { st.shown[s.id] = !st.shown[s.id]; save(); draw(); }; card.appendChild(sb);
+      var tl = el('div', 'tally'); var t = tally(s.id);
+      ORDER.forEach(function (k) { var b = el('button', k === 'ok' ? 'ok' : 'bad'); b.type = 'button'; b.setAttribute('aria-label', LAB[k] + ' for situation ' + s.id.slice(1)); var n = el('b', null, String(t[k])); b.appendChild(el('span', null, LAB[k])); b.appendChild(n);
+        b.onclick = function (ev) { t[k] = Math.max(0, t[k] + (ev.shiftKey ? -1 : 1)); n.textContent = t[k]; save(); }; b.oncontextmenu = function (ev) { ev.preventDefault(); t[k] = Math.max(0, t[k] - 1); n.textContent = t[k]; save(); }; tl.appendChild(b); });
+      card.appendChild(tl); card.appendChild(el('p', 'hint', 'Tap to add. Right-click or Shift+tap to subtract.')); g.appendChild(card); draw();
+    });
+  }
+
+  /* class split */
+  function barFor(t) { var b = el('div', 'bar'), n = total(t) || 1; ORDER.forEach(function (k) { if (t[k]) { var i = el('i', 'k-' + k); i.style.width = (100 * t[k] / n) + '%'; i.title = LAB[k] + ': ' + t[k]; b.appendChild(i); } }); return b; }
+  function renderSplit() {
+    var host = $('split'); host.textContent = ''; var worst = null;
+    SP.situations.forEach(function (s) { var t = tally(s.id), n = total(t); var row = el('div'); row.appendChild(el('b', null, s.id.slice(1) + '. ' + s.title + (n ? '  (' + n + ' students)' : ''))); row.appendChild(barFor(t)); host.appendChild(row);
+      ['missing', 'extra', 'size'].forEach(function (k) { if (n && t[k] && (!worst || t[k] / n > worst.share)) worst = { s: s, k: k, share: t[k] / n, n: t[k], of: n }; }); });
+    var v = $('verdict'); v.textContent = '';
+    if (!worst) { v.textContent = 'Tap the tallies or add check-in codes to see where the class is.'; return; }
+    var msg = { missing: 'a force is missing', extra: 'an extra force was added', size: 'the arrows are the wrong size' }[worst.k];
+    v.appendChild(el('p', null, 'Biggest split: situation ' + worst.s.id.slice(1) + ' (' + worst.s.title.toLowerCase() + '). ' + worst.n + ' of ' + worst.of + ' have ' + msg + '.'));
+    var er = worst.s.errors.filter(function (e) { return e.type === worst.k; })[0]; if (er) { v.appendChild(el('p', null, 'Say: ' + er.fix)); }
+  }
+  $('addcodes').onclick = function () {
+    var gate = { 0: 'S1', 1: 'S2', 2: 'S3' }, map = { C: 'ok', M: 'missing', X: 'extra', S: 'size' }, n = 0, bad = 0;
+    $('codes').value.split(/\n+/).map(function (x) { return x.trim().toUpperCase(); }).filter(Boolean).forEach(function (c) { if (!/^[CMXS]{3}$/.test(c)) { bad++; return; } c.split('').forEach(function (ch, i) { tally(gate[i])[map[ch]]++; }); n++; });
+    save(); $('codemsg').textContent = n + ' code' + (n === 1 ? '' : 's') + ' added' + (bad ? '; ' + bad + ' not readable (three letters from C, M, X, S)' : '') + '.'; $('codes').value = ''; renderSplit(); renderGrid();
+  };
+  $('reset').onclick = function () { st = { tally: {}, seen: {}, shown: {} }; save(); renderGrid(); renderSplit(); renderErr(); };
+
+  /* common errors -> tomorrow's warm-up */
+  function renderErr() {
+    var host = $('errs'); host.textContent = '';
+    var all = []; SP.situations.forEach(function (s) { s.errors.forEach(function (e) { all.push({ s: s, e: e, n: tally(s.id)[e.type] || 0 }); }); });
+    all.sort(function (a, b) { return b.n - a.n; });
+    all.forEach(function (x) { var d = el('label', 'err' + (st.seen[x.e.id] ? ' seen' : '')); d.style.display = 'block'; var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!st.seen[x.e.id]; cb.onchange = function () { st.seen[x.e.id] = cb.checked; save(); renderErr(); };
+      d.appendChild(cb); d.appendChild(document.createTextNode(' ')); var b = el('b', null, 'Situation ' + x.s.id.slice(1) + ': '); d.appendChild(b); d.appendChild(document.createTextNode(x.e.say + (x.n ? ' (' + x.n + ' tallied as ' + LAB[x.e.type].toLowerCase() + ')' : ''))); d.appendChild(el('div', 'hint', 'Fix: ' + x.e.fix)); host.appendChild(d); });
+    var w = $('warm'); w.textContent = ''; var picked = all.filter(function (x) { return st.seen[x.e.id]; });
+    if (!picked.length) { w.textContent = 'Tick the errors you saw today and the warm-up appears here.'; return; }
+    var ol = el('ol'); picked.slice(0, 5).forEach(function (x) { ol.appendChild(el('li', null, 'Draw the forces on: ' + x.s.title.toLowerCase() + '. (Watch for: ' + x.e.say.toLowerCase().replace(/\.$/, '') + '.)')); }); w.appendChild(ol);
+    w.appendChild(el('p', 'hint', 'Then, as a class, say the fix: ' + picked[0].e.fix));
+  }
+  $('copywarm').onclick = function () { var t = $('warm').innerText; try { navigator.clipboard.writeText(t); $('copywarm').textContent = 'Copied'; } catch (e) { $('copywarm').textContent = 'Select the text and press Ctrl+C'; } };
+
+  /* vocabulary and core ideas */
+  function line(t) { return t.replace(/\[\[(.+?)\]\]/g, '<b style="color:var(--good)">$1</b>'); }
+  SP.huddle.defs.forEach(function (d) { var p = el('p', 'big'); p.innerHTML = '<b>' + d.term + ':</b> ' + line(d.text); $('vocab').appendChild(p); });
+  var t = el('table', 'data'); t.innerHTML = '<thead><tr><th>Force</th><th>Source</th><th>Contact or field</th><th>Direction</th></tr></thead>'; var tb = el('tbody');
+  SP.catalogRows.forEach(function (r) { var tr = el('tr'); tr.innerHTML = '<td><b>' + r.f + '</b> (' + r.sym + ')</td><td>' + r.source + '</td><td>' + r.kind + '</td><td>' + r.dir + '</td>'; tb.appendChild(tr); }); t.appendChild(tb); $('cat').appendChild(t);
+  SP.concepts.forEach(function (c) { var d = el('div'); d.appendChild(el('h3', null, c.title + (c.eq ? '   ' + c.eq : ''))); var ul = el('ul'); c.points.forEach(function (p) { ul.appendChild(el('li', 'big', p)); }); d.appendChild(ul); $('core').appendChild(d); });
+
+  renderGrid(); show((location.hash || '#sit').slice(1) && panels.indexOf(location.hash.slice(1)) >= 0 ? location.hash.slice(1) : 'sit');
+})();
+</script>
+</body>
+</html>

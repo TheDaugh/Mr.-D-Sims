@@ -11,6 +11,11 @@ const { chromium } = require(PW);
 const CHROME = process.env.CHROMIUM || ['/opt/pw-browsers/chromium', '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'].find(p => fs.existsSync(p));
 const BASE = process.env.BASE || 'http://localhost:8123', URL = BASE + '/' + (process.env.PAGE || 'templates/' + TEMPLATE + '/lesson.html');
 const ids = require('../shared/ids.js');
+/* A lesson that deliberately changes a standard step (its own warm-up, a gate in the huddle) keeps its own tests in tests/lessons/<lesson-id>.e2e.js:
+     module.exports = { tests: { '<name of a standard test above>': async H => {...} }, extra: [['name', async H => {...}]] }
+   H gives the helpers below. A test listed under `tests` replaces the standard one with the same name; `extra` tests run after. */
+const LESSON_FILE = process.env.PAGE ? path.join(__dirname, 'lessons', path.basename(process.env.PAGE, '.html') + '.e2e.js') : null;
+const X = LESSON_FILE && fs.existsSync(LESSON_FILE) ? require(LESSON_FILE) : { tests: {}, extra: [] };
 
 async function open(br, hash, time) {
   const ctx = await br.newContext({ viewport: { width: 1366, height: 768 }, reducedMotion: 'reduce' }), page = await ctx.newPage();
@@ -28,14 +33,14 @@ async function answer(page, wrong) {
     const todo = await page.evaluate(() => { const txt = h => { const d = document.createElement('div'); d.innerHTML = String(h); return d.textContent.replace(/\s+/g, ' ').trim(); };
       return window.__q.map((q, i) => ({ i, id: q.id, type: q.type, answer: q.answer,
         opt: q.type === 'choice' ? txt(q.options[q.answer]) : null,
-        wrongOpt: q.type === 'choice' ? txt(q.options[q.options.map((o, k) => k).filter(k => k !== q.answer)[0]]) : null,
+        wrongI: q.type === 'choice' ? q.options.map((o, k) => k).filter(k => k !== q.answer)[0] : null,
         done: !!(LE.qs(q.id) && LE.qs(q.id).done) })).filter(x => !x.done); });
     if (!todo.length) return;
     const t = todo[0], box = page.locator('.card .q').nth(t.i);
     if (t.type === 'num' || t.type === 'expr') {
       const val = t.type === 'expr' ? (wrong ? 'x+999' : String(t.answer)) : String(wrong ? t.answer + 123.5 : t.answer);
       await box.locator('input[type=text]').first().fill(val); await box.getByRole('button', { name: 'Check', exact: true }).click();
-    } else await box.locator('button, label', { hasText: (wrong ? t.wrongOpt : t.opt).slice(0, 30) }).first().click();
+    } else await box.locator('button.opt[data-i="' + (wrong ? t.wrongI : t.answer) + '"]').first().click();   // by index: picture options have no text
     await tick(page, 900);
   }
 }
@@ -49,7 +54,8 @@ const next = async page => { await page.locator('#btn-next').click(); await tick
   const secret = 'unit-test-secret', myId = await ids.derive(secret, 'Test Student', '3');
   const br = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox'] });
   const results = [];
-  async function t(name, fn) { try { await fn(); results.push(['ok  ', name]); } catch (e) { if (process.env.DEBUG) console.log(e.stack.split('\n').slice(0, 6).join('\n')); results.push(['FAIL', name + ' -> ' + (e.message || e).toString().split('\n')[0].slice(0, 220)]); } }
+  const H = { br, open, tick, answer, start, step, next, myId, assert, CLK, T0, T18, T25, T33, T44 };
+  async function t(name, fn) { if (X.tests && X.tests[name]) { const own = X.tests[name]; fn = () => own(H); } try { await fn(); results.push(['ok  ', name]); } catch (e) { if (process.env.DEBUG) console.log(e.stack.split('\n').slice(0, 6).join('\n')); results.push(['FAIL', name + ' -> ' + (e.message || e).toString().split('\n')[0].slice(0, 220)]); } }
 
   await t('ID: a typo is refused, the right ID unlocks Continue', async () => {
     const { ctx, page, errs } = await open(br); await tick(page);
@@ -143,6 +149,7 @@ const next = async page => { await page.locator('#btn-next').click(); await tick
     assert.deepStrictEqual(errs, []); await ctx.close();
   });
 
+  for (const [name, fn] of X.extra || []) await t(name, () => fn(H));
   await br.close();
   results.forEach(r => console.log(r[0] + ' ' + r[1]));
   const bad = results.filter(r => r[0] === 'FAIL').length; console.log(bad ? `\n${bad} failed` : '\nall passed'); process.exit(bad ? 1 : 0);
