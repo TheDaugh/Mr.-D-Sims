@@ -75,3 +75,7 @@ Before this change `#key` redirected to the teacher page, the huddle had a solo 
 - "Real view" of a student's page is the live view: step, level, answers, misses, times they left. It cannot show their screen, and by design cannot see anything outside the lesson page.
 - Chemistry progress survives a refresh only inside locked mode (the lock saves a snapshot). Physics and calculus save to the device automatically.
 - Heating-curve virtual-lab records and the calculus accumulation lab are not wired to the portal.
+
+## Shared kit and tests
+
+Physics lessons build on `physics/lessons/engine/lesson-kit.js` (`LK.for(...)`) for the code box, endless practice, notes/stamp step and portal record, and are checked with `tests/validate-items.js` and `tests/e2e-lesson.js`. See `tests/README.md` for the checklist.
