@@ -112,7 +112,7 @@
     K.head = function (card, title, target, preview) {
       card.appendChild(el('h2', null, title));
       var t = el('p', 'target'); t.appendChild(el('b', null, 'Target: ')); t.appendChild(document.createTextNode(target)); card.appendChild(t);
-      if (preview) { var p = el('p', 'hint'); p.appendChild(el('b', null, 'Up next: ')); p.appendChild(document.createTextNode(preview)); card.appendChild(p); }
+      if (preview) { var p = el('p', 'hint'); p.appendChild(el('b', null, 'Up next: ')); p.appendChild(document.createTextNode(String(preview).replace(/^Up next:\s*/i, ''))); card.appendChild(p); }
     };
 
     /* The Start tab. In identity:'id' mode the student types the ID card Mr. D handed out (no name anywhere).

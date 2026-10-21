@@ -14,6 +14,7 @@
     question: 'How fast does xⁿ change, for any n?',
     targets: ['I can state the power rule in words.', 'I can differentiate a polynomial term by term.', 'I can find the slope at a point.'],
     tabs: ['Warm-up', 'Predict', 'Explore', 'Huddle', 'Build', 'Practice', 'Check'],
+    huddleTarget: 'I can state the power rule and use it.',
 
     concepts: [
       { title: 'Derivative', points: ['The slope of the curve at a point.', 'The rate of change of the output.'], eq: "f′(x)" },

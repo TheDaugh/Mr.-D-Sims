@@ -14,6 +14,7 @@
     /* one sentence each, "I can ..." */
     targets: ['I can say what net force means.', 'I can predict how force and mass change acceleration.', 'I can calculate acceleration with a = F / m.'],
     tabs: ['Warm-up', 'Predict', 'Explore', 'Huddle', 'Build', 'Practice', 'Check'],
+    huddleTarget: 'I can define net force and use a = F / m.',
 
     concepts: [
       { title: 'Net force', points: ['Add every force on the object.', 'A push the other way counts as negative.'], eq: 'F_net = F1 + F2' },

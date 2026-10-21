@@ -2,7 +2,9 @@
    Needs a static server on :8123 (python3 -m http.server 8123).
      node tests/template.e2e.js              physics template
      TEMPLATE=calc node tests/template.e2e.js */
-const TEMPLATE = process.env.TEMPLATE || 'physics', CALC = TEMPLATE === 'calc', T0 = CALC ? '12:15' : '09:05', T18 = CALC ? '12:29' : '09:19', T25 = CALC ? '12:35' : '09:25', T33 = CALC ? '12:43' : '09:33', T44 = CALC ? '12:56' : '09:44', PFX = CALC ? 'TPC-' : 'TPL-';
+const TEMPLATE = process.env.TEMPLATE || 'physics', CALC = TEMPLATE === 'calc', CHEM = TEMPLATE === 'chem',
+  CLK = CALC ? ['12:15', '12:29', '12:35', '12:43', '12:56'] : CHEM ? ['10:45', '10:59', '11:05', '11:13', '11:26'] : ['09:05', '09:19', '09:25', '09:33', '09:44'],
+  T0 = CLK[0], T18 = CLK[1], T25 = CLK[2], T33 = CLK[3], T44 = CLK[4], PFX = CALC ? 'TPC-' : CHEM ? 'TPK-' : 'TPL-';
 const fs = require('fs'), path = require('path'), assert = require('assert');
 const PW = process.env.PLAYWRIGHT_DIR || ['/opt/npm-tools/node_modules/playwright', '/home/claude/.npm-global/lib/node_modules/playwright'].find(p => fs.existsSync(p));
 const { chromium } = require(PW);
@@ -74,7 +76,7 @@ const next = async page => { await page.locator('#btn-next').click(); await tick
     await next(page); assert.strictEqual(await step(page), 'predict');
     await page.clock.setSystemTime(new Date('2026-10-21T' + T18 + ':00-04:00')); await tick(page, 2500);
     assert.strictEqual(await step(page), 'huddle');
-    await page.locator('.hd-line input').first().fill(CALC ? 'slope' : 'sum'); await page.locator('.hd-line input').nth(1).fill(CALC ? 'power' : 'velocity');
+    await page.locator('.hd-line input').first().fill(CALC ? 'slope' : CHEM ? '6.02 × 10²³' : 'sum'); await page.locator('.hd-line input').nth(1).fill(CALC ? 'power' : CHEM ? 'mass' : 'velocity');
     await page.getByRole('button', { name: 'Check mine' }).click();
     assert.ok(await page.locator('.hd-line input.ok').count() >= 2);
     assert.strictEqual(await page.locator('#btn-next').isDisabled(), false);
