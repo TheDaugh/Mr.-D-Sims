@@ -2,8 +2,8 @@
 const test = require('node:test'), assert = require('node:assert'), fs = require('fs'), path = require('path');
 const pace = require('../../shared/pace.js'); require('../../calculus/shared/mathcheck.js'); const MC = globalThis.MC;
 const root = path.resolve(__dirname, '../..');
-const specs = fs.readdirSync(path.join(root, 'templates')).filter(d => fs.existsSync(path.join(root, 'templates', d, 'spec.js')))
-  .map(d => ({ d, spec: require(path.join(root, 'templates', d, 'spec.js')) }));
+const found = []; (function walk(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { if (['node_modules', '.git', 'keys', 'tests'].includes(e.name)) continue; const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (/(^|\.)spec\.js$/.test(e.name)) found.push(p); } })(root);
+const specs = found.map(f => ({ d: path.relative(root, f), spec: require(f) }));
 function rng(seed) { let a = seed; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 for (const { d, spec } of specs) {
   test(d + ': pacing is valid', () => assert.deepStrictEqual(pace.validate(spec.pacing), []));

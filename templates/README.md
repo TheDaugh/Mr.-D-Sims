@@ -22,7 +22,7 @@ That makes the page, the spec and the content file, and adds the lesson to `shar
 
 1. **Edit the spec.** `targets` (three, one sentence each, "I can ..."), `question`, `concepts` (one-line points), `huddle` (definitions, a worked example, a labeled figure; `[[blank]]` is a write-on blank), `predicts`, `skills` (a generator per skill, bands 1 to 4), `misconceptions`, `pacing`.
 2. **Edit the Explore picture** in `content.js` (a small SVG or canvas sim). Nothing else lives there.
-3. **Check it.** `node --test tests/unit/` (the spec is validated: pacing, targets, every generator at every band), `TEMPLATE=...` is only for the template pages; for a new lesson run `PAGE=<path> TEMPLATE=<course> node tests/template.e2e.js`.
+3. **Check it.** `node --test tests/unit/` validates every spec in the repo (pacing, targets, every generator at every band). Then run the class-period test on your page: `PAGE=<path to your .html> TEMPLATE=<course> node tests/template.e2e.js` (serve the repo first: `python3 -m http.server 8123`).
 4. **Build the keys.** `node tools/build-keys.mjs <path to spec>`. Commit the PDFs under `keys/`.
 5. Push. Netlify deploys from `main`.
 

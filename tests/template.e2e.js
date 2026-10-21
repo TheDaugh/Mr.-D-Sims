@@ -76,7 +76,8 @@ const next = async page => { await page.locator('#btn-next').click(); await tick
     await next(page); assert.strictEqual(await step(page), 'predict');
     await page.clock.setSystemTime(new Date('2026-10-21T' + T18 + ':00-04:00')); await tick(page, 2500);
     assert.strictEqual(await step(page), 'huddle');
-    await page.locator('.hd-line input').first().fill(CALC ? 'slope' : CHEM ? '6.02 × 10²³' : 'sum'); await page.locator('.hd-line input').nth(1).fill(CALC ? 'power' : CHEM ? 'mass' : 'velocity');
+    const blanks = await page.evaluate(() => { const sp = Object.values(window.SPECS)[0], out = []; (sp.huddle.defs || []).forEach(d => MrD.huddle.parse(d.text).forEach(p => p.b && out.push(p.b))); return out; });
+    await page.locator('.hd-line input').first().fill(blanks[0]); await page.locator('.hd-line input').nth(1).fill(blanks[1]);
     await page.getByRole('button', { name: 'Check mine' }).click();
     assert.ok(await page.locator('.hd-line input.ok').count() >= 2);
     assert.strictEqual(await page.locator('#btn-next').isDisabled(), false);
@@ -138,7 +139,7 @@ const next = async page => { await page.locator('#btn-next').click(); await tick
     assert.strictEqual(await step(page), 'notes');
     await page.clock.setSystemTime(new Date('2026-10-21T' + T44 + ':00-04:00')); await tick(page, 2500);
     const text = await page.locator('#stage').innerText();
-    assert.ok(text.includes(PFX), 'stamp shown'); assert.ok(text.includes(myId), 'ID shown'); assert.ok(!/Name:/.test(text), 'no name label');
+    assert.ok(/\b[A-Z]{3}-\d{3,}/.test(text), 'stamp shown'); assert.ok(text.includes(myId), 'ID shown'); assert.ok(!/Name:/.test(text), 'no name label');
     assert.deepStrictEqual(errs, []); await ctx.close();
   });
 
