@@ -69,6 +69,7 @@ td.c-review{background:rgba(192,57,43,.18)}td.c-getting{background:rgba(217,154,
 <script src="../physics/lessons/content/nfl-items.js"></script>
 <script src="../physics/lessons/engine/cart-sim.js"></script>
 <script src="../physics/lessons/content/n2l-items.js"></script>
+<script src="../physics/lessons/content/fbd-net-force.spec.js"></script>
 <!-- chemistry practice -->
 <script src="../chemistry/shared/practice.js"></script>
 <!-- calculus practice -->
@@ -196,7 +197,7 @@ td.c-review{background:rgba(192,57,43,.18)}td.c-getting{background:rgba(217,154,
   function makeQuestion(gen, band, n, seed) {
     var kind = gen.split(':')[0], key = gen.split(':')[1];
     if (kind === 'physics') {
-      var sk = NFL.skills.concat(window.N2L ? N2L.skills : []).filter(function (x) { return x.id === key; })[0], r = rngFor(seed + '|' + n + '|' + key + '|' + band), q = sk.gen(band, r);
+      var sk = NFL.skills.concat(window.N2L ? N2L.skills : [], window.SPECS && SPECS['fbd-net-force'] ? SPECS['fbd-net-force'].skills : []).filter(function (x) { return x.id === key; })[0], r = rngFor(seed + '|' + n + '|' + key + '|' + band), q = sk.gen(band, r);
       var skill = 'review.' ; return { skillTitle: sk.title, q: q, kind: q.type === 'choice' ? 'choice' : 'num' };
     }
     if (kind === 'chem') { var sp = ChemPractice.spec(n, +key, seed); return { skillTitle: sp.title, kind: 'num', q: { prompt: sp.q, answer: sp.ans, tol: 0.01, unit: sp.unit, hint: sp.hint, worked: sp.why } }; }

@@ -65,7 +65,9 @@ function samples(spec, perBand) {
   (spec.skills || []).forEach(sk => {
     o.push('\\subsection*{' + tex(sk.title) + '}');
     for (let b = 1; b <= 4; b++) { const q = sk.gen(b, rng(b * 101 + 7));
-      o.push('\\noindent\\textbf{Level ' + b + '.} ' + tex(q.prompt) + '\\\\ \\A{Answer: ' + tex(ans(q)) + '} \\quad ' + tex(q.worked) + '\\par\\medskip'); }
+      const opts = q.type === 'choice' ? '\\\\ ' + q.options.map((x, i) => (i === q.answer ? '\\A{(' + String.fromCharCode(65 + i) + ') ' : '(' + String.fromCharCode(65 + i) + ') ') + tex(typeof x === 'string' ? x : (x.alt || x.label || '')) + (i === q.answer ? '}' : '')).join(' \\quad ') : '';
+      const a = q.type === 'choice' ? String.fromCharCode(65 + q.answer) : ans(q);
+      o.push('\\noindent\\textbf{Level ' + b + '.} ' + tex(q.prompt) + opts + '\\\\ \\A{Answer: ' + tex(a) + '} \\quad ' + tex(q.worked) + (q.misc ? '\\\\ \\textit{Misconception targeted: ' + tex(q.misc) + '}' : '') + '\\par\\medskip'); }
   });
   return o.join('\n');
 }
