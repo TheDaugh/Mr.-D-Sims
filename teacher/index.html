@@ -52,6 +52,14 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
     <div style="overflow-x:auto"><table id="lv" hidden></table></div>
   </section>
 
+  <section class="card" style="margin-bottom:14px"><h2>Virtual labs</h2>
+    <p class="hint">Open any lab to check it. The live view above does not see virtual labs: each student's work is saved in their own browser, and they hand in a record file. Load those files on the <a href="../chemistry/virtual-lab/teacher.html">virtual-lab teacher page</a> to see predictions, counts, attempts and CERs.</p>
+    <table><tr><th>Lab</th><th>Open</th></tr>
+      <tr><td>Rutherford's Gold Foil (Manchester 1909 room, atom microscope)</td><td><a href="../chemistry/virtual-lab/index.html?lab=rutherford">Open</a> · <a href="../chemistry/virtual-lab/index.html?lab=rutherford&resume=0">fresh start</a></td></tr>
+      <tr><td>Heating Curves of Unknown Solids</td><td><a href="../chemistry/virtual-lab/index.html?lab=heating">Open</a></td></tr>
+      <tr><td>Unknown White Solids</td><td><a href="../chemistry/virtual-lab/index.html">Open</a></td></tr></table>
+    <p class="hint">Opened from here, a lab behaves as a student sees it, with the intro and pre-lab. The teacher build with the key (skips the pre-lab, shows answers) is <code>chemistry/virtual-lab/dist/teacher-key.html</code>, made by <code>node tools/bundle.mjs</code>; keep it off the student site.</p></section>
+
   <section class="card" style="margin-bottom:14px"><h2>Bell schedule</h2>
     <table id="sched"></table>
     <p class="hint">Edit <code>shared/bell.js</code> (the SCHEDULE block) to change a period. Mon to Thu guided notes end at the 42-minute mark and lessons lock until then. On Friday there is no early end: the lesson stays locked until the bell.</p>
