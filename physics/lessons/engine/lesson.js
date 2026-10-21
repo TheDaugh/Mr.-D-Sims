@@ -62,7 +62,8 @@
 
   /* ---------- steps and gating ---------- */
   function stepIndex(id) { for (var i = 0; i < CFG.steps.length; i++) if (CFG.steps[i].id === id) return i; return 0; }
-  function stepCan(i) { var st = CFG.steps[i]; if (KEY || st.optional) return true; try { return !!st.canLeave(ctx()); } catch (e) { return false; } }
+  function skipped(id) { return !!(S.skip && S.skip[id]); }
+  function stepCan(i) { var st = CFG.steps[i]; if (KEY || st.optional || skipped(st.id)) return true; try { return !!st.canLeave(ctx()); } catch (e) { return false; } }
   function reachable() {
     if (KEY || S.ended) return CFG.steps.length - 1;
     var i = 0; while (i < CFG.steps.length - 1 && stepCan(i)) i++; return i;
@@ -79,7 +80,18 @@
     S.step = CFG.steps[CFG.steps.length - 1].id; saveNow(); LE.render(); window.scrollTo(0, 0);
   };
   LE.reached = function () { var i = S.ended ? S.endIdx : Math.max(S.max || 0, stepIndex(S.step)); return { idx: i, label: CFG.steps[Math.min(i, CFG.steps.length - 1)].label, of: CFG.steps.length }; };
-  LE.next = function () { var i = stepIndex(S.step); if (i + 1 < CFG.steps.length && stepCan(i)) LE.goto(CFG.steps[i + 1].id); };
+  LE.next = function () {
+    var i = stepIndex(S.step);
+    if (CFG.steps[i].timed && S.hret) { var back = S.hret; S.hret = ''; if (back !== S.step) { LE.forceGoto(back); return; } }   // a timed huddle hands the student back to where they were
+    if (!(i + 1 < CFG.steps.length && stepCan(i))) return;
+    var j = i + 1; while (j < CFG.steps.length - 1 && skipped(CFG.steps[j].id)) j++;                                           // trimmed steps are skipped, never the last one
+    LE.goto(CFG.steps[j].id);
+  };
+  /* Move without the reachable() check: used by the clock (timed huddle) and by pacing, never by a student click. */
+  LE.forceGoto = function (id) { var idx = stepIndex(id); S.step = id; S.max = Math.max(S.max || 0, idx); viewNotes = false; saveNow(); LE.render(); window.scrollTo(0, 0); };
+  /* How many items of a trimmed step to show. Steps call LE.items('build', 4) and get 4, or fewer when the pace plan shrank it. */
+  LE.items = function (id, full) { var n = S.trim && S.trim[id]; return n ? Math.min(full, n) : full; };
+  LE.isSkipped = skipped;
   LE.gate = function () {
     renderNav();
     var b = $('btn-next'); if (b) b.disabled = !stepCan(stepIndex(S.step));
@@ -89,7 +101,8 @@
     var nav = $('steps'); nav.textContent = '';
     var max = reachable(), cur = stepIndex(S.step);
     CFG.steps.forEach(function (st, i) {
-      var b = el('button', null, (i + 1) + ' ' + st.label); b.type = 'button';
+      var b = el('button', null, (i + 1) + ' ' + st.label + (skipped(st.id) ? ' (skipped)' : '')); b.type = 'button';
+      if (skipped(st.id)) b.className = 'skipped';
       if (i === cur && !viewNotes) b.setAttribute('aria-current', 'step');
       b.disabled = i > max; b.onclick = function () { LE.goto(st.id); };
       nav.appendChild(b);
@@ -104,10 +117,32 @@
     if (document.visibilityState !== 'visible') return;
     S.t[S.step] = (S.t[S.step] || 0) + 1;
     if (S.t[S.step] % 5 === 0) saveNow();
+    paceTick();
     var can = LE.canEnd();
     if (lastCan !== null && can !== lastCan && CFG.steps[stepIndex(S.step)].id === CFG.steps[CFG.steps.length - 1].id && !viewNotes) LE.render();
     lastCan = can;
     if (!liveOn && !KEY) { liveOn = true; MrD.live.attach({ course: CFG.course, lessonId: CFG.id, who: function () { return { first: S.first, period: S.period }; }, snap: liveSnap }); }
+  }
+  /* Pacing (opt-in with cfg.pacing, see shared/pace.js). In a real class period only; #key and home mode never trim or interrupt. */
+  function paceBar(msg) {
+    var b = $('pacebar'); if (!b) { b = el('div'); b.id = 'pacebar'; b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.style.cssText = 'margin:8px 0;padding:8px 14px;border-radius:8px;background:var(--stage);border:1px solid var(--accent);font-weight:600'; var nav = $('steps'); nav.parentNode.insertBefore(b, nav); }
+    b.hidden = !msg; if (msg) b.textContent = msg;
+  }
+  function paceTick() {
+    var P = CFG.pacing; if (!P || KEY || S.ended || !window.MrD || !MrD.pace) return;
+    var c = LE.clock(); if (c.mode !== 'class') return;
+    var hd = MrD.pace.huddleDue(P, c.minutesIn, S.hfired || []);
+    if (hd) {                                                                      // the clock calls the huddle, not the student's progress
+      S.hfired = (S.hfired || []).concat(hd.key); S.hkey = hd.key;
+      var ts = CFG.steps.filter(function (x) { return x.timed; })[0];
+      if (ts && S.step !== ts.id) { S.hret = S.step; LE.forceGoto(ts.id); paceBar('Huddle time. Look up: Mr. D is at the board.'); return; }
+    }
+    var done = CFG.steps.filter(function (x, i) { return i < stepIndex(S.step) && !x.timed; }).map(function (x) { return x.id; });
+    var d = MrD.pace.decide(P, { minutesIn: c.minutesIn, stepId: S.step, doneIds: done });
+    var changed = false; S.skip = S.skip || {}; S.trim = S.trim || {};
+    d.skip.forEach(function (id) { if (!S.skip[id]) { S.skip[id] = 1; changed = true; } });
+    Object.keys(d.items).forEach(function (id) { if (S.trim[id] !== d.items[id]) { S.trim[id] = d.items[id]; changed = true; } });
+    if (changed) { saveNow(); paceBar('Pace check: some parts are trimmed so you finish the core. Skipped parts go in your notes as home practice.'); renderNav(); if (S.skip[S.step] && !CFG.steps[stepIndex(S.step)].timed) LE.next(); }
   }
   /* "Time is up" banner. Shown only from the end mark on (or after the bell), never earlier, so there is no countdown to wait out. */
   function updateEndBar() {
@@ -208,6 +243,7 @@
     var inp = el('input'); inp.type = 'text'; inp.inputMode = 'decimal'; inp.setAttribute('aria-label', q.label || 'Answer'); inp.autocomplete = 'off';
     row.appendChild(inp);
     if (q.unit) row.appendChild(el('span', null, q.unit));
+    if ((q.keypad || CFG.keypad) && window.MrD && MrD.keypad && !st.done) MrD.keypad.attach(inp, { mode: 'number', after: row });
     var btn = el('button', 'btn', 'Check'); btn.type = 'button'; row.appendChild(btn);
     if (st.done) { inp.value = st.val != null ? st.val : ''; inp.disabled = true; btn.disabled = true; if (q.worked) { var w = el('p', 'msg worked ' + (st.ok ? 'ok' : '')); html(w, (st.ok ? 'Correct. ' : 'Here is the reasoning. ') + q.worked); box.appendChild(w); } }
     function go() {
@@ -427,6 +463,7 @@
     ticker = setInterval(tick, 1000);
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && S && S.first && !KEY) { S.hid = (S.hid || 0) + 1; saveNow(); } });
     window.addEventListener('pagehide', saveNow);
+    if (cfg.concepts && window.MrD && MrD.concepts) MrD.concepts.mount($('btn-notes').parentNode, cfg.concepts);
     keyBar(); LE.render();
   };
   LE.cfg = function () { return CFG; };
