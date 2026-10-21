@@ -1,7 +1,7 @@
 /* Portal adapters: turn the scores the lessons already produce into the one record format the review portal reads
    ( see shared/profile.js ).  Each adapter returns { course, lesson, title, first, period, day, reached, of, items:[{skill,title,band,firstTry,ok}] }.
 
-     PortalAdapters.physicsReport(code, LE, NFL)   a physics report code ("NEW~v2~Sam~3~...")
+     PortalAdapters.physicsReport(code, LE, NFL, N2L)   a physics report code ("NEW~v2~Sam~3~...", either lesson)
      PortalAdapters.calcHandIn(name, period, day, code, PR2)   a calculus hand-in code ("PR2-...")
      PortalAdapters.vlabRecord(report, period)     one student's report from the virtual lab (buildReport output)
      PortalAdapters.bundle(records)                the JSON text the portal imports
@@ -15,17 +15,29 @@
   function ymd(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
   function it(skill, title, band, first, ok) { return { skill: skill, title: title, band: band == null ? null : band, firstTry: !!first, ok: ok == null ? !!first : !!ok }; }
 
-  A.physicsReport = function (code, LE, NFL) {
-    var r = LE.decodeReport("newtons-first-law", code);
-    if (!r || !r.ok || r.fields.length < 13) return null;
-    var f = r.fields, items = [], preds = f[7].split(""), chk = f[9].split("-"), bands = f[4].split("-"), miss = f[5].split("-");
+  /* Physics lessons that write a report code. Both start with "NEW", so the lesson is found by trying each id: the checksum includes it.
+     PortalAdapters.physicsReport(code, LE, NFL, N2L)  N2L is optional. */
+  function physLessons(NFL, N2L) {
+    var a = [{ id: "newtons-first-law", title: "Newton’s First Law", lib: NFL }];
+    if (N2L) a.push({ id: "newtons-second-law", title: "Newton’s Second Law", lib: N2L });
+    return a;
+  }
+  A.physicsLesson = function (code, LE, NFL, N2L) {
+    var L = physLessons(NFL, N2L);
+    for (var i = 0; i < L.length; i++) { var r = LE.decodeReport(L[i].id, code); if (r && r.ok && r.fields.length >= 13) return { def: L[i], r: r }; }
+    return null;
+  };
+  A.physicsReport = function (code, LE, NFL, N2L) {
+    var hit = A.physicsLesson(code, LE, NFL, N2L);
+    if (!hit) return null;
+    var f = hit.r.fields, items = [], preds = f[7].split(""), chk = f[9].split("-"), bands = f[4].split("-"), miss = f[5].split("-");
     preds.forEach(function (p, i) { if (p !== "-") items.push(it("predict-" + (i + 1), "Prediction " + (i + 1), +f[3] || 2, p === "A")); });
     if (chk[0] !== undefined) items.push(it("check-c1", "Final check 1", 2, chk[0] === "1"));
     if (chk[1] !== undefined) items.push(it("check-c2", "Final check 2", 2, chk[1] === "1"));
-    NFL.skills.forEach(function (sk, i) { if (bands[i] !== undefined && bands[i] !== "") items.push(it(sk.id, sk.title, +bands[i], +miss[i] === 0)); });
+    hit.def.lib.skills.forEach(function (sk, i) { if (bands[i] !== undefined && bands[i] !== "") items.push(it(sk.id, sk.title, +bands[i], +miss[i] === 0)); });
     var more = (f[15] || "").split("-"), n = +more[0] || 0, clean = +more[1] || 0;
     for (var k = 0; k < n; k++) items.push(it("practice", "Extra practice", +f[3] || 2, k < clean));
-    return { course: "physics", lesson: "newtons-first-law", title: "Newton’s First Law", first: f[1], period: f[2], day: f[12], reached: +f[13] || 0, of: 9, items: items, source: "report code" };
+    return { course: "physics", lesson: hit.def.id, title: hit.def.title, first: f[1], period: f[2], day: f[12], reached: +f[13] || 0, of: 9, items: items, source: "report code" };
   };
 
   A.calcHandIn = function (name, period, day, code, PR2) {
