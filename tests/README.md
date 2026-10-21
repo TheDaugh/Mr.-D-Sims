@@ -21,3 +21,6 @@ See `templates/README.md`: `node tools/new-lesson.mjs ...`, edit the spec, run t
 2. In the lesson config set `lib`, `stamp`, `predNames` and `investKey`. `teacher.html` then lists its codes, key and report reader with no edit.
 3. Add one line to `shared/lessons.js`, an entry in `physics/sims.js`, and skills in `portal/standards.json`. `portal/adapters.js` needs a line in `physLessons`.
 4. Copy `tests/lessons/newtons-second-law.js` and rewrite its `investigate` function. Run both commands above.
+
+## Per-lesson overrides
+`tests/template.e2e.js` loads `tests/lessons/<page-basename>.e2e.js` when it exists. `tests` replaces a template test by name; `extra` adds tests. Slot 4 (`fbd-net-force`) uses it for its six-item check, huddle gate, projector page and portal decode.

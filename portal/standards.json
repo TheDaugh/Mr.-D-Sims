@@ -44,6 +44,27 @@
       "needsReview": true,
       "practice": { "gens": ["physics:N2-motion", "physics:N2-friction"], "lesson": { "label": "Newton's Second Law lesson", "href": "../physics/lessons/newtons-second-law.html" } }
     },
+    "PHYS-F-A": {
+      "course": "physics", "title": "Forces as interactions",
+      "can": "I can name the two objects in a force interaction and sort forces as contact or field forces.",
+      "codes": [{ "framework": "NGSS", "code": "HS-PS2-1", "note": "Closest performance expectation; confirm. Slot 4 target F1." }],
+      "needsReview": true,
+      "practice": { "gens": ["physics:source", "physics:catalog"], "lesson": { "label": "Free-Body Diagrams and Net Force lesson", "href": "../physics/lessons/fbd-net-force.html" } }
+    },
+    "PHYS-F-B": {
+      "course": "physics", "title": "Free-body diagrams and net force",
+      "can": "I can draw a correct free-body diagram for an object in one dimension and find the net force from it.",
+      "codes": [{ "framework": "NGSS", "code": "HS-PS2-1", "note": "Closest performance expectation; confirm. Slot 4 target F3." }],
+      "needsReview": true,
+      "practice": { "gens": ["physics:fbd", "physics:netdir", "physics:net", "physics:pair"], "lesson": { "label": "Free-Body Diagrams and Net Force lesson", "href": "../physics/lessons/fbd-net-force.html" } }
+    },
+    "PHYS-F-V": {
+      "course": "physics", "title": "Vectors and ratios on a line",
+      "can": "I can add forces along a line, give the direction of a net force and reason with a ratio table.",
+      "codes": [{ "framework": "NGSS", "code": "HS-PS2-1", "note": "Prerequisite check for the forces unit; not an NGSS match." }],
+      "needsReview": true,
+      "practice": { "gens": ["physics:net", "physics:netdir"], "lesson": { "label": "Free-Body Diagrams and Net Force lesson", "href": "../physics/lessons/fbd-net-force.html" } }
+    },
     "CHEM-ATOM-1": {
       "course": "chem", "title": "Atoms as an evidence-based model",
       "can": "I can tell what is argument and what is evidence, from Democritus to Dalton, and what a solid-ball atom cannot explain.",
@@ -125,6 +146,21 @@
     "physics/newtons-second-law/predict-3": "PHYS-N2-A",
     "physics/newtons-second-law/check-c1": "PHYS-N2-C",
     "physics/newtons-second-law/check-c2": "PHYS-N2-A",
+    "physics/fbd-net-force/source": "PHYS-F-A",
+    "physics/fbd-net-force/catalog": "PHYS-F-A",
+    "physics/fbd-net-force/fbd": "PHYS-F-B",
+    "physics/fbd-net-force/netdir": "PHYS-F-B",
+    "physics/fbd-net-force/net": "PHYS-F-B",
+    "physics/fbd-net-force/pair": "PHYS-F-B",
+    "physics/fbd-net-force/vp-arith": "PHYS-F-V",
+    "physics/fbd-net-force/vp-dir": "PHYS-F-V",
+    "physics/fbd-net-force/vp-prop": "PHYS-F-V",
+    "physics/fbd-net-force/gate-fbd": "PHYS-F-B",
+    "physics/fbd-net-force/predict-1": "PHYS-F-B",
+    "physics/fbd-net-force/predict-2": "PHYS-F-B",
+    "physics/fbd-net-force/predict-3": "PHYS-F-B",
+    "physics/fbd-net-force/check-c1": "PHYS-F-B",
+    "physics/fbd-net-force/check-c2": "PHYS-F-B",
     "chem/chem.atom-idea": "CHEM-ATOM-1",
     "chem/chem.dalton-model": "CHEM-ATOM-1",
     "chem/chem.model-limits": "CHEM-ATOM-1",

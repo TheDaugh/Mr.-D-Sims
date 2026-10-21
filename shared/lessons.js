@@ -35,5 +35,9 @@ window.MrD.lessons = [
     gates: [{ key: "h1", label: "Huddle" }], live: true },
   { course: "calc", id: "tpl-calc", title: "Template: The Power Rule", unit: "Templates",
     href: "templates/calc/lesson.html", teacher: "calculus/unit-2-differentiation/2-7-product-rule-teacher.html", spec: "templates/calc/spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "physics", id: "fbd-net-force", title: "Free-Body Diagrams and Net Force", unit: "Forces and Newton’s Laws",
+    href: "physics/lessons/fbd-net-force.html", teacher: "physics/lessons/teacher.html",
+    spec: "physics/lessons/content/fbd-net-force.spec.js",
     gates: [{ key: "h1", label: "Huddle" }], live: true }
 ];
