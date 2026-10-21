@@ -141,7 +141,7 @@
         var mark = el('span', 'mark'); line.appendChild(mark); rec.markEl = mark;
         wrap.appendChild(line);
         if (f.type === 'expr') {
-          var pad = el('div', 'pad'), keys = f.pad || DEFAULT_PAD;
+          var pad = el('div', 'pad'), keys = (opt.keypad && window.MrD && MrD.keypad) ? [] : (f.pad || DEFAULT_PAD);   // opt.keypad: the shared restrained keypad replaces the legacy insert row
           keys.forEach(function (k) {
             var d = PADS[k]; if (!d) return;
             var b = el('button', null, esc(d.t)); b.type = 'button'; b.setAttribute('aria-label', 'insert ' + d.ins);
@@ -153,7 +153,7 @@
             };
             pad.appendChild(b);
           });
-          wrap.appendChild(pad);
+          if (opt.keypad && window.MrD && MrD.keypad) MrD.keypad.attach(inp, { mode: 'math', after: line, onInput: function () { upd(); } }); else wrap.appendChild(pad);
           var pv = el('div', 'preview'); pv.setAttribute('aria-live', 'polite'); wrap.appendChild(pv);
           var upd = function () {
             var v = inp.value;

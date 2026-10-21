@@ -4,12 +4,21 @@
      prefix  stamp prefix, e.g. 'N2L'
      title   shown in the notes step and the portal record
      lib     the content namespace, with .skills [{id,title,gen}] and .preds [{correct}]
+   cfg.identity === 'id' switches the Start tab and the stamp line to the student ID (no names).
    K gives: codeBox, morePractice, notesStep, stamp, profileRecord, plus the plain helpers (plain, optText, qdone, f2).
    The lesson still supplies reportFields(S) (field positions are fixed by portal/adapters.js: see docs/LESSON-STANDARD.md). */
 (function () {
   'use strict';
   var LE = window.LE, el = LE.el, LK = window.LK = {};
-  function plain(h) { var d = document.createElement('div'); d.innerHTML = String(h == null ? '' : h); return d.textContent.replace(/\s+/g, ' ').trim(); }
+  /* $TeX$ in a prompt becomes readable plain text for notes and reports: \dfrac{a}{b} -> (a)/(b), x^{2} -> x^2, \sqrt{x} -> sqrt(x). */
+  function plainMath(t) {
+    return t.replace(/\$([^$]+)\$/g, function (_, m) {
+      var r = m.replace(/\\[dt]?frac\{([^{}]*)\}\{([^{}]*)\}/g, '($1)/($2)').replace(/\\sqrt\{([^{}]*)\}/g, 'sqrt($1)').replace(/\^\{([^{}]*)\}/g, '^$1')
+        .replace(/\\(cdot|times)/g, '*').replace(/\\(Delta)/g, 'Δ').replace(/\\(to)/g, '->').replace(/\\[,;! ]/g, ' ').replace(/\\(left|right|big|Big)/g, '').replace(/[{}]/g, '');
+      return r.replace(/\s+/g, ' ').trim();
+    });
+  }
+  function plain(h) { var d = document.createElement('div'); d.innerHTML = String(h == null ? '' : h); var t = d.textContent.replace(/\s+/g, ' ').trim(); return t.indexOf('$') >= 0 ? plainMath(t) : t; }
   function optText(o) { return typeof o === 'string' ? plain(o) : plain((o.label || o.html || '') + (o.desc ? ' (' + o.desc + ')' : '')); }
   function f2(x) { return Number(x).toFixed(2); }
   function qdone(id) { var s = LE.qs(id); return !!(s && s.done); }
@@ -82,7 +91,7 @@
           var rc = LE.reached();
           card.appendChild(el('h3', null, 'Show this to Mr. D'));
           var p = el('p'); p.appendChild(el('span', 'stamp', K.stamp(S))); card.appendChild(p);
-          card.appendChild(el('p', 'hint', 'Name: ' + S.first + ' · Period ' + S.period + ' · You got to step ' + (rc.idx + 1) + ' of ' + rc.of + ' (' + rc.label + ')' + (S.d.more && S.d.more.log.length ? ' · ' + S.d.more.log.length + ' practice questions' : '')));
+          card.appendChild(el('p', 'hint', (cfg.identity === 'id' ? 'ID: ' : 'Name: ') + S.first + ' · Period ' + S.period + ' · You got to step ' + (rc.idx + 1) + ' of ' + rc.of + ' (' + rc.label + ')' + (S.d.more && S.d.more.log.length ? ' · ' + S.d.more.log.length + ' practice questions' : '')));
           var code = LE.encodeReport(ID, opts.reportFields(S));
           card.appendChild(el('h3', null, 'Report code (paste into Classroom if Mr. D asks)'));
           var lc = el('div', 'longcode', code); card.appendChild(lc);
@@ -92,6 +101,59 @@
           if (window.MrD && MrD.profile) MrD.profile.record(K.profileRecord(S));
         },
         canLeave: function () { return true; },
+        teacher: opts.teacher };
+    };
+
+    /* ---- standard tab names, so every lesson reads the same ---- */
+    K.TABS = { start: 'Start', warmup: 'Warm-up', predict: 'Predict', explore: 'Explore', huddle: 'Huddle', build: 'Build', practice: 'Practice', check: 'Check', notes: 'Wrap-up' };
+
+    /* Every tab opens with the same two lines: what you will be able to do, and what happens next.
+       target: "I can ..." (one sentence). preview: one short line, e.g. "Next: push the cart three times and watch." */
+    K.head = function (card, title, target, preview) {
+      card.appendChild(el('h2', null, title));
+      var t = el('p', 'target'); t.appendChild(el('b', null, 'Target: ')); t.appendChild(document.createTextNode(target)); card.appendChild(t);
+      if (preview) { var p = el('p', 'hint'); p.appendChild(el('b', null, 'Up next: ')); p.appendChild(document.createTextNode(String(preview).replace(/^Up next:\s*/i, ''))); card.appendChild(p); }
+    };
+
+    /* The Start tab. In identity:'id' mode the student types the ID card Mr. D handed out (no name anywhere).
+       opts: { title, question, targets:[...], tabs:[...] } — one-sentence lines only. */
+    K.startStep = function (opts) {
+      return { id: 'start', label: K.TABS.start,
+        render: function (card, c) {
+          var S = c.S; card.appendChild(el('h2', null, opts.title));
+          card.appendChild(el('p', 'qtext', opts.question));
+          card.appendChild(el('h3', null, 'By the end you can'));
+          var ul = el('ul'); (opts.targets || []).forEach(function (t) { ul.appendChild(el('li', null, t)); }); card.appendChild(ul);
+          card.appendChild(el('h3', null, 'Today'));
+          var ol = el('ol'); (opts.tabs || []).forEach(function (t) { ol.appendChild(el('li', null, t)); }); card.appendChild(ol);
+          if (cfg.identity === 'id' && window.MrD && MrD.ids) {
+            var host = el('div'); card.appendChild(host);
+            MrD.ids.ask(host, { id: S.first, period: S.period, onChange: function (r) { if (r.valid) { S.first = r.id; S.period = r.period; } else { S.first = ''; S.period = r.period; } LE.save(); LE.gate(); } });
+            card.appendChild(el('p', 'hint', 'Use the ID on your card. No names on this page.'));
+          } else {
+            var row = el('div', 'row'), f = el('input'); f.type = 'text'; f.maxLength = 20; f.value = S.first; f.setAttribute('aria-label', 'First name');
+            var pe = el('input'); pe.type = 'text'; pe.maxLength = 4; pe.value = S.period; pe.setAttribute('aria-label', 'Period');
+            var l1 = el('label', null, 'First name '); l1.appendChild(f); var l2 = el('label', null, 'Period '); l2.appendChild(pe); row.appendChild(l1); row.appendChild(l2); card.appendChild(row);
+            function upd() { S.first = f.value; S.period = pe.value; LE.save(); LE.gate(); }
+            f.addEventListener('input', upd); pe.addEventListener('input', upd);
+          }
+        },
+        canLeave: function (c) { return c.S.first.trim().length > 0 && c.S.period.trim().length > 0; },
+        teacher: function () { return '<p>' + (cfg.identity === 'id' ? 'Students type the ID from their card; a typo is caught on the page. Numbers are seeded from the ID, so a student gets the same values on any device.' : 'First name and period only.') + '</p>'; } };
+    };
+
+    /* The Huddle tab: Mr. D teaches, the student writes. Timed (cfg.pacing.huddles pulls everyone here at atMin), optional (never blocks),
+       and closed by the huddle code in school hours. spec is the MrD.huddle spec. */
+    K.huddleStep = function (opts) {
+      return { id: 'huddle', label: K.TABS.huddle, optional: true, timed: true,
+        render: function (card, c) {
+          var S = c.S; K.head(card, opts.title || 'Huddle with Mr. D', opts.target, 'Listen, then fill in the blanks as Mr. D writes them.');
+          S.d.hud = S.d.hud || {};
+          var host = el('div'); card.appendChild(host);
+          MrD.huddle.render(host, opts.spec, S.d.hud, { key: c.key, onChange: function () { LE.save(); } });
+          K.codeBox(card, c, opts.gateKey || 'h1', 'Huddle code');
+        },
+        canLeave: function (c) { return true; },
         teacher: opts.teacher };
     };
     return K;

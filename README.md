@@ -45,6 +45,12 @@ The first ten rebuild the LabVIEW originals (Graphs.exe, Gravity.exe and so on).
 
 Students build their own notes as they work. At the end they can print the notes as a PDF or download a `.tex` file (compiles with pdflatex or on Overleaf).
 
+## Building new lessons
+
+`templates/` has a runnable template lesson for each course, and `tools/new-lesson.mjs` starts a new lesson from one. A lesson's teaching lives in one `spec.js`; the page, the PDF keys (`keys/`) and the tests all read it. Start at `templates/README.md`. The rules every lesson follows are in `docs/LESSON-STANDARD.md`.
+
+The teacher hub is `teacher/index.html` (the Teacher link on the front page): today's codes, `#key` links, key PDFs and the Student IDs tool.
+
 ## Using them
 
 - **Locally:** double-click `index.html`, or any sim file.

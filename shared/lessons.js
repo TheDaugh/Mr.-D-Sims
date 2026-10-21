@@ -5,6 +5,7 @@
      href     path from the repo root
      gates    the huddles, in order: key "h1", "h2", ...
      live     true when the lesson reports to the live view
+     spec     (optional) path to the lesson's spec file; lessons made with tools/new-lesson.mjs have one, and the hub links their key PDFs
    Later this is also where the review portal learns which lessons feed which standards (portal/standards.json). */
 window.MrD = window.MrD || {};
 window.MrD.lessons = [
@@ -25,5 +26,14 @@ window.MrD.lessons = [
     gates: [{ key: "h1", label: "Huddle 1" }], live: true },
   { course: "calc", id: "product-rule-v2", title: "2.7 The Product Rule", unit: "Unit 2 · Differentiation",
     href: "calculus/unit-2-differentiation/2-7-product-rule.html", teacher: "calculus/unit-2-differentiation/2-7-product-rule-teacher.html",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+{ course: "physics", id: "tpl-physics", title: "Template: Net Force and Acceleration", unit: "Templates",
+    href: "templates/physics/lesson.html", teacher: "physics/lessons/teacher.html", spec: "templates/physics/spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "chem", id: "tpl-chem", title: "Template: Counting Particles", unit: "Templates",
+    href: "templates/chem/lesson.html", teacher: "chemistry/teacher.html", spec: "templates/chem/spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "calc", id: "tpl-calc", title: "Template: The Power Rule", unit: "Templates",
+    href: "templates/calc/lesson.html", teacher: "calculus/unit-2-differentiation/2-7-product-rule-teacher.html", spec: "templates/calc/spec.js",
     gates: [{ key: "h1", label: "Huddle" }], live: true }
 ];
