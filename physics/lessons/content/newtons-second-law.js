@@ -243,7 +243,7 @@
     return { title: 'Newton’s Second Law: My Notes', sections: secs };
   }
 
-  var cfg = { id: ID, course: 'physics', version: 1, title: 'Newton’s Second Law', subtitle: 'Online lesson · questions adjust to you', steps: steps, notes: notesDoc,
+  var cfg = { id: ID, course: 'physics', version: 1, title: 'Newton’s Second Law', lock: true, subtitle: 'Online lesson · questions adjust to you', steps: steps, notes: notesDoc,
     gates: [{ key: 'h1', label: 'Huddle 1' }, { key: 'h2', label: 'Huddle 2' }],
     /* read by teacher.html: nothing there needs editing when a lesson follows this shape */
     lib: N2L, stamp: K.stamp, predNames: ['P1 steady push, v–t graph', 'P2 double the force', 'P3 double the mass'],

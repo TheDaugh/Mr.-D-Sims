@@ -67,7 +67,7 @@
   Object.keys(REG).forEach(function (id) {
     var c = REG[id], a = el('div', 'cell'); a.innerHTML = '<b>' + c.title + '</b><br><a href="' + id + '.html">Student page</a><br><a href="' + id + '.html#key">Student page with the key on</a>'; host.appendChild(a);
   });
-  var ov = el('div', 'cell'); ov.innerHTML = '<b>Unlock any locked student</b><br><span class="codebig">' + MrD.codes.override() + '</span><br><span class="hint">One code for every lesson and every student, until 7:00 AM tomorrow. Physics lessons only lock if you turn locked mode on for them.</span>'; host.appendChild(ov);
+  var ov = el('div', 'cell'); ov.innerHTML = '<b>Unlock any locked student</b><br><span class="codebig">' + MrD.codes.override() + '</span><br><span class="hint">One code for every lesson and every student, until 7:00 AM tomorrow. Both Newton’s Laws lock during the physics period; this code frees any student.</span>'; host.appendChild(ov);
   host.appendChild(el('p', 'hint', 'Codes are readable from 7:00 AM and change at 7:00 AM each school day (' + MrD.bell.dayKey() + '). Students are asked for a huddle code only on weekdays 7:00 AM to 3:00 PM. After 3:00 PM, or at home, no code is asked.'));
   /* stamp */
   document.getElementById('sgo').onclick = function () { var o = document.getElementById('sout'); o.hidden = false; var who = { first: document.getElementById('sn').value, period: document.getElementById('sp').value }; o.textContent = ['First Law ' + NFL.stamp(who)].concat(Object.keys(REG).filter(function (id) { return REG[id].stamp; }).map(function (id) { return REG[id].title + ' ' + REG[id].stamp(who); })).join('   ·   '); };
