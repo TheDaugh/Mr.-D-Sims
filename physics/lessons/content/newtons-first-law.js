@@ -301,7 +301,7 @@
     return { title: 'Newton’s First Law: My Notes', sections: secs };
   }
 
-  var cfg = { id: ID, course: 'physics', version: 3, title: 'Newton’s First Law', subtitle: 'Online lesson · questions adjust to you', steps: steps, notes: notesDoc,
+  var cfg = { id: ID, course: 'physics', version: 3, title: 'Newton’s First Law', lock: true, subtitle: 'Online lesson · questions adjust to you', steps: steps, notes: notesDoc,
     gates: [{ key: 'h1', label: 'Huddle 1' }, { key: 'h2', label: 'Huddle 2' }] };
   (window.LESSONS_REG = window.LESSONS_REG || {})[ID] = cfg;
 })();

@@ -42,7 +42,7 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
     <section class="card"><h2>Lock desk (one student's own code)</h2>
       <div class="row"><select id="ll" aria-label="Lesson"></select></div>
       <div class="row"><input id="ln" type="text" placeholder="Name as typed" aria-label="Student name" style="width:200px"><input id="lk" type="number" min="1" value="2" aria-label="Lock number" style="width:70px"><b class="code" id="lc"></b></div>
-      <p class="hint">The locked screen shows a name and a lock number. Only chemistry's Atom Discovery uses locked mode today; the others have no lock to open.</p></section>
+      <p class="hint">The locked screen shows a name and a lock number. Every guided lesson and virtual lab locks during its own class's period (until the 42-minute mark Mon-Thu, the whole period Friday). Type the name exactly as the student typed it.</p></section>
   </div>
 
   <section class="card" style="margin-bottom:14px"><h2>Today's huddle code</h2>
@@ -123,6 +123,7 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
 
   /* lock desk */
   L.forEach(function(l){var o=document.createElement("option");o.value=l.id;o.textContent=cname[l.course]+": "+l.title;$("ll").appendChild(o);o=o.cloneNode(true);$("lv-les").appendChild(o)});
+  [["vlab-01-unknown-solids","Virtual lab: Unknown White Solids"],["vlab-02-heating-curves","Virtual lab: Heating Curves"],["vlab-rutherford-gold-foil","Virtual lab: Rutherford's Gold Foil"]].forEach(function(v){var o=document.createElement("option");o.value=v[0];o.textContent=v[1];$("ll").appendChild(o)});
   $("ll").value="atom-discovery";
   function lock(){var n=$("ln").value.trim();$("lc").textContent=n?MrD.codes.lock($("ll").value,n,$("lk").value):""}
   $("ln").oninput=lock;$("lk").oninput=lock;$("ll").onchange=lock;

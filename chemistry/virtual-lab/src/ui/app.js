@@ -574,7 +574,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const qs = lab.prelab.questions, correct = qs.filter((q) => S.prelab.answers[q.id] === q.correct).length;
     return { version: 2, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, stage: S.stage, submitted: S.cerDone, prelab: { correct, total: qs.length, placement: S.prelab.placement || null, prediction: S.prelab.prediction, answers: S.prelab.answers }, scat: scatSummary(S.scat), cer: S.cerDone ? S.cer : null, safety: S.safety, events: log.events };
   }
-  function baseRecord() {
+  function baseRecord() { const r = baseRecord0(); if (S.lockExits != null) r.lock = { exits: S.lockExits, awaySec: S.lockAway }; return r; }
+  function baseRecord0() {
     if (SCAT) return scatRecord();
     if (HEAT) return heatRecord();
     collectNotebook();
@@ -583,21 +584,69 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const fileName = (prefix) => `${prefix}-${(S.student || "student").replace(/\W+/g, "-")}.json`;
   $("#download").addEventListener("click", () => { const r = record(); downloadJSON(fileName("lab-record"), r); });
 
+  // ---------- locked mode (shared/lock.js) ----------
+  // On only during chemistry's period (until the end mark Mon-Thu, the whole period Friday), never in the teacher build,
+  // and off with #nolock=<code> from the lock desk. Fullscreen starts from the click that leaves the intro. A saved lab
+  // that is reopened (page closed, or a new day) meets a gate first: a code if the page was closed, a Continue button otherwise.
+  let lockArmed = false, lockGateEl = null;
+  const lockClockOn = () => !!window.LessonLock && !TEACHER && (/nolock=(\d+)/.exec(location.hash) || [])[1] !== LessonLock.offCode() && !!MrD.bell.clock("chem").lockOn;
+  const lockWanted = () => lockClockOn() && !!(S.student || "").trim() && !S.cerDone && S.stage !== "done";
+  function lockChip() {
+    let c = $("#lockchip");
+    if (!lockArmed) { if (c) c.remove(); $("#fullscreen").hidden = false; return; }
+    if (!c) { c = h("span", { id: "lockchip", class: "hint" }); $(".hud").prepend(c); }
+    c.textContent = `🔒 left the lab ${LessonLock.stats().total}×`; $("#fullscreen").hidden = true;   // the Menu's own fullscreen toggle would count as an exit
+  }
+  function lockNote(msg, host) { let n = $("#lockmsg"); if (!n) { n = h("p", { id: "lockmsg", class: "hint", style: "color:var(--bad)" }); (host || $("#introBody")).append(n); } n.textContent = msg; }
+  function lockStart(go, host) {
+    if (lockArmed || !lockWanted()) return go();
+    LessonLock.enter(S.student.trim()).then((ok) => {
+      if (!ok) return lockNote("Fullscreen did not start. This lab needs Chrome on your Chromebook. Tell Mr. D.", host);
+      lockArmed = true; lockChip(); go();
+    });
+  }
+  function lockFinish() {
+    if (!lockArmed) return;
+    const st = LessonLock.stats(); S.lockExits = st.total; S.lockAway = st.awaySec;
+    lockArmed = false; LessonLock.finish(); lockChip();
+  }
+  function lockGate() {
+    if (lockArmed || S.stage === "intro" || !lockWanted()) return;
+    const rec = LessonLock.pending(), root = $("#stage"), msg = h("div", { class: "ll-msg", "aria-live": "polite" });
+    const done = () => { lockArmed = true; lockGateEl.remove(); lockGateEl = null; root.inert = false; lockChip(); };
+    let card;
+    if (rec) {
+      const inp = h("input", { type: "text", inputmode: "numeric", maxlength: "4", autocomplete: "off", "aria-label": "Unlock code from Mr. D", class: "ll-code" });
+      const go = h("button", { class: "primary", onclick: () => LessonLock.resume(inp.value).then((r) => { if (r === "ok") done(); else msg.textContent = r === "nofs" ? "Fullscreen did not start. Click again." : "Not the code. Hand up and wait for Mr. D."; }) }, "Unlock");
+      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") go.click(); });
+      card = h("div", { class: "ll-card", role: "alertdialog", "aria-modal": "true" }, h("h2", {}, "🔒 Locked. Hand up, eyes forward."),
+        h("p", {}, `You closed the lab. That is lock number ${LessonLock.lockNo()}. Mr. D needs to see you and give you a code.`), h("div", { class: "ll-row" }, inp, go), msg);
+    } else {
+      const go = h("button", { class: "primary", onclick: () => LessonLock.enter(S.student.trim()).then((ok) => { if (ok) done(); else msg.textContent = "Fullscreen did not start. This lab needs Chrome on your Chromebook. Tell Mr. D."; }) }, "Continue in fullscreen");
+      card = h("div", { class: "ll-card", role: "alertdialog", "aria-modal": "true" }, h("h2", {}, "🔒 Locked mode"),
+        h("p", {}, "This lab runs in fullscreen while class is on. Leaving it (a new tab, another window, closing the page) is recorded. The second time, your screen locks until Mr. D gives you a code."), h("div", { class: "ll-row" }, go), msg);
+    }
+    lockGateEl = h("div", { class: "ll-ov" }, card); document.body.append(lockGateEl); root.inert = true;
+    const f = card.querySelector("input, button"); if (f) f.focus();
+  }
+  if (window.LessonLock) LessonLock.init({ id: "vlab-" + lab.id, root: $("#stage"), onChange: lockChip });
+
   // ---------- save and resume ----------
   const SAVE_KEY = "vlab:" + lab.id;
   function snapshot() {
     collectNotebook();
     return { version: 1, lab: lab.id, seed, student: S.student, savedAt: new Date().toISOString(), started: log.started, activeSec: ACT.sec, elapsed: (performance.now() - log.t0) / 1000, events: log.events,
-      S: { ppe: S.ppe, inv: S.inv, srcKey: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, safety: S.safety, sel: S.sel, stage: S.stage, prelab: S.prelab, cer: S.cer, submitted: S.submitted, cerDone: S.cerDone, touched: S.touched, nbSeen: S.nbSeen, heat: S.heat, scat: S.scat, speed: S.speed, paused: S.paused, interval: S.interval }, P, visited: [...visited], notebook: S.notebook,
+      S: { ppe: S.ppe, inv: S.inv, srcKey: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, safety: S.safety, sel: S.sel, stage: S.stage, prelab: S.prelab, cer: S.cer, submitted: S.submitted, cerDone: S.cerDone, touched: S.touched, nbSeen: S.nbSeen, lockExits: S.lockExits, lockAway: S.lockAway, heat: S.heat, scat: S.scat, speed: S.speed, paused: S.paused, interval: S.interval }, P, visited: [...visited], notebook: S.notebook,
       cont: CONT.map((c) => ({ key: c.key, loc: c.loc, slot: c.slot, tare: c.tare, c: c.c, heat: c.heat || null })) };
   }
   function autosave() { if (S.demo || S.stage === "intro") return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot())); } catch (e) { /* storage blocked: file save still works */ } }
   function restore(sn, quiet) {
     Object.assign(S.ppe, sn.S.ppe); S.inv = sn.S.inv; S.srcKey = sn.S.srcKey; S.plateOn = sn.S.plateOn; S.plateC = sn.S.plateC; S.safety = sn.S.safety; S.sel = sn.S.sel;
-    for (const k of ["stage", "prelab", "cer", "submitted", "cerDone", "touched", "nbSeen", "heat", "scat", "speed", "paused", "interval"]) if (sn.S[k] !== undefined) S[k] = sn.S[k];
+    for (const k of ["stage", "prelab", "cer", "submitted", "cerDone", "touched", "nbSeen", "lockExits", "lockAway", "heat", "scat", "speed", "paused", "interval"]) if (sn.S[k] !== undefined) S[k] = sn.S[k];
     for (const r of sn.cont) { const c = byKey(r.key); c.loc = r.loc; c.slot = r.slot; c.tare = r.tare; c.c = r.c; c.heat = r.heat || null; }
     Object.assign(P, sn.P); sn.visited.forEach((v) => visited.add(v));
     ACT.set(sn.activeSec || 0); log.events = sn.events; log.started = sn.started; log.t0 = performance.now() - sn.elapsed * 1000;
+    S.student = sn.student || S.student;   // the intro box is not on screen after a resume, so the name has to come from the save
     { const stEl = $("#student"); if (stEl) stEl.value = sn.student || ""; }
     table.querySelectorAll("select").forEach((x) => { const v = (sn.notebook[x.dataset.u] || {})[x.dataset.t]; if (v) x.value = v; });
     if (!HEAT) $("#plate").value = S.plateC; if (book) book.refresh(); syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
@@ -721,10 +770,10 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     getNotebook: () => { collectNotebook(); return S.notebook; },
     getRows: () => Object.fromEntries(Object.keys(S.heat).map((k) => [k, goodRows(S.heat[k])])),
     onDemo: () => demoStart(),
-    onIntroDone: (name) => { S.student = name; S.stage = "prelab"; log.add("stage", { to: "prelab", name }); closeDlg("dlgIntro"); renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); },
+    onIntroDone: (name) => { S.student = name; lockStart(() => { S.stage = "prelab"; log.add("stage", { to: "prelab", name }); closeDlg("dlgIntro"); renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); }); },
     onAnswer: (id, choice, correct) => log.add("prelab_answer", { q: id, choice, correct }),
     onPrelabDone: () => { S.stage = "lab"; log.add("prelab_done", { prediction: S.prelab.prediction, placement: S.prelab.placement }); closeDlg("dlgPrelab"); renderQuests(); say(NOPPE ? "Pre-lab done. The dark-room curtain is open." : "Pre-lab done. The lab door will open once you have goggles and an apron."); },
-    onCerDone: (c) => { if (!gateOk()) return showGate(); S.cer = c; S.cerDone = true; S.stage = "done"; log.add("cer", c); closeDlg("dlgCER"); openDone(); },
+    onCerDone: (c) => { if (!gateOk()) return showGate(); S.cer = c; S.cerDone = true; S.stage = "done"; log.add("cer", c); closeDlg("dlgCER"); lockFinish(); openDone(); },
     onCerClose: () => closeDlg("dlgCER"), onFinish: () => finishData()
   };
   $("#theoryBody").replaceChildren(...theoryNodes(lab));
@@ -743,6 +792,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const r = record(), mins = Math.round(r.activeSec / 60);
     drawBadge($("#badge"), { title: lab.badgeTitle || lab.title, student: S.student, gold: r.challenge, minutes: mins, code: r.code, date: new Date().toLocaleDateString() });
     $("#doneInfo").textContent = SCAT ? (r.challenge ? "You finished the lab and the challenge." : "You finished the lab. The challenge is still open if you want the gold badge.") : r.challenge ? "You finished the required samples and the challenge." : "You finished the required samples. The challenge sample is still open if you want the gold badge.";
+    if (S.lockExits != null) $("#doneInfo").textContent += ` Times you left the lab: ${S.lockExits}.`;
     openDlg("dlgDone");
   }
   // ---------- tutorial arrows: one fixed sample, guided step by step ----------
@@ -875,7 +925,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (S.incident) return say("Finish the incident first.", "warn");
     const wasIntro = dlg("dlgIntro").open; if (wasIntro) { S.student = $("#student").value.trim(); closeDlg("dlgIntro"); }
     await runDemo(demoApi);
-    if (S.stage === "intro") { renderIntro($("#introBody"), stageCtx); openDlg("dlgIntro"); }
+    if (S.stage === "intro") intro();
   }
   function renderKey() {
     const rows = [];
@@ -896,7 +946,11 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       h("div", { class: "controls" }, labSel, seedIn, h("button", { onclick: () => { location.search = `?lab=${labSel.value}&seed=${seedIn.value}`; } }, "Load lab and seed"), h("button", { onclick: () => { location.search = `?lab=${labSel.value}&seed=${Math.floor(Math.random() * 1e9)}`; } }, "New random samples")));
   }
   $("#btnKey").addEventListener("click", () => { renderKey(); openDlg("dlgKey"); });
-  const intro = () => { renderIntro($("#introBody"), stageCtx); openDlg("dlgIntro"); };
+  const intro = () => {
+    renderIntro($("#introBody"), stageCtx);
+    if (lockClockOn()) { const note = h("p", { class: "hint" }, "🔒 Locked mode. This lab runs in fullscreen while class is on. Leaving it (a new tab, another window, closing the page) is recorded. The second time, your screen locks until Mr. D gives you a code."), f = $("#introBody .foot"); if (f) f.before(note); else $("#introBody").append(note); }
+    openDlg("dlgIntro");
+  };
 
   ready = true;
   syncUnit(); renderPPE(); renderControls(); renderFeed(); renderInv(); renderSafety(); setView("room");
@@ -906,6 +960,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   renderQuests();
   if (TEACHER) { $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
   if (S.stage === "intro") intro(); else if (S.stage === "prelab") { renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); }
+  lockGate();
   setInterval(autosave, 5000);
   $("#boot").hidden = true; $("#app").hidden = false; 
   let last = performance.now(), t0 = last, lastCtl = 0;

@@ -66,6 +66,7 @@
 <script src="../../shared/config.js"></script>
 <script src="../../shared/bell.js"></script>
 <script src="../../shared/codes.js"></script>
+<script src="../../shared/lock.js"></script>
 <script src="../../shared/teacherbar.js"></script>
 <script src="../../shared/live.js"></script>
 <script src="../../shared/profile.js"></script>
@@ -83,6 +84,53 @@
   var LESSON_ID = 'product-rule-v2', KEY = MrD.isKey(), PREVIEW = KEY;
   var DEBUG = /debug/.test(location.hash), LAST = null;
   function clk() { return MrD.bell.clock('calc'); }
+
+  /* ---------- locked mode (shared/lock.js) ----------
+     On only during calculus's period (until the end mark Mon-Thu, the whole period Friday), never in #key, and off with
+     #nolock=<code> from the lock desk. Fullscreen starts from the click that leaves the Start step. Closing the page and
+     reopening it asks for Mr. D's code. */
+  var lockArmed = false, lockResume = false;
+  function lockWanted() {
+    if (KEY || !S || !S.first || !S.first.trim() || S.ended || S.doneAt) return false;
+    if ((/nolock=(\d+)/.exec(location.hash) || [])[1] === LessonLock.offCode()) return false;
+    return !!clk().lockOn;
+  }
+  function lockNote(msg) {
+    var n = $('lockmsg'); if (!n) { n = el('p', 'msg bad'); n.id = 'lockmsg'; n.style.color = 'var(--warn)'; $('step-' + cur()).appendChild(n); }
+    n.textContent = msg;
+  }
+  /* Runs go() now when no lock is needed; otherwise enters fullscreen first (inside the student's click), then runs go(). */
+  function lockStart(go) {
+    if (lockArmed || !lockWanted()) { go(); return; }
+    LessonLock.enter(S.first.trim()).then(function (ok) {
+      if (!ok) { lockNote('Fullscreen did not start. This lesson needs Chrome on your Chromebook. Tell Mr. D.'); return; }
+      lockArmed = true; renderNav(); go();
+    });
+  }
+  function lockFinish() {
+    if (!lockArmed) return;
+    var st = LessonLock.stats(); S.lockExits = st.total; S.lockAway = st.awaySec;
+    lockArmed = false; LessonLock.finish(); save(); renderNav();
+  }
+  function lockAwayText() { var a = S.lockAway || 0; return Math.floor(a / 60) + ':' + ('0' + (a % 60)).slice(-2); }
+  function renderLockResume() {
+    var host = $('lockresume');
+    if (!host) { host = el('section', 'card'); host.id = 'lockresume'; $('step-start').parentNode.insertBefore(host, $('step-start')); }
+    host.hidden = false; host.innerHTML = '';
+    host.appendChild(el('h2', null, '\uD83D\uDD12 Locked. Hand up, eyes forward.'));
+    host.appendChild(el('p', null, 'You closed the lesson. That is lock number ' + LessonLock.lockNo() + '. Mr. D needs to see you and give you a code.'));
+    var row = el('div', 'row'), inp = document.createElement('input'); inp.type = 'text'; inp.inputMode = 'numeric'; inp.maxLength = 4; inp.setAttribute('aria-label', 'Unlock code from Mr. D'); inp.style.width = '6em';
+    var b = el('button', 'btn primary', 'Unlock'); b.type = 'button'; row.appendChild(inp); row.appendChild(b); host.appendChild(row);
+    var msg = el('p', 'msg bad'); msg.style.color = 'var(--warn)'; host.appendChild(msg);
+    function go() {
+      LessonLock.resume(inp.value).then(function (r) {
+        if (r === 'ok') { lockArmed = true; lockResume = false; host.hidden = true; renderAll(); }
+        else msg.textContent = r === 'nofs' ? 'Fullscreen did not start. Click again.' : 'Not the code. Hand up and wait for Mr. D.';
+      });
+    }
+    b.onclick = go; inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+    inp.focus();
+  }
 
   function $(id) { return document.getElementById(id); }
   var el = Q.el, rich = Q.rich;
@@ -135,8 +183,8 @@
   function reachable() { if (PREVIEW || S.ended) return STEPS.length - 1; var r = 0; for (var i = 0; i < STEPS.length - 1; i++) { if (canLeave(STEPS[i])) r = i + 1; else break; } return r; }
   function cur() { return STEPS.indexOf(S.step) < 0 ? 'start' : S.step; }
   function goto(step) {
-    if (STEPS.indexOf(step) > reachable()) return;
-    S.step = step; save(); renderAll(); window.scrollTo(0, 0);
+    if (STEPS.indexOf(step) > reachable() || lockResume) return;
+    lockStart(function () { S.step = step; save(); renderAll(); window.scrollTo(0, 0); });
   }
   function advance(from) { var i = STEPS.indexOf(from); if (i + 1 < STEPS.length) goto(STEPS[i + 1]); }
   function renderNav() {
@@ -146,6 +194,7 @@
       if (s === cur()) b.setAttribute('aria-current', 'step');
       b.disabled = i > r; b.onclick = function () { goto(s); }; nav.appendChild(b);
     });
+    if (lockArmed) { var lc = el('span', 'hint', '\uD83D\uDD12 left the lesson ' + LessonLock.stats().total + '\u00d7'); lc.style.marginLeft = 'auto'; nav.appendChild(lc); }
   }
   function nextBtn(host, label, fn, disabled) {
     var row = el('div', 'row'), b = el('button', 'btn primary', label); b.type = 'button'; b.disabled = !!disabled; b.onclick = fn; row.appendChild(b); host.appendChild(row); return b;
@@ -183,6 +232,7 @@
     var row = el('div', 'row');
     row.innerHTML = '<label>First name <input type="text" id="who-first" autocomplete="given-name"></label> <label>Period <input type="text" id="who-period" maxlength="6"></label>';
     h.appendChild(row);
+    if (lockWanted() && !lockArmed) h.appendChild(el('p', 'hint', '\uD83D\uDD12 Locked mode. This lesson runs in fullscreen while class is on. Leaving it (Esc, a new tab, another window, closing the page) is recorded on your stamp. The second time, your screen locks until Mr. D gives you a code.'));
     var b = nextBtn(h, 'Begin the warm-up', function () { S.first = $('who-first').value.trim(); S.period = $('who-period').value.trim(); advance('start'); }, !canLeave('start'));
     function upd() { S.first = $('who-first').value; S.period = $('who-period').value; b.disabled = !canLeave('start'); save(); renderNav(); }
     $('who-first').value = S.first; $('who-period').value = S.period;
@@ -680,6 +730,7 @@
       tb2.onclick = function () { download('product-rule-notes-' + (S.first || 'student').toLowerCase().replace(/[^a-z0-9]/g, '') + '.tex', buildTex(), 'application/x-tex'); };
       r.appendChild(pb); r.appendChild(tb2); out.appendChild(r);
       out.appendChild(el('p', 'hint', 'In the print window, choose \u201cSave as PDF\u201d as the destination. The .tex file compiles in Overleaf or any LaTeX install if you want to keep editing.'));
+      if (S.lockExits != null) out.appendChild(el('p', 'hint', 'Times you left the lesson: ' + S.lockExits + ' \u00b7 time away ' + lockAwayText()));
       h.appendChild(out);
     }
   }
@@ -707,7 +758,7 @@
   }
   function liveSnap() {
     var i = STEPS.indexOf(cur()), q = LAST && LAST.q ? LAST.q : null;
-    return { step: LABELS[STEPS[i]], stepIdx: i + 1, stepCount: STEPS.length, band: S.level, answered: S.stats.items, misses: S.stats.items - S.stats.clean, prompt: '', exits: S.hid || 0, secs: Math.round(S.active / 1000), done: !!S.doneAt, stuck: S.stats.assisted >= 3 };
+    return { step: LABELS[STEPS[i]], stepIdx: i + 1, stepCount: STEPS.length, band: S.level, answered: S.stats.items, misses: S.stats.items - S.stats.clean, prompt: '', exits: lockArmed ? LessonLock.stats().total : (S.hid || 0), secs: Math.round(S.active / 1000), done: !!S.doneAt, stuck: S.stats.assisted >= 3 };
   }
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') { S.hid = (S.hid || 0) + 1; save(); } });
   setInterval(function () { if (!S.first) return; updateEndBar(); updFin(); }, 1000);
@@ -759,6 +810,8 @@
   var RENDER = { start: renderStart, warm: renderWarm, predict: renderPredict, sim: renderSim, huddle: renderHuddle, build: renderBuild, practice: renderPractice, mastery: renderMastery, wrap: renderWrap };
   function renderAll() {
     var c = cur();
+    if (lockResume) { STEPS.forEach(function (s) { $('step-' + s).hidden = true; }); renderNav(); renderLockResume(); return; }
+    if (lockArmed) { if (S.ended || S.doneAt) lockFinish(); else LessonLock.save(STEPS.indexOf(c), false, null); }   // progress itself saves in S; the lock only needs to know where the student is
     STEPS.forEach(function (s) { $('step-' + s).hidden = s !== c; });
     S.max = Math.max(S.max || 0, STEPS.indexOf(c));
     clearInterval(warmTimer);
@@ -768,6 +821,8 @@
   if (PREVIEW && !S.first) { S.first = 'Preview'; S.period = '0'; }
   if (DEBUG) window.__pr = { S: function () { return S; }, goto: goto, last: function () { return LAST; }, solve: function (ok) { if (LAST) { LAST.autofill(ok); LAST.check(); } },
     reachable: reachable, render: renderAll, level: function () { return S.level; }, setup: function () { if (window.__pr_setup) window.__pr_setup(); } };
+  LessonLock.init({ id: LESSON_ID, root: document.querySelector('.wrap'), onChange: function () { renderNav(); } });
+  if (lockWanted() && LessonLock.pending()) lockResume = true;   // today's lock record was never finished: the page was closed, so it counts as an exit and needs a code
   renderAll();
   MrD.live.attach({ course: 'calc', lessonId: LESSON_ID, who: function () { return { first: S.first, period: S.period }; }, snap: liveSnap });
 })();

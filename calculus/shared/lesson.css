@@ -2,6 +2,9 @@
 :root{--bg:#eef2f6;--surface:#fff;--stage:#f7fafc;--ink:#142230;--muted:#566878;--line:#cbd6e0;--accent:#2b4fd9;--good:#1c7d4a;--warn:#b3412e;--gold:#c9791a;--soft:#e8eefc;
   --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e161e;--surface:#16212b;--stage:#101a23;--ink:#e6edf3;--muted:#92a3b3;--line:#2a3a48;--accent:#8aa4ff;--good:#4fcf8c;--warn:#ff7d68;--gold:#f0a94a;--soft:#1b2740;color-scheme:dark}}
+/* shared/lock.js (locked mode) reads these names; map them onto this page's tokens */
+:root{--panel:var(--surface);--hot:var(--warn);--bad:var(--warn)}
+.btn.big{font-size:1.05rem;min-height:46px;padding:8px 22px}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 var(--body);padding:18px 16px 64px}
 .wrap{max-width:none;margin-inline:auto;padding-inline:clamp(12px,3vw,40px)}

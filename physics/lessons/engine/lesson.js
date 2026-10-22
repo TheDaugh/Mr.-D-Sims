@@ -60,6 +60,57 @@
   LE.setBand = function (b, why) { b = Math.max(1, Math.min(4, b)); if (b !== S.band) S.bandLog.push(S.band + '>' + b + (why ? ':' + why : '')); S.band = b; LE.save(); };
   LE.seedRng = function (tag) { if (!S.seed) { S.seed = LE.norm(S.first) + '|' + LE.norm(S.period); LE.save(); } return LE.rng(S.seed + '|' + tag); };
 
+  /* ---------- locked mode (shared/lock.js) ----------
+     Opt-in per lesson with cfg.lock = true. On only during this class's period (the same clock rule as the chemistry
+     lessons: until the end mark Mon-Thu, the whole period Friday), never in #key, and off with #nolock=<code> from the lock desk.
+     Fullscreen starts from the click that leaves the Start step. Closing the page and reopening asks for Mr. D's code. */
+  var lockArmed = false, lockResume = false;
+  function lockWanted() {
+    if (!CFG || !CFG.lock || !window.LessonLock || KEY || !S || !S.first || S.ended) return false;
+    if ((/nolock=(\d+)/.exec(location.hash) || [])[1] === LessonLock.offCode()) return false;
+    return !!LE.clock().lockOn;
+  }
+  function lockNote(msg) {
+    var n = $('lockmsg'); if (!n) { n = el('p', 'msg bad'); n.id = 'lockmsg'; $('stage').appendChild(n); }
+    n.textContent = msg;
+  }
+  function lockChip() {
+    var host = $('btn-notes') && $('btn-notes').parentNode; if (!host) return;
+    var c = $('lockchip');
+    if (!lockArmed) { if (c) c.remove(); return; }
+    if (!c) { c = el('span', 'hint'); c.id = 'lockchip'; host.insertBefore(c, host.firstChild); }
+    c.textContent = '🔒 left the lesson ' + LessonLock.stats().total + '×';
+  }
+  /* Runs go() now when no lock is needed; otherwise enters fullscreen first (inside the student's click) and runs go() once it starts. */
+  function lockStart(go) {
+    if (lockArmed || !lockWanted()) { go(); return; }
+    LessonLock.enter(S.first.trim()).then(function (ok) {
+      if (!ok) { lockNote('Fullscreen did not start. This lesson needs Chrome on your Chromebook. Tell Mr. D.'); return; }
+      lockArmed = true; lockChip(); go();
+    });
+  }
+  function lockFinish() {
+    if (!lockArmed) return;
+    var st = LessonLock.stats(); S.lockExits = st.total; S.lockAway = st.awaySec;
+    lockArmed = false; LessonLock.finish(); lockChip(); saveNow();
+  }
+  function lockResumeCard(root) {
+    var card = el('section', 'card'), n = LessonLock.lockNo();
+    card.appendChild(el('h2', null, '🔒 Locked. Hand up, eyes forward.'));
+    card.appendChild(el('p', null, 'You closed the lesson. That is lock number ' + n + '. Mr. D needs to see you and give you a code.'));
+    var row = el('div', 'row'), inp = el('input'); inp.type = 'text'; inp.inputMode = 'numeric'; inp.maxLength = 4; inp.setAttribute('aria-label', 'Unlock code from Mr. D'); inp.style.width = '6em';
+    var btn = el('button', 'btn primary big', 'Unlock'); btn.type = 'button'; row.appendChild(inp); row.appendChild(btn); card.appendChild(row);
+    var msg = el('p', 'msg bad'); card.appendChild(msg);
+    function go() {
+      LessonLock.resume(inp.value).then(function (r) {
+        if (r === 'ok') { lockArmed = true; lockResume = false; lockChip(); LE.render(); }
+        else msg.textContent = r === 'nofs' ? 'Fullscreen did not start. Click again.' : 'Not the code. Hand up and wait for Mr. D.';
+      });
+    }
+    btn.onclick = go; inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+    root.appendChild(card); inp.focus();
+  }
+
   /* ---------- steps and gating ---------- */
   function stepIndex(id) { for (var i = 0; i < CFG.steps.length; i++) if (CFG.steps[i].id === id) return i; return 0; }
   function skipped(id) { return !!(S.skip && S.skip[id]); }
@@ -70,13 +121,13 @@
   }
   function ctx() { return { S: S, LE: LE, band: LE.band(), key: KEY, cfg: CFG }; }
   LE.goto = function (id) {
-    var idx = stepIndex(id); if (idx > reachable()) return;
-    S.step = id; S.max = Math.max(S.max || 0, idx); viewNotes = false; saveNow(); LE.render(); window.scrollTo(0, 0);
+    var idx = stepIndex(id); if (idx > reachable() || lockResume) return;
+    lockStart(function () { S.step = id; S.max = Math.max(S.max || 0, idx); viewNotes = false; saveNow(); LE.render(); window.scrollTo(0, 0); });
   };
   LE.stepIndex = function (id) { return stepIndex(id || S.step); };
   /* The student presses End at the end mark (or after the bell). Their stamp records the furthest step they reached. */
   LE.endNow = function (why) {
-    S.ended = why || 'time'; S.endIdx = Math.max(S.max || 0, stepIndex(S.step)); S.endedAt = Date.now();
+    S.ended = why || 'time'; S.endIdx = Math.max(S.max || 0, stepIndex(S.step)); S.endedAt = Date.now(); lockFinish();
     S.step = CFG.steps[CFG.steps.length - 1].id; saveNow(); LE.render(); window.scrollTo(0, 0);
   };
   LE.reached = function () { var i = S.ended ? S.endIdx : Math.max(S.max || 0, stepIndex(S.step)); return { idx: i, label: CFG.steps[Math.min(i, CFG.steps.length - 1)].label, of: CFG.steps.length }; };
@@ -112,7 +163,7 @@
   /* ---------- timing ---------- */
   var lastCan = null, liveOn = false;
   function tick() {
-    if (!S || !S.first) return;
+    if (!S || !S.first || lockResume) return;
     updateEndBar();
     if (document.visibilityState !== 'visible') return;
     S.t[S.step] = (S.t[S.step] || 0) + 1;
@@ -161,7 +212,7 @@
     var boxes = document.querySelectorAll('#stage .q');
     for (var i = 0; i < boxes.length; i++) { var qs = S.q[boxes[i].dataset.qid]; if (!qs || !qs.done) { var qt = boxes[i].querySelector('.qtext'); prompt = qt ? qt.textContent : ''; stuck = !!(qs && qs.misses >= 1); break; } }
     var tot = 0; for (k in S.t) tot += S.t[k];
-    return { step: CFG.steps[stepIndex(S.step)].label, stepIdx: stepIndex(S.step) + 1, stepCount: CFG.steps.length, band: LE.band(), answered: ans, misses: miss, prompt: prompt, exits: S.hid || 0, secs: tot, stuck: stuck, done: !!S.ended };
+    return { step: CFG.steps[stepIndex(S.step)].label, stepIdx: stepIndex(S.step) + 1, stepCount: CFG.steps.length, band: LE.band(), answered: ans, misses: miss, prompt: prompt, exits: lockArmed ? LessonLock.stats().total : (S.hid || 0), secs: tot, stuck: stuck, done: !!S.ended };
   }
 
   /* ---------- question widgets ---------- */
@@ -445,11 +496,15 @@
   LE.render = function () {
     var stage = $('stage'); stage.textContent = '';
     renderNav();
+    if (lockResume) { lockResumeCard(stage); return; }
     if (viewNotes) { notesView(stage); return; }
     var i = stepIndex(S.step), st = CFG.steps[i]; S.max = Math.max(S.max || 0, i);
     var card = el('section', 'card'); card.dataset.step = st.id; stage.appendChild(card);
     if (KEY && st.teacher) { var kp = el('div', 'keypanel'); kp.appendChild(el('h4', null, 'Teacher key \u00b7 ' + st.label)); var inner = el('div'); html(inner, st.teacher(ctx())); kp.appendChild(inner); stage.insertBefore(kp, card); }
+    if (lockArmed) { if (i === CFG.steps.length - 1 && LE.canEnd()) lockFinish(); else LessonLock.save(i, false, null); }   // progress itself saves in S; the lock only needs to know where the student is
     st.render(card, ctx());
+    if (i === 0 && lockWanted() && !lockArmed) card.appendChild(el('p', 'hint', '\ud83d\udd12 Locked mode. This lesson runs in fullscreen while class is on. Leaving it (Esc, a new tab, another window, closing the page) is recorded on your stamp. The second time, your screen locks until Mr. D gives you a code.'));
+    if (i === CFG.steps.length - 1 && LE.canEnd() && S.lockExits != null) card.appendChild(el('p', 'hint', 'Times you left the lesson: ' + S.lockExits + ' \u00b7 time away ' + Math.floor(S.lockAway / 60) + ':' + ('0' + (S.lockAway % 60)).slice(-2)));
     var row = el('div', 'row');
     if (i > 0) { var bk = el('button', 'btn', 'Back'); bk.type = 'button'; bk.onclick = function () { S.step = CFG.steps[i - 1].id; saveNow(); LE.render(); window.scrollTo(0, 0); }; row.appendChild(bk); }
     if (i + 1 < CFG.steps.length) { var nx = el('button', 'btn primary', 'Continue'); nx.type = 'button'; nx.id = 'btn-next'; nx.onclick = LE.next; row.appendChild(nx); }
@@ -470,10 +525,14 @@
   LE.start = function (cfg) {
     CFG = cfg; KEY = MrD.isKey();
     S = load();
+    if (CFG.lock && window.LessonLock) {
+      LessonLock.init({ id: CFG.id, root: document.querySelector('.wrap'), onChange: lockChip });
+      if (lockWanted() && LessonLock.pending()) lockResume = true;   // today's lock record was never finished: the page was closed, so it counts as an exit and needs a code
+    }
     document.title = cfg.title + ' \u00b7 Mr. D';
     $('title').textContent = cfg.title; $('subtitle').textContent = cfg.subtitle;
     $('btn-notes').onclick = function () { if (!S.first) return; viewNotes = true; LE.render(); window.scrollTo(0, 0); };
-    window.addEventListener('hashchange', function () { KEY = MrD.isKey(); keyBar(); LE.render(); });
+    window.addEventListener('hashchange', function () { KEY = MrD.isKey(); if (KEY) lockResume = false; keyBar(); LE.render(); });
     ticker = setInterval(tick, 1000);
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && S && S.first && !KEY) { S.hid = (S.hid || 0) + 1; saveNow(); } });
     window.addEventListener('pagehide', saveNow);

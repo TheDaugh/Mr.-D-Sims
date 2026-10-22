@@ -23,7 +23,7 @@ Every guided lesson in physics, chemistry and calculus follows the same rules, s
 | `shared/bell.js` | Periods, code day, `gatesOn`, `clock(course)`, the 42-minute and Friday rules. |
 | `shared/codes.js` | Huddle codes, the unlock-any-student code, per-student lock codes, stamps. |
 | `shared/teacherbar.js` | `MrD.isKey()` and the one teacher bar. |
-| `shared/lock.js` | Fullscreen locked mode (opt-in). |
+| `shared/lock.js` | Fullscreen locked mode. On in every guided lesson and virtual lab. |
 | `shared/notes.js` | Printable notes from a small model: print, PDF, `.tex`. |
 | `shared/profile.js` | Scores saved on the student's device for the portal; export and import JSON. |
 | `shared/live.js`, `live/` | Live view client and the Cloudflare Worker. |
@@ -39,7 +39,7 @@ Already follows the standard. For the next lesson:
 - In the content file set `course:'physics'`, a new `id`, `gates:[{key:'h1',label:'Huddle 1'}, ...]` and a `version`.
 - Keep the last step as Notes: practice before the end mark (`morePractice`), stamp and report code after `canEnd`, `MrD.profile.record(...)`.
 - Add the lesson to `shared/lessons.js` and give each skill an id that `portal/standards.json` can map (`physics/<lesson-id>/<skill>`).
-- Physics has no locked mode. If you want Friday locking in physics, add `LessonLock.init/enter/finish` the way `chemistry/unit-3-atoms-ions/atom-discovery.html` does (about 30 lines) and use `clock('physics').lockOn`.
+- **Locked mode** is built into the engine. A lesson config with `lock: true` (both Newton's Laws have it) turns it on during physics's period only (the end mark Mon-Thu, the whole period Friday), never in `#key`, off with `#nolock=<code>`. The Start step's Continue click enters fullscreen; closing the page and reopening asks for a code. A template-built lesson gets it by adding `lock: true` to its config. `tests/lock.e2e.js` covers it.
 - `projectile-concept-checker` is an older page with its own tiers, name screen and gate. Rebuild it on the engine before it is used as a guided lesson.
 
 ### Chemistry (`chemistry/`)
