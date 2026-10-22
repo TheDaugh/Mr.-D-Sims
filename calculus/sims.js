@@ -21,6 +21,19 @@ window.UNITS = [
       },
       {
         type: "lesson",
+        icon: "📈",
+        title: "2.6 Derivatives of eˣ and ln x",
+        href: "unit-2-differentiation/2-6-exp-log.html",
+        blurb: "Slide a point along eˣ and ln x and compare slope with height, then build both rules and show you own them.",
+        tags: ["e^x", "ln x", "adaptive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-2-differentiation/2-6-exp-log.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/2-6-exp-log-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/2-6-exp-log-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
         icon: "📐",
         title: "2.7 The Product Rule",
         href: "unit-2-differentiation/2-7-product-rule.html",
@@ -30,6 +43,19 @@ window.UNITS = [
           { label: "Teacher key (#key)", href: "unit-2-differentiation/2-7-product-rule.html#key" },
           { label: "Teacher page", href: "unit-2-differentiation/2-7-product-rule-teacher.html" },
           { label: "Outline", href: "unit-2-differentiation/2-7-product-rule-outline.md" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "➗",
+        title: "2.8 The Quotient Rule",
+        href: "unit-2-differentiation/2-8-quotient-rule.html",
+        blurb: "Test a tempting guess against the true tangent, then build the quotient rule and show you own it.",
+        tags: ["quotient rule", "adaptive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-2-differentiation/2-8-quotient-rule.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/2-8-quotient-rule-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/2-8-quotient-rule-makeup.pdf" }
         ]
       }
     ]

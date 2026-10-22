@@ -1,0 +1,69 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 2.6 Derivatives of e? and ln x}\fancyhead[R]{\small Make-up key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{2.6 Derivatives of e? and ln x}
+\textbf{You missed this lesson. Copy this into your notes. That is all you need to do.}\par\medskip
+\subsection*{Question of the day}
+What is the slope of e? at every point, and of ln x?\par
+\subsection*{Targets}\begin{itemize}\item I can state the derivatives of e? and ln x.
+\item I can differentiate sums that use both rules.
+\item I can find slopes, tangent lines and normal lines.\end{itemize}
+\subsection*{Concepts}\begin{itemize}
+\item \textbf{The curve e?} (d/dx e? = e?): Its slope at a point equals its height there. It never has a horizontal tangent.
+\item \textbf{The curve ln x} (d/dx ln x = 1/x): Its slope at x is the reciprocal of x. The slopes shrink as x grows: it flattens out.
+\item \textbf{Tangent and normal} (normal slope = --1/m): Tangent: y -- y\textsubscript{0} = m(x -- x\textsubscript{0}). Normal: slope is the negative reciprocal, --1/m.
+\end{itemize}
+\subsection*{What the class predicted, and what is true}\begin{itemize}
+\item The curve $y=e^x$ climbs faster and faster. As $x$ increases, its slopes will... \A{keep growing.} The curve gets steeper, so its slopes keep growing.
+\item The curve $y=\ln x$ rises but flattens out. As $x$ increases, its slopes will... \A{shrink toward 0.} A flattening curve has slopes that shrink toward 0 (they are $1/x$).
+\end{itemize}
+\section*{Huddle notes (answers filled in)}
+\subsection*{Definitions}\begin{itemize}
+\item \textbf{e?:} Its slope at any point equals its \A{height}: d/dx e? = \A{e?}.
+\item \textbf{ln x:} Its slope at x is the \A{reciprocal} of x: d/dx ln x = \A{1/x}.
+\item \textbf{Horizontal tangent:} The slope is \A{zero}. The curve e? never has one.
+\end{itemize}
+\subsection*{Worked example}
+Find the slope of f(x) = ln x + 3x\textsuperscript{2} at x = 1.\\
+\begin{itemize}
+\item f?(x) = 1/x + \A{6x}
+\item f?(1) = 1 + \A{6}
+\item So the slope is \A{7}.
+\end{itemize}
+\subsection*{Label the curve e?}
+\begin{enumerate}
+\item The \A{point} where we measure.
+\item The \A{tangent line}: its slope equals the height.
+\item The curve is \A{y = e?}.
+\end{enumerate}
+\section*{One worked sample of each skill}
+\subsection*{Differentiate}
+\noindent\textbf{Level 1.} Differentiate.\\ \A{Answer: $e^{x}$} \quad $\dfrac{d}{dx}e^{x}=e^{x}$.\par\medskip
+\noindent\textbf{Level 2.} Differentiate.\\ \A{Answer: $\frac{2}{x}$} \quad $2\cdot\dfrac{1}{x}=\dfrac{2}{x}$.\par\medskip
+\noindent\textbf{Level 3.} Differentiate term by term.\\ \A{Answer: $10 x + 2 e^{x} - \frac{5}{x}$} \quad $10x+2e^{x}-\dfrac{5}{x}$.\par\medskip
+\noindent\textbf{Level 4.} Differentiate. Rewrite the root as a power if that helps.\\ \A{Answer: $\frac{6}{2 \sqrt{x}} - \frac{6}{x} + e^{x}$} \quad $\dfrac{6}{2\sqrt{x}}-\dfrac{6}{x}+e^{x}$.\par\medskip
+\subsection*{Slope at a point}
+\noindent\textbf{Level 1.} Find the slope of $y=e^{x}$ at $x=0$.\\ \A{Answer: 1} \quad The slope equals the height, $e^{0}=1$.\par\medskip
+\noindent\textbf{Level 2.} Let $f(x)=6e^{x}+5x$. Find $f'(0)$.\\ \A{Answer: 11} \quad $f'(x)=6e^{x}+5$, so $f'(0)=6+5=11$.\par\medskip
+\noindent\textbf{Level 3.} Let $f(x)=6\ln x+x^{2}$. Find $f'(4)$.\\ \A{Answer: 9.5} \quad $f'(x)=\dfrac{6}{x}+2x$, so $f'(4)=9.5$.\par\medskip
+\noindent\textbf{Level 4.} Let $f(x)=6\ln x-\dfrac{6}{x}$. Find $f'(2)$.\\ \A{Answer: 4.5} \quad $f'(x)=\dfrac{6}{x}+\dfrac{6}{x^{2}}$, so $f'(2)=4.5$.\par\medskip
+\subsection*{Tangent and normal lines}
+\noindent\textbf{Level 1.} Find the tangent line to $y=\ln x$ at $x=1$.\\ \A{Answer: $x - 1$} \quad Point $(1,0)$, slope 1, so $y=x-1$.\par\medskip
+\noindent\textbf{Level 2.} Find the tangent line to $y=2e^{x}$ at $x=0$.\\ \A{Answer: $2 + 2 x$} \quad Point $(0,2)$, slope 2, so $y=2+2x$.\par\medskip
+\noindent\textbf{Level 3.} Find the tangent line to $y=e^{x}-2x$ at $x=0$.\\ \A{Answer: $1 + \left(-1\right) x$} \quad Point $(0,1)$, slope $-1$: $y=1+(-1)x$.\par\medskip
+\noindent\textbf{Level 4.} Find the normal line to $y=\ln x+4x^{2}$ at $x=1$.\\ \A{Answer: $4 - \frac{x - 1}{9}$} \quad Tangent slope 9, so the normal slope is $-\tfrac{1}{9}$: $y=4-\dfrac{x-1}{9}$.\par\medskip
+\subsection*{Limits that are derivatives}
+\noindent\textbf{Level 1.} Evaluate $\displaystyle\lim_{h\to0}\dfrac{\ln(2+h)-\ln 2}{h}$.\\ \A{Answer: 0.5} \quad It is $f'(2)$ for $f=\ln x$: $\dfrac{1}{2}$.\par\medskip
+\noindent\textbf{Level 2.} Evaluate $\displaystyle\lim_{h\to0}\dfrac{e^{h}-1}{h}$.\\ \A{Answer: 1} \quad It is $f'(0)$ for $f=e^{x}$: $e^{0}=1$.\par\medskip
+\noindent\textbf{Level 3.} Evaluate $\displaystyle\lim_{x\to5}\dfrac{\ln x-\ln 5}{x-5}$.\\ \A{Answer: 0.2} \quad It is $f'(5)$ for $f=\ln x$: $\dfrac{1}{5}$.\par\medskip
+\noindent\textbf{Level 4.} Evaluate $\displaystyle\lim_{x\to0}\dfrac{6(e^{x}-1)}{x}$.\\ \A{Answer: 6} \quad $f(x)=6e^{x}$, $f(0)=6$, so the limit is $f'(0)=6$.\par\medskip
+\subsection*{Horizontal tangents}
+\noindent\textbf{Level 1.} Let $f(x)=2\ln x-x$ for $x>0$. At which $x$ is the tangent horizontal?\\ \A{Answer: 2} \quad $f'(x)=\dfrac{2}{x}-1=0$ gives $x=2$.\par\medskip
+\noindent\textbf{Level 2.} Let $f(x)=10\ln x-2x$ for $x>0$. At which $x$ is the tangent horizontal?\\ \A{Answer: 5} \quad $\dfrac{10}{x}-2=0$ gives $x=5$.\par\medskip
+\noindent\textbf{Level 3.} Let $f(x)=6\ln x-3x+7$ for $x>0$. At which $x$ is the tangent horizontal?\\ \A{Answer: 2} \quad $f'(x)=\dfrac{6}{x}-3=0$ gives $x=2$.\par\medskip
+\noindent\textbf{Level 4.} Let $f(x)=\ln x+\dfrac{7}{x}$ for $x>0$. At which $x$ is the tangent horizontal?\\ \A{Answer: 7} \quad $f'(x)=\dfrac{1}{x}-\dfrac{7}{x^{2}}=0$ gives $x=7$.\par\medskip
+\end{document}

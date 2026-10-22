@@ -35,5 +35,11 @@ window.MrD.lessons = [
     gates: [{ key: "h1", label: "Huddle" }], live: true },
   { course: "calc", id: "tpl-calc", title: "Template: The Power Rule", unit: "Templates",
     href: "templates/calc/lesson.html", teacher: "calculus/unit-2-differentiation/2-7-product-rule-teacher.html", spec: "templates/calc/spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "calc", id: "2-6-exp-log", title: "2.6 Derivatives of eˣ and ln x", unit: "unit-2-differentiation",
+    href: "calculus/unit-2-differentiation/2-6-exp-log.html", spec: "calculus/unit-2-differentiation/2-6-exp-log.spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "calc", id: "2-8-quotient-rule", title: "2.8 The Quotient Rule", unit: "unit-2-differentiation",
+    href: "calculus/unit-2-differentiation/2-8-quotient-rule.html", spec: "calculus/unit-2-differentiation/2-8-quotient-rule.spec.js",
     gates: [{ key: "h1", label: "Huddle" }], live: true }
 ];
