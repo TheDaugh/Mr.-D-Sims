@@ -16,7 +16,7 @@
     var row = el('div', 'row'); card.appendChild(row);
     var arrows = { W: Object.assign(F('down', 62, 'W'), {}), N: Object.assign(F('up', 62, 'N'), { off: 16 }), T: Object.assign(F('up', 44, 'T'), { off: -16 }), f: F('left', 62, 'f'), F: F('right', 62, 'F') };
     var order = ['W', 'N', 'T', 'f', 'F'], tbl = el('div', 'scroll'); card.appendChild(tbl);
-    function draw() { box.innerHTML = SP.fbd(order.filter(function (k) { return seen[k]; }).map(function (k) { return arrows[k]; }), { alt: 'Block with the forces you chose' }); box.style.maxWidth = '340px'; }
+    function draw() { box.innerHTML = SP.fbd(order.filter(function (k) { return seen[k]; }).map(function (k) { return arrows[k]; }), { alt: 'Block with the forces you chose' }); box.style.maxWidth = '480px'; }
     function table() {
       var t = el('table', 'data'); t.innerHTML = '<thead><tr><th>Force</th><th>Source</th><th>Contact or field</th><th>Direction</th></tr></thead>';
       var tb = el('tbody'); SP.catalogRows.forEach(function (r) { var tr = el('tr'), on = seen[r.sym] || c.key; tr.innerHTML = '<td><b>' + r.f + '</b> (' + r.sym + ')</td><td>' + (on ? r.source : '') + '</td><td>' + (on ? r.kind : '') + '</td><td>' + (on ? r.dir : '') + '</td>'; tb.appendChild(tr); });
@@ -25,6 +25,7 @@
     SP.catalogRows.forEach(function (r) { var b = el('button', 'btn' + (seen[r.sym] ? ' primary' : ''), r.f.replace(' (weight)', '')); b.type = 'button'; b.onclick = function () { seen[r.sym] = !seen[r.sym]; LE.save(); b.className = 'btn' + (seen[r.sym] ? ' primary' : ''); draw(); table(); }; row.appendChild(b); });
     draw(); table();
   } });
+  cfg.lock = true;
   var K = LK.for({ id: ID, prefix: 'FBD', identity: 'id', title: SP.title, lib: { skills: SP.skills, preds: [] } }), T = K.TABS;
   function stepIdx(id) { for (var i = 0; i < cfg.steps.length; i++) if (cfg.steps[i].id === id) return i; return -1; }
   function bitsOf(S) { return SP.vp.map(function (v) { var s = LE.qs(v.id); return s && s.ok && s.misses === 0 ? 1 : 0; }); }
@@ -140,6 +141,19 @@
     var v = c.S.d.vp || {};
     return '<p>Stamp for this device: <b>' + K.stamp(c.S) + '</b>. Guided notes end at the 42-minute mark Monday to Thursday (the bell on Friday). A student who finishes early keeps getting practice at their own level until then.</p><p>The report code carries the ID, start band, the six warm-up bits, the check-in code, one entry per Build and Practice question (skill, rung, band, misses, seconds) and the flags: <b>scaf</b> (arrow table first) and <b>fluent</b> (' + (v.fluent ? 'this student: ready for the slot 20 incline extension' : 'six clean first tries on the warm-up means slot 20 incline extension') + '). Paste any code into the portal or the teacher page.</p>';
   } });
+  /* Journal (closes the lesson): before, now, confidence 1-4, one thing to test. One sentence each; none of it blocks the stamp. */
+  var JR = [['before', 'What I believed before', 'Before today I thought…'], ['now', 'What I believe now', 'Now I think…'], ['test', 'One thing I would test', 'I would test…']];
+  var wrapNotes = cfg.steps[stepIdx('notes')], wrapRender = wrapNotes.render;
+  wrapNotes.render = function (card, c) {
+    var S = c.S, J = S.d.jr = S.d.jr || {};
+    card.appendChild(el('h2', null, 'Journal'));
+    card.appendChild(el('p', 'target', 'One sentence each. It goes into your notes.'));
+    JR.forEach(function (j) { var b = el('div', 'q'); card.appendChild(b); b.appendChild(el('p', 'qhead', j[1])); var ta = el('textarea'); ta.rows = 2; ta.value = J[j[0]] || ''; ta.placeholder = j[2]; ta.setAttribute('aria-label', j[1]); ta.addEventListener('input', function () { J[j[0]] = ta.value; LE.save(); }); b.appendChild(ta); });
+    var cr = el('div', 'row'); cr.appendChild(el('span', null, 'Confidence, 1 (guessing) to 4 (could teach it):'));
+    [1, 2, 3, 4].forEach(function (n) { var lb = el('label'), rd = document.createElement('input'); rd.type = 'radio'; rd.name = 'jconf'; rd.checked = J.conf === n; rd.onchange = function () { J.conf = n; LE.save(); }; lb.appendChild(rd); lb.appendChild(document.createTextNode(' ' + n)); cr.appendChild(lb); });
+    card.appendChild(cr);
+    wrapRender(card, c);
+  };
   K.stamp = function (S) { return 'FBD-' + MrD.codes.stamp(ID, S.first, S.period); };
 
   var stdNotes = cfg.notes;
@@ -161,6 +175,8 @@
     var bl = (S.d.blog || []).map(function (x) { return { type: 'box', label: x.title + ':', text: x.p + ' → ' + x.a + '. ' + x.w }; });
     var idx = out.map(function (s) { return s.title; }).indexOf('Problems I solved');
     out.splice(idx < 0 ? out.length : idx, 0, { title: 'Build problems', blocks: bl.length ? bl : [{ type: 'p', text: 'Your Build problems appear here.' }] });
+    var J = S.d.jr || {};
+    out.push({ title: 'Journal', blocks: [{ type: 'box', label: 'What I believed before:', text: J.before || '' }, { type: 'box', label: 'What I believe now:', text: J.now || '' }, { type: 'p', text: 'Confidence (1–4): ' + (J.conf || '____') }, { type: 'box', label: 'One thing I would test:', text: J.test || '' }] });
     d.sections = out; return d;
   };
 })();
