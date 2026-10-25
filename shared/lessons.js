@@ -41,5 +41,9 @@ window.MrD.lessons = [
     gates: [{ key: "h1", label: "Huddle" }], live: true },
   { course: "calc", id: "2-8-quotient-rule", title: "2.8 The Quotient Rule", unit: "unit-2-differentiation",
     href: "calculus/unit-2-differentiation/2-8-quotient-rule.html", spec: "calculus/unit-2-differentiation/2-8-quotient-rule.spec.js",
+      gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "physics", id: "fbd-net-force", title: "Free-Body Diagrams and Net Force", unit: "Forces and Newton’s Laws",
+    href: "physics/lessons/fbd-net-force.html", teacher: "physics/lessons/teacher.html",
+    spec: "physics/lessons/content/fbd-net-force.spec.js",
     gates: [{ key: "h1", label: "Huddle" }], live: true }
 ];
