@@ -49,3 +49,4 @@ body.hub{background:var(--hub-bg);color:var(--hub-ink);font:16px/1.5 var(--body)
 .empty{padding:40px clamp(16px,4vw,56px);color:var(--hub-muted);font-size:1.05rem}
 footer.hubfoot{padding:30px clamp(16px,4vw,56px) 50px;color:var(--hub-muted);font:400 .78rem var(--mono)}
 @media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+.card.soon{opacity:.6}.card.soon:hover,.card.soon:focus-within{transform:none;border-color:var(--hub-line)}

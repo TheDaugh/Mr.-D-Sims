@@ -1,6 +1,6 @@
 /* The list of guided lessons that have huddle codes, for the teacher dashboard (teacher/index.html)
    and the course teacher pages. When you build a new guided lesson, add one line here.
-     course   physics | chem | calc
+     course   physics | chem | calc | stats
      id       the lesson's id, the same string the lesson uses when it asks MrD.codes.gate(id, key)
      href     path from the repo root
      gates    the huddles, in order: key "h1", "h2", ...
@@ -35,6 +35,9 @@ window.MrD.lessons = [
     gates: [{ key: "h1", label: "Huddle" }], live: true },
   { course: "calc", id: "tpl-calc", title: "Template: The Power Rule", unit: "Templates",
     href: "templates/calc/lesson.html", teacher: "calculus/unit-2-differentiation/2-7-product-rule-teacher.html", spec: "templates/calc/spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "stats", id: "tpl-stats", title: "Template: z-Scores", unit: "Templates",
+    href: "templates/stats/lesson.html", spec: "templates/stats/spec.js",
     gates: [{ key: "h1", label: "Huddle" }], live: true },
   { course: "calc", id: "2-6-exp-log", title: "2.6 Derivatives of eˣ and ln x", unit: "unit-2-differentiation",
     href: "calculus/unit-2-differentiation/2-6-exp-log.html", spec: "calculus/unit-2-differentiation/2-6-exp-log.spec.js",

@@ -86,7 +86,7 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
 
   <section class="card"><h2>More</h2>
     <p><a href="../portal/index.html">Review portal</a>: load a class's scores files to see standards by student, or hand the link to students.</p>
-    <p><a href="../physics/lessons/teacher.html">Physics teacher page</a> · <a href="../chemistry/teacher.html">Chemistry teacher page</a> · <a href="../calculus/teacher.html">Calculus teacher hub</a></p>
+    <p><a href="../physics/lessons/teacher.html">Physics teacher page</a> · <a href="../chemistry/teacher.html">Chemistry teacher page</a> · <a href="../calculus/teacher.html">Calculus teacher hub</a> · <a href="../stats/index.html">Statistics course hub</a></p>
     <p class="hint">Add <code>#key</code> to any guided lesson's address to see exactly what students see, with every step open and the answers marked.</p></section>
 </div>
 <div id="cards-print" aria-hidden="true"></div>
@@ -98,9 +98,9 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
 <script src="../shared/ids.js"></script>
 <script>
 (function(){
-  var $=function(i){return document.getElementById(i)},B=MrD.bell,L=MrD.lessons,COURSE={physics:"physics",chem:"chem",calc:"calc"};
+  var $=function(i){return document.getElementById(i)},B=MrD.bell,L=MrD.lessons,COURSE={physics:"physics",chem:"chem",calc:"calc",stats:"stats"};
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-  var cname={physics:"Physics",chem:"Chemistry",calc:"Calculus"};
+  var cname={physics:"Physics",chem:"Chemistry",calc:"Calculus",stats:"Statistics"};
 
   function paint(){
     var d=new Date();
@@ -115,7 +115,7 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
     $("gate-note").textContent="One code for every class, course and lesson. It changes at 7:00 AM and is readable from then on. Tap it to show it large for the board.";
     $("hc").onclick=function(e){e.preventDefault();$("fsc").textContent=hc;$("fsd").textContent="Huddle code · all classes";$("fs").hidden=false};
     $("codes").innerHTML="<tr><th>Lesson</th><th>Teacher view</th></tr>"+L.map(function(l){
-      return "<tr><td>"+esc(cname[l.course])+": "+esc(l.title)+'</td><td><a href="../'+l.href+'#key">#key view</a> · <a href="../'+l.teacher+'">teacher page</a></td></tr>';
+      return "<tr><td>"+esc(cname[l.course])+": "+esc(l.title)+'</td><td><a href="../'+l.href+'#key">#key view</a>'+(l.teacher?' · <a href="../'+l.teacher+'">teacher page</a>':'')+'</td></tr>';
     }).join("");
   }
   $("fsx").onclick=function(){$("fs").hidden=true};

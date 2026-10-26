@@ -121,7 +121,12 @@
       "codes": [{ "framework": "AP Calculus AB", "code": "DER-3.A", "note": "Product and quotient rules in the AP course framework, as best I recall. Verify the code against your copy of the Course and Exam Description." }],
       "needsReview": true,
       "practice": { "gens": ["calc:2", "calc:3", "calc:4"], "lesson": { "label": "Product Rule lesson", "href": "../calculus/unit-2-differentiation/2-7-product-rule.html" } }
-    }
+    },
+    "STAT-NORMAL-1": {"course": "stats", "title": "The normal curve and the 68-95-99.7 rule", "can": "I can describe a normal curve and use the 68-95-99.7 rule to estimate a percent.", "codes": [{"framework": "CCSS", "code": "HSS-ID.A.4", "title": "Use the mean and standard deviation of a data set to fit it to a normal distribution and to estimate population percentages. Recognize that there are data sets for which such a procedure is not appropriate. Use calculators, spreadsheets, and tables to estimate areas under the normal curve.", "note": "Nearest match, not a verified alignment. Strand names are my guess at the Block B and C skills: check them against the unit plan."}], "needsReview": true, "practice": {"gens": []}},
+    "STAT-NORMAL-2": {"course": "stats", "title": "z-scores", "can": "I can find a z-score and say what it means.", "codes": [{"framework": "CCSS", "code": "HSS-ID.A.4", "title": "Use the mean and standard deviation of a data set to fit it to a normal distribution and to estimate population percentages. Recognize that there are data sets for which such a procedure is not appropriate. Use calculators, spreadsheets, and tables to estimate areas under the normal curve.", "note": "Nearest match, not a verified alignment. Strand names are my guess at the Block B and C skills: check them against the unit plan."}], "needsReview": true, "practice": {"gens": []}},
+    "STAT-NORMAL-3": {"course": "stats", "title": "Area below or above a value", "can": "I can read the z-table to find the percent of data below or above a value.", "codes": [{"framework": "CCSS", "code": "HSS-ID.A.4", "title": "Use the mean and standard deviation of a data set to fit it to a normal distribution and to estimate population percentages. Recognize that there are data sets for which such a procedure is not appropriate. Use calculators, spreadsheets, and tables to estimate areas under the normal curve.", "note": "Nearest match, not a verified alignment. Strand names are my guess at the Block B and C skills: check them against the unit plan."}], "needsReview": true, "practice": {"gens": []}},
+    "STAT-NORMAL-4": {"course": "stats", "title": "Area between two values", "can": "I can find the percent of data between two values.", "codes": [{"framework": "CCSS", "code": "HSS-ID.A.4", "title": "Use the mean and standard deviation of a data set to fit it to a normal distribution and to estimate population percentages. Recognize that there are data sets for which such a procedure is not appropriate. Use calculators, spreadsheets, and tables to estimate areas under the normal curve.", "note": "Nearest match, not a verified alignment. Strand names are my guess at the Block B and C skills: check them against the unit plan."}], "needsReview": true, "practice": {"gens": []}},
+    "STAT-NORMAL-5": {"course": "stats", "title": "From a percentile back to a value", "can": "I can use a percentile to find the value, and use the normal model to answer a question about a sample or population.", "codes": [{"framework": "CCSS", "code": "HSS-ID.A.4", "title": "Use the mean and standard deviation of a data set to fit it to a normal distribution and to estimate population percentages. Recognize that there are data sets for which such a procedure is not appropriate. Use calculators, spreadsheets, and tables to estimate areas under the normal curve.", "note": "Nearest match, not a verified alignment. Strand names are my guess at the Block B and C skills: check them against the unit plan."}, {"framework": "CCSS", "code": "HSS-IC.B.4", "title": "Use data from a sample survey to estimate a population mean or proportion; develop a margin of error through the use of simulation models for random sampling.", "note": "Stretch match: this standard is about sample surveys. Confirm it belongs to this strand, or drop it."}], "needsReview": true, "practice": {"gens": []}}
   },
   "skills": {
     "physics/newtons-first-law/S1": "PHYS-N1-A",
@@ -203,6 +208,8 @@
     "chem/chem.identify-unknowns": "CHEM-LAB-2",
     "chem/chem.prelab": "CHEM-LAB-2",
     "calc/calc.warmup.*": "CALC-DER-1",
-    "calc/calc.product-rule*": "CALC-DER-2"
+    "calc/calc.product-rule*": "CALC-DER-2",
+    "stats/tpl-stats/zscore": "STAT-NORMAL-2",
+    "stats/tpl-stats/rule": "STAT-NORMAL-1"
   }
 }

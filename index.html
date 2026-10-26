@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mr. D’s Sims</title>
-<meta name="description" content="Guided lessons, virtual labs and simulations for Mr. D’s physics, chemistry and calculus classes.">
+<meta name="description" content="Guided lessons, virtual labs and simulations for Mr. D’s physics, chemistry, calculus and statistics classes.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared/hub.css">
@@ -28,18 +28,20 @@
 <script src="physics/sims.js"></script><script>window.PHYS=window.UNITS;</script>
 <script src="chemistry/labs.js"></script><script>window.CHEM=window.UNITS;</script>
 <script src="calculus/sims.js"></script><script>window.CALC=window.UNITS;</script>
+<script src="shared/lessons.js"></script><script src="stats/sims.js"></script><script>window.STATS=window.UNITS;</script>
 <script>
 (function(){
   function count(units){var c={lesson:0,lab:0,sim:0};units.forEach(function(u){(u.entries||[]).forEach(function(x){c[x.type||u.type||"sim"]++})});return c}
   var cls=[["physics","Physics","⚛️","hsl(215 70% 30%)",window.PHYS,"Forces, motion and energy. Guided lessons and free-play sims."],
            ["chemistry","Chemistry","🧪","hsl(172 65% 24%)",window.CHEM,"Atoms, matter and reactions. Guided lessons and virtual labs."],
-           ["calculus","Calculus","∫","hsl(265 55% 32%)",window.CALC,"AP Calculus AB. Lessons that adjust to you, and sims."]];
+           ["calculus","Calculus","∫","hsl(265 55% 32%)",window.CALC,"AP Calculus AB. Lessons that adjust to you, and sims."],
+           ["stats","Statistics","📊","hsl(28 75% 32%)",window.STATS,"Intro statistics. Guided lessons with hints at every step."]];
   var host=document.getElementById("classes");
   cls.forEach(function(c){var n=count(c[4]),a=document.createElement("a");a.className="class";a.href=c[0]+"/";a.style.setProperty("--c1",c[3]);
     a.innerHTML='<div class="big" aria-hidden="true">'+c[2]+'</div><h2>'+c[1]+'</h2><p>'+c[5]+'</p><div class="counts"><span>'+n.lesson+' lessons</span><span>'+n.lab+' virtual labs</span><span>'+n.sim+' sims</span></div>';
     host.appendChild(a)});
-  var k=MrD.bell.clock("physics"),names={physics:"Physics",chem:"Chemistry",calc:"Calculus"},live=null;
-  ["physics","chem","calc"].forEach(function(c){var s=MrD.bell.clock(c);if(s.mode==="class")live=names[c]+" is in session until "+MrD.bell.fmtTime(s.session.end)});
+  var k=MrD.bell.clock("physics"),names={physics:"Physics",chem:"Chemistry",calc:"Calculus",stats:"Statistics"},live=null;
+  ["physics","chem","calc","stats"].forEach(function(c){var s=MrD.bell.clock(c);if(s.mode==="class")live=names[c]+" is in session until "+MrD.bell.fmtTime(s.session.end)});
   var el=document.getElementById("now");if(live){el.classList.remove("off");document.getElementById("nowtxt").textContent=live}else{document.getElementById("nowtxt").textContent=MrD.bell.gatesOn()?"Huddle codes are on until 3:00 PM":"Home mode: no huddle codes right now"}
 })();
 </script>

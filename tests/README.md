@@ -8,7 +8,7 @@ Run from the repo root with a static server (`python3 -m http.server 8123`). Pla
 | `node tests/e2e-lesson.js newtons-second-law 1 2 3 4` | Whole lesson in Chromium at each starting band: no JS errors, every step reachable, codes, practice before the end mark, stamp at the end. The browser clock is pinned to a Wednesday 9:00 AM. `KEY=1` runs in `#key` mode. |
 
 | `node --test tests/unit/` | Pure logic and specs: IDs (every single-character typo is caught), pacing, placement, keypad inserts, huddle blanks, and every `spec.js` (pacing valid, targets one sentence, each generator checkable at every band). |
-| `TEMPLATE=physics\|chem\|calc node tests/template.e2e.js` | A simulated class period through a template: ID check, placement, timed huddle, pace trim, keypad, `#key`, full run to the stamp. `PAGE=<path>` tests a lesson made from the template. |
+| `TEMPLATE=physics\|chem\|calc\|stats node tests/template.e2e.js` | A simulated class period through a template: ID check, placement, timed huddle, pace trim, keypad, `#key`, full run to the stamp. `PAGE=<path>` tests a lesson made from the template. |
 | `node tests/lock.e2e.js` | Locked mode in every guided lesson and virtual lab that uses it: fullscreen from Start, warning then lock on repeat exits, per-student and unlock-any codes, a code after closing the page, and never locked in `#key`, the teacher build, after 3 PM or with `#nolock`. Add a target to its `TARGETS` list when a new lesson or lab opts in. |
 | `node tests/smoke.js` | Every lesson, hub, teacher page and the portal load with no JavaScript errors (`KEY=1` also opens each lesson at `#key`). |
 

@@ -16,7 +16,7 @@ function lessonList() {
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'shared/lessons.js'), 'utf8'), win);
   return win.MrD.lessons || [];
 }
-const extra = ['index.html', 'physics/index.html', 'chemistry/index.html', 'calculus/index.html', 'teacher/index.html', 'portal/index.html',
+const extra = ['index.html', 'physics/index.html', 'chemistry/index.html', 'calculus/index.html', 'stats/index.html', 'teacher/index.html', 'portal/index.html',
   'physics/lessons/teacher.html', 'chemistry/teacher.html'];
 
 (async () => {

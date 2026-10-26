@@ -1,10 +1,11 @@
-/* End-to-end: a lesson template through a simulated class period (Wed 2026-10-21; physics 9:00-9:50, calc 12:10-1:00).
+/* End-to-end: a lesson template through a simulated class period (Wed 2026-10-21; physics 9:00-9:50, calc 12:10-1:00; stats 10:00-10:50 placeholder).
    Needs a static server on :8123 (python3 -m http.server 8123).
      node tests/template.e2e.js              physics template
-     TEMPLATE=calc node tests/template.e2e.js */
-const TEMPLATE = process.env.TEMPLATE || 'physics', CALC = TEMPLATE === 'calc', CHEM = TEMPLATE === 'chem',
-  CLK = CALC ? ['12:15', '12:29', '12:35', '12:43', '12:56'] : CHEM ? ['10:45', '10:59', '11:05', '11:13', '11:26'] : ['09:05', '09:19', '09:25', '09:33', '09:44'],
-  T0 = CLK[0], T18 = CLK[1], T25 = CLK[2], T33 = CLK[3], T44 = CLK[4], PFX = CALC ? 'TPC-' : CHEM ? 'TPK-' : 'TPL-';
+     TEMPLATE=calc node tests/template.e2e.js
+     TEMPLATE=stats node tests/template.e2e.js */
+const TEMPLATE = process.env.TEMPLATE || 'physics', CALC = TEMPLATE === 'calc', CHEM = TEMPLATE === 'chem', STATS = TEMPLATE === 'stats',
+  CLK = CALC ? ['12:15', '12:29', '12:35', '12:43', '12:56'] : STATS ? ['10:05', '10:19', '10:25', '10:33', '10:46'] : CHEM ? ['10:45', '10:59', '11:05', '11:13', '11:26'] : ['09:05', '09:19', '09:25', '09:33', '09:44'],
+  T0 = CLK[0], T18 = CLK[1], T25 = CLK[2], T33 = CLK[3], T44 = CLK[4], PFX = CALC ? 'TPC-' : STATS ? 'TPS-' : CHEM ? 'TPK-' : 'TPL-';
 const fs = require('fs'), path = require('path'), assert = require('assert');
 const PW = process.env.PLAYWRIGHT_DIR || ['/opt/npm-tools/node_modules/playwright', '/home/claude/.npm-global/lib/node_modules/playwright'].find(p => fs.existsSync(p));
 const { chromium } = require(PW);

@@ -1,7 +1,8 @@
 /* MrD.hub: draws a course hub. Full screen, one row per unit, tabs for Lessons / Virtual labs / Sims.
 
    Each course's data file (sims.js, labs.js) sets window.UNITS = [ { id, title, blurb, entries:[...] } ].
-   An entry is { title, href, blurb, tags, type, icon, teacher:[{label,href}] }.
+   An entry is { title, href, blurb, tags, type, icon, soon, teacher:[{label,href}] }.
+     soon   true draws a "coming soon" card with no link (stats/sims.js uses it until a lesson is registered)
      type   "lesson" (a guided lesson), "lab" (a virtual lab) or "sim" (a free-play simulation). Missing means "sim".
    (A unit may call its list sims or labs instead of entries; both work.)
 
@@ -57,10 +58,10 @@
       return h;
     }
     function card(x) {
-      var c = e("div", "card"), a = e("a", "cardlink"); a.href = x.href;
+      var c = e("div", "card" + (x.soon ? " soon" : "")), a = e(x.soon ? "div" : "a", "cardlink"); if (!x.soon) a.href = x.href;
       var h1 = hue(x.title), art = e("div", "art"); art.style.setProperty("--c1", "hsl(" + h1 + " 55% 32%)"); art.style.setProperty("--c2", "hsl(" + ((h1 + 40) % 360) + " 60% 20%)");
       art.textContent = x.icon || (TABS.filter(function (t) { return t[0] === x.type; })[0] || TABS[2])[2]; art.setAttribute("aria-hidden", "true");
-      var b = e("div", "body"); b.append(e("span", "kind", KIND[x.type] || "SIM"), e("h3", null, x.title));
+      var b = e("div", "body"); b.append(e("span", "kind", x.soon ? "COMING SOON" : KIND[x.type] || "SIM"), e("h3", null, x.title));
       if (x.blurb) b.append(e("p", null, x.blurb));
       if (x.tags && x.tags.length) { var pl = e("div", "pills"); x.tags.forEach(function (t) { pl.append(e("span", "pill", t)); }); b.append(pl); }
       a.append(art, b); c.append(a);
