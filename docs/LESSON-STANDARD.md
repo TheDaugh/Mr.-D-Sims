@@ -39,7 +39,7 @@ Already follows the standard. For the next lesson:
 - In the content file set `course:'physics'`, a new `id`, `gates:[{key:'h1',label:'Huddle 1'}, ...]` and a `version`.
 - Keep the last step as Notes: practice before the end mark (`morePractice`), stamp and report code after `canEnd`, `MrD.profile.record(...)`.
 - Add the lesson to `shared/lessons.js` and give each skill an id that `portal/standards.json` can map (`physics/<lesson-id>/<skill>`).
-- **Locked mode** is built into the engine. A lesson config with `lock: true` (both Newton's Laws have it) turns it on during physics's period only (the end mark Mon-Thu, the whole period Friday), never in `#key`, off with `#nolock=<code>`. The Start step's Continue click enters fullscreen; closing the page and reopening asks for a code. A template-built lesson gets it by adding `lock: true` to its config. `tests/lock.e2e.js` covers it.
+- **Locked mode** is built into the engine. A lesson config with `lock: true` (both Newton's Laws have it) turns it on during physics's period only (the end mark Mon-Thu, the whole period Friday), never in `#key`, off with `#nolock=<code>`. The Start step's Continue click enters fullscreen; closing the page and reopening asks for a code. A template-built lesson is locked by default (`engine/standard.js` sets `lock: true`); keep `shared/lock.js` on its page. `tests/lock.e2e.js` covers it.
 - `projectile-concept-checker` is an older page with its own tiers, name screen and gate. Rebuild it on the engine before it is used as a guided lesson.
 
 ### Chemistry (`chemistry/`)

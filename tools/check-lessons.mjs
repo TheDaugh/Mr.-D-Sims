@@ -58,7 +58,10 @@ for (const L of registry) {
   const has = (s) => new RegExp(s.replace('.', '\\.')).test(src.html);
   // Engine lessons (v2 and the older physics ones) turn locked mode on only with `lock: true` in their config; loading
   // shared/lock.js alone does nothing. Older chemistry and calculus pages drive lock.js from their own code.
-  const lockOn = isV2 ? /\block\s*:\s*true\b/.test(src.text) : (/\block\s*:\s*true\b/.test(src.text) || has('lock.js'));
+  // v2 lessons get `lock: true` from engine/standard.js; they are locked when the page loads lock.js and does not opt out.
+  const engineLocks = /\block\s*:\s*true\b/.test(rd('physics/lessons/engine/standard.js'));
+  const lockOn = isV2 ? (engineLocks && has('lock.js') && !/\block\s*:\s*false\b/.test(src.text))
+                      : (/\block\s*:\s*true\b/.test(src.text) || has('lock.js'));
   const localGate = /\bPREVIEW\b|hashCode|function\s+gate\s*\(/.test(src.text);
 
   if (isV2) {
@@ -66,7 +69,7 @@ for (const L of registry) {
     if (!L.spec) note('ERROR', id, 'v2 lesson has no `spec` in shared/lessons.js (keys, tests and the hub read it)');
     else if (!exists(L.spec)) note('ERROR', id, `spec file missing: ${L.spec}`);
     if (localGate) note('ERROR', id, 'local gate hash or PREVIEW flag; use MrD.codes.gate / MrD.codes.huddle');
-    if (!lockOn) note('GAP', id, 'locked mode is off: add `lock: true` to the lesson config (Ian: every guided lesson is locked), then add it to TARGETS in tests/lock.e2e.js');
+    if (!lockOn) note('GAP', id, 'locked mode is off: the page must load shared/lock.js and the lesson must not set `lock: false` (Ian: every guided lesson is locked)');
   } else {
     if (!has('bell.js')) note('LEGACY', id, 'does not use shared/bell.js (no clock rules)');
     if (!has('ids.js')) note('LEGACY', id, 'asks for a name, not a student ID (shared/ids.js)');
