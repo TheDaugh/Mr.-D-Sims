@@ -62,6 +62,17 @@ h2{margin:0 0 4px;font-size:1.2rem}.what{margin:0 0 10px;color:#566170}
   s = section('hist', 'NK.hist', 'Slide the bar width down. The bars trace the normal curve.');
   NK.hist(s, {});
 
+  s = section('transform', 'NK.transform', 'Add, multiply or standardize. The faded bars are the original data. Mean and SD update live.');
+  d = document.createElement('div'); d.className = 'cols'; s.appendChild(d); a = document.createElement('div'); b = document.createElement('div'); d.appendChild(a); d.appendChild(b);
+  NK.transform(a, { mode: 'add' }); NK.transform(b, { mode: 'mul', mean: 6, sd: 2 }); NK.transform(s, { mode: 'z' });
+
+  s = section('density', 'NK.density and NK.skew', 'Drag the two edges: the shaded area is a proportion. Slide the tail: the mean and the median move.');
+  d = document.createElement('div'); d.className = 'cols'; s.appendChild(d); a = document.createElement('div'); b = document.createElement('div'); d.appendChild(a); d.appendChild(b);
+  NK.density(a, { kind: 'rect', L: 10 }); NK.skew(b, {});
+
+  s = section('fit', 'NK.fit', 'Switch on a normal curve with the same mean and SD, then judge the fit.');
+  NK.fit(s, { bars: [1, 4, 9, 14, 16, 14, 9, 4, 1, 0, 0, 0, 1], start: 40, width: 5, label: 'pretend heights' });
+
   s = section('routine', 'NK.routine and the worked example', 'The six-move card, and the example every number of which is computed. The Concepts panel in each lesson holds both, with the table.');
   d = document.createElement('div'); d.className = 'cols'; s.appendChild(d); a = document.createElement('div'); b = document.createElement('div'); d.appendChild(a); d.appendChild(b);
   NK.routine.render(a, { active: 2 }); NK.example(b);

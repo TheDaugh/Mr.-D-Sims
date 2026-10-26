@@ -5,17 +5,18 @@ const path = require('path'), ID = 'unit-3-review-1-3', TARGETS = ['T1', 'T2', '
 async function toWarm(H, hash, time) { const r = await H.open(H.br, hash, time); await H.tick(r.page); await H.start(r.page, H.myId, '3'); await H.next(r.page); return r; }
 async function warmUp(H, page, right) { for (let i = 0; i < 8 && !(await page.evaluate(() => LE.S().band0)); i++) { await H.answer(page, !right); await H.tick(page, 900); } }
 async function toPractice(H, page, right) { await warmUp(H, page, right); await H.tick(page, 1500); await H.next(page); H.assert.strictEqual(await H.step(page), 'practice'); }
-const cur = page => page.evaluate(() => { const S = LE.S(), R = S.d.rv; return { tid: R.cur.tid, n: S.d.more.n, tb: Object.assign({}, R.tb), q: window.__q.map(q => ({ id: q.id, type: q.type, answer: q.answer, tag: q.tag, n: q.options && q.options.length })) }; });
+const cur = page => page.evaluate(() => { const S = LE.S(), R = S.d.rv; return { tid: R.cur.tid, sim: !!R.cur.sim, n: S.d.more.n, tb: Object.assign({}, R.tb), q: window.__q.map(q => ({ id: q.id, type: q.type, answer: q.answer, tag: q.tag, n: q.options && q.options.length })) }; });
 /* next practice item right, or missed on purpose (two different wrong options for choices, a wrong number three times for numbers) */
 async function doItem(H, page, miss) {
-  const q = (await cur(page)).q[0], box = page.locator('.card .q').first();
-  if (!miss) await H.answer(page, false);
+  const c0 = await cur(page), q = c0.q[0], box = page.locator('.card .q').first();
+  if (c0.sim) { if (miss) await page.evaluate(id => window.__sims[id].wrong(), q.id); await H.tick(page, 150); await page.evaluate(id => window.__sims[id].solve(), q.id); }
+  else if (!miss) await H.answer(page, false);
   else if (q.type === 'choice') { const wrong = [...Array(q.n).keys()].filter(i => i !== q.answer).slice(0, 2); for (const w of wrong) { await box.locator('button.opt[data-i="' + w + '"]').click(); await H.tick(page, 200); } }
   else await H.answer(page, true);
   await H.tick(page, 300); const nb = page.getByRole('button', { name: 'Next question' }); await nb.click(); await H.tick(page, 400);
 }
-async function force(page, tid, band) {   // put a chosen target at a chosen level on screen as practice item 100+
-  await page.evaluate(([tid, band]) => { const S = LE.S(); S.step = 'practice'; S.band0 = S.band0 || 2; const R = S.d.rv = S.d.rv || { tb: {}, queue: [], last: '', round: 0 }, M = S.d.more = S.d.more || { n: 0, log: [] }; M.n = 100 + Math.floor(Math.random() * 1e6); R.cur = { n: M.n, tid }; R.tb[tid] = band; LE.save(); LE.render(); }, [tid, band]);
+async function force(page, tid, band, sim) {   // put a chosen target at a chosen level on screen as practice item 100+
+  await page.evaluate(([tid, band, sim]) => { const S = LE.S(); S.step = 'practice'; S.band0 = S.band0 || 2; const R = S.d.rv = S.d.rv || { tb: {}, queue: [], last: '', round: 0 }, M = S.d.more = S.d.more || { n: 0, log: [] }; M.n = 100 + Math.floor(Math.random() * 1e6); R.cur = { n: M.n, tid, sim: !!sim }; R.tb[tid] = band; LE.save(); LE.render(); }, [tid, band, !!sim]);
 }
 
 module.exports = { tests: {
@@ -88,6 +89,55 @@ module.exports = { tests: {
       const wrongChoice = async () => { const q = (await cur(page)).q[0], w = [...Array(q.n).keys()].find(i => i !== q.answer); await box().locator('button.opt[data-i="' + w + '"]').click(); await H.tick(page, 200); };
       await force(page, 'T3', 3); await wrongChoice(); H.assert.match(await fb(), /Do not compare the raw scores/, 'choice, level 3: nudge');
       await force(page, 'T3', 4); await wrongChoice(); H.assert.strictEqual((await fb()).trim(), 'Not quite.', 'choice, level 4: no hint'); H.assert.deepStrictEqual(errs, []); await ctx.close();
+    }],
+    ['Interactive checkers: picture first, wrong then right, hints fade by level, four misses reveal', async H => {
+      const { ctx, page, errs } = await toWarm(H); await warmUp(H, page, true); const fb = () => page.locator('.card .q .fb').innerText(), sims = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9'];
+      for (const tid of sims) {
+        await force(page, tid, 2, true); const c = await cur(page); H.assert.ok(c.sim && c.q[0].type === 'custom', tid + ' is a sim');
+        const order = await page.evaluate(() => { const q = document.querySelector('.card .q'), k = [...q.children].map(x => x.className); return { w: k.findIndex(x => /qsim/.test(x)), t: k.indexOf('qtext') }; }); H.assert.ok(order.w >= 0 && order.w < order.t, tid + ': the live picture comes before the question');
+        await page.evaluate(id => window.__sims[id].wrong(), c.q[0].id); await H.tick(page, 150); H.assert.ok((await fb()).length > 5, tid + ': a wrong try says why');
+        H.assert.strictEqual(await page.getByRole('button', { name: 'Next question' }).count(), 0, tid + ': not done after a miss');
+        await page.evaluate(id => window.__sims[id].solve(), c.q[0].id); await H.tick(page, 150);
+        const st = await page.evaluate(id => LE.qs(id), c.q[0].id); H.assert.ok(st.done && st.ok && st.misses === 1, tid + ' solved after one miss'); H.assert.strictEqual(await page.getByRole('button', { name: 'Next question' }).count(), 1);
+      }
+      for (const [band, first, second] of [[1, /Hint: /, /Hint: /], [2, /Hint: /, /Hint: /], [3, /Hint: Turn the percent/, /Hint: The \d+th percentile/], [4, null, /Hint: The \d+th percentile/]]) {
+        await force(page, 'T1', band, true); const id = (await cur(page)).q[0].id;
+        if (band === 1) H.assert.strictEqual(await page.locator('.qremember').count(), 1, 'level 1 shows Remember'); else H.assert.strictEqual(await page.locator('.qremember').count(), 0);
+        await page.evaluate(id => window.__sims[id].wrong(), id); await H.tick(page, 150); const a = await fb(); if (first) H.assert.match(a, first, 'level ' + band + ' first miss'); else H.assert.ok(!/Hint:/.test(a), 'level 4: no hint after the first miss: ' + a);
+        await page.evaluate(id => window.__sims[id].wrong(), id); await H.tick(page, 150); H.assert.match(await fb(), second, 'level ' + band + ' second miss');
+      }
+      await force(page, 'T4', 2, true); const id4 = (await cur(page)).q[0].id; for (let i = 0; i < 4; i++) { await page.evaluate(id => window.__sims[id].wrong(), id4); await H.tick(page, 150); }
+      const st4 = await page.evaluate(id => LE.qs(id), id4); H.assert.ok(st4.done && !st4.ok && st4.misses === 4, 'four misses end the item'); H.assert.ok(/Here is the reasoning/.test(await page.locator('.card .q').first().innerText()), 'the reasoning shows');
+      H.assert.deepStrictEqual(errs, []); await ctx.close();
+    }],
+    ['Interactive checkers work with a real mouse and keyboard: slider, markers, buttons, curve toggle', async H => {
+      const { ctx, page, errs } = await toWarm(H); await warmUp(H, page, true); const ask = async (tid, band) => { await force(page, tid, band, true); return cur(page); }, fb = () => page.locator('.card .q .fb').innerText();
+      const widgetText = () => page.locator('.card .q .nk-readout').first().innerText();
+      let c = await ask('T4', 2); const q4 = await page.evaluate(id => ({ sol: window.__q.find(q => q.id === id).solution, fol: window.__q.find(q => q.id === id).follow }), c.q[0].id);
+      const rng4 = page.locator('.card .q input[type=range]'); await rng4.focus(); await page.keyboard.press('Home');   // c = -20
+      for (let i = 0; i < q4.sol.c + 20; i++) await page.keyboard.press('ArrowRight'); H.assert.match(await widgetText(), new RegExp('added ' + q4.sol.c.toString().replace('-', '\\-')));
+      await page.locator('.card .q .qfollow button.opt[data-i="' + q4.fol.answer + '"]').click(); await page.locator('.card .q .nk-check').click(); await H.tick(page, 150); H.assert.ok((await page.evaluate(id => LE.qs(id), c.q[0].id)).ok, 'T4 solved with the keyboard');
+      c = await ask('T6', 2); const b2 = page.getByRole('button', { name: 'Divide by the SD' }); H.assert.strictEqual(await b2.isDisabled(), true, 'divide waits for subtract'); await page.getByRole('button', { name: 'Subtract the mean' }).click(); await b2.click(); H.assert.match(await widgetText(), /Mean = 0 · SD = 1/);
+      const f6 = await page.evaluate(id => window.__q.find(q => q.id === id).follow.answer, c.q[0].id); await page.locator('.card .q .qfollow button.opt[data-i="' + f6 + '"]').click(); await page.locator('.card .q .nk-check').click(); await H.tick(page, 150); H.assert.ok((await page.evaluate(id => LE.qs(id), c.q[0].id)).ok, 'T6 solved with the buttons');
+      c = await ask('T7', 4); const sol7 = await page.evaluate(id => window.__q.find(q => q.id === id), c.q[0].id), handles = page.locator('.card .q .nk-marker'); const step = await page.evaluate(id => window.__sims[id].w.step, c.q[0].id);
+      const b0 = await page.evaluate(id => window.__sims[id].w.state().b, c.q[0].id); await handles.nth(1).focus(); for (let i = 0; i < Math.round((b0 - sol7.solution.b) / step); i++) await page.keyboard.press('ArrowLeft'); await handles.nth(0).focus(); for (let i = 0; i < Math.round(sol7.solution.a / step); i++) await page.keyboard.press('ArrowRight');
+      H.assert.ok(Math.abs((await page.evaluate(id => window.__sims[id].w.state().area, c.q[0].id)) - sol7.answer) < 0.004, 'T7 edges moved by keyboard reach the area'); if (sol7.follow) await page.locator('.card .q .qfollow button.opt[data-i="' + sol7.follow.answer + '"]').click(); await page.locator('.card .q .nk-check').click(); await H.tick(page, 150); H.assert.ok((await page.evaluate(id => LE.qs(id), c.q[0].id)).ok, 'T7 solved');
+      c = await ask('T8', 2); const q8 = await page.evaluate(id => window.__q.find(q => q.id === id), c.q[0].id); await page.locator('.card .q input[type=range]').focus(); await page.keyboard.press('Home'); for (let i = 0; i < Math.round((q8.solution.s + 1) * 2); i++) await page.keyboard.press('ArrowRight');
+      await page.locator('.card .q .qfollow button.opt[data-i="' + q8.follow.answer + '"]').click(); await page.locator('.card .q .nk-check').click(); await H.tick(page, 150); H.assert.ok((await page.evaluate(id => LE.qs(id), c.q[0].id)).ok, 'T8 solved with the slider');
+      c = await ask('T9', 2); const q9 = await page.evaluate(id => window.__q.find(q => q.id === id), c.q[0].id); await page.locator('.card .q .qfollow button.opt[data-i="' + q9.follow.answer + '"]').click(); await page.locator('.card .q .nk-check').click(); await H.tick(page, 150);
+      H.assert.match(await fb(), /Press the button to show the normal curve/, 'must look at the curve first'); await page.getByRole('button', { name: /Show a normal curve/ }).click(); H.assert.ok(await page.locator('.card .q .nk-fit path.nk-line').evaluate(e => e.getAttribute('visibility') === 'visible'), 'curve shown');
+      await page.locator('.card .q .nk-check').click(); await H.tick(page, 150); H.assert.ok((await page.evaluate(id => LE.qs(id), c.q[0].id)).ok, 'T9 solved');
+      c = await ask('T2', 2); const q2 = await page.evaluate(id => window.__q.find(q => q.id === id), c.q[0].id), P = q2.params; await page.locator('.card .q .nk-ruler .nk-marker').focus();
+      for (let i = 0; i < 60 && Math.abs((await page.evaluate(id => window.__sims[id].w.state().value, c.q[0].id)) - q2.solution.value) > 1e-9; i++) await page.keyboard.press(q2.solution.value > P.mean ? 'ArrowRight' : 'ArrowLeft');
+      await page.locator('.card .q .nk-check').click(); await H.tick(page, 150); H.assert.ok((await page.evaluate(id => LE.qs(id), c.q[0].id)).ok, 'T2 solved with the arrow keys');
+      c = await ask('T1', 2); const q1 = await page.evaluate(id => window.__q.find(q => q.id === id), c.q[0].id); await page.locator('.card .q .nk-dotplot .nk-marker').focus();
+      for (let i = 0; i < 120 && Math.abs((await page.evaluate(id => window.__sims[id].w.state().marker, c.q[0].id)) - q1.solution.marker) > 1e-9; i++) await page.keyboard.press((await page.evaluate(id => window.__sims[id].w.state().marker, c.q[0].id)) < q1.solution.marker ? 'ArrowRight' : 'ArrowLeft');
+      await page.locator('.card .q .nk-check').click(); await H.tick(page, 150); H.assert.ok((await page.evaluate(id => LE.qs(id), c.q[0].id)).ok, 'T1 solved by dragging the marker');
+      H.assert.deepStrictEqual(errs, []); await ctx.close();
+    }],
+    ['About half of the practice items are interactive checkers, and the rest stay static', async H => {
+      const { ctx, page } = await toWarm(H); await toPractice(H, page, true); let sims = 0; for (let i = 0; i < 9; i++) { if ((await cur(page)).sim) sims++; await doItem(H, page, false); }
+      H.assert.ok(sims >= 3 && sims <= 6, sims + ' of the first nine items were sims'); await ctx.close();
     }],
     ['No tiers, no minutes, no stars on the student page', async H => {
       const { ctx, page } = await toWarm(H); await toPractice(H, page, true); const txt = await page.locator('#stage').innerText();

@@ -5,6 +5,10 @@
      NK.ruler(host, opts)                   SD-step ruler: how many SDs from the mean
      NK.dotplot(host, opts)                 dots, a draggable marker, a percentile count
      NK.hist(host, opts)                    bin-width slider; bars morph into a density curve
+     NK.transform(host, opts)               add / multiply / standardize: what happens to center, spread and shape
+     NK.density(host, opts)                 drag two edges on a density curve; the shaded area is a proportion
+     NK.skew(host, opts)                    slide the long tail; the mean and median move
+     NK.fit(host, opts)                     a histogram with a normal curve you can switch on
      NK.tiles(host, opts)                   drag-and-drop tiles and slots: mouse, touch, tap, keyboard
      NK.routine.render(host, opts)          the six-move card: Picture, z, Row, Column, Area, Sentence
      NK.example(host)                       the worked example (every number computed)
@@ -168,7 +172,7 @@
 
   /* ---------- NK.ruler ---------- */
   NK.ruler = function (host, o) {
-    o = Object.assign({ mean: 70, sd: 10, value: 85, steps: 3, label: 'SD ruler' }, o || {});
+    o = Object.assign({ mean: 70, sd: 10, value: 85, steps: 3, label: 'SD ruler', step: null, showZ: true, fixed: false, name: 'Pretend data' }, o || {});
     var W = 620, H = 120, X0 = 30, X1 = W - 30, Y = 50, lo = o.mean - o.steps * o.sd, hi = o.mean + o.steps * o.sd, val = o.value, self = emitter({});
     var wrap = el('div', 'nk-ruler'), svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': o.label, 'class': 'nk-svg' }); wrap.appendChild(svg);
     var X = function (v) { return X0 + (v - lo) / (hi - lo) * (X1 - X0); };
@@ -181,17 +185,19 @@
     var g = sv('g', { 'class': 'nk-marker', tabindex: 0, role: 'slider', 'aria-label': 'Value on the ruler', 'aria-valuemin': lo, 'aria-valuemax': hi }, svg);
     sv('line', { y1: 8, y2: Y, 'class': 'nk-mline' }, g); sv('circle', { r: 11, cy: 14, 'class': 'nk-mdot' }, g);
     var readout = el('p', 'nk-readout'); readout.setAttribute('aria-live', 'polite'); wrap.appendChild(readout);
-    var stepV = o.sd / 2;
+    var stepV = o.step || o.sd / 2;
     function draw() { g.setAttribute('transform', 'translate(' + X(val) + ',0)'); g.setAttribute('aria-valuenow', val);
-      var z = (val - o.mean) / o.sd; readout.textContent = 'Pretend data: mean ' + o.mean + ', SD ' + o.sd + '. A value of ' + +val.toFixed(2) + ' is ' + (z === 0 ? 'at the mean (z = 0).' : Math.abs(z).toFixed(2) + ' SD ' + (z > 0 ? 'above' : 'below') + ' the mean (z = ' + fmtZ(z) + ').'); self.emit('change', { value: val, z: z }); }
-    draggable(svg, g, { toVal: function (x) { return lo + (x - X0) / (X1 - X0) * (hi - lo); }, set: function (v) { val = clamp(snap(v, stepV), lo, hi); draw(); }, get: function () { return val; }, step: function () { return stepV; }, min: function () { return lo; }, max: function () { return hi; } });
+      var z = (val - o.mean) / o.sd; if (!o.showZ) { readout.textContent = o.name + ': mean ' + o.mean + ', SD ' + o.sd + '. Value: ' + +val.toFixed(2) + '.'; self.emit('change', { value: val, z: z }); return; } readout.textContent = o.name + ': mean ' + o.mean + ', SD ' + o.sd + '. A value of ' + +val.toFixed(2) + ' is ' + (z === 0 ? 'at the mean (z = 0).' : Math.abs(z).toFixed(2) + ' SD ' + (z > 0 ? 'above' : 'below') + ' the mean (z = ' + fmtZ(z) + ').'); self.emit('change', { value: val, z: z }); }
+    if (!o.fixed) draggable(svg, g, { toVal: function (x) { return lo + (x - X0) / (X1 - X0) * (hi - lo); }, set: function (v) { val = clamp(snap(v, stepV), lo, hi); draw(); }, get: function () { return val; }, step: function () { return stepV; }, min: function () { return lo; }, max: function () { return hi; } });
+    else { g.removeAttribute('tabindex'); g.style.pointerEvents = 'none'; }
+    self.state = function () { return { value: val, z: (val - o.mean) / o.sd }; };
     self.el = wrap; self.setValue = function (v) { val = clamp(v, lo, hi); draw(); }; self.getValue = function () { return val; }; self.getZ = function () { return (val - o.mean) / o.sd; };
     host.appendChild(wrap); draw(); return self;
   };
 
   /* ---------- NK.dotplot ---------- */
   NK.dotplot = function (host, o) {
-    o = Object.assign({ data: [2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 8, 9], unit: 'pretend values', step: 1, label: 'Dot plot' }, o || {});
+    o = Object.assign({ data: [2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 8, 9], unit: 'pretend values', step: 1, label: 'Dot plot', strict: false }, o || {});
     var data = o.data.slice().sort(function (a, b) { return a - b; }), n = data.length, lo = Math.min.apply(null, data) - 1, hi = Math.max.apply(null, data) + 1, mk = o.marker != null ? o.marker : data[Math.floor(n / 2)];
     var W = 620, H = 220, X0 = 30, X1 = W - 30, BASE = H - 36, R = 8, self = emitter({}), wrap = el('div', 'nk-dotplot'), svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': o.label, 'class': 'nk-svg' }); wrap.appendChild(svg);
     var X = function (v) { return X0 + (v - lo) / (hi - lo) * (X1 - X0); };
@@ -201,15 +207,16 @@
     var g = sv('g', { 'class': 'nk-marker', tabindex: 0, role: 'slider', 'aria-label': 'Marker', 'aria-valuemin': lo, 'aria-valuemax': hi }, svg);
     sv('line', { y1: 8, y2: BASE, 'class': 'nk-mline' }, g); sv('circle', { r: 11, cy: 14, 'class': 'nk-mdot' }, g);
     var readout = el('p', 'nk-readout'); readout.setAttribute('aria-live', 'polite'); wrap.appendChild(readout);
-    function count() { return data.filter(function (d) { return d <= mk + 1e-9; }).length; }
+    function below(d) { return o.strict ? d < mk - 1e-9 : d <= mk + 1e-9; }
+    function count() { return data.filter(below).length; }
     function draw() {
       g.setAttribute('transform', 'translate(' + X(mk) + ',0)'); g.setAttribute('aria-valuenow', mk);
-      dots.forEach(function (d) { d.c.setAttribute('class', 'nk-dot' + (d.v <= mk + 1e-9 ? ' nk-low' : '')); });
-      var c = count(); readout.textContent = c + ' of ' + n + ' dots are at or below ' + +mk.toFixed(2) + '. That is the ' + Math.round(c / n * 100) + 'th percentile. (' + o.unit + ')';
+      dots.forEach(function (d) { d.c.setAttribute('class', 'nk-dot' + (below(d.v) ? ' nk-low' : '')); });
+      var c = count(); readout.textContent = c + ' of ' + n + ' dots are ' + (o.strict ? 'below ' : 'at or below ') + +mk.toFixed(2) + '. That is the ' + Math.round(c / n * 100) + 'th percentile. (' + o.unit + ')';
       self.emit('change', { marker: mk, below: c, n: n, percentile: c / n * 100 });
     }
     draggable(svg, g, { toVal: function (x) { return lo + (x - X0) / (X1 - X0) * (hi - lo); }, set: function (val) { mk = clamp(snap(val, o.step), lo, hi); draw(); }, get: function () { return mk; }, step: function () { return o.step; }, min: function () { return lo; }, max: function () { return hi; } });
-    self.el = wrap; self.setMarker = function (v) { mk = clamp(v, lo, hi); draw(); }; self.count = count; self.n = n;
+    self.el = wrap; self.setMarker = function (v) { mk = clamp(v, lo, hi); draw(); }; self.count = count; self.n = n; self.state = function () { return { marker: mk, below: count(), n: n, percentile: count() / n * 100 }; };
     host.appendChild(wrap); draw(); return self;
   };
 
@@ -236,6 +243,124 @@
     }
     sl.oninput = draw; self.el = wrap; self.setWidth = function (frac) { sl.value = Math.round(frac * 100); draw(); }; self.getWidth = function () { return bw; };
     host.appendChild(wrap); draw(); return self;
+  };
+
+  /* ---------- NK.transform: what adding, multiplying or standardizing does to a distribution ---------- */
+  var SHAPE9 = [1, 3, 6, 9, 11, 9, 6, 3, 1], SHAPE_SD = (function () { var N = 0, v = 0; SHAPE9.forEach(function (c) { N += c; }); SHAPE9.forEach(function (c, i) { v += c * (i - 4) * (i - 4); }); return Math.sqrt(v / N); })();
+  NK.SHAPE9 = SHAPE9; NK.SHAPE_SD = SHAPE_SD;
+  function niceStep(span, want) { var raw = span / (want || 6), p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; }
+  NK.niceStep = niceStep;
+  /* opts: { mode:"add"|"mul"|"z", mean, sd }.  add: a slider for the constant c (-20..20); mul: a slider for the factor k (0.5..4); z: two buttons, subtract the mean, then divide by the SD.
+     state: { mode, c, k, stage, mean, sd }.  The faded bars are the original data; the blue bars are the data now. */
+  NK.transform = function (host, o) {
+    o = Object.assign({ mode: 'add', mean: 70, sd: 10, cMax: 20, name: 'Pretend data' }, o || {});
+    var self = emitter({}), c = 0, k = 1, stage = 0, W = 620, H = 230, X0 = 30, X1 = 590, BASE = 175, TOP = 34;
+    var wrap = el('div', 'nk-transform'), svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'Histogram before and after the change', 'class': 'nk-svg' }); wrap.appendChild(svg);
+    var ctl = el('div', 'nk-row'), readout = el('p', 'nk-readout'); readout.setAttribute('aria-live', 'polite'); wrap.appendChild(ctl); wrap.appendChild(readout);
+    function now() { return o.mode === 'add' ? { mean: o.mean + c, sd: o.sd } : o.mode === 'mul' ? { mean: o.mean * k, sd: o.sd * k } : stage === 0 ? { mean: o.mean, sd: o.sd } : stage === 1 ? { mean: 0, sd: o.sd } : { mean: 0, sd: 1 }; }
+    function range() {
+      if (o.mode === 'add') return [o.mean - o.cMax - 4 * o.sd, o.mean + o.cMax + 4 * o.sd];
+      if (o.mode === 'mul') return [Math.min(0, o.mean - 4 * o.sd), o.mean * 4 + 4 * o.sd * 4];
+      var m = now(); return [m.mean - 4 * m.sd, m.mean + 4 * m.sd];
+    }
+    function bars(m, sdv, lo, hi, cls) {
+      var X = function (v) { return X0 + (v - lo) / (hi - lo) * (X1 - X0); }, sp = sdv / SHAPE_SD, g = sv('g', {}, svg);
+      SHAPE9.forEach(function (n, i) { var cx = m + (i - 4) * sp, h = n / 11 * (BASE - TOP); sv('rect', { x: X(cx - sp / 2) + 0.5, y: BASE - h, width: Math.max(1, X(cx + sp / 2) - X(cx - sp / 2) - 1), height: h, 'class': cls }, g); });
+    }
+    function draw() {
+      svg.textContent = ''; var m = now(), r = range(), lo = r[0], hi = r[1], X = function (v) { return X0 + (v - lo) / (hi - lo) * (X1 - X0); };
+      if (o.mode !== 'z') bars(o.mean, o.sd, lo, hi, 'nk-ghost');
+      bars(m.mean, m.sd, lo, hi, 'nk-bar');
+      sv('line', { x1: X0, x2: X1, y1: BASE, y2: BASE, 'class': 'nk-axis' }, svg);
+      var st = niceStep(hi - lo, 7); for (var v = Math.ceil(lo / st) * st; v <= hi + 1e-9; v += st) { sv('line', { x1: X(v), x2: X(v), y1: BASE, y2: BASE + 5, 'class': 'nk-axis' }, svg); sv('text', { x: X(v), y: BASE + 20, 'text-anchor': 'middle', 'class': 'nk-tick' }, svg).textContent = +v.toFixed(2); }
+      sv('line', { x1: X(m.mean), x2: X(m.mean), y1: TOP - 6, y2: BASE, 'class': 'nk-mline', 'stroke-dasharray': '6 4' }, svg); sv('text', { x: X(m.mean), y: TOP - 8, 'text-anchor': 'middle', 'class': 'nk-mtx' }, svg).textContent = 'mean';
+      readout.textContent = o.name + ': ' + (o.mode === 'add' ? 'added ' + c : o.mode === 'mul' ? 'multiplied by ' + k : stage === 0 ? 'original data' : stage === 1 ? 'mean subtracted' : 'divided by the SD') + '. Mean = ' + +m.mean.toFixed(2) + ' · SD = ' + +m.sd.toFixed(2) + ' · Shape: same.';
+      self.emit('change', self.state());
+    }
+    self.state = function () { var m = now(); return { mode: o.mode, c: c, k: k, stage: stage, mean: m.mean, sd: m.sd }; };
+    if (o.mode === 'z') {
+      var b1 = el('button', 'nk-btn', 'Subtract the mean'), b2 = el('button', 'nk-btn', 'Divide by the SD'), rs = el('button', 'nk-btn nk-ghostbtn', 'Start over'); [b1, b2, rs].forEach(function (b) { b.type = 'button'; ctl.appendChild(b); });
+      var sync = function () { b1.disabled = stage !== 0; b2.disabled = stage !== 1; };
+      b1.onclick = function () { stage = 1; sync(); draw(); }; b2.onclick = function () { stage = 2; sync(); draw(); }; rs.onclick = function () { stage = 0; sync(); draw(); }; sync();
+      self.setStage = function (s) { stage = s; sync(); draw(); };
+    } else {
+      var l = el('label', null, o.mode === 'add' ? 'Add ' : 'Multiply by '), inp = el('input'), out = el('b');
+      inp.type = 'range'; if (o.mode === 'add') { inp.min = -o.cMax; inp.max = o.cMax; inp.step = 1; inp.value = 0; } else { inp.min = 0.5; inp.max = 4; inp.step = 0.5; inp.value = 1; }
+      inp.setAttribute('aria-label', o.mode === 'add' ? 'Constant to add' : 'Factor to multiply by'); out.textContent = inp.value; l.appendChild(inp); ctl.appendChild(l); ctl.appendChild(out);
+      inp.oninput = function () { if (o.mode === 'add') c = +inp.value; else k = +inp.value; out.textContent = inp.value; draw(); };
+      self.setConst = function (v) { inp.value = v; inp.oninput(); };
+    }
+    self.el = wrap; self.range = function () { return o.mode === 'add' ? [-o.cMax, o.cMax] : [0.5, 4]; };
+    host.appendChild(wrap); draw(); return self;
+  };
+
+  /* ---------- NK.density: drag two edges, read the shaded area as a proportion ---------- */
+  NK.DENSITIES = {
+    rect: function (L) { return { f: function (x) { return x >= 0 && x <= L ? 1 / L : 0; }, x0: 0, x1: L, ymax: 1.4 / L, step: L <= 5 ? 0.5 : 1 }; },
+    tri: function () { return { f: function (x) { return x >= 0 && x <= 2 ? x / 2 : 0; }, x0: 0, x1: 2, ymax: 1.2, step: 0.25 }; }
+  };
+  NK.areaUnder = function (f, a, b) { var n = 2000, dx = (b - a) / n, s = 0; for (var i = 0; i < n; i++) s += (f(a + i * dx) + f(a + (i + 1) * dx)) / 2 * dx; return s; };
+  /* opts: { kind:"rect"|"tri", L, a, b }.  state: { a, b, area } */
+  NK.density = function (host, o) {
+    o = Object.assign({ kind: 'rect', L: 10, a: null, b: null }, o || {}); var D = o.kind === 'tri' ? NK.DENSITIES.tri() : NK.DENSITIES.rect(o.L), self = emitter({});   // starts with the whole curve shaded: total area 1
+    var W = 620, H = 200, X0 = 40, X1 = W - 40, BASE = 150, TOP = 26, a = o.a == null ? D.x0 : o.a, b = o.b == null ? D.x1 : o.b, wrap = el('div', 'nk-density'), svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'A density curve with a shaded part', 'class': 'nk-svg' }); wrap.appendChild(svg);
+    var X = function (v) { return X0 + (v - D.x0) / (D.x1 - D.x0) * (X1 - X0); }, Y = function (v) { return BASE - v / D.ymax * (BASE - TOP); };
+    var fill = sv('path', { 'class': 'nk-fill' }, svg), line = sv('path', { 'class': 'nk-line', fill: 'none' }, svg), d = '';
+    for (var v = D.x0; v <= D.x1 + 1e-9; v += (D.x1 - D.x0) / 200) d += (d ? 'L' : 'M') + X(v).toFixed(1) + ' ' + Y(D.f(v)).toFixed(1); line.setAttribute('d', d);
+    sv('line', { x1: X0, x2: X1, y1: BASE, y2: BASE, 'class': 'nk-axis' }, svg); var st = Math.max(D.step * 2, 1); for (var t = D.x0; t <= D.x1 + 1e-9; t += st) { sv('line', { x1: X(t), x2: X(t), y1: BASE, y2: BASE + 5, 'class': 'nk-axis' }, svg); sv('text', { x: X(t), y: BASE + 20, 'text-anchor': 'middle', 'class': 'nk-tick' }, svg).textContent = +t.toFixed(2); }
+    var hs = [0, 1].map(function (i) { var g = sv('g', { 'class': 'nk-marker', tabindex: 0, role: 'slider', 'aria-label': i ? 'Right edge' : 'Left edge', 'aria-valuemin': D.x0, 'aria-valuemax': D.x1 }, svg); sv('line', { y1: TOP - 6, y2: BASE, 'class': 'nk-mline' }, g); sv('circle', { r: 11, cy: TOP - 6, 'class': 'nk-mdot' }, g); return g; });
+    var readout = el('p', 'nk-readout'); readout.setAttribute('aria-live', 'polite'); wrap.appendChild(readout);
+    function area() { return Math.round(NK.areaUnder(D.f, a, b) * 10000) / 10000; }
+    function draw() {
+      hs[0].setAttribute('transform', 'translate(' + X(a) + ',0)'); hs[1].setAttribute('transform', 'translate(' + X(b) + ',0)'); hs[0].setAttribute('aria-valuenow', a); hs[1].setAttribute('aria-valuenow', b);
+      var p = 'M' + X(a) + ' ' + BASE; for (var q = a; q <= b + 1e-9; q += Math.max((b - a) / 100, 0.001)) p += 'L' + X(q).toFixed(1) + ' ' + Y(D.f(q)).toFixed(1); fill.setAttribute('d', b > a ? p + 'L' + X(b) + ' ' + BASE + 'Z' : '');
+      readout.textContent = 'Shaded from ' + +a.toFixed(2) + ' to ' + +b.toFixed(2) + '. Area = proportion = ' + area().toFixed(4).replace(/0+$/, '').replace(/\.$/, '') + ' (' + (area() * 100).toFixed(1).replace(/\.0$/, '') + '%).'; self.emit('change', { a: a, b: b, area: area() });
+    }
+    function set(i, v) { v = clamp(snap(v, D.step), D.x0, D.x1); if (i === 0) a = Math.min(v, b); else b = Math.max(v, a); draw(); }
+    hs.forEach(function (g, i) { draggable(svg, g, { toVal: function (x) { return D.x0 + (x - X0) / (X1 - X0) * (D.x1 - D.x0); }, set: function (v) { set(i, v); }, get: function () { return i ? b : a; }, step: function () { return D.step; }, min: function () { return D.x0; }, max: function () { return D.x1; } }); });
+    self.el = wrap; self.setEdges = function (p, q) { a = clamp(snap(p, D.step), D.x0, D.x1); b = clamp(snap(q, D.step), a, D.x1); draw(); }; self.step = D.step; self.state = function () { return { a: a, b: b, area: area() }; };
+    host.appendChild(wrap); draw(); return self;
+  };
+
+  /* ---------- NK.skew: slide the tail, watch the mean and the median ---------- */
+  function betaPdf(a, b) { var f = function (n) { var r = 1; for (var i = 2; i <= n; i++) r *= i; return r; }, B = f(a - 1) * f(b - 1) / f(a + b - 1); return function (x) { return x <= 0 || x >= 1 ? 0 : Math.pow(x, a - 1) * Math.pow(1 - x, b - 1) / B; }; }
+  NK.skewStats = function (s) {   // s in {-1,-.5,0,.5,1}: -1 long tail left, 1 long tail right
+    var a = 4 - 2 * s, b = 4 + 2 * s, f = betaPdf(a, b), n = 4000, dx = 1 / n, cum = 0, med = 0, i; for (i = 0; i <= n; i++) { cum += f(i * dx) * dx; if (cum >= 0.5) { med = i * dx; break; } }
+    var mean = a / (a + b); return { f: f, a: a, b: b, mean: mean, median: med, rel: Math.abs(mean - med) < 0.004 ? '=' : mean < med ? '<' : '>' };
+  };
+  /* state: { s, mean, median, rel } */
+  NK.skew = function (host, o) {
+    o = Object.assign({ s: 0, name: 'Pretend data' }, o || {}); var self = emitter({}), s = o.s, W = 620, H = 210, X0 = 40, X1 = W - 40, BASE = 160, TOP = 16;
+    var wrap = el('div', 'nk-skew'), svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'A density curve whose tail you can slide', 'class': 'nk-svg' }); wrap.appendChild(svg);
+    var X = function (v) { return X0 + v * (X1 - X0); }, row = el('div', 'nk-row'), lab = el('label', null, 'Tail '), inp = el('input'), readout = el('p', 'nk-readout'); readout.setAttribute('aria-live', 'polite');
+    inp.type = 'range'; inp.min = -1; inp.max = 1; inp.step = 0.5; inp.value = s; inp.setAttribute('aria-label', 'Slide the long tail from left to right'); lab.appendChild(el('span', 'nk-small', 'long tail left')); lab.appendChild(inp); lab.appendChild(el('span', 'nk-small', 'long tail right')); row.appendChild(lab); wrap.appendChild(row); wrap.appendChild(readout);
+    function draw() {
+      svg.textContent = ''; var S = NK.skewStats(s), Y = function (v) { return BASE - v / 3.2 * (BASE - TOP); }, d = '';
+      for (var x = 0; x <= 1.0001; x += 0.005) d += (d ? 'L' : 'M') + X(x).toFixed(1) + ' ' + Y(S.f(x)).toFixed(1);
+      sv('path', { d: d + 'L' + X(1) + ' ' + BASE + 'L' + X(0) + ' ' + BASE + 'Z', 'class': 'nk-fill' }, svg); sv('path', { d: d, 'class': 'nk-line', fill: 'none' }, svg); sv('line', { x1: X0, x2: X1, y1: BASE, y2: BASE, 'class': 'nk-axis' }, svg);
+      sv('line', { x1: X(S.median), x2: X(S.median), y1: TOP, y2: BASE, 'class': 'nk-mline', 'stroke-dasharray': '6 4' }, svg); sv('text', { x: X(S.median), y: BASE + 20, 'text-anchor': 'middle', 'class': 'nk-mtx' }, svg).textContent = 'median';
+      sv('line', { x1: X(S.mean), x2: X(S.mean), y1: TOP + 14, y2: BASE, stroke: '#1c7d4a', 'stroke-width': 2.5 }, svg); sv('text', { x: X(S.mean), y: BASE + 36, 'text-anchor': 'middle', 'class': 'nk-tick', fill: '#1c7d4a' }, svg).textContent = 'mean';
+      readout.textContent = o.name + ': ' + (s === 0 ? 'no long tail' : 'long tail on the ' + (s > 0 ? 'right' : 'left')) + '. The mean is ' + (S.rel === '=' ? 'equal to' : S.rel === '<' ? 'less than' : 'greater than') + ' the median.'; self.emit('change', { s: s, mean: S.mean, median: S.median, rel: S.rel });
+    }
+    inp.oninput = function () { s = +inp.value; draw(); }; self.el = wrap; self.setS = function (v) { inp.value = v; inp.oninput(); }; self.state = function () { var S = NK.skewStats(s); return { s: s, mean: S.mean, median: S.median, rel: S.rel }; };
+    host.appendChild(wrap); draw(); return self;
+  };
+
+  /* ---------- NK.fit: a histogram with a normal curve you can switch on ---------- */
+  /* opts: { bars:[counts], start, width, label }.  state: { overlay } */
+  NK.fit = function (host, o) {
+    o = Object.assign({ bars: SHAPE9, start: 20, width: 5, label: 'Pretend data' }, o || {}); var h = o.bars, n = h.length, self = emitter({}), W = 520, H = 170, X0 = 30, X1 = W - 30, BASE = 120, TOP = 14, on = false;
+    var wrap = el('div', 'nk-fit'), svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'A histogram of ' + o.label, 'class': 'nk-svg' }); wrap.appendChild(svg);
+    var N = 0, m = 0; h.forEach(function (c, i) { N += c; m += c * i; }); m /= N; var v = 0; h.forEach(function (c, i) { v += c * (i - m) * (i - m); }); var sd = Math.sqrt(v / N), mx = Math.max.apply(null, h), cw = (X1 - X0) / n;
+    h.forEach(function (c, i) { if (c > 0) sv('rect', { x: X0 + i * cw + 2, y: BASE - c / mx * (BASE - TOP), width: cw - 4, height: c / mx * (BASE - TOP), 'class': 'nk-bar' }, svg); });
+    sv('line', { x1: X0, x2: X1, y1: BASE, y2: BASE, 'class': 'nk-axis' }, svg); for (var i = 0; i < n; i += 2) sv('text', { x: X0 + i * cw + cw / 2, y: BASE + 18, 'text-anchor': 'middle', 'class': 'nk-tick' }, svg).textContent = o.start + i * o.width;
+    var curve = sv('path', { 'class': 'nk-line', fill: 'none', 'stroke-dasharray': '6 4', style: 'stroke:#b3412e', visibility: 'hidden' }, svg), d = '';
+    for (var x = -0.5; x <= n - 0.5 + 1e-9; x += 0.1) { var z = (x - m) / sd, y = N * Math.exp(-z * z / 2) / (sd * Math.sqrt(2 * Math.PI)); d += (d ? 'L' : 'M') + (X0 + (x + 0.5) * cw).toFixed(1) + ' ' + (BASE - y / mx * (BASE - TOP)).toFixed(1); }
+    curve.setAttribute('d', d);
+    var btn = el('button', 'nk-btn', 'Show a normal curve with the same mean and SD'); btn.type = 'button'; wrap.appendChild(btn);
+    btn.onclick = function () { on = !on; curve.setAttribute('visibility', on ? 'visible' : 'hidden'); btn.textContent = on ? 'Hide the normal curve' : 'Show a normal curve with the same mean and SD'; self.emit('change', { overlay: on }); };
+    self.el = wrap; self.state = function () { return { overlay: on }; }; self.toggle = function () { btn.onclick(); };
+    host.appendChild(wrap); return self;
   };
 
   /* ---------- NK.zTable ---------- */
