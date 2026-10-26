@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stats widgets · Mr. D</title>
+<meta name="description" content="Every shared stats widget on one page: z-table, curve, ruler, dot plot, histogram, tiles, routine card.">
+<link rel="stylesheet" href="normal-kit.css">
+<style>
+:root{--stage:#f6f9fd;--line:#cbd6e0}
+body{margin:0;background:#edf1f6;color:#142230;font:16px/1.45 system-ui,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:16px}
+h1{margin:0 0 4px}.sub{color:#566170;margin:0 0 14px}
+section{background:#fff;border:1px solid #cbd6e0;border-radius:10px;padding:14px 16px;margin:0 0 16px}
+h2{margin:0 0 4px;font-size:1.2rem}.what{margin:0 0 10px;color:#566170}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px;position:sticky;top:0;background:#edf1f6;padding:6px 0;z-index:10}
+.tabs button{font:600 .95rem system-ui;padding:7px 14px;border-radius:999px;border:1px solid #cbd6e0;background:#fff;cursor:pointer}.tabs button[aria-selected=true]{background:#2b4fd9;color:#fff;border-color:#2b4fd9}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Stats widgets</h1>
+  <p class="sub">One kit for every stats lesson. All numbers on this page are pretend.</p>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div id="panes"></div>
+</div>
+<script src="normal-kit.js"></script>
+<script>
+(function () {
+  var panes = document.getElementById('panes'), tabs = document.getElementById('tabs'), list = [];
+  function section(id, title, what) { var s = document.createElement('section'); s.id = id; s.hidden = true; s.innerHTML = '<h2></h2><p class="what"></p>'; s.querySelector('h2').textContent = title; s.querySelector('.what').textContent = what; panes.appendChild(s); list.push({ id: id, title: title, s: s }); return s; }
+  var s, d;
+
+  s = section('curve', 'NK.curve', 'Drag the marker or use the arrow keys. It snaps to steps of 0.25. The area stays hidden until you press the button.');
+  d = document.createElement('div'); d.className = 'cols'; s.appendChild(d);
+  var a = document.createElement('div'), b = document.createElement('div'); d.appendChild(a); d.appendChild(b);
+  var c1 = NK.curve(a, { markers: [1.25], shade: 'left', hideReadout: true, mean: 70, sd: 10, label: 'Curve, shade left, readout hidden' });
+  var c2 = NK.curve(b, { markers: [-1, 1.5], shade: 'between', label: 'Curve, shade between' });
+  var r = document.createElement('div'); r.className = 'row'; s.appendChild(r);
+  ['left', 'right', 'between'].forEach(function (m) { var x = document.createElement('button'); x.className = 'nk-btn'; x.textContent = 'Shade ' + m; x.onclick = function () { c1.setShade(m); c2.setShade(m); }; r.appendChild(x); });
+
+  s = section('table', 'NK.zTable', 'Lookup: find the area. A wrong click names the failed step. Try the wrong row, the wrong column, or the left area for a right-tail question.');
+  var zt = NK.zTable(s, { height: 330 }); zt.ask({ mode: 'lookup', z: 1.23, want: 'right' });
+  r = document.createElement('div'); r.className = 'row'; s.appendChild(r);
+  [['Lookup: left of z = −1.67', { z: -1.67, want: 'left' }], ['Lookup: right of z = 1.23', { z: 1.23, want: 'right' }], ['Inverse: left area 0.9000', { p: 0.9, want: 'left' }], ['Inverse: right area 0.0500', { p: 0.05, want: 'right' }]].forEach(function (t) { var x = document.createElement('button'); x.className = 'nk-btn'; x.textContent = t[0]; x.onclick = function () { zt.ask(t[1]); }; r.appendChild(x); });
+  var ex = document.createElement('button'); ex.className = 'nk-btn'; ex.textContent = 'Explore mode'; ex.onclick = function () { zt.explore(); }; r.appendChild(ex);
+
+  s = section('tiles', 'NK.tiles', 'Drag a tile to a slot. Or tap a tile, then tap a slot. Or Tab to a tile, Enter to pick up, arrows to a slot, Enter to drop. Two misses on a slot shows a hint.');
+  var done = document.createElement('p'); done.id = 'tiles-done'; NK.tiles(s, {
+    tiles: [{ id: 'picture', label: 'Picture' }, { id: 'z', label: 'z' }, { id: 'row', label: 'Row' }, { id: 'col', label: 'Column' }, { id: 'area', label: 'Area' }, { id: 'sentence', label: 'Sentence' }].sort(function (x, y) { return x.id < y.id ? -1 : 1; }),
+    slots: NK.routine.moves.map(function (m, i) { return { id: 's' + i, label: 'Move ' + (i + 1), answer: m.id, hint: 'Move ' + (i + 1) + ' comes ' + (i === 0 ? 'first: draw before you calculate.' : 'after ' + NK.routine.moves[i - 1].name + '.') }; }),
+    onComplete: function () { done.textContent = 'Routine in order. Nice.'; } }); s.appendChild(done);
+
+  s = section('ruler', 'NK.ruler', 'Slide the value along the ruler. Each tick is one SD. The readout says how many SDs from the mean.');
+  NK.ruler(s, { mean: 70, sd: 10, value: 85 });
+
+  s = section('dotplot', 'NK.dotplot', 'Drag the marker. The readout counts the dots at or below it.');
+  NK.dotplot(s, {});
+
+  s = section('hist', 'NK.hist', 'Slide the bar width down. The bars trace the normal curve.');
+  NK.hist(s, {});
+
+  s = section('routine', 'NK.routine and the worked example', 'The six-move card, and the example every number of which is computed. The Concepts panel in each lesson holds both, with the table.');
+  d = document.createElement('div'); d.className = 'cols'; s.appendChild(d); a = document.createElement('div'); b = document.createElement('div'); d.appendChild(a); d.appendChild(b);
+  NK.routine.render(a, { active: 2 }); NK.example(b);
+
+  list.forEach(function (x, i) {
+    var t = document.createElement('button'); t.type = 'button'; t.setAttribute('role', 'tab'); t.textContent = x.title.replace('NK.', ''); tabs.appendChild(t);
+    t.onclick = function () { list.forEach(function (y, j) { y.s.hidden = j !== i; tabs.children[j].setAttribute('aria-selected', String(j === i)); }); location.hash = x.id; };
+  });
+  var start = Math.max(0, list.map(function (x) { return x.id; }).indexOf(location.hash.slice(1))); tabs.children[start].click();
+})();
+</script>
+</body>
+</html>

@@ -123,7 +123,7 @@
   }
 
   var cfg = { id: ID, course: SPEC.course, version: 1, title: SPEC.title, subtitle: 'Online lesson', identity: 'id', keypad: true,
-    steps: steps, notes: notesDoc, concepts: SPEC.concepts, pacing: SPEC.pacing, gates: (SPEC.pacing.huddles || []).map(function (h) { return { key: h.key, label: 'Huddle' }; }) };
+    steps: steps, notes: notesDoc, concepts: SPEC.concepts, conceptTabs: (SPEC.course === 'stats' && window.NK) ? NK.conceptTabs() : null, pacing: SPEC.pacing, gates: (SPEC.pacing.huddles || []).map(function (h) { return { key: h.key, label: 'Huddle' }; }) };
   (window.LESSONS_REG = window.LESSONS_REG || {})[ID] = cfg;
   return cfg;
   };

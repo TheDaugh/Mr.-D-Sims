@@ -10,6 +10,8 @@ Run from the repo root with a static server (`python3 -m http.server 8123`). Pla
 | `node --test tests/unit/` | Pure logic and specs: IDs (every single-character typo is caught), pacing, placement, keypad inserts, huddle blanks, and every `spec.js` (pacing valid, targets one sentence, each generator checkable at every band). |
 | `TEMPLATE=physics\|chem\|calc\|stats node tests/template.e2e.js` | A simulated class period through a template: ID check, placement, timed huddle, pace trim, keypad, `#key`, full run to the stamp. `PAGE=<path>` tests a lesson made from the template. |
 | `node tests/lock.e2e.js` | Locked mode in every guided lesson and virtual lab that uses it: fullscreen from Start, warning then lock on repeat exits, per-student and unlock-any codes, a code after closing the page, and never locked in `#key`, the teacher build, after 3 PM or with `#nolock`. Add a target to its `TARGETS` list when a new lesson or lab opts in. |
+| `node tests/stats-kit.e2e.js` | The shared stats widgets on `stats/shared/kit-demo.html`: curve (hidden readout, snap, keyboard), z-table (wrong row/column/side, inverse), tiles (mouse, touch, tap, keyboard), ruler, dot plot, histogram, and the Concepts tabs. `SHOTS=<dir>` writes 1366×768 screenshots. |
+| `node tools/build-toolkit.mjs` | Writes the one-page printable (`keys/stats/toolkit.pdf`) and fails if it spills past one page. |
 | `node tests/smoke.js` | Every lesson, hub, teacher page and the portal load with no JavaScript errors (`KEY=1` also opens each lesson at `#key`). |
 
 ## New lesson checklist (spec-based, preferred)

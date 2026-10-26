@@ -536,7 +536,7 @@
     ticker = setInterval(tick, 1000);
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && S && S.first && !KEY) { S.hid = (S.hid || 0) + 1; saveNow(); } });
     window.addEventListener('pagehide', saveNow);
-    if (cfg.concepts && window.MrD && MrD.concepts) MrD.concepts.mount($('btn-notes').parentNode, cfg.concepts);
+    if (cfg.concepts && window.MrD && MrD.concepts) MrD.concepts.mount($('btn-notes').parentNode, cfg.concepts, { course: cfg.course, tabs: cfg.conceptTabs });
     keyBar(); LE.render();
   };
   LE.cfg = function () { return CFG; };
