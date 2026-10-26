@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coulomb’s Law and the Shell Model</title>
+<meta name="description" content="Predict, then change charges and distances in a sim, fill ratio tables, and use the result to explain why an electron near the nucleus is held harder than one far away.">
+<link rel="stylesheet" href="../shared/lab.css">
+<style>
+  .wrap{max-width:none;padding-inline:clamp(12px,3vw,40px)}
+  #chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+  .chip{padding:2px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:.85rem;color:var(--muted)}
+  .chip.on{border-color:var(--accent);color:var(--accent);font-weight:700}
+  .chip.done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+  .keyline{margin-top:10px;padding:8px 10px;border-left:4px solid var(--ok);background:rgba(60,160,90,.1);font-size:.9rem}
+  .endbar{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:center;padding:10px 14px;margin:0 0 12px;background:#fff4d6;border:2px solid #d9a400;border-radius:8px;color:#3a2c00}
+  .endbar[hidden]{display:none}
+  .sub{color:var(--muted);margin:0 0 12px;max-width:72ch}
+  .btn{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btn.ghost{background:var(--panel);color:var(--ink);border-color:var(--line)}
+  .btn.big{font-size:1.05rem;min-height:46px;padding:8px 22px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .stamp{border:3px solid var(--ok);border-radius:14px;text-align:center;padding:14px;margin:10px 0;color:var(--ok);background:var(--ok-bg)}
+  .stamp .big{font-size:1.6rem;font-weight:800;letter-spacing:.04em}
+  table.sum{margin:10px 0}
+  .task{display:flex;gap:8px;align-items:flex-start;padding:2px 0;font-size:.93rem}
+  .task.ok{color:var(--ok)}
+  .task .bx{width:18px;height:18px;border:2px solid var(--line);border-radius:4px;flex:none;margin-top:2px;text-align:center;line-height:14px;font-size:13px}
+  .task.ok .bx{background:var(--ok);border-color:var(--ok);color:#fff}
+  textarea{width:100%;min-height:64px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px}
+  .wtbl td,.wtbl th{padding:4px 6px;font-size:.85rem;text-align:left}
+  .wtbl input{width:78px;font:inherit;padding:3px 5px}
+  .wtbl td.ok input{outline:2px solid var(--ok)} .wtbl td.no input{outline:2px solid var(--bad)}
+  input[type=range]{width:100%}
+  .sl{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);flex:1 1 180px}
+  .sl b{color:var(--ink)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{border:0;border-right:1px solid var(--line);border-radius:0;min-width:40px;background:var(--panel);color:var(--ink);padding:4px 10px;font:inherit}
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:var(--accent);color:var(--accent-ink);font-weight:700}
+  .seg button:disabled{opacity:.45}
+  .ctl{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:flex-end;margin:8px 0}
+  .ctl label{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);gap:2px}
+  .figs{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  figure.pix{margin:0;flex:1 1 200px;max-width:380px;text-align:center}
+  figure.pix canvas{width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;border:2px solid var(--line);border-radius:6px;background:#111;cursor:pointer}
+  figure.pix figcaption{font-size:.82rem;color:var(--muted);margin-top:6px;text-align:left}
+  figure.pix .cr{font-size:.72rem;opacity:.8}
+  .ph{border:2px dashed var(--line);border-radius:6px;padding:26px 12px;text-align:center;color:var(--muted);background:var(--note-bg);font-size:.9rem}
+  .scene text{font-family:system-ui,sans-serif}
+  .scene{width:100%;height:auto;max-height:250px;display:block}
+  canvas.hook{width:100%;max-width:520px;height:auto;image-rendering:pixelated;border:2px solid var(--line);border-radius:6px;background:#dfe9f2;display:block;margin:0 auto}
+  .kt{margin:12px 0;border:2px solid #7a1f12;border-radius:10px;background:var(--panel)}
+  .kt>summary{cursor:pointer;padding:8px 12px;font-weight:700;color:#7a1f12}
+  .kt .in{padding:4px 14px 12px;font-size:.9rem}
+  .kt table{border-collapse:collapse;margin:6px 0;width:100%}.kt td,.kt th{border:1px solid var(--line);padding:3px 7px;text-align:left;vertical-align:top}
+  .kt h3{margin:12px 0 4px;color:#7a1f12}
+  .gatebox{border:2px dashed var(--accent);text-align:center}
+  .legend{columns:2;font-size:.9rem;margin:6px 0 0;padding-left:20px}
+  @media (max-width:760px){.legend{columns:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="back" href="../index.html">← Chemistry</a>
+    <span class="crumb">Unit 3 · Atoms and Ions · Day 7</span>
+    <button type="button" class="ghost" id="open-notes" style="margin-left:auto" title="Your own notes for this lesson. They fill in as you work, and you print them as a PDF at the end.">My notes</button>
+  </header>
+  <h1>Coulomb’s Law and the Shell Model</h1>
+  <p class="lead">Why is an electron near the nucleus held harder than one far away? Two proportions answer it.</p>
+  <div class="mrd-tb" id="tb" hidden></div>
+  <div id="keypanel"></div>
+  <div id="desk"></div>
+  <div id="endbar" class="endbar" hidden></div>
+  <div id="chips" aria-label="Progress"></div>
+  <main id="app"></main>
+</div>
+
+<script src="../../shared/config.js"></script>
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
+<script src="../../shared/teacherbar.js"></script>
+<script src="../../shared/ids.js"></script>
+<script src="../../shared/live.js"></script>
+<script src="../../shared/profile.js"></script>
+<script src="../../shared/notes.js"></script>
+<script src="../../shared/lock.js"></script>
+<script src="../shared/ladder.js"></script>
+<script src="../shared/coulomb-practice.js"></script>
+<script>
+const C=CoulombPractice;
+/* ============ DATA ============ */
+const GATE_Q={q:"Two charges are 2 cm apart. They are moved to 6 cm apart. The force becomes:",opts:[{L:"A",t:"⅓ as big",tag:"inv"},{L:"B",t:"1⁄9 as big",tag:"ok"},{L:"C",t:"1⁄6 as big",tag:"other"},{L:"D",t:"3 times as big",tag:"lin"}]};
+const RULE_BANK=["one quarter","one half","one ninth","one third","twice","three times"];
+const DATA={parts:[
+{title:"What pulls the hair?",sub:"A rubbed balloon pulls hair up without touching it. Today you find out how that pull depends on distance and charge.",blocks:[
+ {type:"info",html:"<b>I can</b> use Coulomb’s law as a proportion to predict how strongly an electron is held.<br><span class='hint'>Up next after today: light from atoms.</span>"},
+ {type:"widget",id:"hook",tasks:["Slide the balloon close, then far."]},
+ {type:"figure",items:[{src:"img/balloon-hair.png",cap:"A charged balloon pulls on hair across a gap. Photo: MikeRun.",alt:"A balloon held above hair, with strands of hair reaching up toward it",credit:"CC BY-SA 4.0 · Wikimedia Commons"}]},
+ {type:"mcq",q:"What pulls the hair toward the balloon, even though they do not touch?",opts:[{t:"Gravity from the balloon"},{t:"Magnetism"},{t:"An electric force between the charge on the balloon and the charge in the hair",ok:1},{t:"Wind from the room"}],why:"Rubbing moves electrons, so the balloon and hair end up with opposite charges. Opposite charges pull on each other across a gap.",hint:"What did the rubbing move from one thing to the other?"},
+ {type:"labels"}
+]},
+{title:"Six quick questions",sub:"Warm up the words before the sim.",blocks:[]},
+{title:"Sim 1: Change the distance",sub:"Both charges stay +1. Only the distance changes.",blocks:[
+ {type:"numpred",save:"predDist",q:"Predict first. The force is <b>36 units</b> at distance 1. What will it be at distance 3?",unit:"units"},
+ {type:"widget",id:"coulomb",cfg:{exp:"dist"},tasks:["Record distance 1, 2 and 3.","Type the force × for each run."]},
+ {type:"cloze",save:"ruleDist",flag:"ruleDist",q:"Finish the rule from your table.",bank:RULE_BANK,items:[{t:"When the distance doubles, the force is ___ as big.",a:"one quarter"},{t:"When the distance triples, the force is ___ as big.",a:"one ninth"}],hint:"Look at your Force × column for distance 2 and distance 3.",okMsg:"✔ Distance ×2 gives force × ¼. Distance ×3 gives force × 1⁄9."}
+]},
+{title:"Sim 2: Change a charge",sub:"The distance stays 1. Only the left charge changes.",blocks:[
+ {type:"numpred",save:"predChg",q:"Predict first. The force is <b>36 units</b> with charges +1 and +1. What will it be if the left charge becomes <b>+3</b>?",unit:"units"},
+ {type:"widget",id:"coulomb",cfg:{exp:"charge"},tasks:["Record left charge 1, 2 and 3.","Type the force × for each run."]},
+ {type:"cloze",save:"ruleChg",flag:"ruleChg",q:"Finish the rule from your table.",bank:RULE_BANK,items:[{t:"When one charge doubles, the force is ___ as big.",a:"twice"},{t:"When one charge triples, the force is ___ as big.",a:"three times"}],hint:"Look at your Force × column for left charge 2 and 3.",okMsg:"✔ Charge ×2 gives force ×2. Charge ×3 gives force ×3."}
+]},
+{title:"Sim 3: Change both",sub:"Now every control works. Two changes at once multiply.",blocks:[
+ {type:"numpred",save:"predBoth",q:"Predict first. The force is <b>36 units</b> at distance 1. The distance doubles <b>and</b> the left charge doubles. What is the force?",unit:"units"},
+ {type:"widget",id:"coulomb",cfg:{exp:"both"},tasks:["Record the starting setting.","Record distance 2 with left charge 2.","Record distance 2 with both charges 2.","Type the force × for each run."]},
+ {type:"cloze",save:"ruleBoth",flag:"ruleBoth",q:"Finish the rule from your table.",bank:["half as big","the same","twice as big","one quarter","four times"],items:[{t:"Distance doubles and one charge doubles: the force is ___.",a:"half as big"},{t:"Distance doubles and both charges double: the force is ___.",a:"the same"}],hint:"Check your Force × column. Distance ×2 is ¼. Each charge ×2 is ×2.",okMsg:"✔ ¼ × 2 = ½, and ¼ × 2 × 2 = 1."},
+ {type:"open",save:"rule",q:"Write the rule in one sentence.",min:25,frame:"Doubling the distance makes the force ____. Doubling one charge makes the force ____."},
+ {type:"gate2"}
+]},
+{title:"The shell model",sub:"Now use the proportions on an atom. One electron, one nucleus.",blocks:[
+ {type:"compare"},
+ {type:"info",html:"A <b>shell</b> is a region where an electron lives. In the model, shell 2 sits <b>4 times</b> as far out as shell 1, and shell 3 sits <b>9 times</b> as far. H, He⁺ and Li²⁺ each have <b>one</b> electron."},
+ {type:"mcq",predict:true,q:"Predict first. In the same ion, which electron is pulled harder by the nucleus?",opts:[{t:"The electron in shell 1, close to the nucleus"},{t:"The electron in shell 3, far from the nucleus"},{t:"Both are pulled the same"}],note:"Now test it."},
+ {type:"widget",id:"shell",tasks:["Test H in shell 2 and shell 3.","Test He⁺ in shell 1.","Test Li²⁺ in shell 1."]},
+ {type:"widget",id:"zeff",only:"fluent",tasks:["Move the slider to 2 inner electrons."]},
+ {type:"mcq",only:"fluent",q:"Lithium’s outer electron has 2 inner electrons between it and the +3 nucleus. About what charge does it feel?",opts:[{t:"+3"},{t:"+1",ok:1},{t:"+5"},{t:"0"}],why:"The inner electrons cancel about 2 of the 3 protons, so the outer electron feels about +1. Slot 15 makes this exact.",hint:"The inner electrons are negative. They cancel some of the nucleus."},
+ {type:"mcq",q:"<b>The question for today.</b> Why is an electron near the nucleus held harder than one far away?",opts:[{t:"Electrons far away are lighter, so they drift off."},{t:"The force falls off with the square of the distance, so a near electron feels a much bigger pull.",ok:1},{t:"Far electrons have less charge."},{t:"The nucleus only pulls on the nearest electron."}],why:"Every electron has the same charge. Only the distance changes, and the force goes as 1 ÷ distance². Shell 1 is 9 times closer than shell 3, so the pull is 81 times bigger.",hint:"Which quantity differs between a near and a far electron: its charge or its distance?"},
+ {type:"num",save:"times81",q:"The shell 1 electron is pulled how many times as hard as the shell 3 electron in the same ion?",ans:81,tol:0.5,unit:"times",why:"Shell 3 is 9 times as far, so the pull is divided by 9 × 9 = 81.",hint:"Distance 9 times as big: divide the force by 9 × 9."}
+]},
+{title:"Harder questions",sub:"Use the proportions on new numbers. Then argue it with evidence.",blocks:[{type:"ladder"},{type:"cer"}]}
+]};
+DATA.parts[1].blocks=C.SIMPLE.map(s=>s.opts?{type:"mcq",q:s.q,opts:s.opts.map(o=>({t:o[0],ok:o[1]})),why:s.why,hint:s.hint,skill:"chem.coulomb.words"}:{type:"num",q:s.q,ans:s.num,tol:0.01,unit:s.unit,why:s.why,hint:s.hint,skill:"chem.coulomb.words"});
+
+/* ============ ENGINE ============ */
+function h(tag,attrs,...kids){const e=document.createElement(tag);for(const k in(attrs||{})){if(k==="class")e.className=attrs[k];else if(k==="html")e.innerHTML=attrs[k];else if(k.startsWith("on"))e.addEventListener(k.slice(2),attrs[k]);else e.setAttribute(k,attrs[k])}kids.flat().forEach(c=>{if(c==null)return;e.append(c.nodeType?c:document.createTextNode(c))});return e}
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,attrs,...kids){const e=document.createElementNS(SVGNS,tag);for(const k in(attrs||{}))e.setAttribute(k,attrs[k]);kids.flat().forEach(c=>{if(c==null)return;e.append(c.nodeType?c:document.createTextNode(c))});return e}
+const KEY=MrD.isKey(),clk=()=>MrD.bell.clock("chem");
+const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+const ST={name:"",period:"",t0:0,q:0,qFirst:0,retries:0,tasks:0,tasksDone:0,partIdx:0,partsDone:[],preds:[],between:false,screen:"check",keep:{},data:{dist:[],charge:[],both:[],shell:[]},log:[],max:0,ended:false,endIdx:0,finished:false,tk:{},pr:{i:0,clean:0},route:"std",check:{i:0,ans:{},res:null,t0:0,skipped:false},typed:[],gate:null,lad:Ladder.init(2),closeN:0};
+let inProgress=false,uid=0,LOCK_ON=false;
+const app=document.getElementById("app"),chipsEl=document.getElementById("chips");
+window.addEventListener("beforeunload",e=>{if(inProgress){e.preventDefault();e.returnValue=""}});
+const fmtT=s=>{s=Math.floor(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+const DONE_TYPES=["mcq","num","numpred","rows","widget","open","gate2","cloze","labels","ladder","cer","journal"];
+const LESSON_ID="coulombs-law";
+/* ID-SWAP: the student ID is stored in the field the older lessons used for the first name, so stamps, lock codes, live view and records carry it. */
+const who=()=>({first:ST.name,period:ST.period});
+LessonLock.init({id:LESSON_ID,root:document.querySelector(".wrap"),onChange:()=>chips()});
+const NOLOCK=(/nolock=(\d+)/.exec(location.hash)||[])[1]===LessonLock.offCode();
+const lockSnap=()=>JSON.parse(JSON.stringify(ST));
+const lockTxt=()=>{if(!LOCK_ON)return"";const L=LessonLock.stats();return` · left the lesson ${L.total}× · away ${fmtT(L.awaySec)}`};
+const g=n=>(Math.round(n*100)/100).toString();
+const NAMES={"¼":.25,"½":.5,"¾":.75,"⅓":1/3,"⅔":2/3,"⅙":1/6,"⅛":.125,"⅕":.2,"⅒":.1};
+/* A ratio can be typed as 0.25, 1/4, ¼ or ×4. Returns NaN when it cannot be read. */
+function parseRatio(s){s=String(s==null?"":s).trim().replace(/[×x*]/gi,"").replace(/⁄|∕/g,"/").replace(/\s+/g,"").replace(/,/g,".");if(!s)return NaN;if(NAMES[s]!=null)return NAMES[s];
+  const m=/^(-?\d*\.?\d+)\/(-?\d*\.?\d+)$/.exec(s);if(m)return +m[1]/+m[2];if(/^-?\d*\.?\d+$/.test(s))return +s;return NaN}
+const near=(v,t)=>Math.abs(v-t)<=Math.max(0.001,Math.abs(t)*0.015);
+const typed=(id,prompt,text)=>{text=String(text==null?"":text).trim();if(text!=="")ST.typed.push({id,prompt:String(prompt).replace(/<[^>]+>/g,"").slice(0,90),text:text.slice(0,500),at:Math.round((Date.now()-ST.t0)/1000)})};
+const strip=s=>String(s).replace(/<[^>]+>/g,"");
+const CK=[...C.CHECK];
+
+/* ---------- widgets ---------- */
+const WIDGET={};
+
+/* The hook: a pixel-art balloon over a head. Hair strands rise with the pull, which falls off as 1 ÷ distance². */
+WIDGET.hook=(tick)=>{
+  const W=64,H=40,S=8,cv=h("canvas",{class:"hook",width:W*S,height:H*S,role:"img","aria-label":"Pixel art of a balloon held above a head. The hair strands reach up toward the balloon, more when it is closer."}),ctx=cv.getContext("2d");
+  let d=5,seenNear=false,seenFar=false,t=0,raf=0,paused=false;
+  const px=(x,y,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x)*S,Math.round(y)*S,S,S)};
+  const disc=(cx,cy,r,c)=>{for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++)if(x*x+y*y<=r*r+r*.6)px(cx+x,cy+y,c)};
+  const line=(x0,y0,x1,y1,c)=>{x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy;for(let k=0;k<200;k++){px(x0,y0,c);if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx}if(e2<=dx){e+=dx;y0+=sy}}};
+  const pull=()=>Math.min(1,1/(d*d)*1.0);  // relative pull: 1 at distance 1, 1/4 at 2, 1/25 at 5
+  function draw(){
+    ctx.fillStyle="#dfe9f2";ctx.fillRect(0,0,W*S,H*S);ctx.fillStyle="#b9c9d6";ctx.fillRect(0,(H-4)*S,W*S,4*S);
+    const p=pull(),hx=32,hy=30;
+    disc(hx,hy+4,9,"#e0ac82");px(hx-3,hy+3,"#222");px(hx+3,hy+3,"#222");line(hx-2,hy+8,hx+2,hy+8,"#8a3b2a");
+    const wob=reduce||paused?0:Math.sin(t/9);
+    for(let i=-6;i<=6;i+=2){const bx=hx+i,by=hy-4+Math.abs(i)*.18,lean=-i*.45*p,len=3+10*p+(p>.15?wob*p*1.5:0),tipx=bx+lean+(i<0?-1:1)*(1-p)*4,tipy=by+(1-p)*9-len*p*1.2;line(bx,by,tipx,tipy,"#5b3a1e")}
+    const by=Math.max(5,hy-9-d*4),bxx=hx;line(bxx,by+7,bxx,by+11,"#444");disc(bxx,by,6,"#d9382b");px(bxx-2,by-3,"#f6a49b");px(bxx-3,by-2,"#f6a49b");
+    ctx.fillStyle="#1c2530";ctx.font="bold 14px system-ui";ctx.fillText("distance "+d,8,20);ctx.fillText("pull "+(p>=.995?"big":p>.2?"medium":p>.06?"small":"tiny"),8,38);
+  }
+  function loop(){t++;if(!cv.isConnected)return;if(!paused&&!reduce)draw();raf=requestAnimationFrame(loop)}
+  const sl=h("input",{type:"range",min:1,max:6,step:1,value:d,"aria-label":"Balloon distance",oninput:e=>{d=+e.target.value;if(d<=1)seenNear=true;if(d>=5)seenFar=true;draw();if(seenNear&&seenFar)tick(0)}});
+  const pb=h("button",{class:"ghost",onclick:()=>{paused=!paused;pb.textContent=paused?"Play":"Pause";draw()}},"Pause");
+  draw();loop();
+  return h("div",{},cv,h("div",{class:"ctl",style:"justify-content:center"},h("label",{style:"min-width:260px"},"Balloon distance: slide it",sl),pb));
+};
+
+/* The coulomb sim. Distance 1 and two +1 charges give 36 force units. Proportions only: no constants. */
+WIDGET.coulomb=(tick,cfg)=>{
+  const exp=cfg.exp,route=ST.route,scaf=route==="scaf",flu=route==="fluent",FMAX={dist:36,charge:108,both:324}[exp];
+  const rows=ST.data[exp];rows.length=0;
+  let q1=1,q2=1,r=1,sgn=1,paused=false,t=0;
+  const svg=sv("svg",{class:"scene",viewBox:"0 0 520 215",role:"img","aria-label":"Two charged particles on a line with a distance ruler, force arrows and a force meter"});
+  const out=h("div",{class:"note","aria-live":"polite",style:"margin-top:6px;min-height:1.3em"});
+  const X=60,PX=70,AX=100;
+  function draw(){
+    svg.replaceChildren();const F=C.force(q1,sgn*q2,r),x1=X,x2=X+PX*r,att=sgn<0,amp=(paused||reduce)?0:1+5*Math.min(1,F/FMAX),j=Math.sin(t/3)*amp;
+    for(let i=0;i<=6;i++){const x=X+PX*i;svg.append(sv("line",{x1:x,y1:AX+34,x2:x,y2:AX+42,stroke:"currentColor","stroke-opacity":.5}),sv("text",{x,y:AX+56,"text-anchor":"middle","font-size":11,fill:"currentColor","fill-opacity":.7},String(i)))}
+    svg.append(sv("line",{x1:X,y1:AX+38,x2:X+PX*6,y2:AX+38,stroke:"currentColor","stroke-opacity":.4}),sv("text",{x:X+PX*6+10,y:AX+42,"font-size":11,fill:"currentColor","fill-opacity":.7},"distance"));
+    svg.append(sv("line",{x1,y1:AX+22,x2:x1,y2:AX+34,stroke:"var(--accent)","stroke-width":2}),sv("line",{x1:x2,y1:AX+22,x2:x2,y2:AX+34,stroke:"var(--accent)","stroke-width":2}),sv("line",{x1,y1:AX+28,x2,y2:AX+28,stroke:"var(--accent)","stroke-width":2}));
+    svg.append(sv("text",{x:(x1+x2)/2,y:AX+20,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"var(--accent)"},"distance = "+r));
+    const rad=q=>11+6*q,L=14+68*Math.min(1,F/FMAX),dirL=att?1:-1,dirR=att?-1:1;
+    const arrow=(x,dir,c)=>{const e=x+dir*L;svg.append(sv("line",{x1:x,y1:AX,x2:e,y2:AX,stroke:c,"stroke-width":4}),sv("polygon",{points:`${e},${AX} ${e-dir*10},${AX-6} ${e-dir*10},${AX+6}`,fill:c}))};
+    arrow(x1+(att?rad(q1):-rad(q1)),dirL,"#b8860b");arrow(x2+(att?-rad(q2):rad(q2)),dirR,"#b8860b");
+    const pL=x1+(att?j:-j)*0+j*dirL*.6,pR=x2+j*dirR*.6;
+    svg.append(sv("circle",{cx:pL,cy:AX,r:rad(q1),fill:"var(--hot)",stroke:"rgba(0,0,0,.4)"}),sv("text",{x:pL,y:AX+5,"text-anchor":"middle","font-size":15,"font-weight":700,fill:"#fff"},"+"));
+    svg.append(sv("circle",{cx:pR,cy:AX,r:rad(q2),fill:sgn>0?"var(--hot)":"var(--cold)",stroke:"rgba(0,0,0,.4)"}),sv("text",{x:pR,y:AX+5,"text-anchor":"middle","font-size":15,"font-weight":700,fill:"#fff"},sgn>0?"+":"−"));
+    svg.append(sv("text",{x:x1,y:AX-rad(q1)-16,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"currentColor"},"left +"+q1),sv("text",{x:x2,y:AX-rad(q2)-16,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"currentColor"},"right "+(sgn>0?"+":"−")+q2));
+    svg.append(sv("text",{x:260,y:22,"text-anchor":"middle","font-size":13,fill:"currentColor"},att?"unlike charges: they pull together":"like charges: they push apart"));
+    // force meter
+    svg.append(sv("rect",{x:20,y:AX+66,width:420,height:14,fill:"none",stroke:"currentColor","stroke-opacity":.4}),sv("rect",{x:20,y:AX+66,width:Math.max(2,420*Math.min(1,F/FMAX)),height:14,fill:"var(--accent)"}));
+    svg.append(sv("text",{x:450,y:AX+78,"font-size":15,"font-weight":700,fill:"currentColor"},g(F)+" units"),sv("text",{x:20,y:AX+96,"font-size":11,fill:"currentColor","fill-opacity":.7},"force meter (full bar = "+FMAX+" units)"));
+  }
+  let raf=0;const loop=()=>{t++;if(!svg.isConnected)return;if(!paused&&!reduce)draw();raf=requestAnimationFrame(loop)};
+  const seg=(vals,get,set,dis,fmt)=>{const bs=vals.map(v=>h("button",{type:"button",onclick:()=>{set(v);sync()}},fmt?fmt(v):String(v)));const el=h("span",{class:"seg"},bs);el.sync=()=>bs.forEach((b,i)=>{b.classList.toggle("on",vals[i]===get());b.disabled=dis})
+    return el};
+  const sD=h("input",{type:"range",min:1,max:6,step:1,value:1,"aria-label":"Distance",oninput:e=>{r=+e.target.value;sync()}});
+  const dv=h("b",{},"1");
+  const s1=seg([1,2,3],()=>q1,v=>q1=v,exp==="dist",v=>"+"+v),s2=seg([1,2,3],()=>q2,v=>q2=v,exp!=="both",v=>String(v));
+  const sgnB=h("button",{class:"ghost",type:"button",onclick:()=>{sgn=-sgn;sync()}},"Flip sign"),guess=h("input",{type:"text",inputmode:"decimal",size:6,"aria-label":"My guess for the force",style:"width:90px"});
+  const rec=h("button",{class:"btn",type:"button",onclick:record},"Record this run"),pb=h("button",{class:"ghost",type:"button",onclick:()=>{paused=!paused;pb.textContent=paused?"Play":"Pause";draw()}},"Pause"),rs=h("button",{class:"ghost",type:"button",onclick:reset},"Reset");
+  sD.disabled=exp==="charge";sgnB.disabled=exp!=="both";
+  function sync(){dv.textContent=r;sD.value=r;s1.sync();s2.sync();draw()}
+  function reset(){q1=1;q2=1;r=1;sgn=1;rows.length=0;guess.value="";out.textContent="Reset. Record the starting setting again.";ST.keep["checked_"+exp]=false;renderTable();sync()}
+  const tb=h("tbody"),head=h("thead"),chk=h("button",{class:"btn",type:"button",onclick:checkRatios},"Check my ratios");
+  const auxCols=flu?[]:exp==="dist"?[["Distance ×",x=>x.r/rows[0].r]]:exp==="charge"?[["Left charge ×",x=>x.q1/rows[0].q1]]:[["Distance ×",x=>x.r/rows[0].r],["Charge ×",x=>(x.q1*x.q2)/(rows[0].q1*rows[0].q2)]];
+  const sgnTxt=x=>(x.s>0?"+":"−")+x.q2;
+  function renderTable(){
+    head.replaceChildren(h("tr",{},["Run","Left","Right","Distance",...auxCols.map(a=>a[0]),"Force (units)",flu||!scaf?"My guess (units)":null,"Force × first run"].filter(Boolean).map(t=>h("th",{},t))));
+    tb.replaceChildren(...rows.map((x,i)=>{const base=i===0;
+      const inp=h("input",{type:"text",inputmode:"decimal","aria-label":"Force ratio for run "+(i+1),value:base?"1":(x.typed==null?"":x.typed),oninput:e=>{x.typed=e.target.value;x.ok=null;td.className=""}});
+      if(base||x.ok===true)inp.disabled=true;
+      const td=h("td",{class:x.ok===true?"ok":x.ok===false?"no":""},inp);
+      return h("tr",{},h("td",{},String(i+1)),h("td",{},"+"+x.q1),h("td",{},sgnTxt(x)),h("td",{},String(x.r)),...auxCols.map(a=>h("td",{},g(a[1](x)))),h("td",{},g(x.F)),flu||!scaf?h("td",{},x.guess==null?"—":g(x.guess)+(near(x.guess,x.F)?" ✓":"")):null,td)}));
+    chk.style.display=rows.length>1?"":"none";
+  }
+  function msg(t){out.textContent=t}
+  function record(){
+    const F=C.force(q1,sgn*q2,r);
+    if(!rows.length&&!(q1===1&&q2===1&&r===1&&sgn>0)){msg("Record the starting setting first: distance 1, both charges +1.");return}
+    if(rows.some(x=>x.q1===q1&&x.q2===q2&&x.r===r&&x.s===sgn)){msg("You already recorded that setting. Change something first.");return}
+    const gv=guess.value.trim()===""?null:parseRatio(guess.value);
+    if(flu&&rows.length&&(gv==null||isNaN(gv))){msg("Type your guess for the force first. Then record.");return}
+    rows.push({q1,q2,r,s:sgn,F,guess:isNaN(gv)?null:gv,typed:null,ok:null});if(gv!=null&&!isNaN(gv))typed("sim-"+exp+"-guess","Guess for force at d="+r+", q="+q1+","+q2,gv);
+    guess.value="";msg("Recorded run "+rows.length+": "+g(F)+" units.");renderTable();tasks()
+  }
+  const has=(f)=>rows.some(f);
+  function tasks(){
+    if(exp==="dist"&&has(x=>x.r===1)&&has(x=>x.r===2)&&has(x=>x.r===3))tick(0);
+    if(exp==="charge"&&has(x=>x.q1===1)&&has(x=>x.q1===2)&&has(x=>x.q1===3))tick(0);
+    if(exp==="both"){if(has(x=>x.q1===1&&x.q2===1&&x.r===1))tick(0);if(has(x=>x.r===2&&x.q1===2&&x.q2===1&&x.s>0))tick(1);if(has(x=>x.r===2&&x.q1===2&&x.q2===2&&x.s>0))tick(2)}
+  }
+  function checkRatios(){
+    let bad=0,tips=[];const F0=rows[0].F;
+    rows.forEach((x,i)=>{if(i===0)return;if(x.typed==null||x.typed===""){bad++;x.ok=null;return}
+      const v=parseRatio(x.typed),tgt=x.F/F0;typed("sim-"+exp+"-ratio","Force × for run "+(i+1),x.typed);
+      if(near(v,tgt)){x.ok=true}else{x.ok=false;bad++;const df=x.r/rows[0].r;
+        if(exp!=="charge"&&df!==1&&near(v,df))tips.push("Run "+(i+1)+": that is how much the distance grew. The force went from "+g(F0)+" to "+g(x.F)+".");
+        else if(exp!=="charge"&&df!==1&&near(v,1/df))tips.push("Run "+(i+1)+": that is 1 ÷ distance. Divide the forces: "+g(x.F)+" ÷ "+g(F0)+".");
+        else if(exp==="charge"&&near(v,Math.pow(x.q1/rows[0].q1,2)))tips.push("Run "+(i+1)+": the force follows the charge, not the charge squared. Divide "+g(x.F)+" ÷ "+g(F0)+".");
+        else tips.push("Run "+(i+1)+": divide this force by the first force: "+g(x.F)+" ÷ "+g(F0)+".")}});
+    ST.retries+=bad?1:0;renderTable();
+    if(!bad&&rows.length>1){msg("✔ Every ratio matches. Compare them with your prediction.");ST.keep["checked_"+exp]=true;
+      const pk={dist:"predDist",charge:"predChg",both:"predBoth"}[exp],pv=ST.keep[pk],row=exp==="dist"?rows.find(x=>x.r===3):exp==="charge"?rows.find(x=>x.q1===3):rows.find(x=>x.r===2&&x.q1===2&&x.q2===1);
+      if(pv!=null&&row)out.innerHTML="✔ Every ratio matches. You predicted <b>"+g(pv)+"</b> units for "+(exp==="dist"?"distance 3":exp==="charge"?"left charge 3":"distance 2 and left charge 2")+". The sim says <b>"+g(row.F)+"</b>.";
+      if(exp==="both"){tick(3)}else tick(1)}
+    else if(tips.length)msg(tips[0]+(tips.length>1?" (and "+(tips.length-1)+" more to fix)":""));
+    else msg("Type a ratio for each run after the first. Then check.");
+  }
+  renderTable();
+  const hint=scaf?h("p",{class:"hint",html:"<b>How to fill the last column:</b> divide this run’s force by the first run’s force. Example: 9 ÷ 36 = 0.25, which is ¼."}):h("p",{class:"hint"},flu?"Type your guess for the force before every record after the first.":"Record each run, then type how many times as big (or small) the force is compared with run 1.");
+  const root=h("div",{},svg,
+    h("div",{class:"ctl"},h("label",{},h("span",{},"Distance: ",dv),sD),h("label",{},"Left charge",s1),h("label",{},"Right charge size",s2),h("label",{},"Right sign",sgnB),(flu||!scaf)?h("label",{},"My guess (units)",guess):null),
+    h("div",{class:"row"},rec,pb,rs,chk),out,h("div",{style:"overflow-x:auto;margin-top:6px"},h("table",{class:"wtbl"},head,tb)),hint);
+  sync();loop();return root;
+};
+
+/* The shell diagram: one electron, one nucleus. Shell n sits n² times as far out as shell 1; the pull is Z ÷ (n²)². */
+WIDGET.shell=(tick)=>{
+  const ions=[{k:"H",Z:1,t:"H (nucleus +1)"},{k:"He⁺",Z:2,t:"He⁺ (nucleus +2)"},{k:"Li²⁺",Z:3,t:"Li²⁺ (nucleus +3)"}],rows=ST.data.shell;rows.length=0;
+  let ion=0,n=1;const scaf=ST.route==="scaf";
+  const svg=sv("svg",{class:"scene",viewBox:"0 0 520 190",role:"img","aria-label":"A nucleus on the left with shell 1, shell 2 and shell 3 marked at distances 1, 4 and 9, and an electron with a pull arrow"});
+  const out=h("div",{class:"note","aria-live":"polite",style:"min-height:1.3em"}),guess=h("input",{type:"text",inputmode:"decimal",style:"width:100px","aria-label":"My guess for the pull"});
+  const XN=36,U=44,xs=m=>XN+U*m*m;
+  function draw(){
+    svg.replaceChildren();const Z=ions[ion].Z,xe=xs(n);
+    svg.append(sv("line",{x1:XN,y1:110,x2:XN+U*9+10,y2:110,stroke:"currentColor","stroke-opacity":.3}));
+    [1,2,3].forEach(m=>{svg.append(sv("line",{x1:xs(m),y1:70,x2:xs(m),y2:150,stroke:"currentColor","stroke-opacity":.35,"stroke-dasharray":"4 3"}),sv("text",{x:xs(m),y:166,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"currentColor"},"shell "+m),sv("text",{x:xs(m),y:182,"text-anchor":"middle","font-size":11,fill:"currentColor","fill-opacity":.75},m*m+" × as far"))});
+    svg.append(sv("circle",{cx:XN,cy:110,r:10+4*Z,fill:"var(--hot)",stroke:"rgba(0,0,0,.4)"}),sv("text",{x:XN,y:114,"text-anchor":"middle","font-size":13,"font-weight":700,fill:"#fff"},"+"+Z),sv("text",{x:XN,y:60,"text-anchor":"middle","font-size":12,fill:"currentColor"},"nucleus"));
+    const p=Z/Math.pow(n,4),L=10+Math.min(90,30*p*(p>1?1:1));
+    svg.append(sv("line",{x1:xe-9,y1:110,x2:Math.max(XN+14+4*Z,xe-9-L),y2:110,stroke:"#b8860b","stroke-width":4}),sv("polygon",{points:`${Math.max(XN+14+4*Z,xe-9-L)},110 ${Math.max(XN+14+4*Z,xe-9-L)+10},104 ${Math.max(XN+14+4*Z,xe-9-L)+10},116`,fill:"#b8860b"}));
+    svg.append(sv("circle",{cx:xe,cy:110,r:9,fill:"var(--cold)",stroke:"rgba(0,0,0,.4)"}),sv("text",{x:xe,y:114,"text-anchor":"middle","font-size":11,"font-weight":700,fill:"#fff"},"e⁻"),sv("text",{x:xe,y:92,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"currentColor"},"pull ?"));
+  }
+  const sI=h("span",{class:"seg"},ions.map((o,i)=>h("button",{type:"button",onclick:()=>{ion=i;sync()}},o.k))),sN=h("span",{class:"seg"},[1,2,3].map(m=>h("button",{type:"button",onclick:()=>{n=m;sync()}},"shell "+m)));
+  function sync(){[...sI.children].forEach((b,i)=>b.classList.toggle("on",i===ion));[...sN.children].forEach((b,i)=>b.classList.toggle("on",i+1===n));draw()}
+  const tb=h("tbody"),tbl=h("table",{class:"wtbl"},h("thead",{},h("tr",{},["Ion","Shell","Distance (shell 1 = 1)","My guess","Pull (H shell 1 = 1)"].map(t=>h("th",{},t)))),tb);
+  let tries={};
+  function check(){
+    const Z=ions[ion].Z,key=ion+"-"+n,act=Z/Math.pow(n,4),aF=C.pull(Z,n),aTxt=C.fmt(aF),v=parseRatio(guess.value);
+    if(isNaN(v)){out.textContent="Type a number or a fraction, like 1/4 or 0.25.";return}
+    if(rows.some(x=>x.key===key)){out.textContent="You already tested that one. Pick another.";return}
+    typed("shell-guess","Pull guess for "+ions[ion].k+" shell "+n,guess.value);
+    tries[key]=(tries[key]||0)+1;
+    if(near(v,act)||tries[key]>=2){const ok=near(v,act);rows.push({key,ion:ions[ion].k,n,Z,guess:guess.value.trim(),act:aTxt,ok});
+      out.innerHTML=ok?"✔ Pull = <b>"+aTxt+"</b>. Distance × "+n*n+" divides the force by "+Math.pow(n,4)+(Z>1?", and charge × "+Z+" multiplies it by "+Z:"")+".":"Not quite. The pull is <b>"+aTxt+"</b>: distance × "+n*n+" divides by "+n*n+" × "+n*n+" = "+Math.pow(n,4)+(Z>1?", charge × "+Z+" multiplies by "+Z:"")+".";
+      if(!ok)ST.retries++;
+      ST.q++;if(ok&&tries[key]===1)ST.qFirst++;ST.log.push({skill:"chem.coulomb.shell",title:"The shell model",band:null,first:ok&&tries[key]===1});
+      guess.value="";renderRows();tasksDone()}
+    else{ST.retries++;const nn=n*n;let m="Not quite. ";
+      if(n>1&&near(v,1/n))m+="Shell "+n+" is "+nn+" times as far, not "+n+" times. ";
+      else if(n>1&&near(v,1/(n*n)))m+="That divides by the distance ("+nn+"). The force divides by the distance squared. ";
+      else if(Z>1&&n===1&&near(v,1/Z))m+="A bigger nuclear charge pulls harder, not weaker. ";
+      m+=scaf?"Steps: shell "+n+" is "+nn+" times as far, so divide by "+nn+" × "+nn+"; then multiply by the nuclear charge "+Z+".":"Try once more.";out.textContent=m}
+  }
+  function renderRows(){tb.replaceChildren(h("tr",{},h("td",{},"H"),h("td",{},"1"),h("td",{},"1"),h("td",{},"—"),h("td",{},"1 (the reference)")),...rows.map(x=>h("tr",{},h("td",{},x.ion),h("td",{},String(x.n)),h("td",{},String(x.n*x.n)),h("td",{},x.guess+(x.ok?" ✓":"")),h("td",{},x.act))))}
+  function tasksDone(){const has=(i,m)=>rows.some(x=>x.ion===ions[i].k&&x.n===m);if(has(0,2)&&has(0,3))tick(0);if(has(1,1))tick(1);if(has(2,1))tick(2);ST.keep.shellDone=rows.length}
+  renderRows();sync();
+  return h("div",{},svg,h("div",{class:"ctl"},h("label",{},"Ion",sI),h("label",{},"Shell",sN),h("label",{},"Guess the pull (H shell 1 = 1)",guess),h("button",{class:"btn",type:"button",onclick:check},"Check my guess")),out,h("div",{style:"overflow-x:auto"},tbl),
+    scaf?h("p",{class:"hint",html:"<b>Steps:</b> (1) distance factor = shell number squared. (2) divide by that number squared. (3) multiply by the nuclear charge."}):null);
+};
+
+/* Look-ahead for slot 15: inner electrons cancel part of the nucleus. */
+WIDGET.zeff=(tick)=>{
+  let k=0;const svg=sv("svg",{class:"scene",viewBox:"0 0 520 150",role:"img","aria-label":"A lithium atom: nucleus +3, 0 to 2 inner electrons, and an outer electron"}),read=h("div",{class:"readout"});
+  const sl=h("input",{type:"range",min:0,max:2,step:1,value:0,"aria-label":"Inner electrons between",oninput:e=>{k=+e.target.value;draw()}});
+  function draw(){svg.replaceChildren();
+    svg.append(sv("circle",{cx:90,cy:75,r:24,fill:"var(--hot)",stroke:"rgba(0,0,0,.4)"}),sv("text",{x:90,y:80,"text-anchor":"middle","font-size":15,"font-weight":700,fill:"#fff"},"+3"));
+    for(let i=0;i<k;i++)svg.append(sv("circle",{cx:150+i*0,cy:55+i*40,r:9,fill:"var(--cold)"}),sv("text",{x:150,y:59+i*40,"text-anchor":"middle","font-size":10,"font-weight":700,fill:"#fff"},"e⁻"));
+    svg.append(sv("circle",{cx:400,cy:75,r:11,fill:"var(--cold)"}),sv("text",{x:400,y:79,"text-anchor":"middle","font-size":11,"font-weight":700,fill:"#fff"},"e⁻"),sv("text",{x:400,y:48,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"currentColor"},"outer electron"));
+    svg.append(sv("line",{x1:389,y1:75,x2:260,y2:75,stroke:"#b8860b","stroke-width":2+(3-k)*1.5}));
+    read.replaceChildren(h("div",{class:"stat"},h("b",{},"+"+(3-k)),h("span",{},"charge the outer electron roughly feels (3 − "+k+")")));if(k===2)tick(0)}
+  draw();return h("div",{},h("p",{class:"hint",html:"<b>Look ahead.</b> Electrons between the nucleus and the outer electron cancel part of the pull. Slide to add inner electrons."}),svg,h("label",{class:"sl",style:"max-width:320px"},"Inner electrons between: ",sl),read);
+};
+
+/* ---------- blocks ---------- */
+const BLOCK={};
+const feedback=()=>h("div",{class:"fb"});
+function show(fb,ok,html){fb.className="fb show "+(ok?"ok":"no");fb.innerHTML=html}
+const CUR={skill:"chem.coulomb.words",title:"Coulomb’s law",band:null};
+const logq=first=>ST.log.push({skill:CUR.skill,title:CUR.title,band:CUR.band,first:!!first});
+const qCard=(...k)=>h("div",{class:"card"},h("div",{class:"q"},...k));
+BLOCK.info=b=>h("div",{class:"card"},h("div",{class:"note",html:b.html}));
+
+BLOCK.mcq=(b,done)=>{
+  const name="q"+(++uid);let failed=false,counted=false;const fb=feedback();
+  const opts=b.predict?b.opts:shuffle(b.opts),sk=b.skill||CUR.skill;
+  const box=h("div",{class:"opts"},opts.map(o=>h("label",{},h("input",{type:"radio",name}),h("span",{html:o.t}))));
+  const btn=h("button",{class:"btn",onclick:()=>{
+    const i=[...box.querySelectorAll("input")].findIndex(x=>x.checked);if(i<0)return;const o=opts[i];
+    if(b.predict){ST.preds.push({q:b.q,choice:o.t});box.querySelectorAll("input").forEach(x=>x.disabled=true);btn.disabled=true;show(fb,true,"🔒 Locked in. "+(b.note||"Now test it."));done();return}
+    if(!counted){counted=true;ST.q++}
+    if(o.ok){if(!failed)ST.qFirst++;ST.log.push({skill:sk,title:CUR.title,band:CUR.band,first:!failed});box.querySelectorAll("input").forEach(x=>x.disabled=true);btn.disabled=true;show(fb,true,"✔ "+b.why);done()}
+    else{failed=true;ST.retries++;show(fb,false,"Not quite. "+(b.hint||"Look again."))}
+  }},b.predict?"Lock in my guess":"Check");
+  return qCard(h("p",{html:b.q}),box,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+
+BLOCK.num=(b,done)=>{
+  let failed=false,counted=false;const fb=feedback();
+  const inp=h("input",{type:"text",inputmode:"decimal","aria-label":"Your answer",style:"width:140px"});
+  const sk=b.skill||CUR.skill,ttl=b.title||CUR.title,bd=b.band==null?CUR.band:b.band;
+  const btn=h("button",{class:"btn",onclick:()=>{
+    const v=parseRatio(inp.value);if(isNaN(v))return;
+    if(!counted){counted=true;ST.q++}
+    typed("num-"+sk,b.q,inp.value);
+    const tol=Math.max(b.tol||0,Math.abs(b.ans)*0.005);
+    if(Math.abs(v-b.ans)<=tol){if(!failed)ST.qFirst++;ST.log.push({skill:sk,title:ttl,band:bd,first:!failed});if(b.save)ST.keep[b.save]=v;inp.disabled=true;btn.disabled=true;show(fb,true,"✔ "+b.why);done(!failed)}
+    else{failed=true;ST.retries++;const tr=(b.traps||[]).find(t=>Math.abs(v-t.v)<=Math.max(.011,Math.abs(t.v)*.005));show(fb,false,"Not quite. "+(tr?tr.msg:(b.hint||"Check your work.")))}
+  }},"Check");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  return qCard(h("p",{html:b.q}),h("div",{class:"row"},inp,h("span",{},b.unit||""),btn),fb);
+};
+
+/* A numeric prediction: typed, locked, and logged before the run. Not graded. */
+BLOCK.numpred=(b,done)=>{
+  const fb=feedback(),inp=h("input",{type:"text",inputmode:"decimal","aria-label":"My prediction",style:"width:140px"});
+  const btn=h("button",{class:"btn",onclick:()=>{const v=parseRatio(inp.value);if(isNaN(v))return;ST.keep[b.save]=v;ST.preds.push({q:b.q,choice:g(v)+" "+(b.unit||"")});typed("pred-"+b.save,b.q,inp.value);inp.disabled=true;btn.disabled=true;show(fb,true,"🔒 Locked in. Now run it.");done()}},"Lock in my guess");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  return qCard(h("p",{html:b.q}),h("div",{class:"row"},inp,h("span",{},b.unit||""),btn),fb);
+};
+
+BLOCK.cloze=(b,done)=>{
+  const fb=feedback(),bank=shuffle(b.bank),sels=b.items.map(it=>h("select",{"aria-label":"Missing words"},h("option",{value:""},"choose…"),bank.map(w=>h("option",{value:w},w))));
+  const lines=b.items.map((it,i)=>{const[pre,post]=it.t.split("___");return h("p",{style:"margin:8px 0"},pre,sels[i],post)});
+  let counted=false,failed=false;
+  const btn=h("button",{class:"btn",onclick:()=>{
+    if(sels.some(s=>!s.value))return;if(!counted){counted=true;ST.q++}let bad=0;
+    sels.forEach((s,i)=>{const ok=s.value===b.items[i].a;s.style.outline="2px solid var(--"+(ok?"ok":"bad")+")";if(!ok)bad++});
+    if(bad){failed=true;ST.retries++;show(fb,false,bad+" not right yet. "+b.hint)}
+    else{sels.forEach((s,i)=>{s.disabled=true;ST.keep[(b.save||"cl")+i]=s.value;typed("cloze-"+(b.save||"cl")+i,b.items[i].t.replace("___","…"),s.value)});btn.disabled=true;if(!failed)ST.qFirst++;ST.log.push({skill:CUR.skill,title:CUR.title,band:null,first:!failed});show(fb,true,b.okMsg||"✔ Correct.");if(b.flag)ST.tk[b.flag]=true;done()}
+  }},"Check");
+  return qCard(h("p",{html:b.q}),...lines,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+
+BLOCK.rows=(b,done)=>{
+  let counted=false,anyFail=false;const fb=feedback();
+  const sels=b.rows.map(r=>h("select",{"aria-label":strip(r.q)},h("option",{value:""},"Choose…"),b.choices.map((c,i)=>h("option",{value:i},c))));
+  const per=b.rows.map(()=>({first:true}));
+  const lines=b.rows.map((r,i)=>h("div",{class:"row",style:"margin:8px 0;justify-content:space-between"},h("span",{style:"flex:1 1 300px",html:r.q}),sels[i]));
+  const btn=h("button",{class:"btn",onclick:()=>{
+    if(sels.some(s=>s.value===""))return;if(!counted){counted=true;ST.q+=b.rows.length}let bad=0;
+    b.rows.forEach((r,i)=>{const ok=+sels[i].value===r.ans;if(ok){if(per[i].first&&!anyFail)ST.qFirst++;sels[i].disabled=true;sels[i].style.outline="2px solid var(--ok)"}else{bad++;per[i].first=false;sels[i].style.outline="2px solid var(--bad)"}});
+    if(bad){anyFail=true;ST.retries++;show(fb,false,bad+" not right yet. "+b.hint)}
+    else{btn.disabled=true;per.forEach(x=>ST.log.push({skill:"chem.coulomb.rules",title:"The two proportions",band:null,first:x.first&&!anyFail}));show(fb,true,"✔ All correct.<br>"+b.rows.map(r=>"• "+r.why).join("<br>"));done()}
+  }},"Check");
+  return qCard(h("p",{html:b.q}),...lines,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+
+BLOCK.open=(b,done)=>{
+  const key=b.save||"open",ta=h("textarea",{"aria-label":"Your response",placeholder:b.frame}),cnt=h("span",{class:"hint"},"0 / "+b.min+" characters"),fb=feedback();
+  const btn=h("button",{class:"btn",disabled:"",onclick:()=>{ST.keep[key]=ta.value.trim();typed("open-"+key,b.q,ta.value);ta.disabled=true;btn.disabled=true;show(fb,true,"✔ Saved to your notes.");done()}},"Save my answer");
+  ta.addEventListener("input",()=>{cnt.textContent=ta.value.trim().length+" / "+b.min+" characters";btn.disabled=ta.value.trim().length<b.min});
+  if(b.value){ta.value=b.value;ta.dispatchEvent(new Event("input"))}
+  return qCard(h("p",{html:b.q}),ta,h("div",{class:"row",style:"margin-top:8px"},btn,cnt),fb);
+};
+
+BLOCK.widget=(b,done)=>{
+  const marks=b.tasks.map(()=>false),els=b.tasks.map(t=>h("div",{class:"task"},h("span",{class:"bx"}),h("span",{},t)));
+  ST.tasks+=b.tasks.length;
+  const tick=i=>{if(marks[i])return;marks[i]=true;ST.tasksDone++;els[i].classList.add("ok");els[i].querySelector(".bx").textContent="✓";if(marks.every(Boolean))done()};
+  return h("div",{class:"card"},h("div",{style:"margin-bottom:8px"},h("b",{},"Sim tasks"),els),WIDGET[b.id](tick,b.cfg));
+};
+
+BLOCK.figure=b=>{
+  const wrap=h("div",{class:"figs"});
+  b.items.forEach(it=>{
+    const img=new Image(),cv=h("canvas",{role:"img","aria-label":it.alt||it.cap,title:"Click to replay"}),ctx=cv.getContext("2d");let run=0;
+    const cap=h("figcaption",{},it.cap,h("div",{class:"cr"},it.credit||"")),fig=h("figure",{class:"pix"},cv,cap);
+    function frame(step){const W=cv.width,H=cv.height,sw=Math.max(1,Math.round(W/step)),sh=Math.max(1,Math.round(H/step));const t=document.createElement("canvas");t.width=sw;t.height=sh;const tc=t.getContext("2d");tc.imageSmoothingEnabled=true;tc.drawImage(img,0,0,sw,sh);ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,W,H);ctx.drawImage(t,0,0,sw,sh,0,0,W,H)}
+    function play(){const id=++run;if(reduce){frame(1);return}[32,16,8,4,2,1].forEach((st,i)=>setTimeout(()=>{if(id===run)frame(st)},i*170))}
+    img.onload=()=>{cv.width=img.width;cv.height=img.height;frame(1);if("IntersectionObserver" in window){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();play()}},{threshold:.4});frame(32);io.observe(cv)}else play()};
+    /* If the photo is not in img/ yet, say so with a labeled placeholder. */
+    img.onerror=()=>{cv.replaceWith(h("div",{class:"ph",role:"img","aria-label":"Photo placeholder: "+(it.alt||it.cap)},"Photo placeholder: "+(it.alt||it.cap)+" (the photo file has not been added yet)"))};
+    img.src=it.src;cv.addEventListener("click",play);wrap.append(fig);
+  });
+  return h("div",{class:"card"},wrap);
+};
+
+/* Foundations: the parts of the sim, labeled before anything moves. */
+BLOCK.labels=(b,done)=>{
+  const svg=sv("svg",{class:"scene",viewBox:"0 0 520 190",role:"img","aria-label":"Labeled picture of the sim: left charge, right charge, distance, force arrows and force meter"});
+  const call=(n,x,y)=>[sv("circle",{cx:x,cy:y,r:10,fill:"var(--accent)"}),sv("text",{x,y:y+4,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"#fff"},String(n))];
+  svg.append(sv("line",{x1:80,y1:90,x2:80+70*3,y2:90,stroke:"currentColor","stroke-opacity":.25}));
+  svg.append(sv("circle",{cx:80,cy:90,r:17,fill:"var(--hot)"}),sv("text",{x:80,y:96,"text-anchor":"middle","font-size":15,"font-weight":700,fill:"#fff"},"+"),sv("circle",{cx:290,cy:90,r:17,fill:"var(--hot)"}),sv("text",{x:290,y:96,"text-anchor":"middle","font-size":15,"font-weight":700,fill:"#fff"},"+"));
+  svg.append(sv("line",{x1:100,y1:90,x2:134,y2:90,stroke:"#b8860b","stroke-width":4}),sv("polygon",{points:"100,90 110,84 110,96",fill:"#b8860b"}),sv("line",{x1:270,y1:90,x2:236,y2:90,stroke:"#b8860b","stroke-width":4}),sv("polygon",{points:"270,90 260,84 260,96",fill:"#b8860b"}));
+  svg.append(sv("line",{x1:80,y1:132,x2:290,y2:132,stroke:"var(--accent)","stroke-width":2}),sv("line",{x1:80,y1:126,x2:80,y2:138,stroke:"var(--accent)","stroke-width":2}),sv("line",{x1:290,y1:126,x2:290,y2:138,stroke:"var(--accent)","stroke-width":2}),sv("text",{x:185,y:150,"text-anchor":"middle","font-size":12,fill:"var(--accent)"},"distance = 3"));
+  svg.append(sv("rect",{x:80,y:168,width:300,height:12,fill:"none",stroke:"currentColor","stroke-opacity":.4}),sv("rect",{x:80,y:168,width:110,height:12,fill:"var(--accent)"}));
+  svg.append(...call(1,80,52),...call(2,290,52),...call(3,185,112),...call(4,122,66),...call(5,400,174));
+  const leg=h("ol",{class:"legend"},["Left charge (+). Pick its size.","Right charge. Pick its size and sign.","Distance. Slide it from 1 to 6.","Force arrows. Longer means stronger.","Force meter. The number is in force units."].map(t=>h("li",{},t)));
+  const box=h("div",{class:"card"},h("div",{class:"note"},h("b",{},"Read the sim before you move anything."),svg,leg,h("p",{class:"hint"},"Facts: distance 1 with two +1 charges makes 36 units. Everything else is a proportion of that.")));
+  setTimeout(done,0);return box;
+};
+
+/* Gate: one class-split question, then a stop for the huddle code. The choice travels in the live-view prompt. */
+BLOCK.gate2=(b,done)=>{
+  const fb=feedback(),name="g"+(++uid),box=h("div",{class:"opts"},GATE_Q.opts.map(o=>h("label",{},h("input",{type:"radio",name}),h("span",{html:"<b>"+o.L+".</b> "+o.t}))));
+  const stop=h("div"),btn=h("button",{class:"btn",onclick:()=>{const i=[...box.querySelectorAll("input")].findIndex(x=>x.checked);if(i<0)return;const o=GATE_Q.opts[i];
+    ST.gate={L:o.L,t:o.t,tag:o.tag};box.querySelectorAll("input").forEach(x=>x.disabled=true);btn.disabled=true;
+    ST.log.push({skill:"chem.coulomb.distance",title:"Class split",band:null,first:o.tag==="ok"});ST.q++;if(o.tag==="ok")ST.qFirst++;
+    show(fb,true,"🔒 Locked in: "+o.L+". Hold here. Mr. D shows the class split.");
+    if(KEY||!MrD.bell.gatesOn()){stop.append(h("div",{class:"card gatebox"},h("p",{style:"margin:0"},KEY?"✋ Class huddle here. The code is skipped in the teacher view.":"✋ In class there is a huddle here. Outside school hours, keep going.")));setTimeout(done,0);return}
+    const f2=feedback(),inp=h("input",{type:"text",inputmode:"numeric",maxlength:4,autocomplete:"off","aria-label":"Code from Mr. D",style:"width:120px;font-size:1.3rem;text-align:center"});
+    const ub=h("button",{class:"btn",onclick:()=>{if(inp.value.trim()===MrD.codes.gate(LESSON_ID,"h1")){inp.disabled=true;ub.disabled=true;show(f2,true,"✔ Unlocked.");done()}else show(f2,false,"Not the code. Eyes up and wait for Mr. D.")}},"Unlock");
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter")ub.click()});
+    stop.append(h("div",{class:"card gatebox"},h("h2",{},"✋ Eyes up. Mr. D has the code."),h("p",{style:"margin:0 auto 10px;max-width:46ch"},"Stop here. Class talk comes first."),h("div",{class:"row",style:"justify-content:center"},inp,ub),f2));
+  }},"Lock in my answer");
+  return h("div",{},qCard(h("p",{html:"<b>Check-in.</b> "+GATE_Q.q}),box,h("div",{class:"row",style:"margin-top:8px"},btn),fb),stop);
+};
+
+/* After the sims: the first guesses from the check, next to what the sim showed. Never labeled as a type. */
+BLOCK.compare=(b,done)=>{
+  const A=ST.check.ans,rows=[["Distance doubles (1 → 2)","c1","¼ as big"],["Distance triples (1 → 3)","c2","1⁄9 as big"],["One charge doubles","c4","2 times as big"],["Both charges double","c6","4 times as big"]];
+  setTimeout(done,0);
+  return h("div",{class:"card"},h("div",{class:"note"},h("b",{},"Back to your first guesses."),h("div",{style:"overflow-x:auto"},h("table",{class:"wtbl"},h("thead",{},h("tr",{},["Change","My first guess","What the sim showed"].map(t=>h("th",{},t)))),h("tbody",{},rows.map(r=>h("tr",{},h("td",{},r[0]),h("td",{},A[r[1]]==null?"(skipped)":A[r[1]]+(A[r[1]]===r[2]?" ✓":"")),h("td",{},r[2]))))))));
+};
+
+/* The closing ladder: four numeric slots at a hidden band, then a bonus pair for students moving fast. Time pressure trims it. */
+function ladderSlots(){const c=clk(),m=(c.mode==="class"&&!KEY)?(c.minutesIn||0):0;if(m>=40)return[];if(m>=36)return[1,3];return[1,2,3,4]}
+BLOCK.ladder=(b,done)=>{
+  const host=h("div"),slots=ladderSlots(),seq=slots.map(s=>({slot:s}));
+  if(ST.route==="fluent"&&slots.length>2){seq.push({ext:1},{ext:2})}
+  let i=0;
+  if(ST.closeN===0)ST.lad=Ladder.init({scaf:1,std:2,fluent:3}[ST.route]||2);
+  function next(){
+    if(i>=seq.length){host.append(h("p",{class:"hint"},"Questions done. One argument to write next."));setTimeout(done,0);return}
+    const s=seq[i++],spec=s.ext?C.extension(s.ext):C.closing(s.slot,ST.lad.band);CUR.skill=spec.skill;CUR.title=spec.title;CUR.band=spec.band;window.__spec=spec;
+    const holder=h("div");host.append(holder);
+    holder.append(BLOCK.num(Object.assign({},spec),first=>{ST.closeN++;if(!s.ext)Ladder.record(ST.lad,first);holder.append(h("div",{class:"row",style:"justify-content:center;margin:8px 0"},h("button",{class:"btn",onclick:()=>{next()}},"Next →")))}));
+    if(KEY)keyMark(holder,Object.assign({type:"num"},spec));
+  }
+  next();return host;
+};
+
+/* CER: claim, evidence, reasoning. The frame thins out as the ladder climbs. */
+BLOCK.cer=(b,done)=>{
+  const band=ST.lad.band,fr=band<=2;
+  const fields=[["Claim",fr?"The electron in shell ___ is held harder, about ___ times as hard.":"Which electron, and how many times harder?"],["Evidence",fr?"Shell 3 is ___ times as far out as shell 1, so the force is divided by ___.":"Use a number from your tables or sims."],["Reasoning",fr?"Coulomb’s law says the force goes as 1 ÷ ____, so the closer electron ____.":"Say why the distance matters this way."]];
+  const tas=fields.map(f=>h("textarea",{"aria-label":f[0],placeholder:f[1],style:"min-height:56px"})),fb=feedback();
+  const btn=h("button",{class:"btn",disabled:"",onclick:()=>{ST.keep.cer=tas.map(t=>t.value.trim());tas.forEach((t,i)=>{typed("cer-"+fields[i][0].toLowerCase(),"CER "+fields[i][0],t.value);t.disabled=true});btn.disabled=true;show(fb,true,"✔ Saved to your notes.");ST.log.push({skill:"chem.coulomb.cer",title:"Claim, evidence, reasoning",band:band,first:true});done()}},"Save my argument");
+  tas.forEach(t=>t.addEventListener("input",()=>{btn.disabled=tas.some(x=>x.value.trim().length<12)}));
+  return qCard(h("p",{html:"<b>Argue it.</b> A He⁺ ion has one electron in shell 1. Another He⁺ ion has its electron in shell 3. Which electron is held harder, and by how many times?"}),...fields.map((f,i)=>h("div",{style:"margin:8px 0"},h("b",{},f[0]),tas[i])),h("p",{class:"hint"},"Scale: Claim 1 point (which electron and how many times). Evidence 1 point (a distance or force number). Reasoning 1 point (1 ÷ distance², with a reason)."),h("div",{class:"row"},btn),fb);
+};
+
+/* The atom journal: one prompt, four short answers. */
+BLOCK.journal=(b,done)=>{
+  const c1=ST.check.ans.c1,pre=c1==null?"":("Doubling the distance makes the force "+c1.replace(/ as big$/,"")+".");
+  const bef=h("input",{type:"text",value:pre,"aria-label":"What I believed before",style:"width:100%"}),now=h("input",{type:"text","aria-label":"What I believe now",placeholder:"Doubling the distance makes the force ____.",style:"width:100%"}),test=h("input",{type:"text","aria-label":"One thing I would test",placeholder:"I would test ____.",style:"width:100%"});
+  let conf=0;const cs=h("span",{class:"seg"},[1,2,3,4].map(n=>h("button",{type:"button",onclick:()=>{conf=n;[...cs.children].forEach((x,i)=>x.classList.toggle("on",i+1===n));chk()}},String(n))));
+  const fb=feedback(),btn=h("button",{class:"btn",disabled:"",onclick:()=>{ST.keep.journal={before:bef.value.trim(),now:now.value.trim(),conf,test:test.value.trim()};["before","now","test"].forEach((k,i)=>typed("journal-"+k,"Atom journal: "+k,[bef,now,test][i].value));typed("journal-conf","Atom journal: confidence (1 to 4)",String(conf));[bef,now,test].forEach(x=>x.disabled=true);[...cs.children].forEach(x=>x.disabled=true);btn.disabled=true;show(fb,true,"✔ Saved to your notes.");done()}},"Save my journal");
+  function chk(){btn.disabled=!(bef.value.trim().length>5&&now.value.trim().length>5&&conf&&test.value.trim().length>5)}
+  [bef,now,test].forEach(x=>x.addEventListener("input",chk));chk();
+  return qCard(h("p",{html:"<b>Atom journal.</b> One minute."}),h("p",{},"What I believed before:"),bef,h("p",{},"What I believe now:"),now,h("p",{},"How sure am I? (1 = guessing, 4 = could teach it)"),cs,h("p",{},"One thing I would test:"),test,h("div",{class:"row",style:"margin-top:8px"},btn),fb);
+};
+
+/* ---------- the check (Push and Pull) ---------- */
+function showCheck(){
+  ST.screen="check";ST.between=false;if(!ST.check.t0)ST.check.t0=Date.now();chips();app.replaceChildren();window.scrollTo(0,0);updateEndBar();
+  if(LOCK_ON)LessonLock.save(0,false,lockSnap());
+  app.append(h("h2",{},"Push and Pull check"),h("p",{class:"sub"},"Not graded. Your first guesses help Mr. D plan today. A wrong guess is useful."));
+  const host=h("div");app.append(host);let i=ST.check.i;
+  const late=h("div",{class:"endbar",hidden:""});app.append(late);
+  const tm=setInterval(()=>{if(!host.isConnected){clearInterval(tm);return}if(!KEY&&Date.now()-ST.check.t0>10*60000&&late.hidden){late.hidden=false;late.append(h("span",{html:"<b>Time to move on.</b> Your answers so far are saved."}),h("button",{class:"btn",onclick:()=>finish(true)},"Go to the lesson"))}},1000);
+  function finish(skipped){clearInterval(tm);ST.check.skipped=!!skipped;ST.check.res=C.route(ST.check.ans);ST.route=ST.check.res.route;
+    ST.preds.unshift({q:"Check: distance 1 → 2",choice:ST.check.ans.c1||"(skipped)"});
+    app.replaceChildren(h("h2",{},"Check saved"),h("div",{class:"card"},h("p",{},"Nothing here is graded. You will see how your guesses compare with the sim in the lesson."),h("div",{class:"row",style:"justify-content:center;margin-top:10px"},h("button",{class:"btn big",onclick:()=>showPart(0)},"Start the lesson →"))));
+    if(LOCK_ON)LessonLock.save(0,false,lockSnap());chips()}
+  function item(){
+    host.replaceChildren();if(i>=CK.length){finish(false);return}
+    const it=CK[i];ST.check.i=i;
+    const prog=h("p",{class:"hint"},"Question "+(i+1)+" of "+CK.length);let card;
+    if(it.kind==="mcq"){const name="ck"+i,opts=shuffle(it.opts),box=h("div",{class:"opts"},opts.map(o=>h("label",{},h("input",{type:"radio",name}),h("span",{html:o.t}))));
+      const btn=h("button",{class:"btn",onclick:()=>{const k=[...box.querySelectorAll("input")].findIndex(x=>x.checked);if(k<0)return;ST.check.ans[it.id]=opts[k].t;typed("check-"+it.id,it.q,opts[k].t);i++;item()}},i<CK.length-1?"Next":"Finish");
+      card=qCard(h("p",{html:it.q}),box,h("div",{class:"row",style:"margin-top:8px"},btn));
+      if(KEY)opts.forEach((o,k)=>{if(o.tag==="ok")box.children[k].style.outline="2px solid var(--ok)";box.children[k].append(h("small",{style:"margin-left:8px;color:var(--muted)"},"["+o.tag+"]"))});
+    }else{
+      const ins=it.cols.map(c=>h("input",{type:"text",inputmode:"decimal","aria-label":c.lab,style:"width:90px"}));
+      const btn=h("button",{class:"btn",onclick:()=>{const v=ins.map(x=>parseRatio(x.value));if(v.some(isNaN))return;ST.check.ans[it.id]=v;typed("check-"+it.id,it.q,v.join(", "));i++;item()}},i<CK.length-1?"Next":"Finish");
+      card=qCard(h("p",{html:it.q}),h("table",{class:"wtbl"},h("thead",{},h("tr",{},h("th",{},"Start"),...it.cols.map(c=>h("th",{},c.lab)))),h("tbody",{},h("tr",{},h("td",{},String(it.base)),...ins.map(x=>h("td",{},x))))),h("div",{class:"row",style:"margin-top:8px"},btn));
+      if(KEY)card.append(h("div",{class:"keyline",html:"<b>KEY ✔</b> "+it.cols.map(c=>c.lab+": "+c.ans).join(" · ")}));
+    }
+    host.append(prog,card);
+  }
+  item();
+}
+
+/* ---------- part runner ---------- */
+const NP=DATA.parts.length;
+const stepName=i=>i<0?"Check":i<NP?`Part ${i+1}: ${DATA.parts[i].title}`:i===NP?"Keep practicing":"Takeaways";
+function mk(b,done){const c=BLOCK[b.type](b,done);if(KEY)keyMark(c,b);return c}
+function chips(){
+  const el=[h("span",{class:"chip"+(ST.screen==="check"?" on":ST.check.res?" done":""),onclick:KEY?()=>showCheck():null,style:KEY?"cursor:pointer":""},(ST.check.res&&ST.screen!=="check"?"✓ ":"")+"Check"),
+    ...DATA.parts.map((p,i)=>h("span",{class:"chip"+(ST.partsDone[i]?" done":ST.screen==="part"&&i===ST.partIdx?" on":""),onclick:KEY?()=>showPart(i):null,style:KEY?"cursor:pointer":""},(ST.partsDone[i]?"✓ ":"")+(i+1))),
+    h("span",{class:"chip"+(ST.screen==="practice"?" on":""),onclick:KEY?()=>showPractice():null,style:KEY?"cursor:pointer":""},"Practice"),
+    h("span",{class:"chip"+(ST.screen==="takeaways"?" on":ST.finished?" done":""),onclick:KEY?()=>showTakeaways():null,style:KEY?"cursor:pointer":""},"Notes")];
+  if(LOCK_ON&&inProgress)el.push(h("span",{class:"chip",style:"margin-left:auto"},"🔒 exits "+LessonLock.stats().total));
+  chipsEl.replaceChildren(...el);
+}
+function enterScreen(screen,idx){ST.screen=screen;ST.max=Math.max(ST.max,idx);ST.between=screen!=="part";if(LOCK_ON&&screen!=="final")LessonLock.save(screen==="part"?idx:NP,screen!=="part",lockSnap());chips();app.replaceChildren();window.scrollTo(0,0);updateEndBar()}
+function showPart(i){
+  ST.partIdx=i;enterScreen("part",i+1);
+  const P=DATA.parts[i];CUR.skill=["chem.coulomb.words","chem.coulomb.words","chem.coulomb.distance","chem.coulomb.charge","chem.coulomb.combined","chem.coulomb.shell","chem.coulomb.shell"][i];CUR.title=P.title;CUR.band=null;
+  app.append(h("h2",{},`Part ${i+1} of ${NP}: ${P.title}`),h("p",{class:"sub"},P.sub));
+  const last=i===NP-1,blocks=P.blocks.filter(b=>!b.only||b.only===ST.route||KEY);
+  const advance=()=>{ST.partsDone[i]=true;if(last)afterParts();else showPart(i+1)};
+  const nextBtn=h("button",{class:"btn big",disabled:"",onclick:advance},last?"Keep going →":"Next part →"),nextWrap=h("div",{class:"row",style:"justify-content:center;margin:20px 0"},nextBtn);
+  const needed=blocks.filter(b=>DONE_TYPES.includes(b.type)&&!(b.only&&b.only!==ST.route&&KEY)).length;let got=0,idx=0;const cards=[];
+  const unlock=()=>{if(got>=needed||KEY){nextBtn.disabled=false;nextBtn.removeAttribute("disabled")}};
+  const reveal=()=>{
+    while(idx<blocks.length){
+      const b=blocks[idx++];let fin=false;
+      const card=mk(b,()=>{if(fin)return;fin=true;got++;unlock();reveal()});
+      card._b=b;cards.push(card);app.append(card);
+      if(b.only&&b.only!==ST.route&&KEY)card.prepend(h("div",{class:"keyline",html:"<b>KEY</b> Shown only on the "+b.only+" route."}));
+      if(DONE_TYPES.includes(b.type)&&!fin&&!KEY)break;
+    }
+    app.append(nextWrap);unlock();
+  };
+  reveal();window.__cards=cards;
+}
+function afterParts(){if(clk().canEnd&&!KEY)showTakeaways();else showPractice()}
+
+/* Endless practice at the hidden band, from CoulombPractice.spec. */
+function showPractice(){
+  enterScreen("practice",NP+1);
+  app.append(h("h2",{},"Keep practicing"),h("p",{class:"sub"},"Fresh problems at your level. Keep going until Mr. D calls time."));
+  const box=h("div");app.append(box);
+  if(KEY)app.append(h("div",{class:"row",style:"justify-content:center;margin:16px 0"},h("button",{class:"ghost",onclick:()=>showTakeaways()},"Teacher: go to the notes")));
+  const next=()=>{
+    box.replaceChildren();const spec=C.spec(ST.pr.i,ST.lad.band,ST.name+"|"+ST.period);
+    CUR.skill=spec.skill;CUR.title=spec.title;CUR.band=spec.band;window.__spec=spec;
+    box.append(h("p",{class:"hint"},`Problem ${ST.pr.i+1}`));
+    const card=mk(Object.assign({},spec),first=>{ST.pr.i++;if(first)ST.pr.clean++;Ladder.record(ST.lad,first);box.append(h("div",{class:"row",style:"justify-content:center;margin:12px 0"},h("button",{class:"btn big",onclick:next},"Next problem →")))});
+    box.append(card);
+  };
+  next();
+}
+
+/* ---------- the end mark ---------- */
+function updateEndBar(){
+  const bar=document.getElementById("endbar");if(!bar)return;const c=clk();
+  const show=c.needsEnd&&inProgress&&!KEY&&ST.screen!=="takeaways"&&ST.screen!=="final";
+  bar.hidden=!show;if(!show){bar.replaceChildren();return}
+  if(bar.firstChild)return;
+  bar.append(h("span",{html:c.mode==="class"?"<b>Time to end your guided notes.</b> Finish the question you are on, then press the button.":"<b>You can finish your notes now.</b>"}),
+    h("button",{class:"btn",onclick:()=>{ST.ended=true;ST.endIdx=ST.max;if(LOCK_ON)LessonLock.finish();showTakeaways()}},"End my guided notes"));
+}
+setInterval(()=>{if(ST.name)updateEndBar()},1000);
+
+/* ---------- takeaways ---------- */
+const TAKEAWAYS=[
+ {type:"rows",flag:"match",q:"Match each change to what it does to the force.",choices:["× ¼","× 1⁄9","× 2","× 4","× ½"],rows:[{q:"Distance doubles",ans:0,why:"Distance × 2 divides the force by 2 × 2."},{q:"Distance triples",ans:1,why:"Distance × 3 divides the force by 3 × 3."},{q:"One charge doubles",ans:2,why:"Charge acts in a straight proportion."},{q:"Both charges double",ans:3,why:"2 × 2 = 4."},{q:"Distance doubles and one charge doubles",ans:4,why:"¼ × 2 = ½."}],hint:"Charges multiply the force. Distance divides it by its square."},
+ {type:"open",save:"why",flag:"why",q:"Finish the sentence: why is an electron near the nucleus held harder than one far away?",min:30,frame:"A near electron is held harder because ____."},
+ {type:"journal",flag:"journal"}
+];
+function showTakeaways(){
+  enterScreen("takeaways",NP+2);if(LOCK_ON&&ST.ended)LessonLock.finish();CUR.skill="chem.coulomb.rules";CUR.title="Takeaways";CUR.band=null;
+  app.append(h("h2",{},"Takeaways"),h("p",{class:"sub"},"These go straight into your notes."));
+  let got=0;const fin=h("button",{class:"btn big",disabled:"",onclick:showFinal},"Get my stamp and notes");
+  TAKEAWAYS.forEach(t=>{const b=Object.assign({},t);let f=false;app.append(mk(b,()=>{if(f)return;f=true;ST.tk[b.flag]=true;got++;if(got===TAKEAWAYS.length||KEY){fin.disabled=false;fin.removeAttribute("disabled")}}))});
+  app.append(h("div",{class:"row",style:"justify-content:center;margin:20px 0"},fin,h("button",{class:"ghost",onclick:openNotes},"My notes")));
+  if(KEY){fin.disabled=false;fin.removeAttribute("disabled")}
+}
+
+/* ---------- notes ---------- */
+function notesModel(){
+  const k=ST.keep,D=ST.data,tk=ST.tk,A=ST.check.ans,J=k.journal||{};
+  const tbl=(rows,extra)=>({head:["Run","Left","Right","Distance","Force (units)","Force × run 1"],rows:rows.map((x,i)=>[String(i+1),"+"+x.q1,(x.s>0?"+":"−")+x.q2,String(x.r),g(x.F),i===0?"1":(x.typed||"")])});
+  return{title:"Coulomb’s Law and the Shell Model",unit:"Unit 3 · Atoms and Ions",name:ST.name,period:ST.period,date:new Date().toLocaleDateString(),sections:[
+   {h:"Push and Pull: my first guesses",rows:[["Distance doubles, force becomes",A.c1||""],["One charge doubles, force becomes",A.c4||""]]},
+   {h:"Sim 1: change the distance",table:tbl(D.dist),rows:[["My prediction for distance 3",k.predDist!=null?g(k.predDist)+" units":""],["Rule",k.ruleDist0?`Distance ×2: force ${k.ruleDist0}. Distance ×3: force ${k.ruleDist1}.`:""]]},
+   {h:"Sim 2: change a charge",table:tbl(D.charge),rows:[["My prediction for left charge 3",k.predChg!=null?g(k.predChg)+" units":""],["Rule",k.ruleChg0?`One charge ×2: force ${k.ruleChg0}. One charge ×3: force ${k.ruleChg1}.`:""]]},
+   {h:"Sim 3: change both",table:tbl(D.both),rows:[["Rule",k.ruleBoth0?`Distance ×2 and one charge ×2: ${k.ruleBoth0}. Distance ×2 and both charges ×2: ${k.ruleBoth1}.`:""],["The rule in my words",k.rule||""]]},
+   {h:"The shell model (one electron)",table:{head:["Ion","Shell","My guess","Pull (H shell 1 = 1)"],rows:D.shell.map(x=>[x.ion,String(x.n),x.guess,x.act])},rows:[["Shell 1 is pulled this many times harder than shell 3",k.times81!=null?String(k.times81):""],["Why a near electron is held harder",k.why||""]]},
+   {h:"Claim, evidence, reasoning",rows:[["Claim",(k.cer||[])[0]||""],["Evidence",(k.cer||[])[1]||""],["Reasoning",(k.cer||[])[2]||""]]},
+   {h:"Atom journal",rows:[["What I believed before",J.before||""],["What I believe now",J.now||""],["How sure I am (1 to 4)",J.conf?String(J.conf):""],["One thing I would test",J.test||""]]}
+  ]};
+}
+function openNotes(){MrD.notes.open(notesModel,"coulombs-law-notes-"+(ST.name||"student").toLowerCase().replace(/[^a-z0-9]/g,""))}
+
+/* ---------- stamp ---------- */
+function recordProfile(){MrD.profile.record({course:"chem",lesson:LESSON_ID,title:"Coulomb’s Law and the Shell Model",first:ST.name,period:ST.period,day:MrD.bell.dayKey(),reached:(ST.ended?ST.endIdx:ST.max)+1,of:NP+3,items:ST.log.map(l=>({skill:l.skill,title:l.title,band:l.band,firstTry:l.first,ok:true}))})}
+const checkCode=()=>{const r=ST.check.res;return r?`check ${r.right}/8 [${r.tags.lin},${r.tags.inv},${r.tags.invsq},${r.tags.other}]`:"check -"};
+function summaryText(label){
+  const secs=(Date.now()-ST.t0)/1000,when=new Date();
+  let t=`${ST.name} · Period ${ST.period} · Coulomb’s Law · ${label} · time ${fmtT(secs)} · questions right on the first try ${ST.qFirst}/${ST.q} · retries ${ST.retries} · sim tasks ${ST.tasksDone}/${ST.tasks} · practice ${ST.pr.i} (${ST.pr.clean} first try) · ${checkCode()}${ST.gate?" · gate "+ST.gate.L:""}${lockTxt()} · ${when.toLocaleDateString()} ${when.toLocaleTimeString()}`;
+  return t;
+}
+const responsesText=()=>ST.typed.map(x=>`[${fmtT(x.at)}] ${x.id} | ${x.prompt} | ${x.text}`).join("\n");
+function showFinal(){
+  ST.finished=true;ST.screen="final";inProgress=false;if(LOCK_ON)LessonLock.finish();chips();app.replaceChildren();window.scrollTo(0,0);updateEndBar();
+  recordProfile();
+  const reachedI=ST.ended?ST.endIdx:ST.max,total=NP+3,label="got to "+(reachedI>=NP+2?"Takeaways":reachedI>=NP+1?"Keep practicing":"Part "+reachedI)+" ("+(reachedI+1)+" of "+total+")",when=new Date(),txt=summaryText(label);
+  const stamp="COUL-"+MrD.codes.stamp(LESSON_ID,ST.name,ST.period);
+  const st=h("div",{class:"stamp"},h("div",{class:"big"},"✔ "+stamp),h("div",{style:"font-size:24px;margin:4px 0"},ST.name),h("div",{},`${when.toLocaleDateString()} · ${when.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}`));
+  const tbl=h("table",{class:"sum"},h("tr",{},h("th",{},"How far you got"),h("td",{},label.replace("got to ",""))),h("tr",{},h("th",{},"Time"),h("td",{},fmtT((Date.now()-ST.t0)/1000))),h("tr",{},h("th",{},"Sim tasks finished"),h("td",{},`${ST.tasksDone} of ${ST.tasks}`)),h("tr",{},h("th",{},"Questions right on the first try"),h("td",{},`${ST.qFirst} of ${ST.q}`)),h("tr",{},h("th",{},"Practice problems"),h("td",{},String(ST.pr.i))),LOCK_ON?h("tr",{},h("th",{},"Times you left the lesson"),h("td",{},String(LessonLock.stats().total))):null);
+  const copy=h("button",{class:"ghost",onclick:async()=>{try{await navigator.clipboard.writeText(txt+"\n"+responsesText());copy.textContent="Copied ✔"}catch(e){copy.textContent="Select and copy the line below"}}},"Copy summary for Mr. D");
+  const save=h("button",{class:"ghost",onclick:()=>MrD.notes.download("coulombs-law-responses-"+(ST.name||"student")+".txt",txt+"\n\n"+responsesText())},"Save my responses (.txt)");
+  app.append(h("div",{class:"card final"},h("h2",{},"Your guided notes are done 🎉"),h("p",{},"Show Mr. D this screen. The stamp is your proof that you finished, and it says how far you got."),st,tbl,
+    h("div",{class:"row",style:"justify-content:center"},h("button",{class:"btn big",onclick:openNotes},"My notes (print or save as PDF)"),copy,save),
+    h("p",{class:"hint"},"Your notes hold your guesses, your sim data, and your journal. Choose “Save as PDF” in the print window to keep a copy."),h("p",{class:"hint",style:"word-break:break-word"},txt)));
+}
+function start(){ST.t0=Date.now();inProgress=true;MrD.live.attach({course:"chem",lessonId:LESSON_ID,who,snap:liveSnap});showCheck()}
+function liveSnap(){const i=ST.screen==="check"?0:ST.screen==="part"?ST.partIdx+1:ST.screen==="practice"?NP+1:NP+2,r=ST.check.res,pr=ST.screen==="check"?"check "+(ST.check.i+1)+"/8":(r?r.route+" "+checkCode().slice(6):"")+(ST.gate?" GATE "+ST.gate.L:"");
+  return{step:ST.screen==="check"?"Check":stepName(ST.screen==="part"?ST.partIdx:ST.screen==="practice"?NP:NP+1).slice(0,30),stepIdx:i+1,stepCount:NP+3,band:ST.lad.band,answered:ST.q,misses:ST.retries,prompt:pr,exits:LOCK_ON?LessonLock.stats().total:0,secs:Math.round((Date.now()-ST.t0)/1000),done:!!ST.finished,stuck:ST.retries>=6}}
+
+function showResume(rec){
+  chips();const fb=feedback(),n=LessonLock.lockNo();
+  const inp=h("input",{type:"text",inputmode:"numeric",maxlength:4,autocomplete:"off","aria-label":"Unlock code from Mr. D",style:"width:130px;font-size:1.4rem;text-align:center"});
+  const btn=h("button",{class:"btn big",onclick:async()=>{const r=await LessonLock.resume(inp.value);
+    if(r==="ok"){Object.assign(ST,rec.snap||{},{name:rec.name});if(!rec.snap)ST.t0=Date.now();inProgress=true;MrD.live.attach({course:"chem",lessonId:LESSON_ID,who,snap:liveSnap});
+      if(ST.screen==="check")showCheck();else if(ST.screen==="practice")showPractice();else if(ST.screen==="takeaways")showTakeaways();else showPart(ST.partIdx||0)}
+    else if(r==="wrong")show(fb,false,"Not the code. Hand up and wait for Mr. D.");else show(fb,false,"Fullscreen did not start. Click again.")}},"Unlock");
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+  app.append(h("div",{class:"card",style:"border:3px solid var(--hot);text-align:center"},h("h2",{},"🔒 Locked. Hand up, eyes forward."),h("p",{},"You closed this lesson before you finished. Your work is saved up to the start of the part you were on. Mr. D needs to see you and give you a code."),h("p",{},h("b",{},"ID: "),rec.name,"   ",h("b",{},"Lock number: "),String(n)),h("div",{class:"row",style:"justify-content:center"},inp,btn),fb));
+}
+
+/* ---------- teacher key (#key): the real page, answers marked, plus the scan-and-tweak key ---------- */
+const WIDGET_KEY={
+ hook:"Pixel balloon. The strands rise with the pull, which is 1 ÷ distance² (distance 1 = full pull, 2 = ¼, 5 = 1⁄25). Decorative; nothing is scored.",
+ coulomb:"Coulomb sim. Force = 36 × |q₁q₂| ÷ distance² in units, so 36 units is two +1 charges at distance 1. Arrow length is 14 px plus up to 68 px in proportion to force (the 14 px stub is only so a weak force stays visible). Jitter size also follows force and is decoration. Flip sign shows attraction versus repulsion; magnitudes work the same.",
+ shell:"Shell diagram. One-electron ions only (H, He⁺, Li²⁺). Shell n is n² times as far as shell 1 (Bohr spacing). Pull = Z ÷ n⁴ relative to H shell 1. Every ion uses the same shell spacing, a simplification (real orbits shrink as Z rises).",
+ zeff:"Fluent route only. Net charge felt = Z − inner electrons, assuming full shielding at the same distance. A simplification; Slater-rule values such as Li 2s ≈ +1.3 come in slot 15.",
+};
+function keyMark(card,b){
+  const note=html=>card.append(h("div",{class:"keyline",html}));
+  if(b.type==="mcq"){if(b.predict)return note("<b>KEY</b> Prediction: any answer accepted. It goes in the student’s notes.");const ok=b.opts.find(o=>o.ok);note(`<b>KEY ✔</b> ${ok.t}<br><i>${b.why}</i>`);card.querySelectorAll(".opts label").forEach(l=>{if(l.textContent.trim()===strip(ok.t).trim())l.style.outline="2px solid var(--ok)"})}
+  if(b.type==="num")note(`<b>KEY ✔</b> ${b.ans} ${b.unit||""} (band ${b.band==null?"-":b.band})<br><i>${b.why}</i>`);
+  if(b.type==="numpred")note("<b>KEY</b> Prediction: any number accepted, logged before the run. Expected: "+(b.save==="predDist"?"4":b.save==="predChg"?"108":"18")+" units.");
+  if(b.type==="rows")note("<b>KEY ✔</b> "+b.rows.map(r=>`${strip(r.q)} → <b>${b.choices[r.ans]}</b>`).join("<br>"));
+  if(b.type==="cloze")note("<b>KEY ✔</b> "+b.items.map(it=>it.t.replace("___","<b>"+it.a+"</b>")).join("<br>"));
+  if(b.type==="widget")note(`<b>KEY</b> ${WIDGET_KEY[b.id]}`);
+  if(b.type==="open")note("<b>KEY</b> Typed, checked for length only. Good: “Doubling the distance makes the force one quarter as big. Doubling one charge makes it twice as big.”");
+  if(b.type==="gate2")note(`<b>KEY</b> Class split question. Correct: <b>B</b>. A = inverse guess (÷3), C = mixed (÷6), D = linear guess (×3). Today’s code: <b>${MrD.codes.gate(LESSON_ID,"h1")}</b>. Students see the code stop only on weekdays 7:00 AM to 3:00 PM. Script is in the key panel above.`);
+  if(b.type==="ladder")note("<b>KEY</b> Four slots at a hidden band (scaffolded route starts at 1, standard at 2, fluent at 3; two firsts climb, two misses drop). Fluent students at slots ≥3 also get two shielding items. All answers are in the key panel above. Trimmed to 2 slots after minute 36 and skipped after minute 40 in a real class.");
+  if(b.type==="cer")note("<b>KEY</b> Exemplar: Claim: the shell 1 electron is held harder, about 81 times as hard. Evidence: shell 3 is 9 times as far out as shell 1, so the force is divided by 9 × 9 = 81. Reasoning: Coulomb’s law says force goes as 1 ÷ distance², and both electrons have the same charge, so only distance matters. Scale: 1 point each for claim, evidence, reasoning. Common miss: dividing by 9 (not 81).");
+  if(b.type==="journal")note("<b>KEY</b> One prompt. “Before” is prefilled from the student’s check guess and can be edited. Confidence is 1 to 4.");
+  if(b.type==="labels")note("<b>KEY</b> Foundations card. Nobody starts a sim before this.");
+  if(b.type==="compare")note("<b>KEY</b> Pulls the student’s first guesses from the check beside the correct values. No type labels are shown.");
+}
+function keyPanel(){
+  const host=document.getElementById("keypanel");if(!host)return;
+  const R=C.route,best={};CK.forEach(i=>{best[i.id]=i.kind==="mcq"?i.opts.find(o=>o.tag==="ok").t:i.cols.map(c=>c.ans)});
+  const row=(...c)=>"<tr>"+c.map(x=>"<td>"+x+"</td>").join("")+"</tr>";
+  const chk=CK.map(i=>i.kind==="mcq"?row(i.id,i.q,i.opts.map(o=>(o.tag==="ok"?"<b>✔ ":"")+o.t+" <i>["+o.tag+"]</i>"+(o.tag==="ok"?"</b>":"")).join("<br>")):row(i.id,i.q,i.cols.map(c=>c.lab+": <b>"+c.ans+"</b>").join(" · "))).join("");
+  const simT=(k,fn)=>fn.map(s=>`<tr>${s.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("");
+  const dist=[1,2,3,6].map(r=>[ "1,1",r,g(C.force(1,1,r)),g(C.force(1,1,r)/36)]),chg=[1,2,3].map(q=>[q+",1",1,g(C.force(q,1,1)),g(C.force(q,1,1)/36)]);
+  const both=[[ "1,1",1],["2,1",2],["2,2",2]].map(([q,r])=>{const [a,b]=q.split(",").map(Number);return[q,r,g(C.force(a,b,r)),g(C.force(a,b,r)/36)]});
+  const shell=[[1,1],[1,2],[1,3],[2,1],[3,1],[3,2]].map(([Z,n])=>[["H","He⁺","Li²⁺"][Z-1],n,n*n,C.fmt(C.pull(Z,n)),g(C.pull(Z,n).n/C.pull(Z,n).d)]);
+  const lad=[1,2,3,4].map(s=>[s].concat([1,2,3,4].map(b=>{const x=C.closing(s,b);return "b"+b+": <b>"+x.ans+"</b> "+x.unit}))).map(r=>row(...r)).join("");
+  host.innerHTML=`<details class="kt" open><summary>TEACHER KEY: scan, then tweak (the page below is the real student page)</summary><div class="in">
+<h3>Minute timings (50-minute period)</h3><table>${row("<b>Min</b>","<b>Step</b>","<b>Teacher does</b>")}${row("0–10","Push and Pull check (8 items, ungraded)","Circulate. Do not help. A banner appears at 10:00.")}${row("10–14","Part 1 hook, photo, labeled sim","Ask: what do you think the pull depends on?")}${row("14–18","Part 2 six quick questions","Fast. These are words, not a hurdle.")}${row("18–32","Parts 3 to 5: three sim runs (≈4–5 min each)","Walk. Look for the Force × column.")}${row("≈32","Check-in gate (class split) then huddle","See script below. 2–3 minutes.")}${row("34–40","Part 6 shell model, the one question","Listen for “distance², not charge”.")}${row("40–46","Part 7 harder questions + CER","Pace trim cuts the ladder to 2 slots after minute 36.")}${row("46–50","Takeaways, atom journal (one prompt), stamp","Collect stamps. Check typed responses (panel at the bottom).")}</table>
+<h3>Push and Pull check: answers, tags, routing</h3><table>${chk}</table>
+<p>Tags: <b>lin</b> = linear guess, <b>inv</b> = inverse guess, <b>invsq</b> = inverse-square guess applied to a charge, <b>other</b>. Routing (hidden from students): <b>scaffolded</b> if 2+ linear guesses or ≤3 right; <b>fluent</b> if 7–8 right with no linear guesses; otherwise <b>standard</b>. Student stamp text carries <i>check right/8 [lin,inv,invsq,other]</i>. Switch route with the picker in the bar above.</p>
+<h3>Six quick questions</h3><table>${C.SIMPLE.map(s=>row(s.id,s.q,s.opts?s.opts.find(o=>o[1])[0]:s.num+" "+s.unit)).join("")}</table><p><i>These are my placeholder items; swap in your approved six in <code>chemistry/shared/coulomb-practice.js</code> (SIMPLE).</i></p>
+<h3>Sim values (units; reference 36)</h3><table>${row("<b>Left,right</b>","<b>Distance</b>","<b>Force</b>","<b>× first run</b>")}${simT("",dist)}${simT("",chg.map(r=>[r[0],r[1],r[2],r[3]]))}${simT("",both)}</table>
+<p>Rows: distance run (1,2,3,6), charge run (left 1,2,3), both-run (start; d2 q1=2; d2 both 2). Predictions expected: 4, 108, 18.</p>
+<h3>Shell model (H shell 1 = 1)</h3><table>${row("<b>Ion</b>","<b>Shell</b>","<b>Distance ×</b>","<b>Pull</b>","<b>Decimal</b>")}${simT("",shell)}</table><p>Shell 1 vs shell 3, same ion: <b>81×</b>.</p>
+<h3>Class split gate (≈minute 32)</h3><p><b>Q:</b> ${GATE_Q.q} A ⅓ · <b>B 1⁄9</b> · C 1⁄6 · D ×3.</p><ol><li>Say: “Fingers for A, B, C or D. Do not change after you see the room.”</li><li>Tally on the projector page (Class split). If the live view is on, the same letters show as <i>GATE x</i> in each student’s prompt.</li><li>If A is the biggest wrong column: “÷3 is distance alone. Force follows the square: show me 3 × 3.”</li><li>If D: “Far means weak. Which way does the force go when charges move apart?”</li><li>If C: “Add or multiply? Distance ×3 divides by 3 × 3.”</li><li>Say the rule once, with a hand motion: <b>double the distance, quarter the force; double a charge, double the force.</b> Then give the huddle code (today: <b>${MrD.codes.gate(LESSON_ID,"h1")}</b>).</li></ol>
+<h3>Closing ladder answers (slot × band)</h3><table>${row("<b>Slot</b>","<b>Band 1</b>","<b>Band 2</b>","<b>Band 3</b>","<b>Band 4</b>")}${lad}</table><p>Shielding items (fluent only): ${C.extension(1).ans} and ${C.extension(2).ans} of the H shell 1 pull.</p>
+<h3>Common errors and fixes</h3><table>${row("<b>Error</b>","<b>Sounds like</b>","<b>Fix</b>")}${row("Linear guess","“Twice as far, twice the force” or “half”","Put the sim at distance 2 and have them divide 9 ÷ 36 on paper.")}${row("Inverse guess (÷2, ÷3)","“Force just halves”","Same: ratio column. Then ask what 2 × 2 and 3 × 3 are doing.")}${row("Squaring the charge","“Double charge, four times the force”","Ask which run in Sim 2 shows ×4. There is none.")}${row("Adding changes","“÷4 and ×2, so ÷2 … or +”","Two changes: write each factor, multiply them.")}${row("Shell n = n times as far","1⁄4 for shell 2","The info card says shell 2 is 4 times as far. Divide by 4 × 4.")}${row("Charge vs distance in the one question","“far electrons have less charge”","Every electron has the same charge. Only the distance changes.")}</table>
+<h3>Simplifications (listed on purpose)</h3><ul><li>Force units are made up: 36 units = two +1 charges at distance 1. No k, no SI.</li><li>Arrow length has a 14 px stub; jitter follows force. Both are decoration. The meter number is exact.</li><li>Shell spacing 1 : 4 : 9 is the Bohr spacing for one electron. The same spacing is used for H, He⁺ and Li²⁺ so charge and distance stay separate (real orbits shrink as Z rises).</li><li>Only one-electron ions appear, so nothing is shielded. The fluent “look ahead” treats inner electrons as cancelling protons completely at the same distance (Li ≈ +1; Slater gives ≈ +1.3).</li><li>The photo slot shows a labeled placeholder until <code>img/balloon-hair.png</code> is added (credit in <code>img/CREDITS.md</code>).</li></ul>
+<h3>Typed responses (this session)</h3><pre id="typedlog" style="white-space:pre-wrap;margin:0">(none yet)</pre>
+</div></details>`;
+  setInterval(()=>{const p=document.getElementById("typedlog");if(p)p.textContent=ST.typed.length?responsesText():"(none yet)"},1500);
+}
+function lockDesk(){
+  const host=document.getElementById("desk");if(!host)return;host.replaceChildren();
+  const nm=h("input",{type:"text","aria-label":"Student ID",placeholder:"Student ID as shown on their screen",style:"width:240px"}),no=h("input",{type:"number",min:1,value:2,"aria-label":"Lock number",style:"width:80px"}),res=h("b",{style:"font-size:1.4rem;margin-left:10px"});
+  const calc=()=>{res.textContent=nm.value.trim()?LessonLock.unlockCode(nm.value,no.value):""};nm.addEventListener("input",calc);no.addEventListener("input",calc);
+  const stu=location.pathname.split("/").pop()||"coulombs-law.html",off=stu+"#nolock="+LessonLock.offCode();
+  host.append(h("details",{class:"card"},h("summary",{},h("b",{},"🔒 Lock desk")," (a locked student’s screen shows an ID and a lock number)"),
+    h("p",{html:`<b>Unlock any locked student today:</b> <b style="font-size:1.4rem">${MrD.codes.override()}</b> (works for every student and every lock until 7:00 AM tomorrow)`}),
+    h("p",{},"Or get one student’s own code: type the ID and lock number shown on their screen."),h("div",{class:"row"},nm,no,res),
+    h("p",{class:"hint"},"Exit 1 only warns. From exit 2 the screen locks. Locked mode runs only during chemistry’s period."),
+    h("p",{class:"hint"},"Link with locked mode off: ",h("a",{href:off},off))));
+}
+
+/* ---------- boot ---------- */
+if(KEY){
+  const sel=h("select",{"aria-label":"Route"},[["std","Route: standard"],["scaf","Route: scaffolded (linear guessers)"],["fluent","Route: fluent (look-ahead)"]].map(o=>h("option",{value:o[0]},o[1])));
+  sel.onchange=()=>{ST.route=sel.value;ST.lad=Ladder.init({scaf:1,std:2,fluent:3}[ST.route]);ST.closeN=0;if(ST.screen==="part")showPart(ST.partIdx)};
+  MrD.teacherBar(document.getElementById("tb"),{course:"chem",lessonId:LESSON_ID,gates:[{key:"h1",label:"Huddle"}],teacher:"../teacher.html",root:"../../",extra:[sel,Object.assign(h("a",{href:"coulombs-law-board.html",style:"color:#fff"}),{textContent:"Projector page"})]});
+  keyPanel();lockDesk();inProgress=true;ST.name="Preview";ST.period="0";ST.t0=Date.now();ST.check.res=null;showCheck();
+}else{
+  LOCK_ON=!NOLOCK&&clk().lockOn;
+  const REC=LOCK_ON?LessonLock.pending():null;
+  if(REC)showResume(REC);
+  else{
+    chips();let info={valid:false};
+    const idHost=h("div"),b=h("button",{class:"btn big",style:"margin-top:12px",onclick:async()=>{if(!info.valid)return;ST.name=info.id;ST.period=info.period;LOCK_ON=!NOLOCK&&clk().lockOn;if(LOCK_ON&&!(await LessonLock.enter(ST.name))){fsMsg.textContent="Fullscreen did not start. This lesson needs Chrome on your Chromebook. Tell Mr. D.";return}start()}},"Start →"),fsMsg=h("p",{class:"hint",style:"color:var(--bad)"});
+    MrD.ids.ask(idHost,{onChange:i=>{info=i;b.disabled=!i.valid}});b.disabled=!info.valid;
+    const c0=clk();
+    app.append(h("div",{class:"card",id:"start"},h("h2",{},"Coulomb’s Law and the Shell Model"),
+      h("p",{},"It starts with a short check. It is not graded. A wrong guess is fine."),
+      h("p",{},"Then you predict, run a sim, and fill ratio tables. Please don’t refresh the page."),
+      c0.lockOn?h("p",{class:"note"},"🔒 Locked mode. This lesson runs in fullscreen while class is on. Leaving it is recorded on your stamp. The second time, your screen locks until Mr. D gives you a code."):null,
+      c0.mode==="home"?h("p",{class:"note"},"You are working outside class time. No class codes are needed."):null,
+      h("p",{},h("b",{},"Your ID and period:")),idHost,h("div",{},b),fsMsg));
+  }
+}
+document.getElementById("open-notes").onclick=openNotes;
+window.__qa={ST,DATA,WIDGET,BLOCK,C,parseRatio,cards:()=>window.__cards||[],showPart,showCheck,showPractice,showTakeaways};
+</script>
+</body>
+</html>

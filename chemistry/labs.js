@@ -85,6 +85,16 @@ window.UNITS = [
         blurb: "Read a symbol and count its protons, neutrons and electrons. Build particles, decode symbols, write them from counts, and untangle the three classic mix-ups.",
         tags: ["atomic number", "mass number", "ions", "isotopes"],
         teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/counting-particles.html#key" }, { label: "Projector page", href: "unit-3-atoms-ions/counting-particles-board.html" }, { label: "Teacher page", href: "teacher.html" }]
+      },
+      {
+        title: "Coulomb's Law and the Shell Model",
+        type: "lesson",
+        day: 7,
+        icon: "🧲",
+        href: "unit-3-atoms-ions/coulombs-law.html",
+        blurb: "Predict, then change charges and distances in a sim and fill ratio tables. Use the two proportions to explain why an electron near the nucleus is held harder than one far away.",
+        tags: ["Coulomb's law", "proportional reasoning", "shell model", "HS-PS1-1", "HS-PS1-2"],
+        teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/coulombs-law.html#key" }, { label: "Projector page", href: "unit-3-atoms-ions/coulombs-law-board.html" }, { label: "Teacher page", href: "teacher.html" }]
       }
     ]
   }

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coulomb’s Law: Projector Page</title>
+<link rel="stylesheet" href="../shared/lab.css">
+<style>
+  body{font-size:20px}
+  .wrap{max-width:1200px;margin:0 auto;padding:16px clamp(12px,3vw,40px)}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}
+  .bar button,.tally button{font:inherit;font-size:1rem;padding:8px 18px;border-radius:10px;border:2px solid var(--accent);background:var(--panel);color:var(--ink);cursor:pointer;min-height:44px}
+  .bar button.on{background:var(--accent);color:var(--accent-ink)}
+  .panel{display:none}.panel.on{display:block}
+  .sy{display:inline-flex;align-items:center;font-family:ui-serif,Georgia,serif;font-size:6rem;line-height:1}
+  .sy .sn{display:inline-flex;flex-direction:column;font-size:.5em;line-height:1.1;text-align:right;margin-right:4px}
+  .sy .sn sup,.sy .sn sub{position:static;vertical-align:baseline;font-size:1em}
+  .sy .sc{position:static;vertical-align:baseline;font-size:.5em;align-self:flex-start}
+  .three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .three div{border:3px solid var(--line);border-radius:12px;padding:12px;background:var(--panel)}
+  .three b{display:block;font-size:1.3rem}
+  dl{display:grid;grid-template-columns:max-content 1fr;gap:8px 18px}dt{font-weight:700}dd{margin:0}
+  .tile{border:3px solid var(--line);border-radius:12px;padding:14px;background:var(--panel);text-align:center;cursor:pointer;font:inherit;color:var(--ink)}.tile b{display:block;font-size:2.4rem;color:var(--accent)}.tile.on b{color:var(--ok)}.back2{display:flex;gap:10px;margin:22px 0 0}.tally{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:10px 0}
+  .tally .col{text-align:center}
+  .tally .bar2{height:140px;display:flex;align-items:flex-end;justify-content:center}
+  .tally .bar2 i{display:block;width:70%;background:var(--accent);border-radius:6px 6px 0 0;min-height:2px}
+  .tally .n{font-size:2rem;font-weight:800}
+  .small{font-size:.9rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">← Chemistry</a>
+  <h1>Coulomb’s Law and the Shell Model</h1>
+  <p class="lead"><b>Target:</b> I can use Coulomb’s law as a proportion (double the distance, quarter the force; double a charge, double the force) to predict how strongly an electron is held.</p>
+  <div class="bar" role="tablist">
+    <button class="on" data-p="main">Today</button>
+    <button data-p="vocab">Vocabulary</button>
+    <button data-p="core">Core ideas</button>
+    <button data-p="tally">Class split</button>
+  </div>
+
+  <section class="panel on" id="main">
+    <p class="small">Click a tile to show the factor. Charges multiply the force. Distance divides it by its square.</p>
+    <div class="three" id="tiles"></div>
+    <p style="font-size:1.6rem;text-align:center;margin:18px 0 0"><b>Why is an electron near the nucleus held harder than one far away?</b></p>
+    <p class="small" style="text-align:center">Shell 1 is 9 times closer than shell 3. Pull × 81.</p>
+    <div class="back2"><button data-go="vocab">← Vocabulary</button><button data-go="core">← Core ideas</button><button data-go="tally">Class split →</button></div>
+  </section>
+
+  <section class="panel" id="vocab">
+    <h2>Vocabulary</h2>
+    <dl>
+      <dt>Coulomb’s law</dt><dd>The electric force between two charges grows with each charge and shrinks with the square of the distance.</dd>
+      <dt>Proportional</dt><dd>Double one quantity, and the other changes by a fixed factor.</dd>
+      <dt>Inverse square</dt><dd>Double the distance and the force is ¼. Triple it and the force is 1⁄9.</dd>
+      <dt>Electric force</dt><dd>The push or pull between charges. Like charges push apart. Unlike charges pull together.</dd>
+      <dt>Nucleus</dt><dd>The positive centre of the atom.</dd>
+      <dt>Shell</dt><dd>A region where an electron lives. Shell 2 is 4 times as far out as shell 1.</dd>
+      <dt>Nuclear charge</dt><dd>The number of protons, written as + in the sim.</dd>
+    </dl>
+    <div class="back2"><button data-go="main">← Today</button><button data-go="core">Core ideas →</button></div>
+  </section>
+
+  <section class="panel" id="core">
+    <h2>Core ideas</h2>
+    <ol>
+      <li>Double the distance, the force is <b>¼</b>. Triple the distance, it is <b>1⁄9</b>.</li>
+      <li>Double one charge, the force is <b>×2</b>. Double both, it is <b>×4</b>.</li>
+      <li>Two changes at once multiply: distance × 2 and one charge × 2 gives <b>×½</b>.</li>
+      <li>A near electron and a far electron have the same charge. Only the distance differs.</li>
+      <li>Shell 1 to shell 3 is 9 times as far, so the pull is divided by 81.</li>
+    </ol>
+    <div class="back2"><button data-go="main">← Today</button><button data-go="vocab">← Vocabulary</button><button data-go="tally">Class split →</button></div>
+  </section>
+
+  <section class="panel" id="tally">
+    <h2>Check-in gate: distance 2 cm to 6 cm</h2>
+    <p class="small">Click a letter once for each student who chose it. A = ⅓, B = 1⁄9 (correct), C = 1⁄6, D = ×3. The live view shows the same split as GATE letters if it is switched on.</p>
+    <div class="tally" id="pulse"></div>
+    <button id="reset" style="font:inherit;padding:6px 14px">Reset</button>
+    <h2 style="margin-top:24px">Push and Pull check: wrong guesses by type</h2>
+    <div class="tally" id="errs"></div>
+    <button id="reset2" style="font:inherit;padding:6px 14px">Reset</button>
+    <p class="small">The two biggest columns become the opening words of tomorrow’s warm-up.</p>
+    <div class="back2"><button data-go="vocab">← Vocabulary</button><button data-go="core">← Core ideas</button><button data-go="main">← Today</button></div>
+  </section>
+</div>
+<script>
+function go(p){document.querySelectorAll(".bar button").forEach(x=>x.classList.toggle("on",x.dataset.p===p));document.querySelectorAll(".panel").forEach(x=>x.classList.toggle("on",x.id===p));window.scrollTo(0,0)}
+document.querySelectorAll(".bar button").forEach(b=>b.onclick=()=>go(b.dataset.p));
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+const T=[["Distance × 2","× ¼"],["Distance × 3","× 1⁄9"],["One charge × 2","× 2"],["Both charges × 2","× 4"]];
+const tiles=document.getElementById("tiles");
+T.forEach(t=>{const d=document.createElement("button");d.className="tile";d.innerHTML=`${t[0]}<b>?</b>`;d.onclick=()=>{const on=d.classList.toggle("on");d.querySelector("b").textContent=on?t[1]:"?"};tiles.append(d)});
+function tally(id,labels,key){
+  const host=document.getElementById(id);let n=labels.map(()=>0);
+  try{n=JSON.parse(sessionStorage.getItem(key))||n}catch(e){}
+  const draw=()=>{const m=Math.max(1,...n);host.replaceChildren(...labels.map((l,i)=>{
+    const c=document.createElement("div");c.className="col";
+    c.innerHTML=`<div class="bar2"><i style="height:${n[i]/m*100}%"></i></div><div class="n">${n[i]}</div>`;
+    const b=document.createElement("button");b.textContent=l;b.onclick=()=>{n[i]++;try{sessionStorage.setItem(key,JSON.stringify(n))}catch(e){}draw()};c.append(b);return c}))};
+  draw();return()=>{n=labels.map(()=>0);try{sessionStorage.removeItem(key)}catch(e){}draw()};
+}
+const r1=tally("pulse",["A","B","C","D"],"cl.pulse"),r2=tally("errs",["Linear (×2, ×½)","Inverse (÷2, ÷3)","Inverse-square on a charge","Other"],"cl.errs");
+document.getElementById("reset").onclick=r1;document.getElementById("reset2").onclick=r2;
+</script>
+</body>
+</html>
