@@ -97,4 +97,4 @@ Common miss: dividing by 9, not 81.
 1. The six quick questions are mine. You said yours were unapproved and not attached.
 2. The approved content spec and the ladder addendum were not attached. Items are original, shaped by the AP and olympiad pages.
 3. Photo: `img/balloon-hair.png` is a labeled placeholder (Wikimedia refused downloads, HTTP 429). Add the file and keep the credit.
-4. The gate's live class split needs the live worker (`shared/config.js` liveUrl). Without it use the projector page tally.
+4. Live class split: deploy the worker once (`live/README.md`), put its address in `shared/config.js` as `liveUrl`, open the projector page, Class split, press Go live. Until then the same panel works as hand-click tallies.

@@ -20,3 +20,7 @@ First name and period (what the student typed), step, level, counts, and the que
 ## Limits
 
 Cloudflare's free plan covers 100,000 requests a day. A class of 25 beating every 10 seconds for 50 minutes is about 7,500.
+
+## Class split on the projector (Unit 3, slot 7)
+
+`chemistry/unit-3-atoms-ions/coulombs-law-board.html`, panel "Class split", reads `/class` with the same worker address and teacher token you saved on the teacher page. Students' locked gate answers (A to D) and a four-number check summary fill the bars, with a period filter. Nothing new to deploy: the worker already keeps whole beats. Turn live on first (steps above), open the projector page, press **Go live**.

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Coulomb’s Law: Projector Page</title>
 <link rel="stylesheet" href="../shared/lab.css">
+<script src="../../shared/config.js"></script><script src="../../shared/bell.js"></script>
 <style>
   body{font-size:20px}
   .wrap{max-width:1200px;margin:0 auto;padding:16px clamp(12px,3vw,40px)}
@@ -76,7 +77,12 @@
 
   <section class="panel" id="tally">
     <h2>Check-in gate: distance 2 cm to 6 cm</h2>
-    <p class="small">Click a letter once for each student who chose it. A = ⅓, B = 1⁄9 (correct), C = 1⁄6, D = ×3. The live view shows the same split as GATE letters if it is switched on.</p>
+    <p class="small">A = ⅓, B = 1⁄9 (correct), C = 1⁄6, D = ×3. Live: students' locked answers fill the bars. Not connected: click a letter once for each student.</p>
+    <div class="row" id="live" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0">
+      <input id="lu" placeholder="Worker address" style="width:300px;font:inherit;padding:4px"><input id="lt" type="password" placeholder="Teacher token" style="width:180px;font:inherit;padding:4px">
+      <select id="lp" style="font:inherit;padding:4px"><option value="">All periods</option></select>
+      <button id="lgo" style="font:inherit;padding:6px 14px">Go live</button><button id="lstop" style="font:inherit;padding:6px 14px">Stop</button><span class="small" id="lmsg"></span>
+    </div>
     <div class="tally" id="pulse"></div>
     <button id="reset" style="font:inherit;padding:6px 14px">Reset</button>
     <h2 style="margin-top:24px">Push and Pull check: wrong guesses by type</h2>
@@ -102,6 +108,20 @@ function tally(id,labels,key){
     const b=document.createElement("button");b.textContent=l;b.onclick=()=>{n[i]++;try{sessionStorage.setItem(key,JSON.stringify(n))}catch(e){}draw()};c.append(b);return c}))};
   draw();return()=>{n=labels.map(()=>0);try{sessionStorage.removeItem(key)}catch(e){}draw()};
 }
+/* Live class split: poll the live worker (same address and token as the teacher page) and fill the bars from each student's locked gate answer and check summary. */
+let LIVE=false,liveT=0,lastList=[];
+const bars=(id,labels,n,total)=>{const host=document.getElementById(id),m=Math.max(1,...n);host.replaceChildren(...labels.map((l,i)=>{const c=document.createElement("div");c.className="col";c.innerHTML=`<div class="bar2"><i style="height:${n[i]/m*100}%"></i></div><div class="n">${n[i]}</div><div>${l}</div>`;return c}))};
+function paintLive(){const per=document.getElementById("lp").value,list=lastList.filter(b=>!per||b.period===per),L="ABCD",g=[0,0,0,0],e=[0,0,0,0];
+  list.forEach(b=>{const i=b.gate?L.indexOf(b.gate):-1;if(i>=0)g[i]++;if(b.chk){const t=b.chk.split(",").map(Number);t.forEach((v,k)=>{if(k<4&&v>0)e[k]++})}});
+  bars("pulse",["A","B","C","D"],g);bars("errs",["Linear (×2, ×½)","Inverse (÷2, ÷3)","Inverse-square on a charge","Other"],e);
+  document.getElementById("lmsg").textContent=g.reduce((a,b)=>a+b,0)+" of "+list.length+" students have locked the gate answer · updated "+new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit",second:"2-digit"})}
+function pollLive(){const u=document.getElementById("lu").value.trim().replace(/\/$/,""),tok=document.getElementById("lt").value;if(!u||!tok){document.getElementById("lmsg").textContent="Add the worker address and your teacher token.";return}
+  fetch(u+"/class?course=chem&lesson=coulombs-law&day="+encodeURIComponent(MrD.bell.dayKey()),{headers:{"x-teacher":tok}}).then(r=>{if(!r.ok)throw new Error(r.status===401?"Wrong token.":"Worker said "+r.status);return r.json()}).then(list=>{lastList=list;const sel=document.getElementById("lp"),have=[...sel.options].map(o=>o.value);[...new Set(list.map(b=>b.period))].sort().forEach(p=>{if(!have.includes(p)){const o=document.createElement("option");o.value=p;o.textContent="Period "+p;sel.append(o)}});paintLive()}).catch(e=>{document.getElementById("lmsg").textContent=e.message||"Could not reach the worker."})}
+let store=null;try{store=JSON.parse(localStorage.getItem("mrd.teacher.live")||"null")}catch(e){}
+document.getElementById("lu").value=(store&&store.url)||(MrD.config&&MrD.config.liveUrl)||"";document.getElementById("lt").value=(store&&store.tok)||"";
+document.getElementById("lgo").onclick=()=>{try{const s=Object.assign({},store||{},{url:document.getElementById("lu").value.trim(),tok:document.getElementById("lt").value});localStorage.setItem("mrd.teacher.live",JSON.stringify(s))}catch(e){}LIVE=true;clearInterval(liveT);pollLive();liveT=setInterval(pollLive,4000);document.getElementById("pulse").style.pointerEvents="none"};
+document.getElementById("lstop").onclick=()=>{LIVE=false;clearInterval(liveT);document.getElementById("pulse").style.pointerEvents="";document.getElementById("lmsg").textContent="Stopped. Click letters to tally by hand.";r1();r2()};
+document.getElementById("lp").onchange=paintLive;
 const r1=tally("pulse",["A","B","C","D"],"cl.pulse"),r2=tally("errs",["Linear (×2, ×½)","Inverse (÷2, ÷3)","Inverse-square on a charge","Other"],"cl.errs");
 document.getElementById("reset").onclick=r1;document.getElementById("reset2").onclick=r2;
 </script>
