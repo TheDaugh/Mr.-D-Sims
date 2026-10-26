@@ -18,9 +18,9 @@ test('registry: the template is registered under course stats', () => {
 });
 test('hub list: unregistered Unit 3 lessons show as coming soon, registered ones link', () => {
   const run = lessons => { const win = { MrD: { lessons } }; win.window = win; vm.createContext(win); vm.runInContext(read('stats/sims.js'), win); return win.UNITS[0].entries; };
-  const none = run([]); assert.strictEqual(none.length, 8); none.forEach(e => { assert.ok(e.soon); assert.ok(!e.href); });
+  const none = run([]); assert.strictEqual(none.length, 9); none.forEach(e => { assert.ok(e.soon); assert.ok(!e.href); });
   const one = run([{ course: 'stats', id: '3-2-z-scores', href: 'stats/unit-3-normal/3-2-z-scores.html' }]);
-  assert.strictEqual(one.filter(e => e.soon).length, 7); assert.strictEqual(one[1].href, 'unit-3-normal/3-2-z-scores.html');
+  assert.strictEqual(one.filter(e => e.soon).length, 8); assert.strictEqual(one[1].href, 'unit-3-normal/3-2-z-scores.html');
 });
 test('standards: five stats strands, CCSS codes, all needsReview', () => {
   const std = JSON.parse(read('portal/standards.json')).standards;

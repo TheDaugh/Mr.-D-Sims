@@ -12,13 +12,15 @@ for (const { d, spec } of specs) {
     for (const sk of spec.skills || []) for (let b = 1; b <= 4; b++) for (let s = 0; s < 40; s++) {
       const q = sk.gen(b, rng(s * 7 + b)); const where = `${sk.id} band ${b} seed ${s}`;
       assert.ok(q.prompt, where);
-      if (q.type === 'expr') { assert.strictEqual(typeof q.answer, 'string', where); assert.doesNotThrow(() => MC.parse(q.answer, q.vars || ['x']), where + ' answer ' + q.answer); assert.ok(q.hints && q.hints.length, where); }
+      if (q.type === 'choice') { assert.ok(Array.isArray(q.options) && q.options.length >= 3 && q.answer >= 0 && q.answer < q.options.length, where); assert.ok(q.hint, where); }
+      else if (q.type === 'expr') { assert.strictEqual(typeof q.answer, 'string', where); assert.doesNotThrow(() => MC.parse(q.answer, q.vars || ['x']), where + ' answer ' + q.answer); assert.ok(q.hints && q.hints.length, where); }
       else { assert.ok(typeof q.answer === 'number' && isFinite(q.answer), where); assert.ok(q.hint, where); }
       assert.ok(q.worked, where);
     }
   });
   test(d + ': predictions have one correct option in range', () => (spec.predicts || []).forEach(p => { assert.ok(p.answer >= 0 && p.answer < p.options.length); assert.ok(p.why); }));
   test(d + ': no writing longer than a sentence in huddle blanks', () => {
+    if (!spec.huddle) return;   // a mixed review has no huddle
     const H = require('../../shared/huddle.js');
     const all = [].concat((spec.huddle.defs || []).map(x => x.text), (spec.huddle.example.steps || []), (spec.huddle.label.tags || []).map(x => x.text));
     all.forEach(t => H.parse(t).filter(p => p.b).forEach(p => assert.ok(p.b.split(/\s+/).length <= 3, 'blank too long: ' + p.b)));

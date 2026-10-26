@@ -2,6 +2,7 @@
    ( see shared/profile.js ).  Each adapter returns { course, lesson, title, first, period, day, reached, of, items:[{skill,title,band,firstTry,ok}] }.
 
      PortalAdapters.physicsReport(code, LE, NFL, N2L)   a physics report code ("NEW~v2~Sam~3~...", either lesson)
+     PortalAdapters.statsReport(code, LE)   a stats mixed-review report code ("UNI~v1~...")
      PortalAdapters.calcHandIn(name, period, day, code, PR2)   a calculus hand-in code ("PR2-...")
      PortalAdapters.vlabRecord(report, period)     one student's report from the virtual lab (buildReport output)
      PortalAdapters.bundle(records)                the JSON text the portal imports
@@ -53,6 +54,24 @@
     var more = (f[15] || "").split("-"), n = +more[0] || 0, clean = +more[1] || 0;
     for (var k = 0; k < n; k++) items.push(it("practice", "Extra practice", +f[3] || 2, k < clean));
     return { course: "physics", lesson: hit.def.id, title: hit.def.title, first: f[1], period: f[2], day: f[12], reached: +f[13] || 0, of: 9, items: items, source: "report code" };
+  };
+
+  /* Stats mixed review (stats/unit-3-normal-distribution/unit-3-review-1-3): the report code starts "UNI". Fields: 0 v1, 1 id, 2 period, 3 start band, 4 band,
+     5 warm-up right (of 6), 6 unused, 7 day, 8 reached, 9 ended, 10 "n-clean" practice, 11 skipped tabs, 12 skills by target ID "T1:2/3,T2:1/1" (first-try rights/items), 13 the idea named shaky. */
+  var STATS_LESSONS = [{ id: "unit-3-review-1-3", title: "Review: 3.1 to 3.3", steps: 4 }];
+  A.statsReport = function (code, LE) {
+    for (var i = 0; i < STATS_LESSONS.length; i++) {
+      var L = STATS_LESSONS[i], r = LE.decodeReport(L.id, code);
+      if (!r || !r.ok || r.fields[0] !== "v1" || r.fields.length < 13) continue;
+      var f = r.fields, items = [], titles = {}, sp = (typeof window !== "undefined" ? window : globalThis).SPECS || {};
+      ((sp[L.id] && sp[L.id].skills) || []).forEach(function (sk) { titles[sk.id] = sk.title; });
+      (f[12] || "").split(",").filter(Boolean).forEach(function (e) {
+        var m = /^(T\d+):(\d+)\/(\d+)$/.exec(e); if (!m) return;
+        for (var k = 0; k < +m[3]; k++) items.push(it(m[1], titles[m[1]] || m[1], +f[4] || null, k < +m[2]));
+      });
+      return { course: "stats", lesson: L.id, title: L.title, first: f[1], period: f[2], day: f[7], reached: +f[8] || 0, of: L.steps, items: items, source: "report code", flags: f[13] ? "shaky: " + f[13].replace(/_/g, " ") : "" };
+    }
+    return null;
   };
 
   A.calcHandIn = function (name, period, day, code, PR2) {

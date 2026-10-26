@@ -13,7 +13,7 @@
   LK.standard = function (SPEC, opts) {
   opts = opts || {};
   var ID = SPEC.id, MATH = !!window.QKIT && (SPEC.course === 'calc' || SPEC.math), opt = function (o) { return MATH ? QKIT.inline(o) : o; };
-  var K = LK.for({ id: ID, prefix: opts.prefix || 'TPL', identity: 'id', title: SPEC.title, lib: { skills: SPEC.skills.map(function (sk) { return { id: sk.id, title: sk.title, gen: function (b, r) { var q = sk.gen(b, r); q.type = q.type || 'num'; q.math = MATH; q.keypad = true; return q; } }; }), preds: SPEC.predicts } }), qdone = LK.qdone;
+  var K = LK.for({ id: ID, course: SPEC.course, prefix: opts.prefix || 'TPL', identity: 'id', title: SPEC.title, lib: { skills: SPEC.skills.map(function (sk) { return { id: sk.id, title: sk.title, gen: function (b, r) { var q = sk.gen(b, r); q.type = q.type || 'num'; q.math = MATH; q.keypad = true; return q; } }; }), preds: SPEC.predicts } }), qdone = LK.qdone;
   var T = K.TABS, steps = [];
 
   function skillQ(sk, band, tag, n) { var q = sk.gen(band, LE.seedRng(tag + ':' + n + ':' + band)); q.id = tag + '.' + n; q.type = q.type || 'num'; q.math = MATH; q.head = sk.title; q.keypad = true; return q; }

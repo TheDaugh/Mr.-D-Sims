@@ -123,3 +123,4 @@ footer{margin-top:24px;font:400 .75rem var(--mono);color:var(--muted)}
 }
 
 #steps button.skipped{opacity:.55;text-decoration:line-through}
+.qpic{margin:0 0 8px}.qpic svg{display:block}.qremember{margin:6px 0}

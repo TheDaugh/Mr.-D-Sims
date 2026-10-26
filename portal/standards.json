@@ -218,6 +218,12 @@
     "calc/calc.warmup.*": "CALC-DER-1",
     "calc/calc.product-rule*": "CALC-DER-2",
     "stats/tpl-stats/zscore": "STAT-NORMAL-2",
-    "stats/tpl-stats/rule": "STAT-NORMAL-1"
+    "stats/tpl-stats/rule": "STAT-NORMAL-1",
+    "stats/unit-3-review-1-3/T2": "STAT-NORMAL-2",
+    "stats/unit-3-review-1-3/T3": "STAT-NORMAL-2",
+    "stats/unit-3-review-1-3/T6": "STAT-NORMAL-2",
+    "stats/unit-3-review-1-3/T7": "STAT-NORMAL-1",
+    "stats/unit-3-review-1-3/T8": "STAT-NORMAL-1",
+    "stats/unit-3-review-1-3/T9": "STAT-NORMAL-1"
   }
 }
