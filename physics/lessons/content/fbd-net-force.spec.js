@@ -227,7 +227,7 @@
     question: 'Which forces act on an object, and which way do they add up?',
     /* one sentence each, "I can ..." */
     targets: ['I can name the two objects in any force interaction.', 'I can sort forces as contact or field forces.', 'I can draw a free-body diagram and find the net force.'],
-    tabs: ['Warm-up', 'Predict', 'Explore', 'Huddle', 'Build', 'Practice', 'Check'],
+    tabs: ['Warm-up', 'Predict', 'Explore', 'Model problems', 'Huddle', 'Build', 'Practice', 'Check'],
     huddleTarget: 'I can label forces on a free-body diagram and add them.',
     exploreTarget: 'I can sort each force as contact or field.',
 
@@ -290,11 +290,14 @@
     pacing: { budgetMin: 42,
       steps: [
         { id: 'start', prio: 1, min: 2 }, { id: 'warmup', prio: 1, min: 6 }, { id: 'predict', prio: 1, min: 3 },
-        { id: 'explore', prio: 3, min: 4 }, { id: 'build', prio: 2, min: 10, minItems: 6, parts: 12 },
+        { id: 'explore', prio: 3, min: 3 }, { id: 'models', prio: 2, min: 8, minItems: 3, parts: 5 }, { id: 'build', prio: 2, min: 8, minItems: 6, parts: 12 },
         { id: 'practice', prio: 1, min: 5 }, { id: 'check', prio: 1, min: 3 }
       ],
       huddles: [{ key: 'h1', atMin: 16 }] }
   };
+
+  /* the v2 content (models, six-band ladder, sim specs) is authored separately and read from here by the page, the keys and the tests */
+  SPEC.v2 = typeof module !== 'undefined' && module.exports ? require('./fbd-net-force.v2.content.js') : root.FBD_V2;
 
   if (typeof module !== 'undefined' && module.exports) module.exports = SPEC; else (root.SPECS = root.SPECS || {})[SPEC.id] = SPEC;
 })(typeof window !== 'undefined' ? window : globalThis);

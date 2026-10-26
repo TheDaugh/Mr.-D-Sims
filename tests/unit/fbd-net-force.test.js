@@ -74,3 +74,12 @@ test('six projector situations: every force has a label, the net is stated, each
 test('prompt variety: no band of any skill has fewer than 8 distinct prompts in 200 draws', () => {
   for (const sk of S.skills) for (let b = 1; b <= 4; b++) { const seen = new Set(); for (let k = 0; k < 200; k++) seen.add(sk.gen(b, rng(k * 17 + b)).prompt); assert.ok(seen.size >= 8, `${sk.id} band ${b}: ${seen.size} distinct prompts`); }
 });
+
+test('v2: the spec carries the authored content, pacing plans the Model problems tab, every sim has a page and a script', () => {
+  const fs = require('fs'), path = require('path'), root = path.join(__dirname, '../../physics/lessons');
+  assert.ok(S.v2 && S.v2.MODELS.length === 5 && S.v2.MOVES.length === 6 && Object.keys(S.v2.LADDER).length === 6);
+  const ids = S.pacing.steps.map(x => x.id); assert.deepStrictEqual(ids, ['start', 'warmup', 'predict', 'explore', 'models', 'build', 'practice', 'check']);
+  const total = S.pacing.steps.reduce((a, x) => a + x.min, 0), core = S.pacing.steps.filter(x => x.prio === 1).reduce((a, x) => a + x.min, 0);
+  assert.ok(total >= 30 && total <= 42, 'guided minutes ' + total); assert.ok(core <= 0.6 * S.pacing.budgetMin, 'core minutes ' + core);
+  S.v2.SIMS.forEach(m => { assert.ok(fs.existsSync(path.join(root, 'sims', m.id + '.html')), m.id + '.html'); assert.ok(fs.existsSync(path.join(root, 'sims', m.id + '.js')), m.id + '.js'); });
+});

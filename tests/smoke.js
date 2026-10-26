@@ -23,6 +23,7 @@ const extra = ['index.html', 'physics/index.html', 'chemistry/index.html', 'calc
   const pages = [];
   lessonList().forEach(l => { pages.push(l.href); if (process.env.KEY) pages.push(l.href + '#key'); if (l.teacher) pages.push(l.teacher); });
   extra.forEach(p => pages.push(p));
+  ['arrow', 'elevator', 'friction', 'twoblock', 'rope', 'chain'].forEach(id => pages.push('physics/lessons/sims/' + id + '.html'));   // slot 4 sims
   (process.env.PAGES || '').split(',').filter(Boolean).forEach(p => pages.push(p));
   const seen = new Set(), list = pages.filter(p => !seen.has(p) && seen.add(p) && fs.existsSync(path.join(ROOT, p.split('#')[0])));
   const br = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox'] });

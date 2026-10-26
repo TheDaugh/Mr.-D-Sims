@@ -26,7 +26,7 @@ function texText(raw) {
     .replace(/²/g, '\\textsuperscript{2}').replace(/³/g, '\\textsuperscript{3}').replace(/⁻¹/g, '\\textsuperscript{-1}').replace(/₀/g, '\\textsubscript{0}').replace(/₁/g, '\\textsubscript{1}').replace(/₂/g, '\\textsubscript{2}')
     .replace(/[−–]/g, '--').replace(/—/g, '---').replace(/×/g, '$\\times$').replace(/÷/g, '$\\div$').replace(/π/g, '$\\pi$').replace(/Δ/g, '$\\Delta$').replace(/Σ/g, '$\\Sigma$')
     .replace(/≤/g, '$\\le$').replace(/≥/g, '$\\ge$').replace(/≈/g, '$\\approx$').replace(/→/g, '$\\rightarrow$').replace(/°/g, '$^\\circ$').replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
-    .replace(/…/g, '...').replace(/·/g, '$\\cdot$').replace(/[^\x00-\x7e]/g, '?');
+    .replace(/μ/g, '$\\mu$').replace(/λ/g, '$\\lambda$').replace(/√/g, '$\\surd$').replace(/∫/g, '$\\int$').replace(/ÿ/g, '$\\ddot{y}$').replace(/ΣF/g, '$\\Sigma F$').replace(/…/g, '...').replace(/·/g, '$\\cdot$').replace(/[^\x00-\x7e]/g, '?');
 }
 let MC = null; try { require('../calculus/shared/mathcheck.js'); MC = globalThis.MC; } catch (e) {}
 const ans = q => q.type === 'expr' && MC ? '$' + MC.toLatex(String(q.answer), q.vars || ['x']) + '$'
@@ -83,6 +83,26 @@ function makeup(spec) {
   o.push('\\end{document}');
   return o.join('\n');
 }
+/* v2 content (models, six-band ladder): one block for the teacher key when a spec carries it */
+function v2Block(spec) {
+  const V = spec.v2; if (!V) return '';
+  const o = [], rung = b => ['A', 'A', 'B', 'B', 'C', 'C'][b - 1], names = ['core', 'honors', 'AP Physics 1', 'AP C / F=ma', 'olympiad', 'college'];
+  o.push('\\section*{The six moves}\\begin{enumerate}' + V.MOVES.map(m => '\\item \\textbf{' + tex(m.name) + '.} ' + tex(m.say)).join('\n') + '\\end{enumerate}');
+  o.push('\\section*{Model problems (five, with every step)}');
+  V.MODELS.forEach(M => {
+    o.push('\\subsection*{' + tex(M.id + ' (' + M.release + '): ' + M.title) + '}', tex(M.prompt) + '\\\\ \\textit{Predict:} ' + tex(M.predict) + ' \\A{' + tex(M.predictAnswer) + '}', '\\begin{enumerate}');
+    M.steps.forEach((st, i) => o.push('\\item \\textbf{' + tex(V.MOVES[i].name) + '.} ' + tex(st)));
+    o.push('\\end{enumerate}', '\\A{Answer: ' + tex(String(M.answer) + ' ' + M.unit + (M.answer2 != null ? ' and ' + M.answer2 + ' N' : '') + (M.youDoAnswer ? '; follow-up ' + M.youDoAnswer + ' N' : '')) + '} \\quad \\textit{Watch for: ' + tex(M.slip) + '}\\par');
+  });
+  o.push('\\section*{The six hidden bands, one sample each}', 'Students never see a band name. Rung A is bands 1--2, B is 3--4, C is 5--6. Build stops at band 4; bands 5 and 6 appear in Practice and Check.\\par\\medskip');
+  for (let b = 1; b <= 6; b++) {
+    const gen = V.LADDER[b][(b - 1) % V.LADDER[b].length], q = gen(V.mk(b * 37 + 5));
+    const opts = q.type === 'choice' ? '\\\\ ' + q.options.map((x, i) => (i === q.answer ? '\\A{(' + String.fromCharCode(65 + i) + ') ' : '(' + String.fromCharCode(65 + i) + ') ') + tex(x) + (i === q.answer ? '}' : '')).join(' \\quad ') : '';
+    const a = q.type === 'choice' ? String.fromCharCode(65 + q.answer) : ans(q) + (q.answer2 != null ? ' and ' + q.answer2 + ' ' + (q.unit2 || q.unit) : '');
+    o.push('\\subsection*{Band ' + b + ' (' + names[b - 1] + ', rung ' + rung(b) + ')}', '\\noindent ' + tex(q.prompt) + opts + '\\\\ \\A{Answer: ' + tex(a) + '}' + (q.symbolic ? ' \\quad Symbolic: ' + tex(q.symbolic) : '') + '\\\\ ' + q.worked.map(tex).join(' ') + '\\\\ \\textit{Misconception targeted: ' + tex(q.misc) + '}\\par');
+  }
+  return o.join('\n');
+}
 function teacher(spec) {
   const o = [head(spec, 'teacher')], P = spec.pacing || { steps: [], huddles: [], budgetMin: 0 };
   o.push('\\section*{' + tex(spec.title) + ' --- teacher key}', '\\textbf{Question:} ' + tex(spec.question) + '\\par');
@@ -94,6 +114,7 @@ function teacher(spec) {
   if (spec.predicts) { o.push('\\subsection*{Predictions}\\begin{itemize}'); spec.predicts.forEach(p => o.push('\\item ' + tex(p.prompt) + ' \\A{' + tex(strip(p.options[p.answer])) + '.} ' + tex(p.why))); o.push('\\end{itemize}'); }
   o.push('\\section*{Huddle script (answers in green)}', huddleBlock(spec, true));
   o.push('\\section*{Every level, with answers}', samples(spec));
+  if (spec.v2) o.push(v2Block(spec));
   if (spec.misconceptions) { o.push('\\section*{Common misconceptions}\\begin{tabularx}{\\textwidth}{@{}X X@{}}\\toprule Students say & Say instead\\\\\\midrule'); spec.misconceptions.forEach(m => o.push(tex(m.say) + ' & ' + tex(m.fix) + '\\\\')); o.push('\\bottomrule\\end{tabularx}'); }
   o.push('\\end{document}');
   return o.join('\n');
