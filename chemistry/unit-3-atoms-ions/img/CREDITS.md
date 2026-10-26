@@ -10,3 +10,5 @@ All images are public domain or CC0 from Wikimedia Commons. Each was reduced to 
 - **h2o2**: Hydrogen peroxide.jpg · Public domain · User:Yanachka · https://commons.wikimedia.org/wiki/File:Hydrogen_peroxide.jpg
 
 **otzi** (Counting Particles hook, `img/otzi.png`): not yet added. The lesson shows a labeled placeholder until a Wikimedia Commons photo of the Iceman (Ötzi) with a free license is placed here and credited in this line.
+
+**balloon-hair** (Coulomb's Law hook, `img/balloon-hair.png`): File:Attractive-electric-force-between-hair-and-balloon.jpg · CC BY-SA 4.0 · MikeRun · https://commons.wikimedia.org/wiki/File:Attractive-electric-force-between-hair-and-balloon.jpg. Not yet added: Wikimedia returned HTTP 429 (rate limit) to every download attempt in the build session, so the lesson shows a labeled placeholder. To finish: download the file, reduce it to about 320 px wide, save it as `img/balloon-hair.png`. The lesson pixelates it on load. CC BY-SA needs the credit shown, and the caption already names the photographer and license.
