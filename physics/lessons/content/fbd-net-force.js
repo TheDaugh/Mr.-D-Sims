@@ -3,7 +3,7 @@
    Check (diagram + net force), and the Wrap-up report. The teaching itself is in fbd-net-force.spec.js. */
 (function () {
   'use strict';
-  var LE = window.LE, el = LE.el, SP = window.SPECS['fbd-net-force'], ID = SP.id, qdone = LK.qdone, plain = LK.plain;
+  var LE = window.LE, el = LE.el, SP = window.SPECS['fbd-net-force'], ID = SP.id, qdone = LK.qdone, plain = LK.plain, UI = window.FBD_UI;
   var RUNG = { source: 'A', catalog: 'A', fbd: 'B', netdir: 'B', net: 'B', pair: 'C' };      // never shown to the student
   var TYPE = { ok: 'C', missing: 'M', extra: 'X', size: 'S' };
   function skillById(id) { return SP.skills.filter(function (s) { return s.id === id; })[0]; }
@@ -24,9 +24,12 @@
     }
     SP.catalogRows.forEach(function (r) { var b = el('button', 'btn' + (seen[r.sym] ? ' primary' : ''), r.f.replace(' (weight)', '')); b.type = 'button'; b.onclick = function () { seen[r.sym] = !seen[r.sym]; LE.save(); b.className = 'btn' + (seen[r.sym] ? ' primary' : ''); draw(); table(); }; row.appendChild(b); });
     draw(); table();
+    UI.simButtons(card, LE.band(), ['arrow']);
   } });
+  cfg.maxBand = 6;
   cfg.lock = true;
   var K = LK.for({ id: ID, prefix: 'FBD', identity: 'id', title: SP.title, lib: { skills: SP.skills, preds: [] } }), T = K.TABS;
+  cfg.steps.splice(cfg.steps.map(function (x) { return x.id; }).indexOf('explore') + 1, 0, UI.modelsStep(K));
   function stepIdx(id) { for (var i = 0; i < cfg.steps.length; i++) if (cfg.steps[i].id === id) return i; return -1; }
   function bitsOf(S) { return SP.vp.map(function (v) { var s = LE.qs(v.id); return s && s.ok && s.misses === 0 ? 1 : 0; }); }
 
@@ -39,18 +42,18 @@
       if (S.d.vp) card.appendChild(el('p', 'msg ok', 'Warm-up saved. Let’s go.' + (S.d.vp.scaffold ? ' Your Build tab starts with an arrow table.' : '')));
     },
     canLeave: function (c) { return SP.vp.every(function (v) { return qdone(v.id); }); },
-    teacher: function (c) { var d = c.S.d.vp; return '<p><b>Vectors and Proportions Check</b> (the pre-assessment, run as the opening). Six items, three parts: add forces on a line (V1, V2), direction of a net force (V3, V4), ratio table (V5, V6). One try each. Answers: ' + SP.vp.map(function (v) { var q = v.gen(LE.seedRng('vp:' + v.id)); return v.id + ' ' + (q.type === 'choice' ? plain(q.options[q.answer]) : q.answer + ' ' + q.unit); }).join('; ') + '.</p><p><b>Sorting.</b> A miss on either direction item puts a one-dimensional arrow table at the start of Build. Six clean first tries flags the student for the slot 20 incline extension. Start band from the count right: 0 to 1 right is band 1, 2 to 3 is band 2, 4 to 6 is band 3. Band 4 is reached only by earning it in Build.</p>' + (d ? '<p>This device: right ' + d.right + ' of 6; sorted into: ' + (d.scaffold ? 'arrow table first' : 'no scaffold') + (d.fluent ? '; flagged for slot 20' : '') + '.</p>' : ''); } };
+    teacher: function (c) { var d = c.S.d.vp; return '<p><b>Vectors and Proportions Check</b> (the pre-assessment, run as the opening). Six items, three parts: add forces on a line (V1, V2), direction of a net force (V3, V4), ratio table (V5, V6). One try each. Answers: ' + SP.vp.map(function (v) { var q = v.gen(LE.seedRng('vp:' + v.id)); return v.id + ' ' + (q.type === 'choice' ? plain(q.options[q.answer]) : q.answer + ' ' + q.unit); }).join('; ') + '.</p><p><b>Sorting.</b> A miss on either direction item puts a one-dimensional arrow table at the start of Build. Six clean first tries flags the student for the slot 20 incline extension. Start band from the count right: 0 to 2 right is band 1, 3 to 4 is band 2, 5 to 6 is band 3. Higher bands are earned in Practice and Check.</p>' + (d ? '<p>This device: right ' + d.right + ' of 6; sorted into: ' + (d.scaffold ? 'arrow table first' : 'no scaffold') + (d.fluent ? '; flagged for slot 20' : '') + '.</p>' : ''); } };
   function sortStudent(S) {
     if (!SP.vp.every(function (v) { return qdone(v.id); })) return;
     var bits = bitsOf(S), right = bits.reduce(function (a, b) { return a + b; }, 0), dirMiss = !bits[2] || !bits[3];
     S.d.vp = { bits: bits, right: right, scaffold: dirMiss, fluent: right === 6 };
-    if (!S.band0) { S.band0 = [1, 1, 2, 2, 3, 3, 3][right]; S.band = S.band0; S.warm = right; S.bandLog.push('start:' + S.band0); }
+    if (!S.band0) { S.band0 = [1, 1, 1, 2, 2, 3, 3][right]; S.band = S.band0; S.warm = right; S.bandLog.push('start:' + S.band0); }
   }
 
   /* ---------- Huddle: formative gate (three diagram checks, one try) -> split code -> Mr. D teaches, the student writes -> teacher code ---------- */
   cfg.steps[stepIdx('huddle')] = { id: 'huddle', label: T.huddle, timed: true,
     render: function (card, c) {
-      var S = c.S; K.head(card, 'Huddle with Mr. D', SP.huddleTarget, 'Check in on three diagrams, then fill in the blanks as Mr. D writes them.');
+      var S = c.S; K.head(card, 'Huddle with Mr. D', SP.huddleTarget, 'Check in on three diagrams. Mr. D reads the class split.');
       S.d.hud = S.d.hud || {}; var gate = el('div'); card.appendChild(gate);
       gate.appendChild(el('h3', null, 'Check-in: pick the right diagram'));
       SP.gate.forEach(function (g) { var q = {}; for (var k in g) q[k] = g[k]; q.head = 'Check-in: ' + g.title; q.maxMiss = 1; q.onDone = function () { gateDone(S); LE.save(); LE.render(); }; LE.ask(gate, q); });
@@ -58,14 +61,14 @@
         var g2 = S.d.gate;
         if (g2) { var p = el('p', 'qtext'); p.innerHTML = 'Your check-in code: <b class="stamp" style="font-size:1.4rem">' + g2.code + '</b>'; card.appendChild(p);
           card.appendChild(el('p', 'hint', 'C: right. M: a force missing. X: an extra force. S: arrows the wrong size. Show this to Mr. D.')); }
-        var host = el('div'); card.appendChild(host); MrD.huddle.render(host, SP.huddle, S.d.hud, { key: c.key, onChange: function () { LE.save(); } });
         K.codeBox(card, c, 'h1', 'Huddle code');
-      } else card.appendChild(el('p', 'hint', 'Answer all three to see your check-in code and the huddle.'));
+        var back = el('div', 'row'), bb = el('button', 'btn', 'Back to Model problems'); bb.type = 'button'; bb.onclick = function () { LE.forceGoto('models'); }; back.appendChild(bb); card.appendChild(back);
+      } else card.appendChild(el('p', 'hint', 'Answer all three to see your check-in code.'));
     },
     canLeave: function (c) { return !!c.S.d.gate && !!c.S.huddle.h1; },
     teacher: function (c) {
       var code = LE.codeFor(ID, 'h1');
-      return '<p><b>Huddle code: ' + code + '</b>. Students first answer three fixed diagram checks (one try each: rest, steady motion, speeding up), then see a three-letter check-in code: C right, M a force missing, X an extra “force of motion” or invented force, S arrows the wrong size. <b>Read the class split before you give the huddle code.</b> Ask for the codes aloud, or open the <a href="fbd-net-force-projector.html">projector page</a> and tap the class split (it lists the most common error and the next-day warm-up).</p><p>Then teach the three definitions, work the example on the board, and label the figure. Students fill the blanks as you write them; the answers are in the make-up key PDF. The huddle is pulled in at minute ' + SP.pacing.huddles[0].atMin + ' by the clock, and students return to where they were.</p>' + (c.S.d.gate ? '<p>This device: check-in code <b>' + c.S.d.gate.code + '</b>.</p>' : '');
+      return '<p><b>Huddle code: ' + code + '</b>. Students first answer three fixed diagram checks (one try each: rest, steady motion, speeding up), then see a three-letter check-in code: C right, M a force missing, X an extra “force of motion” or invented force, S arrows the wrong size. <b>Read the class split before you give the huddle code.</b> Ask for the codes aloud, or open the <a href="fbd-net-force-projector.html">projector page</a> and tap the class split (it lists the most common error and the next-day warm-up).</p><p>Keep it to about three minutes: read the split, name the most common slip, then send students back to the Model problems tab. The huddle is pulled in at minute ' + SP.pacing.huddles[0].atMin + ' by the clock, and students return to where they were.</p>' + (c.S.d.gate ? '<p>This device: check-in code <b>' + c.S.d.gate.code + '</b>.</p>' : '');
     } };
   function gateDone(S) {
     if (S.d.gate) return true;
@@ -94,7 +97,7 @@
       var S = c.S; K.head(card, T.build, 'I can draw a free-body diagram and find the net force.', 'Up next: practice at your level.');
       var blog = S.d.blog = S.d.blog || [];
       if (S.d.vp && S.d.vp.scaffold) { card.appendChild(el('h3', null, 'Arrow table')); card.appendChild(el('p', 'hint', 'Forces to the right: add. Forces to the left: add. Then subtract.')); scaffoldQs(S).forEach(function (q) { LE.ask(card, q); }); }
-      var band = LE.band(), plan = buildPlan(LE.items('build', 12), S.d.bband || (S.d.bband = band)), n = plan.length;
+      var band = LE.band(), plan = buildPlan(LE.items('build', 12), S.d.bband || (S.d.bband = Math.min(4, band))), n = plan.length;
       plan.forEach(function (it, i) {
         var sk = skillById(it[0]), q = skillQ(sk, it[1], 'b', i); q.head = (i < 6 && n === 12 ? 'Question ' : 'Question ') + (i + 1) + ' of ' + n + ' · ' + sk.title;
         q.onDone = function () { var st = LE.qs(q.id); if (!blog.some(function (x) { return x.id === q.id; })) { blog.push({ id: q.id, skill: sk.id, title: sk.title, band: it[1], misses: st.misses, ok: !!st.ok, secs: st.secs || 0, p: plain(q.prompt), a: LK.answerText(q), w: plain(q.worked), fbd: it[0] === 'fbd' }); } LE.save(); LE.gate(); };
@@ -103,27 +106,41 @@
     },
     canLeave: function (c) {
       var S = c.S; if (S.d.vp && S.d.vp.scaffold && !['sc.0', 'sc.1', 'sc.2'].every(qdone)) return false;
-      var n = buildPlan(LE.items('build', 12), S.d.bband || LE.band()).length; for (var i = 0; i < n; i++) if (!qdone('b.' + i)) return false; return true;
+      var n = buildPlan(LE.items('build', 12), S.d.bband || Math.min(4, LE.band())).length; for (var i = 0; i < n; i++) if (!qdone('b.' + i)) return false; return true;
     },
     teacher: function (c) {
       var plan = buildPlan(12, c.band || 2), rows = plan.map(function (it, i) { var sk = skillById(it[0]), q = sk.gen(it[1], LE.seedRng('b:' + i + ':' + it[1])); return '<li><b>' + (i + 1) + '. ' + sk.title + '</b> (rung ' + RUNG[it[0]] + ', band ' + it[1] + '): ' + plain(q.prompt) + ' <b>Answer: ' + LK.answerText(q) + '.</b> ' + plain(q.worked) + ' <i>Misconception: ' + q.misc + '</i></li>'; }).join('');
       return '<p>Twelve items in the order: six simple questions on arrows, sources and the force catalog (rung A), three diagrams in the order rest, steady motion, speeding up (rung B), then closing questions on net direction, net force and two objects (rungs B and C). When the class falls behind, Build shrinks to six items. The student never sees a rung or a band. A clean first try moves the next question up a band, one miss holds, two misses move it down with the reasoning shown. Sample items for band ' + (c.band || 2) + ':</p><ol>' + rows + '</ol>';
     } };
 
+  /* ---------- Practice: the v2 ladder (six hidden bands). Never runs out; a clean first try moves up, one miss holds, two misses move down with the reasoning shown. ---------- */
+  K.morePractice = UI.morePractice;
+  cfg.steps[stepIdx('practice')] = { id: 'practice', label: T.practice,
+    render: function (card, c) {
+      K.head(card, T.practice, 'I can solve force problems at my level.', 'Up next: a two-question check.');
+      UI.morePractice(card, c);
+      UI.simButtons(card, LE.band());
+    },
+    canLeave: function (c) { return (c.S.d.more && c.S.d.more.n || 0) >= LE.items('practice', 4); },
+    teacher: function (c) {
+      var rows = [1, 2, 3, 4, 5, 6].map(function (b) { return '<li><b>Band ' + b + '</b> (rung ' + UI.rungOf(b) + '): ' + SP.v2.LADDER[b].map(function (g) { var q = g(SP.v2.mk(7 * b + 3)); return '<i>' + UI.TITLE[q.id] + '</i>: ' + plain(q.prompt) + ' <b>Answer: ' + UI.answerText(q) + '.</b> ' + plain(q.worked.join(' ')) + (q.symbolic ? ' <i>Symbolic: ' + plain(q.symbolic) + '</i>' : '') + ' <i>Misconception: ' + plain(q.misc) + '</i>'; }).join('</li><li style="list-style:none">') + '</li>'; }).join('');
+      return '<p>Practice never runs out. Everyone does at least four; the hidden band moves up after a clean first try, holds after one miss, and drops after two with the reasoning shown. Bands 4 to 6 ask a “derive first” cloze before the number box opens. This student: band ' + LE.band() + '. The student is shown sims only for their band. One sample per band follows.</p><ul>' + rows + '</ul>';
+    } };
+
   /* ---------- Check: one diagram, one net force, same for the class's level; confidence is not asked here, the gate carries the split ---------- */
   cfg.steps[stepIdx('check')] = { id: 'check', label: T.check,
     render: function (card, c) {
       K.head(card, T.check, 'I can do it without help.', 'Up next: your notes and stamp.');
-      var b = LE.band(); [['fbd', 'C1'], ['net', 'C2']].forEach(function (p) { var q = skillQ(skillById(p[0]), Math.max(b, p[0] === 'fbd' ? 2 : 1), 'chk', p[1]); q.id = p[1]; q.maxMiss = 2; LE.ask(card, q); });
+      UI.checkItems(card, c);
     },
-    canLeave: function () { return qdone('C1') && qdone('C2'); },
-    teacher: function () { return '<p>C1 is a diagram (band 2 or higher, so it always includes a friction or tension scene), C2 is a net force at the student’s band. Two tries each. Both feed the report code and the portal record.</p>'; } };
+    canLeave: function () { var a = UI.itemState('C1'), b = UI.itemState('C2'); return !!(a && a.done && b && b.done); },
+    teacher: function (c) { return '<p>Two questions at the student’s level (band ' + LE.band() + ' on this device), drawn from the same ladder as Practice. Two tries each. Both feed the report code and the portal record.</p>'; } };
 
   /* ---------- report code, portal record, notes ---------- */
   function allLog(S) { return (S.d.blog || []).concat((S.d.more && S.d.more.log) || []); }
   function reportFields(S) {
-    var mlog = (S.d.more && S.d.more.log) || [], c1 = LE.qs('C1'), c2 = LE.qs('C2'), v = S.d.vp || { bits: [] }, g = S.d.gate || { code: '' };
-    var log = allLog(S).map(function (x) { return [x.skill, RUNG[x.skill] || '', x.band, x.misses, x.secs].join(','); }).join(';');
+    var mlog = (S.d.more && S.d.more.log) || [], c1 = UI.itemState('C1'), c2 = UI.itemState('C2'), v = S.d.vp || { bits: [] }, g = S.d.gate || { code: '' };
+    var log = allLog(S).map(function (x) { return [x.skill, RUNG[x.skill] || UI.rungOf(x.band), x.band, x.misses, x.secs].join(','); }).join(';');
     return ['v2', S.first, S.period, S.band0, S.band, S.warm == null ? '' : S.warm,
       (c1 && c1.ok && c1.misses === 0 ? 1 : 0) + '-' + (c2 && c2.ok && c2.misses === 0 ? 1 : 0), LE.today(), LE.reached().idx + 1, S.ended ? 't' : 'f',
       mlog.length + '-' + mlog.filter(function (x) { return x.misses === 0; }).length, Object.keys(S.skip || {}).join('+'),
@@ -134,7 +151,7 @@
     SP.predicts.forEach(function (p, i) { var st = LE.qs(p.id); if (st && st.done) items.push({ skill: 'predict-' + (i + 1), band: S.band0 || 2, firstTry: !!st.ok && st.misses === 0, ok: !!st.ok }); });
     if (v) ['arith', 'dir', 'prop'].forEach(function (part) { SP.vp.forEach(function (x, i) { if (x.part === part) items.push({ skill: 'vp-' + part, band: 1, firstTry: !!v.bits[i], ok: !!v.bits[i] }); }); });
     (S.d.gate && S.d.gate.types || []).forEach(function (t) { items.push({ skill: 'gate-fbd', band: 2, firstTry: t === 'C', ok: t === 'C' }); });
-    ['C1', 'C2'].forEach(function (k) { var q = LE.qs(k); if (q && q.done) items.push({ skill: 'check-' + k.toLowerCase(), band: LE.band(), firstTry: q.ok && q.misses === 0, ok: !!q.ok }); });
+    ['C1', 'C2'].forEach(function (k) { var q = UI.itemState(k), ck = (S.d.chk || {})[k]; if (q && q.done) items.push({ skill: 'check-' + k.toLowerCase(), band: ck ? ck.band : LE.band(), firstTry: q.ok && q.misses === 0, ok: q.ok }); });
     return { course: 'physics', lesson: ID, title: SP.title, first: S.first, period: S.period, day: LE.today(), reached: LE.reached().idx + 1, of: LE.reached().of, items: items };
   };
   cfg.steps[stepIdx('notes')] = K.notesStep({ reportFields: reportFields, teacher: function (c) {
@@ -165,6 +182,9 @@
         var v = S.d.vp; out.push({ title: 'Warm-up: what I know about adding forces', blocks: v ? [{ type: 'table', head: ['Part', 'First try'], rows: [['Add forces on a line', v.bits[0] && v.bits[1] ? 'both right' : 'review'], ['Direction of the net force', v.bits[2] && v.bits[3] ? 'both right' : 'review'], ['Ratio reasoning', v.bits[4] && v.bits[5] ? 'both right' : 'review']] }] : [{ type: 'blank' }] });
       }
       if (s.title === 'My predictions') {
+        var md = SP.v2.MODELS.filter(function (M) { return UI.modelDone(M); }), mb = [{ type: 'list', items: SP.v2.MOVES.map(function (m) { return m.n + '. ' + m.name + ': ' + m.say; }) }];
+        md.forEach(function (M) { mb.push({ type: 'box', label: M.id + ' ' + M.title + ':', text: M.prompt + ' Answer: ' + plain(String(M.answer)) + ' ' + M.unit + (M.answer2 != null ? ' and ' + M.answer2 + ' N' : '') + '. Watch for: ' + M.slip }); });
+        out.push({ title: 'Model problems: the six moves', blocks: mb });
         var seen = S.d.cat || {};
         out.push({ title: 'The force catalog', blocks: [{ type: 'table', head: ['Force', 'Source', 'Contact or field', 'Direction'], rows: SP.catalogRows.map(function (r) { return seen[r.sym] ? [r.f + ' (' + r.sym + ')', r.source, r.kind, r.dir] : [r.f + ' (' + r.sym + ')', '', '', '']; }) }] });
         var blocks = [];

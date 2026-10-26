@@ -57,7 +57,7 @@
   LE.save = function () { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 150); };
   LE.reset = function () { S = fresh(); saveNow(); LE.render(); };
   LE.band = function () { return S.band || S.band0 || 2; };
-  LE.setBand = function (b, why) { b = Math.max(1, Math.min(4, b)); if (b !== S.band) S.bandLog.push(S.band + '>' + b + (why ? ':' + why : '')); S.band = b; LE.save(); };
+  LE.setBand = function (b, why) { b = Math.max(1, Math.min((CFG && CFG.maxBand) || 4, b)); if (b !== S.band) S.bandLog.push(S.band + '>' + b + (why ? ':' + why : '')); S.band = b; LE.save(); };
   LE.seedRng = function (tag) { if (!S.seed) { S.seed = LE.norm(S.first) + '|' + LE.norm(S.period); LE.save(); } return LE.rng(S.seed + '|' + tag); };
 
   /* ---------- locked mode (shared/lock.js) ----------
@@ -516,7 +516,7 @@
     var bar = $('keybar'); bar.hidden = !KEY; bar.textContent = '';
     if (!KEY) return;
     var extra = [];
-    var bsel = el('label', null, 'Preview level '); var sel = el('select'); [1, 2, 3, 4].forEach(function (b) { var o = el('option', null, String(b)); o.value = String(b); if (b === LE.band()) o.selected = true; sel.appendChild(o); });
+    var bsel = el('label', null, 'Preview level '); var sel = el('select'); for (var bi = 1, bm = (CFG && CFG.maxBand) || 4, bl = []; bi <= bm; bi++) bl.push(bi); bl.forEach(function (b) { var o = el('option', null, String(b)); o.value = String(b); if (b === LE.band()) o.selected = true; sel.appendChild(o); });
     sel.onchange = function () { LE.setBand(+sel.value, 'key'); LE.render(); }; bsel.appendChild(sel); extra.push(bsel);
     var rs = el('button', null, 'Reset this device'); rs.type = 'button'; rs.onclick = function () { if (confirm('Clear saved progress on this device?')) LE.reset(); }; extra.push(rs);
     MrD.teacherBar(bar, { course: CFG.course, lessonId: CFG.id, gates: CFG.gates, teacher: 'teacher.html#' + CFG.id, root: '../../', extra: extra });

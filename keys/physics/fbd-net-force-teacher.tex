@@ -11,8 +11,9 @@
 start & 1 & 2 & never trimmed\\
 warmup & 1 & 6 & never trimmed\\
 predict & 1 & 3 & never trimmed\\
-explore & 3 & 4 & skipped first\\
-build & 2 & 10 & shrinks to 6 of 12\\
+explore & 3 & 3 & skipped first\\
+models & 2 & 8 & shrinks to 3 of 5\\
+build & 2 & 8 & shrinks to 6 of 12\\
 practice & 1 & 5 & never trimmed\\
 check & 1 & 3 & never trimmed\\
 Huddle h1 & clock & minute 16 & pulled in by the clock\\
@@ -77,6 +78,82 @@ A crate has W = 40 N down, N = 40 N up, a push of 20 N right, and friction of 8 
 \noindent\textbf{Level 2.} A book A sits on a book B, and B sits on a table. Which list names the forces on book A?\\ \A{(A) Gravity on A, and B's push up} \quad (B) Gravity on A, B's push up, and the table's push up \quad (C) Gravity on A and on B \quad (D) Gravity on A only\\ \A{Answer: A} \quad A is touched only by B, so B pushes up on it. The table touches B, not A.\\ \textit{Misconception targeted: Students list every force in the picture on every object.}\par\medskip
 \noindent\textbf{Level 3.} Box A (4 kg) sits on box B (1 kg). The table pushes up on B. How hard does the table push, in newtons? (g = 9.8 N/kg)\\ \A{Answer: 49 N} \quad The table holds up both: N = (4 + 1) $\times$ 9.8 = 49 N.\\ \textit{Misconception targeted: Students count only the lower box's weight.}\par\medskip
 \noindent\textbf{Level 4.} Boxes of 2 kg and 3 kg are tied together and pulled right with 34 N. Friction on the pair totals 12 N. What is the net force on the pair?\\ \A{Answer: 22 N} \quad 34 -- 12 = 22 N to the right. The tension between the boxes is inside the system and does not count.\\ \textit{Misconception targeted: Students add the tension between the boxes into the net force.}\par\medskip
+\section*{The six moves}\begin{enumerate}\item \textbf{Sketch and name the system.} Draw the situation. Circle the one object you will write the law for.
+\item \textbf{Draw the free-body diagram.} One arrow per force ON that object. Label each as "force by what, on what". Equal forces, equal lengths.
+\item \textbf{Choose the positive direction.} Pick the way the object accelerates, or the way it would. Forces that point that way are positive.
+\item \textbf{Write the sum of forces.} $\Sigma$F = ma with every term signed. Write it in symbols before any number goes in.
+\item \textbf{Solve with units.} Isolate the unknown, substitute, carry units. N is kg$\cdot$m/s\textsuperscript{2}.
+\item \textbf{Sense-check.} Direction right? Size believable? Does it pass a limit (zero mass, zero push)?\end{enumerate}
+\section*{Model problems (five, with every step)}
+\subsection*{M1 (I do): A 2.0 kg book rests on a table}
+Find the normal force on the book.\\ \textit{Predict:} Before any math: is the table pushing harder than, equal to, or less than the pull of gravity? Why? \A{Equal. The book is not accelerating, so the arrows cancel.}
+\begin{enumerate}
+\item \textbf{Sketch and name the system.} System: the book. Interactions: the book with Earth (field) and the book with the table (contact).
+\item \textbf{Draw the free-body diagram.} FBD: W down (Earth on book), N up (table on book). Same length.
+\item \textbf{Choose the positive direction.} Positive: up.
+\item \textbf{Write the sum of forces.} $\Sigma$F = N -- W = ma, and a = 0.
+\item \textbf{Solve with units.} N = W = mg = (2.0 kg)(9.8 m/s\textsuperscript{2}) = 19.6 N.
+\item \textbf{Sense-check.} Check: up, same size as the weight. Pass. Note N equals W because a = 0, not because they are a third-law pair.
+\end{enumerate}
+\A{Answer: 19.6 N} \quad \textit{Watch for: Calling N and W an action-reaction pair. They act on the same object, so they cannot be.}\par
+\subsection*{M2 (I do): A 12 kg crate is pushed right with 80 N; friction is 50 N}
+Find its acceleration.\\ \textit{Predict:} Does it move at constant speed, speed up, or slow down? Which way does the net force point? \A{Speeds up to the right. The push beats friction, so the net force points right.}
+\begin{enumerate}
+\item \textbf{Sketch and name the system.} System: the crate.
+\item \textbf{Draw the free-body diagram.} FBD: F = 80 N right, f = 50 N left, W and N cancel and are equal and opposite.
+\item \textbf{Choose the positive direction.} Positive: right.
+\item \textbf{Write the sum of forces.} $\Sigma$F = F -- f = ma. Up and down add to zero.
+\item \textbf{Solve with units.} a = (80 -- 50) N / 12 kg = 2.5 m/s\textsuperscript{2}.
+\item \textbf{Sense-check.} Check: positive means right, matches the prediction. 30 N on 12 kg is a bit over 2. Pass.
+\end{enumerate}
+\A{Answer: 2.5 m/s\textsuperscript{2}} \quad \textit{Watch for: Adding friction to the push. Friction points against the slide, so its sign is negative.}\par
+\subsection*{M3 (we do): A 60 kg student stands on a scale in an elevator that speeds up upward at 1.5 m/s\textsuperscript{2}}
+What does the scale read?\\ \textit{Predict:} Heavier than, equal to, or lighter than the 588 N at rest? Why? \A{Heavier. To accelerate upward the floor must push up more than gravity pulls down.}
+\begin{enumerate}
+\item \textbf{Sketch and name the system.} System: the student, not the elevator.
+\item \textbf{Draw the free-body diagram.} FBD: N up (scale on student), W down. N is longer than W.
+\item \textbf{Choose the positive direction.} Positive: up.
+\item \textbf{Write the sum of forces.} $\Sigma$F = N -- mg = ma.
+\item \textbf{Solve with units.} N = m(g + a) = 60(9.8 + 1.5) = 678 N.
+\item \textbf{Sense-check.} Check: bigger than 588 N. If a = 0 the formula gives mg. Pass.
+\end{enumerate}
+\A{Answer: 678 N; follow-up 498 N} \quad \textit{Watch for: Thinking the scale reads weight. A scale reads the normal force on you.}\par
+\subsection*{M4 (we do): A 4.0 kg block on a frictionless table is tied to a 2.0 kg hanging block over a light pulley}
+Find the acceleration and the string tension.\\ \textit{Predict:} Is the tension more than, equal to, or less than the 19.6 N weight of the hanging block? \A{Less. The hanging block speeds up downward, so gravity beats the string.}
+\begin{enumerate}
+\item \textbf{Sketch and name the system.} Two objects, so two diagrams. Block 1: T right (string), W and N cancel. Block 2: T up, W2 down.
+\item \textbf{Draw the free-body diagram.} Same string, same T. Same speed, same a.
+\item \textbf{Choose the positive direction.} Positive: the direction of motion, right for block 1 and down for block 2.
+\item \textbf{Write the sum of forces.} Block 1: T = m1 a. Block 2: m2 g -- T = m2 a.
+\item \textbf{Solve with units.} Add: m2 g = (m1 + m2) a, so a = 19.6/6.0 = 3.27 m/s\textsuperscript{2}. Then T = m1 a = 13.1 N.
+\item \textbf{Sense-check.} Check: T < 19.6 N. If m1 is huge, a $\rightarrow$ 0. If m1 $\rightarrow$ 0, a $\rightarrow$ g. Pass.
+\end{enumerate}
+\A{Answer: 3.27 m/s\textsuperscript{2} and 13.1 N} \quad \textit{Watch for: Setting T equal to the hanging weight. That is only true if the block is not accelerating.}\par
+\subsection*{M5 (you do): Two blocks touch on a frictionless floor: 3.0 kg and 5.0 kg. A 24 N push acts on the 3.0 kg block}
+Find the force the 3.0 kg block exerts on the 5.0 kg block.\\ \textit{Predict:} More than 24 N, equal, or less? Which block feels more net force? \A{Less than 24 N. The 5.0 kg block gets only part of the push.}
+\begin{enumerate}
+\item \textbf{Sketch and name the system.} Draw the system of both blocks first: only the 24 N is external. a = 24/8.0 = 3.0 m/s\textsuperscript{2}.
+\item \textbf{Draw the free-body diagram.} Now the 5.0 kg block alone: the contact force C is the only horizontal force.
+\item \textbf{Choose the positive direction.} Positive: right.
+\item \textbf{Write the sum of forces.} C = m2 a.
+\item \textbf{Solve with units.} C = 5.0 $\times$ 3.0 = 15 N.
+\item \textbf{Sense-check.} Check: 15 < 24. By the third law the 5.0 kg block pushes back on the 3.0 kg block with 15 N, leaving it 9 N: 9/3.0 = 3.0. Pass.
+\end{enumerate}
+\A{Answer: 15 N} \quad \textit{Watch for: Saying the 5.0 kg block feels the full 24 N.}\par
+\section*{The six hidden bands, one sample each}
+Students never see a band name. Rung A is bands 1--2, B is 3--4, C is 5--6. Build stops at band 4; bands 5 and 6 appear in Practice and Check.\par\medskip
+\subsection*{Band 1 (core, rung A)}
+\noindent A rope pulls a sled. Which two objects interact, and is the force contact or field?\\ \A{(A) rope and sled, contact} \quad (B) rope and sled, field \quad (C) one object alone, contact \quad (D) motion and rope, contact\\ \A{Answer: A}\\ Every force has two objects: one pushes or pulls, one is pushed or pulled. Touching means contact. Acting across a gap means field.\\ \textit{Misconception targeted: A force belongs to one object; a force never comes from "motion".}\par
+\subsection*{Band 2 (honors, rung A)}
+\noindent A rope pulls a 2 kg bucket straight up with 27.6 N. Take up as positive. Find the acceleration.\\ \A{Answer: 4 m/s\textsuperscript{2}}\\ W = 19.6 N down. $\Sigma$F = T -- W = 8 N. a = 4 m/s\textsuperscript{2} upward.\\ \textit{Misconception targeted: Forgetting weight when a rope pulls.}\par
+\subsection*{Band 3 (AP Physics 1, rung B)}
+\noindent On a frictionless floor, a 20 N push acts on a 4 kg block that touches a 6 kg block. How big is the contact force between them?\\ \A{Answer: 12 N} \quad Symbolic: C = F m2 / (m1 + m2)\\ System: a = F/(m1 + m2) = 2 m/s\textsuperscript{2}. Second block alone: C = m2 a = 12 N.\\ \textit{Misconception targeted: Saying the second block feels the full push.}\par
+\subsection*{Band 4 (AP C / F=ma, rung B)}
+\noindent Mass 6 kg hangs from mass 1 kg, which hangs from a cable. The elevator holding the cable accelerates up at 1 m/s\textsuperscript{2}. Find the tension in the cable. Then find the tension between the masses.\\ \A{Answer: 75.6 N and 64.8 N} \quad Symbolic: T1 = (m1 + m2)(g + a),  T2 = m2 (g + a)\\ Whole stack: T1 -- (m1 + m2) g = (m1 + m2) a. Lower mass alone: T2 -- m2 g = m2 a.\\ \textit{Misconception targeted: Giving the same tension to both strings.}\par
+\subsection*{Band 5 (olympiad, rung C)}
+\noindent A uniform 4 kg rope of length 2 m hangs from a 55.2 N upward pull on its top end. Find the tension in the rope 1 m below the top.\\ \A{Answer: 27.6 N} \quad Symbolic: T(s) = F (1 -- s/L)\\ Whole rope: a = (F -- Mg)/M = 4 m/s\textsuperscript{2} up. The piece below depth s has mass M(1 -- s/L): T = M(1 -- s/L)(g + a) = F(1 -- s/L). The tension falls linearly to zero at the free end.\\ \textit{Misconception targeted: Assuming one tension for the whole rope.}\par
+\subsection*{Band 6 (college, rung C)}
+\noindent A uniform chain of length 2.5 m lies on a frictionless table with 1.2 m hanging over the edge. Find its acceleration at that instant. Then show that y(t) = y0 cosh($\surd$(g/L) t).\\ \A{Answer: 4.7 m/s\textsuperscript{2}} \quad Symbolic: a = g y / L\\ Only the hanging part is pulled: ($\lambda$ y) g = ($\lambda$ L) a. a = g y/L, so $\ddot{y}$ = (g/L) y, which has cosh solutions.\\ \textit{Misconception targeted: Using a = g for a chain that is partly on a table.}\par
 \section*{Common misconceptions}\begin{tabularx}{\textwidth}{@{}X X@{}}\toprule Students say & Say instead\\\midrule
 The crate needs a force of motion pushing it forward. & Motion is not a force. Name the object that exerts every arrow. At constant speed the net force is zero.\\
 A book at rest has no forces on it, or only gravity. & The table pushes up. At rest the forces balance: N equals W.\\

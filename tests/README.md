@@ -25,3 +25,7 @@ See `templates/README.md`: `node tools/new-lesson.mjs ...`, edit the spec, run t
 
 ## Per-lesson overrides
 `tests/template.e2e.js` loads `tests/lessons/<page-basename>.e2e.js` when it exists. `tests` replaces a template test by name; `extra` adds tests. Slot 4 (`fbd-net-force`) uses it for its six-item check, huddle gate, projector page and portal decode.
+
+## Slot 4 (fbd-net-force)
+
+`PAGE=physics/lessons/fbd-net-force.html TEMPLATE=physics node tests/template.e2e.js` runs the standard tests plus `tests/lessons/fbd-net-force.e2e.js`: the Model problems tab, the shrunken huddle, the six-band ladder (two misses stay at band 1, clean answers reach band 5, Build capped at band 4), derive-first clozes, sims offered only for their bands, banned words on every student page and sim, and the report decode. The tests pin a Wednesday in Eastern time, so run them with `TZ=America/New_York` (or the clock-driven checks fail). `tools/build-keys.mjs` needs `pdflatex`.
