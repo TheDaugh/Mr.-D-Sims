@@ -1,12 +1,13 @@
 # Lesson templates
 
-Three runnable template lessons, one per course. They are the starting point for every new guided lesson, and the reference for what a lesson does.
+Four runnable template lessons, one per course. They are the starting point for every new guided lesson, and the reference for what a lesson does.
 
 | Course | Open | Spec |
 |---|---|---|
 | Physics | `templates/physics/lesson.html` | `templates/physics/spec.js` |
 | Chemistry | `templates/chem/lesson.html` | `templates/chem/spec.js` |
 | Calculus | `templates/calc/lesson.html` | `templates/calc/spec.js` |
+| Statistics | `templates/stats/lesson.html` | `templates/stats/spec.js` |
 
 Add `#key` to see every tab with the answers marked. Add `#key&now=2026-10-21T09:30` to pretend it is a different time in class.
 
@@ -16,6 +17,7 @@ Add `#key` to see every tab with the answers marked. Add `#key&now=2026-10-21T09
 node tools/new-lesson.mjs physics newtons-third-law "Newton's Third Law"
 node tools/new-lesson.mjs chem    mole-ratios       "Mole Ratios"          --unit unit-4-reactions
 node tools/new-lesson.mjs calc    2-8-quotient-rule "2.8 The Quotient Rule" --unit unit-2-differentiation
+node tools/new-lesson.mjs stats   3-2-z-scores      "3.2 z-Scores"         --unit unit-3-normal
 ```
 
 That makes the page, the spec and the content file, and adds the lesson to `shared/lessons.js`. Then:

@@ -1,4 +1,4 @@
-/* MrD.bell: the school clock for every guided lesson (physics, chemistry, calculus).
+/* MrD.bell: the school clock for every guided lesson (physics, chemistry, calculus, statistics).
 
    One file decides three things, so no lesson has to:
      1. Is a class in session right now, and when does this lesson end?
@@ -20,7 +20,10 @@
   var SCHEDULE = {
     physics: { label: "Physics",   weekday: [["09:00", "09:50"]],                   friday: [["09:00", "09:40"]] },
     chem:    { label: "Chemistry", weekday: [["10:40", "11:30"], ["13:50", "14:40"]], friday: [["09:40", "10:20"], ["14:00", "14:40"]] },
-    calc:    { label: "Calculus",  weekday: [["12:10", "13:00"]],                   friday: [["12:40", "13:20"]] }
+    calc:    { label: "Calculus",  weekday: [["12:10", "13:00"]],                   friday: [["12:40", "13:20"]] },
+    /* TODO(Ian): these stats times are PLACEHOLDERS, not the real bell. Replace the two pairs below (weekday, friday) with the real period.
+       Both are 50 minutes. Friday needs no 42-minute mark, so a 50-minute Friday just means the lesson stays locked to the bell. */
+    stats:   { label: "Statistics", weekday: [["10:00", "10:50"]],                  friday: [["10:00", "10:50"]] }  // TODO(Ian): real times
   };
   var CFG = { endMinute: 42, earlyOpenMin: 5, gatesFrom: "07:00", gatesUntil: "15:00" };
 

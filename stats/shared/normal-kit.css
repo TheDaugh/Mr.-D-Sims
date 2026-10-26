@@ -1,0 +1,45 @@
+/* NK widgets. Light theme to match the lesson engine. Sized for 1366x768. */
+.nk-svg{width:100%;max-width:680px;background:var(--stage,#f6f9fd);border:1px solid var(--line,#cbd6e0);border-radius:8px;display:block}
+.nk-fill{fill:#cfe0ff;stroke:none}.nk-line{stroke:#2b4fd9;stroke-width:3}.nk-axis{stroke:#7a8a99;stroke-width:1.5}.nk-bold{stroke:#142230;stroke-width:2}
+.nk-tick{font:600 12px system-ui,sans-serif;fill:#142230}.nk-data{fill:#566170;font-weight:400}
+.nk-marker{outline:none}.nk-mline{stroke:#b3412e;stroke-width:2.5}.nk-mdot{fill:#b3412e;stroke:#fff;stroke-width:2}
+.nk-marker:focus-visible .nk-mdot{stroke:#142230;stroke-width:3}
+.nk-dot{fill:#9db6d8;stroke:#142230;stroke-width:1}.nk-dot.nk-low{fill:#2b4fd9}.nk-bar{fill:#9db6ec;stroke:#2b4fd9;stroke-width:1}
+.nk-readout{margin:8px 0;font-weight:600;min-height:1.5em}.nk-readout.nk-hidden{color:#566170;font-weight:400}
+.nk-btn{font:600 .95rem system-ui,sans-serif;padding:8px 15px;border-radius:6px;border:1px solid #2b4fd9;background:#2b4fd9;color:#fff;cursor:pointer}
+.nk-btn:hover{background:#1f3fb4}.nk-row{display:flex;gap:12px;align-items:center;margin:8px 0}
+/* z-table */
+.nk-zt{font:14px/1.35 system-ui,sans-serif;color:#142230}.nk-zt-prompt{font-weight:700;margin:0 0 6px}.nk-zt-fb{min-height:2.7em;margin:6px 0 0;font-weight:600}.nk-good{color:#1c7d4a}.nk-warn{color:#b3412e}
+.nk-zt-scroll{position:relative;overflow:auto;border:1px solid #cbd6e0;border-radius:6px;background:#fff}
+.nk-zt-table{border-collapse:separate;border-spacing:0;width:100%;font:600 13px ui-monospace,Menlo,Consolas,monospace;text-align:center}
+.nk-zt-table th,.nk-zt-table td{padding:5px 3px;border-bottom:1px solid #e3e8ee;border-right:1px solid #eef1f5;white-space:nowrap}
+.nk-zt-table thead th{position:sticky;top:0;background:#eef2f6;z-index:3;border-bottom:2px solid #9db0c2}
+.nk-zt-table tbody th{position:sticky;left:0;background:#eef2f6;z-index:2;border-right:2px solid #9db0c2;min-width:3.4em}
+.nk-zt-table thead th:first-child{left:0;z-index:4}
+.nk-zt-table td{cursor:pointer;outline:none}.nk-zt-table td:focus-visible{box-shadow:inset 0 0 0 3px #142230}
+.nk-zt-table tr.nk-sep th,.nk-zt-table tr.nk-sep td{border-bottom:2px solid #9db0c2}
+.nk-zt-table .nk-hot{background:#fff3c4}.nk-zt-table th.nk-hot{background:#ffd966}.nk-zt-table td.nk-ok{background:#bfe8cf;box-shadow:inset 0 0 0 2px #1c7d4a}.nk-zt-table td.nk-bad{background:#f6c9c0;box-shadow:inset 0 0 0 2px #b3412e}
+.nk-finger{position:absolute;font-size:20px;pointer-events:none;z-index:5;line-height:1;transform:translate(-4px,-2px)}
+.nk-zt-step2{margin:8px 0}.nk-zt-step2 input{font:inherit;width:7em;padding:6px;margin-right:8px}.nk-small{margin:0 0 6px;color:#566170}
+/* tiles */
+.nk-tiles{font:16px system-ui,sans-serif;color:#142230}
+.nk-slots{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.nk-slot{flex:1 1 130px;min-width:120px;border:2px dashed #9db0c2;border-radius:10px;padding:6px;background:#fafcff;outline:none;transition:border-color .15s,background .15s}
+.nk-slot:focus-visible{box-shadow:0 0 0 3px #142230}.nk-slot.nk-over,.nk-slot.nk-target{border-color:#2b4fd9;background:#e6edff;border-style:solid}
+.nk-slot.nk-full{border-style:solid;border-color:#1c7d4a;background:#eaf7ef}.nk-slot.nk-hinted{border-color:#d99a00;background:#fff8e1}
+.nk-slabel{display:block;font:700 .8rem ui-monospace,Menlo,monospace;color:#566170;margin-bottom:4px}.nk-zone{display:block;min-height:46px}
+.nk-bank{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border-radius:10px;background:#eef2f6;min-height:58px}
+.nk-tile{padding:10px 14px;border-radius:8px;background:#fff;border:2px solid #2b4fd9;font-weight:600;cursor:grab;user-select:none;-webkit-user-select:none;position:relative;touch-action:none}
+.nk-tile:focus-visible{box-shadow:0 0 0 3px #142230}.nk-tile.nk-held{background:#2b4fd9;color:#fff;box-shadow:0 0 0 3px #9db6ec}.nk-tile.nk-drag{opacity:.9;cursor:grabbing;box-shadow:0 8px 18px rgba(0,0,0,.25);transition:none}
+.nk-tile.nk-placed{border-color:#1c7d4a;cursor:default}.nk-zone .nk-tile{display:block;text-align:center}
+@keyframes nk-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+@keyframes nk-flash{0%,60%{outline:3px solid #b3412e}100%{outline:3px solid transparent}}
+.nk-shake{animation:nk-shake .4s}@media (prefers-reduced-motion:reduce){.nk-shake{animation:nk-flash .6s}}
+.nk-hint{min-height:1.5em;margin:8px 0 0;font-weight:600;color:#8a5a00}.nk-complete .nk-bank{background:#eaf7ef}
+.nk-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* routine and example */
+.nk-routine{list-style:none;counter-reset:nk;margin:0;padding:0;font:15px/1.4 system-ui,sans-serif;color:#142230}
+.nk-routine li{counter-increment:nk;padding:7px 10px 7px 38px;position:relative;border-radius:8px;margin:4px 0;background:#f3f6fa}
+.nk-routine li::before{content:counter(nk);position:absolute;left:8px;top:6px;width:22px;height:22px;border-radius:50%;background:#2b4fd9;color:#fff;text-align:center;font:700 .8rem/22px system-ui}
+.nk-routine li.nk-active{background:#fff3c4;box-shadow:0 0 0 2px #d99a00}.nk-routine li.nk-done{opacity:.6}
+.nk-example{font:15px/1.45 system-ui,sans-serif;color:#142230}.nk-example ol{margin:0;padding-left:1.2rem}.nk-example li{margin:6px 0}
