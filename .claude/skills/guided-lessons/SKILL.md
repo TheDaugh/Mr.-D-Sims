@@ -5,6 +5,8 @@ description: How to build a Mr. D guided lesson (sim + check + hidden routing + 
 
 # Building a guided lesson in this repo
 
+> **Scope (2026-10-26).** This file describes the earlier single-file chemistry build (Coulomb's law). It is correct for maintaining that page and its siblings (`atom-discovery`, `rutherford-gold-foil`, `counting-particles`, `coulombs-law`). **For a NEW lesson, do not copy any of these pages.** Run `node tools/new-lesson.mjs` and follow `docs/LESSON-STANDARD.md` ("Standard v2") and `templates/README.md`: the lesson is a spec, and the page, keys and tests all read it. Where this file and the standard disagree, the standard wins. Useful here regardless: section 4 (class split), 6 (teacher key), 7 (images), 10 (pitfalls).
+
 Reference build: `chemistry/unit-3-atoms-ions/coulombs-law.html` (+ `coulombs-law-board.html`, `chemistry/shared/coulomb-practice.js`, `chemistry/shared/ladder.js`, `tests/lessons/coulombs-law*.e2e.js`, `tests/unit/coulomb.test.js`). Copy its shape. The account-level `mrd-lesson-base` and `mrd-chem-lesson` skills sit outside the repo; where they disagree with this file on the single-file chem page, this file matches what is built and tested.
 
 ## 0. Before writing
