@@ -70,6 +70,7 @@ td.c-review{background:rgba(192,57,43,.18)}td.c-getting{background:rgba(217,154,
 <script src="../physics/lessons/engine/cart-sim.js"></script>
 <script src="../physics/lessons/content/n2l-items.js"></script>
 <script src="../physics/lessons/content/fbd-net-force.spec.js"></script>
+<script src="../stats/unit-3-normal-distribution/unit-3-review-1-3.spec.js"></script>
 <!-- chemistry practice -->
 <script src="../chemistry/shared/practice.js"></script>
 <!-- calculus practice -->
@@ -273,6 +274,7 @@ td.c-review{background:rgba(192,57,43,.18)}td.c-getting{background:rgba(217,154,
     lines.forEach(function (ln) {
       var r = null;
       if (/^NEW~/i.test(ln)) r = PortalAdapters.physicsReport(ln, LE, NFL, window.N2L);
+      else if (/^UNI~/i.test(ln)) r = PortalAdapters.statsReport(ln, LE);
       else if (/^PR2-/i.test(ln)) { if (!name) { bad.push('calculus codes need the first name'); return; } r = PortalAdapters.calcHandIn(name, per, day, ln, PR2); if (r && r.error) { bad.push(r.error); r = null; } }
       if (r) got.push(r); else if (!/need|checksum/.test(bad[bad.length - 1] || '')) bad.push(ln.slice(0, 24) + '…');
     });

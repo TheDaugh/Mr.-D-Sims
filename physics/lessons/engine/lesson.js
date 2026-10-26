@@ -237,7 +237,9 @@
     LE.debug.qs[q.id] = q;
     var box = el('div', 'q'); box.dataset.qid = q.id; parent.appendChild(box);
     if (q.head) box.appendChild(el('p', 'qhead', q.head));
+    if (q.pic) { var pd = el('div', 'qpic'); html(pd, q.pic); box.appendChild(pd); }   // a picture comes before the question
     if (q.prompt) { var qt = el('p', 'qtext'); html(qt, (window.QKIT && (q.type === 'expr' || q.math)) ? QKIT.inline(q.prompt) : q.prompt); box.appendChild(qt); }
+    if (q.remember) box.appendChild(el('p', 'hint qremember', 'Remember: ' + q.remember));
     if (q.type === 'choice') askChoice(box, q, st);
     else if (q.type === 'num') askNum(box, q, st);
     else if (q.type === 'cloze') askCloze(box, q, st);

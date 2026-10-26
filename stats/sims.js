@@ -6,6 +6,7 @@
     { id: "3-1-normal-curve",   title: "3.1 The Normal Curve",                  blurb: "What a bell curve is, and what the 68-95-99.7 rule says about it." },
     { id: "3-2-z-scores",       title: "3.2 z-Scores",                          blurb: "How many standard deviations a value sits from the mean." },
     { id: "3-3-z-table",        title: "3.3 Reading the z-Table",               blurb: "Find a z-score in the table and read the area to its left." },
+    { id: "unit-3-review-1-3", title: "Review: 3.1 to 3.3", blurb: "Mixed review of percentiles, z-scores, shifting and stretching data, density curves, and normal fit." },
     { id: "3-4-area-below",     title: "3.4 Area Below and Above",              blurb: "Percent of data below a value, and above it." },
     { id: "3-5-area-between",   title: "3.5 Area Between Two Values",           blurb: "Subtract two table areas to get the percent between." },
     { id: "3-6-percentiles",    title: "3.6 From a Percentile Back to a Value", blurb: "Work the table backward: start with a percent, end with a value." },

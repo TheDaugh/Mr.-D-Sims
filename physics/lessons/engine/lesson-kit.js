@@ -50,7 +50,7 @@
       var items = all.map(function (x) { return { skill: x.skill, title: x.title, band: x.band, firstTry: x.misses === 0, ok: !!x.ok }; }), P = S.d.pred || [];
       (lib.preds || []).forEach(function (pr, i) { var st = P[i]; if (st && st.pick != null) items.push({ skill: 'predict-' + (i + 1), band: S.band0 || 2, firstTry: st.pick === pr.correct, ok: st.pick === pr.correct }); });
       ['C1', 'C2'].forEach(function (k) { var q = LE.qs(k); if (q && q.done) items.push({ skill: 'check-' + k.toLowerCase(), band: 2, firstTry: q.ok && q.misses === 0, ok: !!q.ok }); });
-      return { course: 'physics', lesson: ID, title: cfg.title, first: S.first, period: S.period, day: LE.today(), reached: LE.reached().idx + 1, of: LE.reached().of, items: items };
+      return { course: cfg.course || 'physics', lesson: ID, title: cfg.title, first: S.first, period: S.period, day: LE.today(), reached: LE.reached().idx + 1, of: LE.reached().of, items: items };
     };
 
     /* Practice that never runs out: the next skill at the student's hidden level, fresh numbers each time. */

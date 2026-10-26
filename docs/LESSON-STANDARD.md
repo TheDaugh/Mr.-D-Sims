@@ -95,6 +95,9 @@ New lessons start from a template (`templates/README.md`) and get all of the fol
 20. **Keys from one spec.** A lesson's teaching lives in `spec.js` (plain data). The page, the key PDFs and the tests all read it. `node tools/build-keys.mjs <spec>` writes `keys/<course>/<id>-makeup.pdf` (what an absent student copies into their notes; no personal time needed) and `-teacher.pdf` (outline and pacing, huddle script, every level with answers, common misconceptions). The teacher dashboard links both.
 21. **Teacher hub** is `teacher/index.html` (linked from the front page): codes, lock desk, live view, lessons with `#key` links and key PDFs, and the Student IDs tool.
 
+### Question extras (engine)
+A question may carry `pic` (an SVG or HTML string drawn before the prompt: picture first) and `remember` (a one-line concept reminder drawn under the prompt). Both are optional; no existing lesson uses them. A mixed review (stats 3.1 to 3.3) uses them with `SPEC.fade(q, band)`, which fades hints as a student's first-try answers climb.
+
 ### New files
 
 | File | Purpose |

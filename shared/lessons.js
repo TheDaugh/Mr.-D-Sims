@@ -51,5 +51,8 @@ window.MrD.lessons = [
   { course: "physics", id: "fbd-net-force", title: "Free-Body Diagrams and Net Force", unit: "Forces and Newton’s Laws",
     href: "physics/lessons/fbd-net-force.html", teacher: "physics/lessons/teacher.html",
     spec: "physics/lessons/content/fbd-net-force.spec.js",
-    gates: [{ key: "h1", label: "Huddle" }], live: true }
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "stats", id: "unit-3-review-1-3", title: "Review: 3.1 to 3.3", unit: "unit-3-normal-distribution",
+    href: "stats/unit-3-normal-distribution/unit-3-review-1-3.html", spec: "stats/unit-3-normal-distribution/unit-3-review-1-3.spec.js",
+    gates: [], live: true }
 ];
