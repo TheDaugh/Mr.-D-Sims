@@ -87,3 +87,55 @@ test('fade: Remember at band 1 only; nudge then hint at band 3; hint only after 
     const c3 = SP.fade({ type: 'choice', hint: 'full', nudge: 'push', id: 'c' }, 3), c4 = SP.fade({ type: 'choice', hint: 'full', nudge: 'push', id: 'c' }, 4); assert.strictEqual(c3.hint, 'push'); assert.strictEqual(c4.noHint, true);
   } finally { delete global.window; }
 });
+
+/* ---------- interactive checkers ---------- */
+const NK = require('../../stats/shared/normal-kit.js');
+const eachSim = (fn) => { for (const sk of SP.skills) for (let b = 1; b <= 4; b++) for (let s = 0; s < 120; s++) fn(sk, b, sk.gen(b, rng(s * 13 + b), { sim: true }), 'sim seed ' + s + ' ' + sk.id + ' band ' + b); };
+/* what each widget would report if the student left it in a given state */
+function stateOf(q, st) {
+  const P = q.params;
+  switch (q.sim) {
+    case 'dotplot': return { marker: st.marker, below: P.data.filter(d => d < st.marker - 1e-9).length, n: P.data.length };
+    case 'ruler': return { value: st.value, z: (st.value - P.mean) / P.sd };
+    case 'ruler2': return { value: st.value, z: (st.value - P.B.mean) / P.B.sd };
+    case 'transform': return P.mode === 'add' ? { mode: 'add', c: st.c, mean: P.mean + st.c, sd: P.sd } : P.mode === 'mul' ? { mode: 'mul', k: st.k, mean: P.mean * st.k, sd: P.sd * st.k } : { mode: 'z', stage: st.stage };
+    case 'density': { const D = P.kind === 'tri' ? NK.DENSITIES.tri() : NK.DENSITIES.rect(P.L); return { a: st.a, b: st.b, area: Math.round(NK.areaUnder(D.f, st.a, st.b) * 10000) / 10000 }; }
+    case 'skew': { const S = NK.skewStats(st.s); return { s: st.s, mean: S.mean, median: S.median, rel: S.rel }; }
+    case 'fit': return { overlay: !!st.ever, ever: !!st.ever };
+  }
+}
+test('sims: one per target, custom type, say pretend, picture is the live widget', () => {
+  eachSim((sk, b, q, w) => { assert.strictEqual(q.type, 'custom', w); assert.strictEqual(q.tag, sk.id, w); assert.match(q.prompt, /[Pp]retend/, w); assert.ok(q.hint && q.nudge && q.worked && q.keyText && q.remember, w); assert.ok(typeof q.answer === 'number' && isFinite(q.answer), w); assert.strictEqual(typeof q.check, 'function', w); });
+});
+test('sims: the solution passes, the wrong state fails with a message, and the follow-up question matters', () => {
+  eachSim((sk, b, q, w) => {
+    const good = stateOf(q, q.solution), bad = stateOf(q, q.wrongState), pickOK = q.follow ? q.follow.answer : null;
+    assert.strictEqual(q.check(good, pickOK).ok, true, w + ' solution fails: ' + JSON.stringify(q.check(good, pickOK)));
+    const rb = q.check(bad, pickOK); assert.strictEqual(rb.ok, false, w + ' wrong state passes'); assert.ok(rb.msg && rb.msg.length > 5, w);
+    if (q.follow) { assert.ok(q.follow.options.length >= 3 && pickOK >= 0, w); assert.strictEqual(q.check(good, null).ok, false, w + ' needs a pick'); assert.strictEqual(q.check(good, (pickOK + 1) % q.follow.options.length).ok, false, w + ' wrong pick'); assert.strictEqual(new Set(q.follow.options).size, q.follow.options.length, w); }
+  });
+});
+test('sims: T1 target is reachable, data are distinct, the answer is dots below / n', () => {
+  eachSim((sk, b, q, w) => { if (q.sim !== 'dotplot') return; const d = q.params.data; assert.strictEqual(new Set(d).size, d.length, w); const k = d.filter(x => x < q.solution.marker - 1e-9).length; assert.strictEqual(100 * k / d.length, q.answer, w); assert.ok(Number.isInteger(k) && k >= 2 && k <= d.length - 2, w); });
+});
+test('sims: T2 and T3 solutions sit on the ruler (within 3 SD) and on the step grid', () => {
+  eachSim((sk, b, q, w) => { if (q.sim === 'ruler') { const P = q.params; assert.ok(Math.abs(q.solution.value - P.mean) <= 3 * P.sd, w); assert.ok(Math.abs((q.solution.value - P.mean) / P.step - Math.round((q.solution.value - P.mean) / P.step)) < 1e-9, w); const z = (q.solution.value - P.mean) / P.sd; assert.ok(Math.abs(z - Math.round(z * 4) / 4) < 1e-9, w); }
+    if (q.sim === 'ruler2') { const B = q.params.B, A = q.params.A, zA = Math.abs((A.x - A.mean) / A.sd); assert.ok(zA <= 3 && Math.abs((q.solution.value - B.mean) / B.sd - zA) < 1e-9, w); assert.ok(Math.abs(q.solution.value - B.mean) <= 3 * B.sd, w); assert.ok(Math.abs((q.solution.value - B.mean) / q.params.step - Math.round((q.solution.value - B.mean) / q.params.step)) < 1e-9, w); const alt = { value: B.mean - zA * B.sd }; assert.strictEqual(q.check(stateOf(q, alt)).ok, true, 'the other side counts too'); } });
+});
+test('sims: T4 and T5 targets are on the sliders; T7 edges are on the grid and the area is right; T8 slider values exist', () => {
+  eachSim((sk, b, q, w) => {
+    if (q.sim === 'transform' && q.params.mode === 'add') assert.ok(Math.abs(q.solution.c) <= 20 && Number.isInteger(q.solution.c), w);
+    if (q.sim === 'transform' && q.params.mode === 'mul') assert.ok(q.solution.k >= 0.5 && q.solution.k <= 4 && Number.isInteger(q.solution.k * 2), w);
+    if (q.sim === 'density') { const D = q.params.kind === 'tri' ? NK.DENSITIES.tri() : NK.DENSITIES.rect(q.params.L), a = q.solution.a, c = q.solution.b; assert.ok(a >= D.x0 && c <= D.x1 && a < c, w); assert.ok(Math.abs(a / D.step - Math.round(a / D.step)) < 1e-9 && Math.abs(c / D.step - Math.round(c / D.step)) < 1e-9, w); assert.ok(Math.abs(NK.areaUnder(D.f, a, c) - q.answer) < 1e-3, w); }
+    if (q.sim === 'skew') { assert.ok([-1, -0.5, 0, 0.5, 1].includes(q.solution.s), w); assert.ok([-1, -0.5, 0, 0.5, 1].includes(q.params.s), w); }
+  });
+  const m = (s) => NK.skewStats(s); assert.strictEqual(m(0).rel, '='); assert.strictEqual(m(1).rel, '>'); assert.strictEqual(m(0.5).rel, '>'); assert.strictEqual(m(-0.5).rel, '<'); assert.strictEqual(m(-1).rel, '<');
+});
+test('sims: T9 needs the curve switched on before the answer counts', () => {
+  eachSim((sk, b, q, w) => { if (q.sim !== 'fit') return; assert.strictEqual(q.check({ overlay: false, ever: false }, q.follow.answer).ok, false, w); assert.strictEqual(q.check({ overlay: true, ever: true }, q.follow.answer).ok, true, w); });
+});
+test('sims: the draw widgets agree with the spec densities, and the hist/skew math is sane', () => {
+  for (const L of [5, 10]) assert.ok(Math.abs(NK.areaUnder(NK.DENSITIES.rect(L).f, 0, L) - 1) < 1e-3); assert.ok(Math.abs(NK.areaUnder(NK.DENSITIES.tri().f, 0, 2) - 1) < 1e-3);
+  for (const s of [-1, -0.5, 0, 0.5, 1]) { const S = NK.skewStats(s); assert.ok(Math.abs(NK.areaUnder(S.f, 0, 1) - 1) < 1e-3, 'beta area ' + s); }
+  assert.ok(Math.abs(NK.SHAPE_SD - 1.76126) < 1e-4);
+});

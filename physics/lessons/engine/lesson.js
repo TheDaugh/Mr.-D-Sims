@@ -238,6 +238,7 @@
     var box = el('div', 'q'); box.dataset.qid = q.id; parent.appendChild(box);
     if (q.head) box.appendChild(el('p', 'qhead', q.head));
     if (q.pic) { var pd = el('div', 'qpic'); html(pd, q.pic); box.appendChild(pd); }   // a picture comes before the question
+    var wHost = null; if (q.type === 'custom') { wHost = el('div', 'qpic qsim'); box.appendChild(wHost); }   // an interactive item draws its picture (a live sim) first too
     if (q.prompt) { var qt = el('p', 'qtext'); html(qt, (window.QKIT && (q.type === 'expr' || q.math)) ? QKIT.inline(q.prompt) : q.prompt); box.appendChild(qt); }
     if (q.remember) box.appendChild(el('p', 'hint qremember', 'Remember: ' + q.remember));
     if (q.type === 'choice') askChoice(box, q, st);
@@ -245,6 +246,7 @@
     else if (q.type === 'cloze') askCloze(box, q, st);
     else if (q.type === 'text') askText(box, q, st);
     else if (q.type === 'expr') askExpr(box, q, st);
+    else if (q.type === 'custom') askCustom(box, q, st, wHost);
     return box;
   };
 
@@ -259,6 +261,24 @@
     var opt = { keypad: true, key: KEY, seed: q.id + '|' + S.first, noHints: !!q.noHints, maxTries: q.maxMiss ? q.maxMiss : 0,
       onDone: function (res) { st.misses = res.misses; st.hints = res.hints; st.traps = res.traps; st.assisted = res.assisted; finish(q, st, box, !res.assisted); } };
     QKIT.render(slot, spec, opt);
+  }
+
+  /* Interactive item: q.build(widgetHost, controlsHost, api) draws a live sim in widgetHost and its Check button in controlsHost.
+       api.miss(message)   a wrong try: shows the message, counts a miss, reveals after q.maxMiss (default 4) with q.reveal() if given
+       api.solve()         the right answer: finishes the item as solved
+       api.done / api.misses()   state, for a re-render of a finished item
+     The item's q.answer is a plain number (the target) so notes and the report can print it. */
+  function askCustom(box, q, st, wHost) {
+    var ctl = el('div', 'qctl'); box.appendChild(ctl);
+    var api = { done: !!st.done, misses: function () { return st.misses; },
+      miss: function (msg) {
+        if (st.done) return; st.misses++; var fb = feedbackEl(box); fb.className = 'msg bad fb'; html(fb, msg || 'Not quite.');
+        if (st.misses >= (q.maxMiss || 4)) { if (q.reveal) q.reveal(); finish(q, st, box, false); } LE.save(); LE.gate();
+      },
+      solve: function () { if (st.done) return; var f = box.querySelector('.fb'); if (f) f.remove(); finish(q, st, box, true); } };
+    q.build(wHost, ctl, api);
+    if (st.done && q.worked) { var w = el('p', 'msg worked ' + (st.ok ? 'ok' : '')); html(w, (st.ok ? 'Correct. ' : 'Here is the reasoning. ') + q.worked); box.appendChild(w); }
+    keyLine(box, q.keyText || LE.fmtN(q.answer));
   }
 
   function askChoice(box, q, st) {

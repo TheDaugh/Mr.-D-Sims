@@ -7,11 +7,53 @@
   var K = LK.for({ id: ID, course: 'stats', prefix: 'RV3', identity: 'id', title: SPEC.title, lib: { skills: SPEC.skills, preds: [] } }), T = K.TABS, qdone = LK.qdone, steps = [];
   var LABEL = { picture: '' };
 
-  /* one question for a target at a band: picture first, hints faded to the band */
-  function build(tid, band, tag) {
-    var sk = TARGET[tid].sk, q = sk.gen(band, LE.seedRng(tag + ':' + band));
+  /* ---- interactive checkers: the spec says what to check, this draws the widget and the Check button ---- */
+  var NKW = window.__sims = window.__sims || {};
+  function help(q, m) {   // the hint a student gets on miss number m: it fades as the level climbs
+    var b = q.fadeBand || 2; return b <= 2 ? q.fullHint : (m >= 2 ? q.fullHint : (b === 3 ? q.nudge : ''));
+  }
+  function apply(q, w, sol) {
+    if ('marker' in sol) w.setMarker(sol.marker); if ('value' in sol) w.setValue(sol.value);
+    if ('c' in sol || 'k' in sol) w.setConst('c' in sol ? sol.c : sol.k); if ('stage' in sol) w.setStage(sol.stage);
+    if ('a' in sol) w.setEdges(sol.a, sol.b); if ('s' in sol) w.setS(sol.s);
+  }
+  function attachSim(q) {
+    q.build = function (wHost, ctl, api) {
+      var P = q.params, w, w2, pickIdx = null, ever = false, getState;
+      if (q.sim === 'dotplot') { w = NK.dotplot(wHost, { data: P.data, strict: true, step: 0.5, unit: 'pretend scores', marker: P.start, label: 'Quiz scores as dots' }); getState = w.state; }
+      else if (q.sim === 'ruler') { w = NK.ruler(wHost, { mean: P.mean, sd: P.sd, value: P.start, step: P.step, showZ: false, name: 'Pretend test' }); getState = w.state; }
+      else if (q.sim === 'ruler2') {
+        var a = el('div'), b = el('div'); wHost.appendChild(a); wHost.appendChild(b);
+        NK.ruler(a, { mean: P.A.mean, sd: P.A.sd, value: P.A.x, fixed: true, showZ: true, name: P.nameA, label: P.nameA + ' (fixed)' });
+        w = NK.ruler(b, { mean: P.B.mean, sd: P.B.sd, value: P.start, step: P.step, showZ: false, name: P.nameB, label: P.nameB }); getState = w.state;
+      }
+      else if (q.sim === 'transform') { w = NK.transform(wHost, { mode: P.mode, mean: P.mean, sd: P.sd, cMax: P.cMax }); getState = w.state; }
+      else if (q.sim === 'density') { w = NK.density(wHost, { kind: P.kind, L: P.L }); getState = w.state; }
+      else if (q.sim === 'skew') { w = NK.skew(wHost, { s: P.s }); getState = w.state; }
+      else if (q.sim === 'fit') { w = NK.fit(wHost, { bars: P.bars, start: P.start, width: P.width, label: P.label }); w.el.addEventListener('click', function () { if (w.state().overlay) ever = true; }); getState = function () { return { overlay: w.state().overlay, ever: ever || w.state().overlay }; }; }
+      var btns = [];
+      if (q.follow) {
+        var fw = el('div', 'qfollow'); fw.appendChild(el('p', 'qtext', q.follow.prompt)); var list = el('div', 'opts'); fw.appendChild(list);
+        q.follow.options.forEach(function (t, i) { var bt = el('button', 'opt', t); bt.type = 'button'; bt.dataset.i = String(i); bt.setAttribute('aria-pressed', 'false'); bt.onclick = function () { pickIdx = i; btns.forEach(function (x, j) { x.classList.toggle('picked', j === i); x.setAttribute('aria-pressed', String(j === i)); }); }; btns.push(bt); list.appendChild(bt); });
+        ctl.appendChild(fw);
+      }
+      var go = el('button', 'btn primary nk-check', 'Check'); go.type = 'button'; ctl.appendChild(go);
+      go.onclick = function () {
+        if (api.done) return; var r = q.check(getState(), pickIdx);
+        if (r.ok) { api.solve(); go.disabled = true; } else { var h = help(q, api.misses() + 1); api.miss((r.msg || 'Not quite.') + (h ? ' Hint: ' + h : '')); }
+      };
+      if (api.done) { go.disabled = true; btns.forEach(function (x) { x.disabled = true; }); }
+      q.reveal = function () { apply(q, w, q.solution); if (q.follow) { pickIdx = q.follow.answer; btns.forEach(function (x, j) { x.classList.toggle('picked', j === pickIdx); }); } go.disabled = true; };
+      NKW[q.id] = { w: w, solve: function () { apply(q, w, q.solution); if (q.follow) btns[q.follow.answer].click(); if (q.sim === 'fit') w.toggle(); go.click(); }, wrong: function () { apply(q, w, q.wrongState); if (q.follow) btns[(q.follow.answer + 1) % btns.length].click(); go.click(); }, check: function () { go.click(); }, fol: function (i) { btns[i].click(); } };
+    };
+    return q;
+  }
+
+  /* one question for a target at a band: picture first, hints faded to the band. sim: the interactive checker instead of the static item */
+  function build(tid, band, tag, sim) {
+    var sk = TARGET[tid].sk, q = sk.gen(band, LE.seedRng(tag + ':' + band), { sim: !!sim });
     q.id = tag + '.' + band; q.type = q.type || 'num'; q.keypad = true; q.math = false; q.head = sk.title;
-    return SPEC.fade(q, band);
+    SPEC.fade(q, band); return q.type === 'custom' ? attachSim(q) : q;
   }
   function rv() { var S = LE.S(); return S.d.rv || (S.d.rv = { tb: {}, queue: [], last: '', round: 0 }); }
   function tband(tid) { var S = LE.S(), R = rv(); return R.tb[tid] || S.band0 || 1; }
@@ -55,8 +97,8 @@
   }
   function practice(host, c) {
     var S = c.S, M = S.d.more = S.d.more || { n: 0, log: [] }, R = rv(), n = M.n;
-    if (!R.cur || R.cur.n !== n) { R.cur = { n: n, tid: nextTarget() }; LE.save(); }
-    var tid = R.cur.tid, b = tband(tid), q = build(tid, b, 'p' + n), box = el('div'); host.appendChild(box);
+    if (!R.cur || R.cur.n !== n) { var nt = nextTarget(); R.cur = { n: n, tid: nt, sim: (n + SPEC.skills.map(function (s) { return s.id; }).indexOf(nt)) % 2 === 0 }; LE.save(); }   // about half the items are interactive checkers
+    var tid = R.cur.tid, b = tband(tid), q = build(tid, b, 'p' + n, R.cur.sim), box = el('div'); host.appendChild(box);
     q.head = 'Practice ' + (n + 1) + ' · ' + TARGET[tid].sk.title;
     function nextBtn() {
       if (box.querySelector('.nextq')) return;

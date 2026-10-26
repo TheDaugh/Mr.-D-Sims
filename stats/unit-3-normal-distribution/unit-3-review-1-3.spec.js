@@ -36,10 +36,11 @@
   }
   var SHAPE = [1, 3, 6, 9, 11, 9, 6, 3, 1];
   var SKEW = [3, 9, 12, 10, 7, 4, 2, 1, 1];
-  /* the same bars drawn on an axis for (mean, sd): bar i is centered mean + (i - 4) * 0.7 sd */
+  /* the same bars drawn on an axis for (mean, sd): the bars have exactly that mean and SD (bar spacing = sd / the bars' own SD) */
+  var SBINS = (function () { var N = 0, v = 0; SHAPE.forEach(function (c) { N += c; }); SHAPE.forEach(function (c, i) { v += c * (i - 4) * (i - 4); }); return Math.sqrt(v / N); })();   // the bars' own SD, in bar widths
   function barsOn(shape, mean, sd, lo, hi, base, top, color) {
-    var X = function (v) { return 40 + (v - lo) / (hi - lo) * 440; }, m = Math.max.apply(null, shape), s = '';
-    shape.forEach(function (v, i) { var c = mean + (i - Math.floor(shape.length / 2)) * 0.7 * sd, bh = v / m * (base - top), w = 0.7 * sd / (hi - lo) * 440; s += '<rect x="' + (X(c) - w / 2 + 1) + '" y="' + (base - bh) + '" width="' + (w - 2) + '" height="' + bh + '" fill="' + (color || '#9db6ec') + '" stroke="' + BLUE + '"/>'; });
+    var X = function (v) { return 40 + (v - lo) / (hi - lo) * 440; }, m = Math.max.apply(null, shape), s = '', sp = sd / SBINS;
+    shape.forEach(function (v, i) { var c = mean + (i - Math.floor(shape.length / 2)) * sp, bh = v / m * (base - top), w = sp / (hi - lo) * 440; s += '<rect x="' + (X(c) - w / 2 + 1) + '" y="' + (base - bh) + '" width="' + (w - 2) + '" height="' + bh + '" fill="' + (color || '#9db6ec') + '" stroke="' + BLUE + '"/>'; });
     return s;
   }
   function axisNums(lo, hi, step, y, fmt) { var X = function (v) { return 40 + (v - lo) / (hi - lo) * 440; }, s = line(40, y, 480, y, INK, 1.5); for (var v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) s += line(X(v), y, X(v), y + 5, INK, 1.5) + txt(X(v), y + 19, fmt ? fmt(v) : String(r2(v)), { size: 12 }); return s; }
@@ -258,6 +259,113 @@
       remember: 'A normal model needs one peak and symmetry, and no far outliers.', hint: 'Look for one peak, symmetry, and no bar far from the rest. If something is off, name it.', nudge: 'Check the peaks, the tails and any lonely bar.', worked: why };
   }
 
+
+  /* ---------- interactive checkers (sims): one per target ----------
+     Each returns { type:'custom', sim, params, prompt, answer, check(state, pick), solution, wrongState, follow, keyText, hint, nudge, remember, worked }.
+     check() is pure: the page hands it the widget's state (and the follow-up pick) and shows its message on a miss. */
+  function shuf(r, arr) { var a = arr.slice(), i, j, t; for (i = a.length - 1; i > 0; i--) { j = Math.floor(r() * (i + 1)); t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function follow(r, prompt, right, wrongs) { var all = shuf(r, [right].concat(wrongs)); return { prompt: prompt, options: all, answer: all.indexOf(right) }; }
+  function both(chk, fol) { return function (st, pick) {
+    var a = chk(st); if (!a.ok) return a;
+    if (fol) { if (pick == null) return { ok: false, msg: 'That part is right. Now answer the question under the picture.' }; if (pick !== fol.answer) return { ok: false, msg: 'The picture part is right. Check the question under it again.' }; }
+    return { ok: true, msg: '' }; }; }
+
+  function s1(b, r) {   /* T1: drag the marker to a percentile */
+    var n = b <= 1 ? 10 : b === 2 ? 20 : 25, k = INT(r, 2, n - 2), vals = [], v = 40, i, P;
+    for (i = 0; i < n; i++) { v += 1 + INT(r, 0, 2); vals.push(v); }
+    P = 100 * k / n;
+    return { tag: 'T1', type: 'custom', sim: 'dotplot', params: { data: vals, start: vals[Math.floor(n / 2)] },
+      prompt: 'Pretend quiz scores for ' + n + ' students are dots. Drag the marker so it is at the ' + P + 'th percentile, then press Check.', answer: P, unit: '%',
+      check: function (st) { var pct = 100 * st.below / st.n; return Math.abs(pct - P) < 1e-9 ? { ok: true, msg: '' } : { ok: false, msg: 'Your marker has ' + st.below + ' of ' + st.n + ' dots below it: the ' + r2(pct) + 'th percentile. You need the ' + P + 'th.' }; },
+      solution: { marker: vals[k] }, wrongState: { marker: vals[0] - 0.5 }, keyText: 'marker with ' + k + ' dots below it (' + P + 'th percentile)',
+      remember: 'A percentile is the percent of values below.', hint: 'The ' + P + 'th percentile has ' + P + '% of the dots below it. ' + P + '% of ' + n + ' is ' + k + ', so put ' + k + ' dots below the marker.', nudge: 'Turn the percent into a number of dots out of ' + n + '.',
+      worked: P + '% of ' + n + ' dots is ' + k + ' dots. With ' + k + ' dots below the marker, it sits at the ' + P + 'th percentile.' };
+  }
+  function s2(b, r) {   /* T2: slide the dot to a z-score */
+    var sd = pick(r, b <= 1 ? [5, 10] : [4, 8]), mean = pick(r, [50, 60, 70, 80]), z = b <= 1 ? pick(r, [-2, -1, 1, 2]) : b === 2 ? pick(r, [0.5, 1.5, 2.5, -0.5]) : b === 3 ? pick(r, [-2.5, -1.5, -0.5, 1.5]) : pick(r, [-2.25, -1.75, -1.25, 1.25, 1.75, 2.25]), x = mean + z * sd;
+    return { tag: 'T2', type: 'custom', sim: 'ruler', params: { mean: mean, sd: sd, start: mean, step: sd / 4 },
+      prompt: 'Pretend test: mean ' + mean + ', SD ' + sd + '. Slide the dot to the score that has a z-score of ' + num(z) + ', then press Check.', answer: x,
+      check: function (st) { return Math.abs(st.value - x) < 1e-9 ? { ok: true, msg: '' } : { ok: false, msg: 'Your dot is at ' + r2(st.value) + ', which is z = ' + num(r2(st.z)) + '. You need z = ' + num(z) + '.' }; },
+      solution: { value: x }, wrongState: { value: mean }, keyText: 'dot at ' + r2(x),
+      remember: 'z = (value − mean) ÷ SD. It counts SD steps from the mean.', hint: 'z = ' + num(z) + ' means ' + Math.abs(z) + ' SD ' + (z < 0 ? 'below' : 'above') + ' the mean. One SD is ' + sd + ' points.', nudge: 'Count SD steps from the mean. Which side?',
+      worked: Math.abs(z) + ' SD × ' + sd + ' = ' + r2(Math.abs(z) * sd) + ' points ' + (z < 0 ? 'below' : 'above') + ' ' + mean + ' is ' + r2(x) + '.' };
+  }
+  function s3(b, r) {   /* T3: make test B exactly as unusual as test A */
+    var pr = pick(r, PAIRS), A = { mean: pick(r, [60, 70, 80]), sd: pick(r, [5, 10]) }, B = { mean: pick(r, [50, 65, 75]), sd: pick(r, [4, 8]) }, za = pick(r, b <= 2 ? [1, 1.5, 2] : [-2, -1.5, -1, 1, 1.5, 2]);
+    A.x = A.mean + za * A.sd; var zb = -za * (b >= 3 ? 1 : -1) * 0, target = Math.abs(za);
+    return { tag: 'T3', type: 'custom', sim: 'ruler2', params: { A: A, B: B, nameA: pr[0], nameB: pr[1], start: B.mean, step: B.sd / 4 },
+      prompt: 'Pretend scores: the ' + pr[0] + ' dot is fixed (mean ' + A.mean + ', SD ' + A.sd + '). Slide the ' + pr[1] + ' dot (mean ' + B.mean + ', SD ' + B.sd + ') so it is exactly as unusual, then press Check.', answer: target, unit: 'SD',
+      check: function (st) { var z = Math.abs(st.value - B.mean) / B.sd; return Math.abs(z - target) < 1e-9 ? { ok: true, msg: '' } : { ok: false, msg: 'Your ' + pr[1] + ' dot is ' + r2(z) + ' SD from its mean. The ' + pr[0] + ' dot is ' + target + ' SD from its mean. They must match.' }; },
+      solution: { value: B.mean + target * B.sd }, wrongState: { value: B.mean }, keyText: pr[1] + ' dot ' + target + ' SD from its mean (either side)',
+      remember: 'Compare z-scores. The farther from 0, the more unusual.', hint: 'The ' + pr[0] + ' dot is ' + target + ' SD from its mean. Put the ' + pr[1] + ' dot ' + target + ' SD from its mean too, on either side.', nudge: 'Find how many SDs from its mean the fixed dot is.',
+      worked: 'The ' + pr[0] + ' dot is ' + target + ' SD out, so the ' + pr[1] + ' dot goes ' + target + ' × ' + B.sd + ' = ' + r2(target * B.sd) + ' from ' + B.mean + '.' };
+  }
+  function s4(b, r) {   /* T4: slide a constant */
+    var mean = pick(r, [60, 65, 70, 75]), sd = pick(r, [5, 8, 10]), c = pick(r, [-15, -10, -5, 5, 10, 15]), m2 = mean + c, fol = follow(r, 'After sliding, what happened to the SD?', 'It stayed ' + sd + '.', ['It went up by ' + Math.abs(c) + '.', 'It doubled.', 'It went down.']);
+    return { tag: 'T4', type: 'custom', sim: 'transform', params: { mode: 'add', mean: mean, sd: sd, cMax: 20 }, follow: fol,
+      prompt: 'Pretend scores have mean ' + mean + ' and SD ' + sd + '. Slide the constant to add so the new mean is ' + m2 + '. Then answer the question and press Check.', answer: c,
+      check: both(function (st) { return st.c === c ? { ok: true } : { ok: false, msg: 'Your new mean is ' + st.mean + '. You need ' + m2 + '.' }; }, fol),
+      solution: { c: c }, wrongState: { c: 0 }, keyText: 'constant ' + num(c) + '; SD stays ' + sd,
+      remember: 'Adding a constant moves the center by that constant. The spread stays the same.', hint: 'The mean moves by the constant. To go from ' + mean + ' to ' + m2 + ', add ' + num(c) + '.', nudge: 'How far is it from ' + mean + ' to ' + m2 + '?',
+      worked: mean + ' + ' + num(c) + ' = ' + m2 + '. Sliding the data does not change its spread: the SD is still ' + sd + '.' };
+  }
+  function s5(b, r) {   /* T5: slide a factor */
+    var mean = pick(r, [4, 6, 8, 10]), sd = pick(r, [2, 4]), k = pick(r, [0.5, 1.5, 2, 3, 4]), sd2 = sd * k, fol = follow(r, 'After sliding, what happened to the mean?', 'It was multiplied by ' + k + ' too.', ['It stayed the same.', 'It went up by ' + k + '.', 'Cannot tell.']);
+    return { tag: 'T5', type: 'custom', sim: 'transform', params: { mode: 'mul', mean: mean, sd: sd }, follow: fol,
+      prompt: 'Pretend data have mean ' + mean + ' and SD ' + sd + '. Slide the factor to multiply by so the new SD is ' + sd2 + '. Then answer the question and press Check.', answer: k,
+      check: both(function (st) { return st.k === k ? { ok: true } : { ok: false, msg: 'Your new SD is ' + r2(st.sd) + '. You need ' + sd2 + '.' }; }, fol),
+      solution: { k: k }, wrongState: { k: 1 }, keyText: 'factor ' + k + '; mean becomes ' + mean * k,
+      remember: 'Multiplying by k multiplies the center and the spread by k.', hint: 'The SD is multiplied by the factor. ' + sd + ' × ? = ' + sd2 + '.', nudge: 'What do you multiply ' + sd + ' by to get ' + sd2 + '?',
+      worked: sd + ' × ' + k + ' = ' + sd2 + '. The mean is multiplied too: ' + mean + ' × ' + k + ' = ' + mean * k + '.' };
+  }
+  function s6(b, r) {   /* T6: standardize in two steps */
+    var mean = pick(r, [60, 70, 80, 100]), sd = pick(r, [5, 8, 10]), fol = follow(r, 'The z-scores have…', 'mean 0 and SD 1.', ['mean 1 and SD 0.', 'mean 0 and the old SD of ' + sd + '.', 'the old mean of ' + mean + ' and SD 1.']);
+    return { tag: 'T6', type: 'custom', sim: 'transform', params: { mode: 'z', mean: mean, sd: sd }, follow: fol,
+      prompt: 'Pretend scores have mean ' + mean + ' and SD ' + sd + '. Turn them into z-scores: press "Subtract the mean", then "Divide by the SD". Then answer the question and press Check.', answer: 0,
+      check: both(function (st) { return st.stage === 2 ? { ok: true } : { ok: false, msg: st.stage === 0 ? 'Press "Subtract the mean" first.' : 'Now press "Divide by the SD".' }; }, fol),
+      solution: { stage: 2 }, wrongState: { stage: 0 }, keyText: 'press both buttons; z-scores have mean 0, SD 1',
+      remember: 'Subtract the mean to center. Divide by the SD to rescale.', hint: 'A z-score is (value − mean) ÷ SD. Do the subtraction first, then the division. Watch the mean and SD in the readout.', nudge: 'Do the two steps of the z-score formula in order.',
+      worked: 'Subtracting ' + mean + ' moves the center to 0. Dividing by ' + sd + ' makes the SD 1.' };
+  }
+  function s7(b, r) {   /* T7: shade a proportion on a density curve */
+    var kind = b <= 2 ? 'rect' : pick(r, ['rect', 'tri']), D, a, c, T, params, pairs = [], x, y, L = pick(r, [5, 10]);
+    D = kind === 'rect' ? NKDENS.rect(L) : NKDENS.tri();
+    for (x = D.x0; x <= D.x1 + 1e-9; x += D.step) for (y = x + D.step; y <= D.x1 + 1e-9; y += D.step) { var ar = areaOf(D.f, x, y); if (ar >= 0.1 && ar <= 0.9) pairs.push([x, y, ar]); }
+    var ch = pick(r, pairs); a = ch[0]; c = ch[1]; T = r4(ch[2]); params = { kind: kind, L: L };
+    var fol = b >= 3 ? follow(r, 'What is the total area under the whole density curve?', '1', ['100', 'The height of the curve', 'It depends on the curve']) : null;
+    return { tag: 'T7', type: 'custom', sim: 'density', params: params, follow: fol,
+      prompt: 'Pretend values follow ' + (kind === 'rect' ? 'a flat density curve from 0 to ' + L : 'a triangle-shaped density curve from 0 to 2') + '. Drag the two edges so the shaded proportion is ' + T + (fol ? '. Then answer the question' : '') + ' and press Check.', answer: T,
+      check: both(function (st) { return Math.abs(st.area - T) <= 0.004 ? { ok: true } : { ok: false, msg: 'Your shaded area is ' + r4(st.area) + '. You need ' + T + '.' }; }, fol),
+      solution: { a: a, b: c }, wrongState: { a: D.x0, b: D.x0 }, keyText: 'edges at ' + a + ' and ' + c + ' (area ' + T + ')',
+      remember: 'Area under a density curve is a proportion. The total area is 1.', hint: 'Watch the area readout as you drag. You need ' + T + '. ' + (kind === 'rect' ? 'The curve is flat, so area = width × ' + r2(1 / L) + '.' : 'Area on the left of x is x × x ÷ 4.'), nudge: 'Drag an edge and watch the area readout change.',
+      worked: 'Shading from ' + a + ' to ' + c + ' gives an area of ' + T + ', so the proportion is ' + T + '.' };
+  }
+  function s8(b, r) {   /* T8: slide the tail until the mean is greater than, less than, or equal to the median */
+    var want = pick(r, b <= 1 ? ['>', '<'] : ['>', '<', '=']), words = { '>': 'greater than', '<': 'less than', '=': 'equal to' }, sol = { '>': 1, '<': -1, '=': 0 }[want], fol = follow(r, 'Which way does the mean move compared with the median?', 'Toward the long tail.', ['Toward the peak.', 'It never moves.', 'Away from the long tail.']);
+    return { tag: 'T8', type: 'custom', sim: 'skew', params: { s: 0.5 * (sol === 0 ? 1 : -sol) }, follow: fol,
+      prompt: 'Pretend data follow the density curve shown. Slide the tail until the mean is ' + words[want] + ' the median. Then answer the question and press Check.', answer: sol,
+      check: both(function (st) { return st.rel === want ? { ok: true } : { ok: false, msg: 'Right now the mean is ' + ({ '>': 'greater than', '<': 'less than', '=': 'equal to' })[st.rel] + ' the median. You need it ' + words[want] + '.' }; }, fol),
+      solution: { s: sol }, wrongState: { s: sol === 0 ? 1 : 0 }, keyText: 'tail ' + (sol > 0 ? 'right' : sol < 0 ? 'left' : 'none') + ' (mean ' + want + ' median)',
+      remember: 'The mean is pulled toward the long tail. The median is not.', hint: want === '=' ? 'With no long tail the curve is symmetric, so the mean and median match.' : 'The mean is pulled toward the long tail. For the mean ' + words[want] + ' the median, put the tail on the ' + (want === '>' ? 'right' : 'left') + '.', nudge: 'Which side must the tail be on?',
+      worked: want === '=' ? 'No long tail: symmetric, so the mean equals the median.' : 'A long tail on the ' + (want === '>' ? 'right' : 'left') + ' pulls the mean ' + (want === '>' ? 'above' : 'below') + ' the median.' };
+  }
+  function s9(b, r) {   /* T9: switch on a normal curve, then say whether it fits */
+    var kinds = b <= 1 ? ['normal', 'right'] : b === 2 ? ['normal', 'right', 'bimodal'] : ['normal', 'left', 'bimodal', 'outlier', 'right'], kind = pick(r, kinds), h = pick(r, T9SHAPES[kind]), got = classify(h), idx = T9ORDER.indexOf(got), what = pick(r, ['heights in cm', 'commute times in minutes', 'test scores', 'reaction times']);
+    var fol = { prompt: 'Is a normal model a reasonable fit for these pretend ' + what + '?', options: T9ORDER.map(function (k) { return T9OPT[k]; }), answer: idx };
+    return { tag: 'T9', type: 'custom', sim: 'fit', params: { bars: h, start: pick(r, [20, 40, 60]), width: 5, label: what }, follow: fol,
+      prompt: 'Pretend ' + what + ' are shown. Press the button to lay a normal curve with the same mean and SD over the bars, look, then answer the question and press Check.', answer: idx,
+      check: function (st, pick_) { if (!st.ever) return { ok: false, msg: 'Press the button to show the normal curve first.' }; if (pick_ == null) return { ok: false, msg: 'Now answer the question under the picture.' }; return pick_ === idx ? { ok: true } : { ok: false, msg: 'Look at where the bars leave the curve: peaks, tails, and any lonely bar.' }; },
+      solution: { ever: true }, wrongState: { ever: false }, keyText: T9OPT[got],
+      remember: 'A normal model needs one peak and symmetry, and no far outliers.', hint: 'Where do the bars and the curve disagree? A long tail, two peaks, or a far bar means a normal model is shaky.', nudge: 'Compare the bars to the curve. Where do they disagree?',
+      worked: { normal: 'The bars follow the curve: one peak, symmetric.', right: 'The bars have a long right tail the curve does not.', left: 'The bars have a long left tail the curve does not.', bimodal: 'The bars have two peaks; the curve has one.', outlier: 'One bar sits far from the rest; the curve misses it.' }[got] };
+  }
+  var NKDENS = {
+    rect: function (L) { return { f: function (x) { return x >= 0 && x <= L ? 1 / L : 0; }, x0: 0, x1: L, step: L <= 5 ? 0.5 : 1 }; },
+    tri: function () { return { f: function (x) { return x >= 0 && x <= 2 ? x / 2 : 0; }, x0: 0, x1: 2, step: 0.25 }; }
+  };
+  var areaOf = function (f, a, b) { return area(f, a, b, 2000); };
+  var r4 = function (x) { return Math.round(x * 10000) / 10000; };
+
   /* ---------- fading hints ---------- */
   /* The page asks for the full question; fade() decides what help comes with it.
        band 1  a "Remember" line up front, full hint after a miss
@@ -267,6 +375,7 @@
   function fade(q, band) {
     var full = q.hint, nudge = q.nudge || 'Look at the picture again.', root_ = typeof window !== 'undefined' ? window : null;
     if (band >= 2) q.remember = '';
+    if (q.type === 'custom') { q.fadeBand = band; q.fullHint = full; return q; }   // a sim shows its own state; the content file fades the hint by miss count
     if (q.type === 'choice') { if (band === 3) q.hint = nudge; if (band >= 4) q.noHint = true; }
     else if (band >= 3) {
       q.hint = '';
@@ -275,10 +384,12 @@
     q.fadeBand = band; q.fullHint = full; return q;
   }
 
+  /* a skill generator: gen(band, rng) is the static item; gen(band, rng, { sim: true }) is the interactive checker */
+  function V(stat, sim) { return function (b, r, o) { return o && o.sim ? sim(b, r) : stat(b, r); }; }
   var SKILLS = [
-    { id: 'T1', title: 'T1 Percentiles', gen: t1 }, { id: 'T2', title: 'T2 z-scores', gen: t2 }, { id: 'T3', title: 'T3 Compare two values', gen: t3 },
-    { id: 'T4', title: 'T4 Add a constant', gen: t4 }, { id: 'T5', title: 'T5 Multiply by a constant', gen: t5 }, { id: 'T6', title: 'T6 z-scores: mean 0, SD 1', gen: t6 },
-    { id: 'T7', title: 'T7 Density curve area', gen: t7 }, { id: 'T8', title: 'T8 Mean versus median', gen: t8 }, { id: 'T9', title: 'T9 Is a normal model reasonable?', gen: t9 }
+    { id: 'T1', title: 'T1 Percentiles', gen: V(t1, s1) }, { id: 'T2', title: 'T2 z-scores', gen: V(t2, s2) }, { id: 'T3', title: 'T3 Compare two values', gen: V(t3, s3) },
+    { id: 'T4', title: 'T4 Add a constant', gen: V(t4, s4) }, { id: 'T5', title: 'T5 Multiply by a constant', gen: V(t5, s5) }, { id: 'T6', title: 'T6 z-scores: mean 0, SD 1', gen: V(t6, s6) },
+    { id: 'T7', title: 'T7 Density curve area', gen: V(t7, s7) }, { id: 'T8', title: 'T8 Mean versus median', gen: V(t8, s8) }, { id: 'T9', title: 'T9 Is a normal model reasonable?', gen: V(t9, s9) }
   ];
 
   var SPEC = {
@@ -324,7 +435,7 @@
     pacing: { budgetMin: 42,
       steps: [{ id: 'start', prio: 1, min: 2 }, { id: 'warmup', prio: 1, min: 6 }, { id: 'practice', prio: 2, min: 30, minItems: 8, parts: 12 }, { id: 'notes', prio: 1, min: 4 }],
       huddles: [] },
-    helpers: { area: area, meanMedian: meanMedian, classify: classify, T9SHAPES: T9SHAPES, T8SHAPES: T8SHAPES, DENS: DENS }
+    helpers: { NKDENS: NKDENS, area: area, meanMedian: meanMedian, classify: classify, T9SHAPES: T9SHAPES, T8SHAPES: T8SHAPES, DENS: DENS }
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = SPEC; else (root.SPECS = root.SPECS || {})[SPEC.id] = SPEC;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -43,3 +43,5 @@
 .nk-routine li::before{content:counter(nk);position:absolute;left:8px;top:6px;width:22px;height:22px;border-radius:50%;background:#2b4fd9;color:#fff;text-align:center;font:700 .8rem/22px system-ui}
 .nk-routine li.nk-active{background:#fff3c4;box-shadow:0 0 0 2px #d99a00}.nk-routine li.nk-done{opacity:.6}
 .nk-example{font:15px/1.45 system-ui,sans-serif;color:#142230}.nk-example ol{margin:0;padding-left:1.2rem}.nk-example li{margin:6px 0}
+.nk-ghost{fill:none;stroke:#9db0c2;stroke-dasharray:4 3}.nk-ghostbtn{background:#fff;color:#2b4fd9}.nk-btn:disabled{opacity:.45;cursor:default}
+.nk-skew input[type=range],.nk-transform input[type=range]{width:260px}.nk-skew .nk-small{margin:0 8px}
