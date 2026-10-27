@@ -111,6 +111,7 @@
       render: function (card, c) {
         var st = S().d.mod = S().d.mod || { i: 0, n: {} };
         K.head(card, 'Models', 'I can find a boundary value in five moves.', 'Watch one, work one with Mr. D, then do one yourself.');
+        card.appendChild(el('p', 'hint', 'Need a calculator? Open Concepts, then Calculator.'));
         var chips = el('div', 'row'); card.appendChild(chips);
         C.models.forEach(function (M, k) {
           var b = el('button', 'btn small' + (k === st.i ? ' primary' : ''), (modelDone(M) ? '✓ ' : '') + M.id); b.type = 'button';

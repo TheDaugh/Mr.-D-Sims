@@ -208,6 +208,22 @@ module.exports = {
       await typeIn(page, 2, '59.6'); H.assert.ok(await page.evaluate(() => LE.qs('X3').ok), '59.6 is within 0.1 of 59.7');
       H.assert.deepStrictEqual(errs, []); await ctx.close();
     }],
+    ['Concepts: a Calculator tab (invNorm and normalcdf) and a Table backward tutorial, in front of the kit tabs', async H => {
+      const { ctx, page, errs } = await H.open(H.br); await H.tick(page); await H.start(page, H.myId, '3'); await H.next(page);
+      await page.getByRole('button', { name: 'Concepts' }).click();
+      H.assert.deepStrictEqual(await page.locator('.cp-tab').allInnerTexts(), ['Concepts', 'Calculator', 'Table backward', 'z-table', 'Routine', 'Example']);
+      await page.locator('.cp-tab', { hasText: 'Calculator' }).click();
+      const out = page.locator('.nk-calc .nk-readout'); H.assert.ok((await out.nth(0).innerText()).includes('invNorm(0.9, 30, 6) = 37.69'));
+      H.assert.ok((await out.nth(1).innerText()).includes('Area to the left = 0.8997'), 'z = 1.28 gives the percentile');
+      await page.getByLabel('Area to the left').fill('0.05'); await page.getByLabel('Mean').first().fill('30'); H.assert.ok((await out.nth(0).innerText()).includes('= 20.13'));
+      await page.getByLabel('Area to the left').fill('1.5'); H.assert.ok((await out.nth(0).innerText()).includes('between 0 and 1'));
+      await page.getByLabel('Value or z').fill('37.69'); await page.getByLabel('Mean').nth(1).fill('30'); await page.getByLabel('SD').nth(1).fill('6'); H.assert.ok((await out.nth(1).innerText()).includes('Area to the left = 0.9000'));
+      await page.locator('.cp-tab', { hasText: 'Table backward' }).click(); H.assert.ok((await page.locator('.nk-steps').innerText()).includes('1.28'));
+      H.assert.ok(await page.locator('.cp-panel .nk-zt-table').count() >= 1, 'the table is under the steps');
+      await page.keyboard.press('Escape'); await page.evaluate(() => LE.forceGoto('models')); await H.tick(page, 300);
+      H.assert.ok((await page.locator('.card').innerText()).includes('Open Concepts, then Calculator'));
+      H.assert.deepStrictEqual(errs, []); await ctx.close();
+    }],
     ['Board page: Forward fills the four blanks, then walks model M1; the curve is static; Back undoes', async H => {
       const ctx = await H.br.newContext({ viewport: { width: 1366, height: 768 } }), page = await ctx.newPage(), errs = []; page.on('pageerror', e => errs.push(e.message));
       await page.goto(BASE + '/stats/unit-3-normal-distribution/3-6-boundary-values-board.html'); await page.waitForTimeout(300);

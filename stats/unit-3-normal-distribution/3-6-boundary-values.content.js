@@ -35,6 +35,7 @@
   }
 
   var cfg = LK.standard(SP, { prefix: 'BOU', explore: explore });
+  cfg.conceptTabs = NK.boundaryTabs().concat(NK.conceptTabs());   // the Calculator and Table backward tabs come first: students have invNorm and normalcdf here, and the table as a back-up
   var K = LK.for({ id: ID, course: SP.course, prefix: 'BOU', identity: 'id', title: SP.title, lib: { preds: SP.predicts,
     skills: SP.skills.map(function (sk) { return { id: sk.id, title: sk.title, gen: function (b, r) { var q = sk.gen(b, r); q.type = q.type || 'num'; q.keypad = true; return q; } }; }) } }), T = K.TABS;
   function stepIdx(id) { for (var i = 0; i < cfg.steps.length; i++) if (cfg.steps[i].id === id) return i; return -1; }
@@ -101,6 +102,7 @@
   cfg.steps[stepIdx('build')] = { id: 'build', label: T.build,
     render: function (card, c) {
       K.head(card, T.build, SP.buildTarget, 'Up next: endless practice at your level.');
+      card.appendChild(el('p', 'hint', 'Need a calculator? Open Concepts, then Calculator.'));
       var n = LE.items('build', 4), b = LE.band();
       for (var i = 0; i < n; i++) LE.ask(card, buildQ(i, b));
     },
