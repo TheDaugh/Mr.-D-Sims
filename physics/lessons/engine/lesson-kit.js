@@ -25,7 +25,7 @@
   LK.plain = plain; LK.optText = optText; LK.f2 = f2; LK.qdone = qdone;
 
   /* the standard report-field helpers, shared so every lesson orders them the same way */
-  LK.answerText = function (q) { return q.type === 'choice' ? optText(q.options[q.answer]) : (LE.fmtN(q.answer) + (q.unit ? ' ' + q.unit : '')); };
+  LK.answerText = function (q) { return q.type === 'choice' ? optText(q.options[q.answer]) : (LE.fmtN(q.answer) + (q.answer2 != null ? ' and ' + LE.fmtN(q.answer2) : '') + (q.unit ? ' ' + q.unit : '')); };
 
   LK.for = function (cfg) {
     var ID = cfg.id, lib = cfg.lib, K = {};

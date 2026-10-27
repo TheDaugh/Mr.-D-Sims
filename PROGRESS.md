@@ -2,6 +2,26 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-10-27: Unit 3 slot 9, Electron Configurations I (first v2 chemistry lesson)
+
+Built from `node tools/new-lesson.mjs chem electron-config-1 ... --unit unit-3-atoms-ions`, wiring the Day Card (`chemistry/unit-3-atoms-ions/day-cards/slot-09.card.md`, `slot-09.content.js`). Nothing in the content was rewritten.
+
+- Page, spec, Explore and wiring: `electron-config-1.{html,spec.js,content.js}`; Models tab: `electron-config-1.models.js`; board page: `electron-config-1-board.html`.
+- New shared figure `chemistry/shared/energy-ladder.js` (rules, SVG, drag widget; also draws question pictures, the huddle figure and the board). Not `ladder.js`, which is the difficulty ladder.
+- Engine (additive): `config` answer type and `answer2` in `lesson.js`; `SPEC.buildTarget` in `standard.js` (Build hard-coded "I can use a = F / m" for every course, so the chem template shows a physics sentence too; left as is).
+- Tests: `tests/unit/slot-09-content.test.js` (require path only changed), `tests/unit/energy-ladder.test.js`, `tests/lessons/electron-config-1.e2e.js`, lock target, `specs.test.js` accepts `config` items.
+
+Doubts for Ian (the card's list of what I added or interpreted):
+1. Target T7 was 113 characters; the spec rule is under 110. "(full form)" became "full" before "ground-state".
+2. Huddle: the card gives none. Definitions and the phosphorus example come from `board.reveal` and M1 verbatim (counts and the final total are blanks). Three label lines on the ladder are mine. Concepts (three) come from `hint0` and the board writes; their equations are mine.
+3. Warm-up: W1 to W6 replace the placement ladder. Band 2 if W1 to W4 and W5, W6 are all first try, else band 1. Only bands 1 and 2 are placed.
+4. Models sit after the Huddle. The pace plan has no `models` step, so they are unbudgeted (the 38 planned minutes do not include them).
+5. M3 moves 1, 2, 3 and 6 need questions the card does not word; I asked them from the model's numbers (electron count, order, electrons left after 3p, sum of superscripts). Move 5 "draw the boxes" is click-to-cycle and passes any arrangement with the right counts.
+6. Explore: "filling order hidden until the student commits an order" is built as: the order numbers appear on the ladder only when all electrons are placed. Rule priority on a bad drop: Pauli, then Aufbau, then Hund. Prompts for the `rec` items and the three capacities are mine.
+7. "Give both" (rules band 4, answer2) has no separator in the prompt; the box says to separate with a comma.
+8. Check tab is the card's exit (X1 to X3) and the report code field 7 is now the three first-try bits (`1-1-1`). Exit labels (secure, developing, not yet) are teacher-only.
+9. The gate uses the standard huddle code; `gate.items` are listed in the Huddle teacher panel only. Ink on the board is not built (decision 2).
+10. Not done: `portal/standards.json` has no strand for electron configurations, so write/read/rules are unmapped. `tools/build-keys.mjs` was not run (no `pdflatex` here), so no key PDFs. The board page is not linked from any hub.
 ## 2026-10-27: calculus 3.1 The Chain Rule (v2), first lesson of Unit 3
 
 Built from the calc template: `calculus/unit-3-composite-implicit-inverse/3-1-chain-rule.{html,spec.js,content.js}`, registered in `shared/lessons.js`, keys in `keys/calc/3-1-chain-rule-{makeup,teacher}.pdf`.

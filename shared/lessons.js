@@ -55,6 +55,10 @@ window.MrD.lessons = [
   { course: "stats", id: "unit-3-review-1-3", title: "Review: 3.1 to 3.3", unit: "unit-3-normal-distribution",
     href: "stats/unit-3-normal-distribution/unit-3-review-1-3.html", spec: "stats/unit-3-normal-distribution/unit-3-review-1-3.spec.js",
     gates: [], live: true },
+  { course: "chem", id: "electron-config-1", title: "Electron Configurations I", unit: "Unit 3 · Atoms and Ions",
+    href: "chemistry/unit-3-atoms-ions/electron-config-1.html", teacher: "chemistry/teacher.html",
+    spec: "chemistry/unit-3-atoms-ions/electron-config-1.spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
   { course: "calc", id: "3-1-chain-rule", title: "3.1 The Chain Rule", unit: "unit-3-composite-implicit-inverse",
     href: "calculus/unit-3-composite-implicit-inverse/3-1-chain-rule.html", spec: "calculus/unit-3-composite-implicit-inverse/3-1-chain-rule.spec.js",
     gates: [{ key: "h1", label: "Huddle" }], live: true }
