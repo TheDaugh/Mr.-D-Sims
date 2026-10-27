@@ -3,7 +3,7 @@ import { h, mulberry32, wordCount } from "./dom.js";
 import { citesCount, evidenceItems } from "./scatter.js";
 
 export function theoryNodes(lab) {
-  return lab.theory.map((s, i) => h("details", { open: i === 0 }, h("summary", {}, h("b", {}, s.title)), s.body.map((p) => h("p", {}, p))));
+  return (lab.theory || []).map((s, i) => h("details", { open: i === 0 }, h("summary", {}, h("b", {}, s.title)), s.body.map((p) => h("p", {}, p))));
 }
 
 const DEFAULT_STEPS = ["Watch the 30-second demo, or skip it.", "Do the pre-lab: four questions and a short prediction. The lab door stays locked until you finish.", "Suit up and run your first sample (Unknown A) with yellow arrows guiding you.", "Repeat the tests on B and C yourself. Unknown D is a challenge for the gold badge.", "Record what you observe, write a Claim, Evidence, Reasoning, then hand in. Hand-in opens after the minimum active lab time."];
@@ -21,8 +21,8 @@ export function renderIntro(box, ctx) {
     h("ol", {}, (lab.introSteps || DEFAULT_STEPS).map((t) => h("li", {}, t))),
     h("h3", {}, "Controls"),
     h("table", { class: "keys" },
-      key("← ↑ → ↓ or W A S D", "Walk. On screen you move along the floor diagonals."), key("E", "Use what you are facing (locker, shelf, bench, sink…)."), key("N / T / M", "Notebook, Theory, Microscope."),
-      key("Esc", "Step away from the bench, or close a window."), key("Hover", "Point at anything to see its name and picture."), ...(lab.introKeys || []).map(([k, t]) => key(k, t))),
+      ...(lab.keyRows ? lab.keyRows.map(([k, t]) => key(k, t)) : [key("← ↑ → ↓ or W A S D", "Walk. On screen you move along the floor diagonals."), key("E", "Use what you are facing (locker, shelf, bench, sink…)."), key("N / T / M", "Notebook, Theory, Microscope."),
+      key("Esc", "Step away from the bench, or close a window."), key("Hover", "Point at anything to see its name and picture."), ...(lab.introKeys || []).map(([k, t]) => key(k, t))])),
     h("p", { class: "hint" }, "The bar along the bottom is your log. It tells you what happened and why. Read it."),
     h("label", { style: "display:block;margin:12px 0" }, "Your name ", name),
     h("div", { class: "controls foot" }, lab.noDemo ? null : h("button", { onclick: ctx.onDemo }, "▶ Watch the demo"), go));
@@ -87,7 +87,7 @@ export function renderCER(box, ctx) {
   const picks = new Set(C.evidence || []);
   function evidence() {
     const row = nb[unk.value] || {};
-    const items = lab.tests.filter((t) => row[t.key]).map((t) => `Unknown ${unk.value}, ${t.name}: ${(t.options.find((o) => o[0] === row[t.key]) || [])[1] || row[t.key]}`);
+    const items = ctx.evidenceItems ? ctx.evidenceItems(unk.value) : lab.tests.filter((t) => row[t.key]).map((t) => `Unknown ${unk.value}, ${t.name}: ${((t.options || []).find((o) => o[0] === row[t.key]) || [])[1] || row[t.key]}`);
     evBox.replaceChildren(...(items.length ? items.map((txt) => h("label", { class: "ck" }, h("input", { type: "checkbox", value: txt, checked: picks.has(txt) ? "" : null, onchange: (e) => { e.target.checked ? picks.add(txt) : picks.delete(txt); update(); } }), txt)) : [h("p", { class: "hint" }, "You have no recorded observations for this unknown. Open the notebook.")]));
     update();
   }
@@ -108,8 +108,8 @@ export function renderCER(box, ctx) {
     h("h2", {}, "Claim, Evidence, Reasoning"), h("p", {}, post.prompt),
     h("label", {}, "Which unknown? ", unk),
     h("h3", {}, "Claim"), h("p", { class: "hint" }, "One sentence that answers the question."), chips(post.starters.claim, claim), claim, cc,
-    h("h3", {}, "Evidence"), h("p", { class: "hint" }, "Tick the observations from your own data that support the claim. Pick at least two."), evBox, note,
-    h("h3", {}, "Reasoning"), h("p", { class: "hint" }, "Explain why that evidence means that substance. Use particles. Evidence says what happened; reasoning says why it matters."), chips(post.starters.reasoning, reasoning), h("p", { class: "hint" }, "Word bank (click to insert):"), chips(post.wordBank, reasoning), reasoning, rc,
+    h("h3", {}, "Evidence"), h("p", { class: "hint" }, (lab.cerUi || {}).evidenceHint || "Tick the observations from your own data that support the claim. Pick at least two."), evBox, note,
+    h("h3", {}, "Reasoning"), h("p", { class: "hint" }, (lab.cerUi || {}).reasoningHint || "Explain why that evidence means that substance. Use particles. Evidence says what happened; reasoning says why it matters."), chips(post.starters.reasoning, reasoning), h("p", { class: "hint" }, "Word bank (click to insert):"), chips(post.wordBank, reasoning), reasoning, rc,
     h("h3", {}, "Check yourself"), checks, status, h("div", { class: "controls foot" }, h("button", { onclick: () => ctx.onCerClose() }, "Back to the lab"), submit));
   evidence();
 }

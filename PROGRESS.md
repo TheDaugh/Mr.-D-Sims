@@ -2,6 +2,29 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-10-27: Chemistry virtual lab 4, Flame Tests (slot 8, lab day)
+
+Built as a new module in `chemistry/virtual-lab` (`?lab=flame`), from the slot 8 sheet. Nothing in the three content files was rewritten.
+
+- Content: `content/flame-data.json`, `flame-items.json`, `flame-lab-content.json` (byte for byte; hashes pinned in `test/flame.test.js`), `content/labs/04-flame-tests.json` (wiring, `ui` wording, step card and captions copied from the sheet), `content/rooms/flame-lab.json` (the lab 1 room with the bench relabelled Flame bench and one UNKNOWNS shelf).
+- Engine and UI: `src/engine/flame.js`, `src/ui/flame.js`, hooks in `app.js`, `stages.js` (theory optional, `keyRows`, `evidenceItems`, `cerUi`), `quests.js` (`flame` state), `index.html`, `stage.css`. Paper page: `flame-explore.html`.
+- Built: bench with burner, bottles, splints; 10-second ring; results table; unknowns locked until all seven are recorded; reused-splint rule (sodium yellow first, run flagged); spectroscope drawn from the data; Tutorial 1 (hint pictures on the first five quests) and Tutorial 2 (four frames, opens on first use); step card always on screen; practice hints from items.json (hint k opens after the k-th miss, the answer is never shown); two huddle codes; three hidden bands. Not built: stamps, report codes, board reveal.
+- Tests: `test/flame.test.js`, `test/flame-words.test.js` (the word rule), `test/slot-08-content.test.cjs` (the sheet's test, two paths changed), `test/flame.e2e.js`; `tests/lock.e2e.js` has a flame target.
+
+Doubts for Ian (nothing guessed silently):
+1. **Code 2 and the one-code rule.** Both gates use `MrD.codes.gate`, which is the one daily code, so code 1 also opens gate 2. Gate 2 only shows a code box when seven flame tests are recorded and both unknowns are answered (the sheet's rule, still marked pending). It does not open by itself, so early finishers keep working; a Huddle 2 button appears when the record is complete. The lab ends when code 2 and the CER are both in.
+2. **Practice items.** The data says the practice set is not run in class on a lab day. You asked for hints from items.json, so a Practice tab opens in the notebook once the seven salts are recorded (in class and at home). Say if it should be home only.
+3. **Bands.** Hidden. Start at band 1, up one only on a first-try right answer, never down; the band only picks the next item. The sheet says bands change hint depth and the number of extra unknowns but gives no numbers, so every student gets three hints per item and endless extra bottles.
+4. **Hint cost.** Hint 1 opens after the first miss, hint 2 after the second, hint 3 after the third; a fourth miss closes the item as missed (the answer is not shown, and the record says so).
+5. **b3-4 (explain).** Grading is pending your decision. The sentence is saved in the record and not scored; the model answer is not shown.
+6. **Reused splint.** A splint is spent after a hold; a second dip on one splint also counts as reuse. The flash lasts 2 s, read from the K masking text in the data. A flagged run still counts as recorded; a clean retest clears the flag.
+7. **Ca.** Marked needs_review in the data; the teacher key (`#key`, Key button) repeats it. Students see Ca's NIST lines like the other rows.
+8. **Wording of mine** (all in `content/labs/04-flame-tests.json`, `ui`): button labels, status lines, intro, the huddle screens, the exit-ticket hand-off. The pre-lab pictures, Tutorial 1 pictures and Tutorial 2 frames are drawn by me from the sheet's one-line picture descriptions.
+9. **Brightness order** (faint, moderate, bright, very bright) drives the flame glow only; it is an author-set display choice in the wiring file.
+10. **Word rule.** The test lists the sheet's 15 words plus a few it would be easy to leak (photon, quantum, orbital...). Slot 7 review words (electron, shell, charge...) may appear in the pre-lab only. Salt and element names and the units the sheet's items use are not checked.
+11. **Not done:** no hub link in `chemistry/labs.js`, no reader for lab 4 records in `teacher.html` or the gradebook, no teacher key PDF, no teacher bundle entry. The swatch row is on the paper page, not in the simulator (you show it at huddle 1).
+12. `node tests/lock.e2e.js` needs `TZ=America/New_York`; without it the virtual-lab targets fail on an unmodified checkout too. `node tools/review.js --gate` still fails on the unreviewed lab 1 content (unchanged).
+
 ## 2026-10-27: docs only, v3 day rules (branch docs/day-rules-v3)
 
 Added `docs/DAY-RULES.md`, a "Standard v3" section in `docs/LESSON-STANDARD.md`, and a "Supersedes" block in `CLAUDE.md`. No code, tests or templates changed. The clock itself (huddles at minute 3 and 25) is a separate code branch. Chem slot 9 and stats 3.6 are already on main from the earlier Day Cards and predate these rules.

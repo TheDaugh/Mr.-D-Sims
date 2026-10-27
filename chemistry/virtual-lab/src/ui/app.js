@@ -13,6 +13,8 @@ import { createScatter, newScat, fixScat, summary as scatSummary, tallyDone, mat
 import { createHeatBook, drawGraph, goodRows } from "./heatbook.js";
 import { profile, stateAt, reading, assign } from "../engine/heating.js";
 import { runDemo } from "./demo.js";
+import { createFlame, newFlame, fixFlame } from "./flame.js";
+import * as FE from "../engine/flame.js";
 import { questDone, questProgress } from "../engine/quests.js";
 import { drawIcon } from "./icons.js";
 import { fitStage } from "./fit.js";
@@ -27,8 +29,8 @@ import { indexHazards, losePoints } from "../engine/hazards.js";
 import { parseRoom, step, facingTile, hasPPE, tileAt } from "../engine/room.js";
 
 const FIT = fitStage($("#stage"));
-const CAP = 10;
-const LABS = { "unknown-solids": "01-unknown-solids.json", heating: "02-heating-curves.json", rutherford: "03-rutherford-gold-foil.json" };
+let CAP = 10;
+const LABS = { "unknown-solids": "01-unknown-solids.json", heating: "02-heating-curves.json", rutherford: "03-rutherford-gold-foil.json", flame: "04-flame-tests.json" };
 const PRACTICE = { id: "practice", mass: 10, power: 100, T0: 20, mp: 50, bp: 150, Tend: 90, cs: 2, cl: 2.5, cg: 2, Lf: 200, Lv: 1000 };
 const SHORT = { NaCl: "Salt", sucrose: "Sugar", NaHCO3: "B.Soda", CaCO3: "Chalk", starch: "Starch", citric: "Citric", water: "Water", vinegar: "Vinegar", iodine: "Iodine" };
 
@@ -37,6 +39,10 @@ async function boot() {
     const params = new URLSearchParams(location.search), labFile = LABS[params.get("lab")] || LABS["unknown-solids"];
     const getJSON = (u) => (window.__CONTENT__ && window.__CONTENT__[u] ? Promise.resolve(structuredClone(window.__CONTENT__[u])) : fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); }));
     const lab = await getJSON("content/labs/" + labFile);
+    if (lab.kind === "flame") {   // the sheet's three content files stay untouched; this file only wires them together
+      const [fd, fi, fc] = await Promise.all([lab.files.data, lab.files.items, lab.files.content].map(getJSON));
+      Object.assign(lab, { flameData: fd, flameItems: fi, content: fc, prelab: fc.prelab, postlab: fc.postlab, quests: fc.quests, tests: fc.tests, terms: fc.terms });
+    }
     const urls = ["content/species.json", "content/reactions.json", "content/rooms/" + (lab.roomFile || "main-lab") + ".json", "content/hazards.json", "content/config.json"];
     const [species, reactions, roomDef, hazardData, config] = await Promise.all(urls.map(getJSON));
     const modeInfo = await resolveMode(params, config), key = "vlab:" + lab.id;
@@ -59,7 +65,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   $("#boot").hidden = true;
   const world = buildWorld(speciesData, reactionData);
   const EL = speciesData.electrolytes;
-  const HEAT = lab.kind === "heating", SCAT = lab.kind === "scatter", NOPPE = !!lab.noPPE;
+  const HEAT = lab.kind === "heating", SCAT = lab.kind === "scatter", FL = lab.kind === "flame", NOPPE = !!lab.noPPE;
+  if (FL) { CAP = lab.carry; lab.quests = lab.quests.map((q) => ({ ...q, state: "flame", rule: q.id, ...(q.id === "knowns" ? { count: 7 } : {}) })); }
   for (const [id, txt] of Object.entries(lab.roomText || {})) for (const e of Object.values(roomDef.legend)) if (e.id === id) e.text = txt;
   const solids = speciesData.species.filter((s) => s.phase === "s").map((s) => s.id);
   const params = new URLSearchParams(location.search);
@@ -71,8 +78,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const FX = lab.fixed || {}, hpool = HEAT ? lab.substances.map((x) => x.id).filter((id) => !Object.values(FX).includes(id)) : [], hrest = HEAT ? assign(hpool, seed, lab.tubes.filter((t) => !FX[t]).length) : [];
   let hri = 0; const hsubs = HEAT ? lab.tubes.map((t) => FX[t] || hrest[hri++]) : [];
   if (HEAT && TUT) { const at = hsubs.indexOf(TUT.id), ti = lab.tubes.indexOf(TUT.unknown); if (at >= 0 && ti >= 0) [hsubs[at], hsubs[ti]] = [hsubs[ti], hsubs[at]]; }
-  const unknowns = SCAT ? [] : HEAT ? lab.tubes.map((L, i) => ({ label: L, id: hsubs[i] })) : order.slice(0, 4).map((id, i) => ({ label: "ABCD"[i], id }));
-  const truth = {}; if (!HEAT && !SCAT) for (const id of solids) truth[id] = fingerprint(world, EL, id, lab.standard);
+  const unknowns = SCAT || FL ? [] : HEAT ? lab.tubes.map((L, i) => ({ label: L, id: hsubs[i] })) : order.slice(0, 4).map((id, i) => ({ label: "ABCD"[i], id }));
+  const truth = {}; if (!HEAT && !SCAT && !FL) for (const id of solids) truth[id] = fingerprint(world, EL, id, lab.standard);
   const TEACHER = window.__TEACHER__ === true;
   const ACT = createActive();
   const log = new Log();
@@ -83,16 +90,16 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     { key: "b1", label: "B1", name: "Beaker 1", kind: "beaker", cap: 250, empty: 105.0, loc: "bench", slot: 0 },
     { key: "b2", label: "B2", name: "Beaker 2", kind: "beaker", cap: 250, empty: 105.0, loc: "bench", slot: 1 },
     { key: "wg", label: "WG", name: "Watch glass", kind: "watch", cap: 0, empty: 20.0, loc: "bench", slot: 2 }
-  ].filter((c) => !(HEAT && c.key === "wg"));
+  ].filter((c) => !(HEAT && c.key === "wg") && !FL);
   CONT.forEach((c) => { c.c = newContainer(c.name, c.cap); c.tare = 0; c.fizz = 0; });
-  const sources = SCAT ? [{ key: "none", id: "none", label: "(nothing)", short: "-", group: "none", phase: "s", shelf: 0, idx: 0, color: "#cccccc" }] : HEAT ? unknowns.map((u, i) => ({ key: "s" + u.label, id: u.label, label: `Sample ${u.label}`, short: u.label, group: "Unknown samples", phase: "s", shelf: 0, idx: i, heatSub: u.id, color: "#e8e4d6" })) : [
+  const sources = FL ? [] : SCAT ? [{ key: "none", id: "none", label: "(nothing)", short: "-", group: "none", phase: "s", shelf: 0, idx: 0, color: "#cccccc" }] : HEAT ? unknowns.map((u, i) => ({ key: "s" + u.label, id: u.label, label: `Sample ${u.label}`, short: u.label, group: "Unknown samples", phase: "s", shelf: 0, idx: i, heatSub: u.id, color: "#e8e4d6" })) : [
     ...unknowns.map((u, i) => ({ key: "u" + u.label, id: u.id, label: `Unknown ${u.label}`, short: u.label, group: "Unknown samples", phase: "s", shelf: 0, idx: i })),
     ...["water", "vinegar", "iodine"].map((id, i) => ({ key: id, id, label: speciesData.species.find((s) => s.id === id).name, short: SHORT[id], group: "Liquids", phase: "l", shelf: 0, idx: 4 + i })),
     ...solids.map((id, i) => ({ key: id, id, label: speciesData.species.find((s) => s.id === id).name + " (known)", short: SHORT[id], group: "Known samples", phase: "s", shelf: 1, idx: i }))
   ];
-  if (!HEAT && !SCAT) sources.forEach((s) => { s.color = speciesData.species.find((x) => x.id === s.id).color; });
+  if (!HEAT && !SCAT && !FL) sources.forEach((s) => { s.color = speciesData.species.find((x) => x.id === s.id).color; });
 
-  const S = { sel: "b1", srcKey: sources[0].key, ppe: { goggles: false, apron: false, tongs: false }, inv: [], view: "room", panel: null, mode: modeInfo.mode, incident: null, safety: { points: 100, incidents: [] }, plateOn: false, plateC: 150, bulb: null, bulbUntil: 0, feed: [], notebook: {}, student: "", stage: "intro", prelab: { answers: {}, prediction: "" }, cer: {}, submitted: false, cerDone: false, touched: {}, demo: false, scat: newScat(), nbSeen: 0, heat: Object.fromEntries(unknowns.map((u) => [u.label, { rows: [], items: [], axes: { title: "", x: "", y: "" } }])), speed: 1, paused: false, stepTo: null, interval: 15 };
+  const S = { sel: "b1", srcKey: sources[0] ? sources[0].key : null, ppe: { goggles: false, apron: false, tongs: false }, inv: [], view: "room", panel: null, mode: modeInfo.mode, incident: null, safety: { points: 100, incidents: [] }, plateOn: false, plateC: 150, bulb: null, bulbUntil: 0, feed: [], notebook: {}, student: "", stage: "intro", prelab: { answers: {}, prediction: "" }, cer: {}, submitted: false, cerDone: false, touched: {}, demo: false, scat: newScat(), flame: newFlame(), nbSeen: 0, heat: Object.fromEntries(unknowns.map((u) => [u.label, { rows: [], items: [], axes: { title: "", x: "", y: "" } }])), speed: 1, paused: false, stepTo: null, interval: 15 };
   // ---------- heating model (heating lab only): constant-power plate, temperature from the sample's enthalpy ----------
   const subOfSrc = (src) => (src.heatSub === "practice" ? PRACTICE : lab.substances.find((x) => x.id === src.heatSub));
   const hsub = (c) => (c.heat.sub === "practice" ? PRACTICE : lab.substances.find((x) => x.id === c.heat.sub));
@@ -342,8 +349,13 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
 
   // ---------- DOM ----------
-  const canvas = $("#bench"), renderer = createRenderer(canvas);
+  const canvas = $("#bench"), renderer = FL ? null : createRenderer(canvas);
+  const studentKey = () => (params.get("seed") ? "seed" + seed : String(S.student || "").trim().toLowerCase().replace(/\s+/g, " "));
+  const fl = FL ? createFlame({ lab, data: lab.flameData, items: lab.flameItems, content: lab.content, S, log, say, canvas, studentKey, carried: () => S.inv, tip: (ev, info) => showTip(ev, info),
+    canAct: () => S.stage === "lab" && !S.demo && ppeOk(), running: () => S.stage === "lab" && S.view === "bench" && !document.querySelector("#stage dialog[open]"), ppeOn: () => hasPPE(S.ppe),
+    onChange: () => { fl.syncSources(sources); if (ready) { renderInv(); renderQuests(); autosave(); } }, openNotebook: (t) => openFlNb(t), openSpectroscope: () => openSpec(), showTutorial2: (fr) => showTut2(fr) }) : null;
   canvas.addEventListener("click", (ev) => {
+    if (FL) return;
     const r = canvas.getBoundingClientRect();
     const hit = renderer.hit((ev.clientX - r.left) * (320 / r.width), (ev.clientY - r.top) * (180 / r.height));
     if (!hit) return;
@@ -361,7 +373,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (!S.inv.includes(S.srcKey)) S.srcKey = S.inv[0] || null;
     srcSel.replaceChildren(...(S.inv.length ? S.inv.map((k) => { const s = sources.find((x) => x.key === k); return h("option", { value: k }, s.label); }) : [h("option", { value: "" }, "(nothing carried)")]));
     const s = sources.find((x) => x.key === S.srcKey);
-    $("#unit").textContent = s && s.phase === "l" ? "mL" : "g"; if (s) srcSel.value = S.srcKey;
+    if ($("#unit")) $("#unit").textContent = s && s.phase === "l" ? "mL" : "g"; if (s) srcSel.value = S.srcKey;
   }
 
   const ctl = $("#controls");
@@ -380,7 +392,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   };
   const [timeRow, timeRead] = HEAT ? timeCtl() : [];
   if (HEAT) ctl.append(timeRead, timeRow);
-  ctl.append(movers, h("p", { id: "where", class: "note", style: "margin:10px 0" }), adder,
+  if (FL) { ctl.append(fl.controls); $("#controlsCard p.hint")?.remove(); }
+  else ctl.append(movers, h("p", { id: "where", class: "note", style: "margin:10px 0" }), adder,
     ...(HEAT ? [h("div", { class: "controls", style: "margin-top:10px" }, h("button", { id: "btnTare", onclick: tare }, "Tare"), h("button", { onclick: empty }, "Empty & rinse"))] : [
       h("div", { class: "controls", style: "margin-top:10px" },
         h("button", { id: "btnTare", onclick: tare }, "Tare"), h("button", { onclick: stir }, "Stir"), h("button", { id: "btnCond", onclick: conduct }, "Test conductivity"),
@@ -396,6 +409,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const t = c.heat.E / hsub(c).power; S.stepTo = (Math.floor(t / S.interval + 1e-9) + 1) * S.interval; S.paused = false; log.add("advance", { container: c.key, to: S.stepTo }); renderControls();
   }
   function renderControls() {
+    if (FL) return fl.refresh();
     $("#cont").value = S.sel; const c = cur();
     if (HEAT) {
       const st = c.heat ? hstate(c) : null, t = c.heat ? c.heat.E / hsub(c).power : 0;
@@ -418,9 +432,9 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
 
   // ---------- lab sheet ----------
   $("#title").textContent = lab.title;
-  const table = HEAT || SCAT ? document.createElement("table") : $("#table");
-  if (!HEAT && !SCAT) { $("#steps").replaceChildren(...lab.steps.map((s) => h("li", {}, s))); $("#tests").replaceChildren(...lab.tests.map((t) => h("li", {}, h("b", {}, t.name + ". "), t.how))); }
-  if (!HEAT && !SCAT) table.replaceChildren(
+  const table = HEAT || SCAT || FL ? document.createElement("table") : $("#table");
+  if (!HEAT && !SCAT && !FL) { $("#steps").replaceChildren(...lab.steps.map((s) => h("li", {}, s))); $("#tests").replaceChildren(...lab.tests.map((t) => h("li", {}, h("b", {}, t.name + ". "), t.how))); }
+  if (!HEAT && !SCAT && !FL) table.replaceChildren(
     h("thead", {}, h("tr", {}, h("th", {}, "Sample"), lab.tests.map((t) => h("th", {}, t.name)), h("th", {}, "I think it is"))),
     h("tbody", {}, unknowns.map((u) => h("tr", { "data-u": u.label, ...(CH.includes(u.label) ? { "data-ch": "1", class: "challenge" } : {}) },
       h("th", { scope: "row" }, "Unknown " + u.label + (CH.includes(u.label) ? " (challenge)" : "")),
@@ -433,6 +447,17 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     h("div", { class: "controls foot" }, h("button", { id: "nbToCer", class: "primary", onclick: () => finishData() }, "I'm done with the data → write the CER")));
   const scat = SCAT ? createScatter({ lab, S, log, say, seed, onChange: () => { if (ready) { renderQuests(); autosave(); } }, onFinish: () => finishData() }) : null;
   if (SCAT) $("#sheet").replaceChildren(h("button", { class: "x", "data-close": "" }, "Close ✕"), h("h2", {}, "Foil apparatus and notebook"), h("details", {}, h("summary", {}, h("b", {}, "Steps")), h("ol", {}, lab.introSteps.map((t) => h("li", {}, t)))), scat.el);
+  if (FL) { $("#sheet").replaceChildren(fl.sheet); $("#btnTheory").hidden = true; $("#btnDemo").hidden = true; $("#btnMicro").textContent = "🔭 Spectroscope"; $("#btnMicro").title = "Spectroscope (M)"; $("#ppe").hidden = false;
+    $("#stepCard").hidden = false; $("#stepCard").replaceChildren(h("h3", {}, lab.stepCard.title), h("ol", {}, lab.stepCard.steps.map((t) => h("li", {}, t)))); }
+  const flStageOk = () => ["lab", "postlab", "done"].includes(S.stage) || S.demo;
+  function openFlNb(t) { if (!flStageOk()) return; if (!dlg("dlgNotebook").open) log.add("notebook_open", { tab: t }); fl.showTab(t || "table"); openDlg("dlgNotebook"); }
+  function openSpec() { if (!flStageOk()) return; const f = S.flame; if (f.last) log.add("spec_open", { sample: f.last.label || f.last.sample }); if (f.last && !f.tut2) { f.tut2 = true; log.add("tut2_open"); fl.tutorial2(); } else openFlNb("spec"); autosave(); renderQuests(); }
+  function showTut2(frames) {
+    let i = 0; const box = $("#tut2Body"), U = lab.ui;
+    const draw = () => { box.replaceChildren(h("h2", {}, U.tutHead), h("p", { class: "hint" }, U.tutOf.replace("{n}", i + 1).replace("{t}", frames.length)), h("div", { class: "frame" }, frames[i].pic, h("p", { class: "cap" }, frames[i].text)),
+      h("div", { class: "controls foot" }, h("button", { id: "tutBack", disabled: i === 0, onclick: () => { i--; draw(); } }, U.tutBack), i < frames.length - 1 ? h("button", { id: "tutNext", class: "primary", onclick: () => { i++; draw(); } }, U.tutNext) : h("button", { id: "tutDone", class: "primary", onclick: () => { closeDlg("dlgTut2"); openFlNb("spec"); } }, U.tutDone))); };
+    draw(); openDlg("dlgTut2");
+  }
   function openScope() { if (!["lab", "postlab", "done"].includes(S.stage)) return; openScatter(); scat.focusScope(); }
   function openScatter() { if (!["lab", "postlab", "done"].includes(S.stage) && !S.demo) return; log.add("scat_open"); say("You step up to the foil apparatus."); scat.refresh(); openDlg("dlgNotebook"); }
   // ---------- the room ----------
@@ -485,8 +510,9 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (!visited.has(t.id)) { visited.add(t.id); log.add("visit", { object: t.id }); }
     if (t.type === "station" && SCAT) { openScatter(); }
     else if (t.type === "shelf" && SCAT) { closePanel(); say(t.text); }
-    else if (t.type === "station") { setView("bench"); say("You stand at your bench."); }
-    else if (t.type === "shelf" || t.type === "locker" || t.type === "rack") { S.panel = t; renderPanel(); }
+    else if (t.type === "shelf" && FL && !fl.unlocked()) { closePanel(); say(lab.ui.locked, "warn"); }
+    else if (t.type === "station") { setView("bench"); say(FL ? "You stand at the flame bench." : "You stand at your bench."); fl && fl.refresh(); }
+    else if (t.type === "shelf" || t.type === "locker" || t.type === "rack") { if (FL && t.type === "shelf") fl.syncSources(sources); S.panel = t; renderPanel(); }
     else { closePanel(); say(t.text); }
     return true;
   }
@@ -510,7 +536,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     if (!["lab", "postlab", "done"].includes(S.stage)) return;
     if (k === "j") return toggleTasks();
     if (/^[0-9]$/.test(k)) return selectInv(k === "0" ? 9 : +k - 1);
-    if (k === "n") return openNotebook(); if (k === "t") return openDlg("dlgTheory"); if (k === "m") return SCAT ? openScope() : openMicro();
+    if (k === "n") return openNotebook(); if (k === "t") return FL ? undefined : openDlg("dlgTheory"); if (k === "m") return SCAT ? openScope() : FL ? openSpec() : openMicro();
     if (HEAT && S.view === "bench" && k === " ") { e.preventDefault(); togglePause(); return; }
     if (S.view !== "room" || e.target.tagName === "BUTTON") return;
     if (DIRS[k]) { e.preventDefault(); walk(...DIRS[k]); }
@@ -568,14 +594,19 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     return { version: 2, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, stage: S.stage, submitted: S.cerDone, prelab: { correct, total: qs.length, prediction: S.prelab.prediction, answers: S.prelab.answers }, samples, cer: S.cerDone ? S.cer : null, safety: S.safety, events: log.events };
   }
   function record() {
-    const r = baseRecord(); r.activeSec = Math.round(ACT.sec); r.minActive = lab.minActiveMin || 0; r.challenge = challengeDone(); r.code = checkCode({ student: r.student, lab: lab.id, seed, activeSec: r.activeSec, events: log.events.length, cerDone: S.cerDone }); r.codeEvents = log.events.length; return r;
+    const r = baseRecord(); r.activeSec = Math.round(ACT.sec); if (FL) return r; r.minActive = lab.minActiveMin || 0; r.challenge = challengeDone(); r.code = checkCode({ student: r.student, lab: lab.id, seed, activeSec: r.activeSec, events: log.events.length, cerDone: S.cerDone }); r.codeEvents = log.events.length; return r;
   }
   function scatRecord() {
     const qs = lab.prelab.questions, correct = qs.filter((q) => S.prelab.answers[q.id] === q.correct).length;
     return { version: 2, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, stage: S.stage, submitted: S.cerDone, prelab: { correct, total: qs.length, placement: S.prelab.placement || null, prediction: S.prelab.prediction, answers: S.prelab.answers }, scat: scatSummary(S.scat), cer: S.cerDone ? S.cer : null, safety: S.safety, events: log.events };
   }
   function baseRecord() { const r = baseRecord0(); if (S.lockExits != null) r.lock = { exits: S.lockExits, awaySec: S.lockAway }; return r; }
+  function flameRecord() {
+    const qs = lab.prelab.questions, correct = qs.filter((q) => S.prelab.answers[q.id] === q.correct).length, f = S.flame;
+    return { version: 2, lab: lab.id, student: S.student, mode: S.mode, seed, started: log.started, stage: S.stage, prelab: { correct, total: qs.length, prediction: S.prelab.prediction, answers: S.prelab.answers }, flame: { rows: f.rows, unknowns: f.unk, items: f.items, huddle1: f.huddle1, huddle2: f.huddle2, recordComplete: fl.recordComplete() }, cer: S.cerDone ? S.cer : null, safety: S.safety, events: log.events };
+  }
   function baseRecord0() {
+    if (FL) return flameRecord();
     if (SCAT) return scatRecord();
     if (HEAT) return heatRecord();
     collectNotebook();
@@ -636,20 +667,20 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function snapshot() {
     collectNotebook();
     return { version: 1, lab: lab.id, seed, student: S.student, savedAt: new Date().toISOString(), started: log.started, activeSec: ACT.sec, elapsed: (performance.now() - log.t0) / 1000, events: log.events,
-      S: { ppe: S.ppe, inv: S.inv, srcKey: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, safety: S.safety, sel: S.sel, stage: S.stage, prelab: S.prelab, cer: S.cer, submitted: S.submitted, cerDone: S.cerDone, touched: S.touched, nbSeen: S.nbSeen, lockExits: S.lockExits, lockAway: S.lockAway, heat: S.heat, scat: S.scat, speed: S.speed, paused: S.paused, interval: S.interval }, P, visited: [...visited], notebook: S.notebook,
+      S: { ppe: S.ppe, inv: S.inv, srcKey: S.srcKey, plateOn: S.plateOn, plateC: S.plateC, safety: S.safety, sel: S.sel, stage: S.stage, prelab: S.prelab, cer: S.cer, submitted: S.submitted, cerDone: S.cerDone, touched: S.touched, nbSeen: S.nbSeen, lockExits: S.lockExits, lockAway: S.lockAway, heat: S.heat, scat: S.scat, flame: S.flame, speed: S.speed, paused: S.paused, interval: S.interval }, P, visited: [...visited], notebook: S.notebook,
       cont: CONT.map((c) => ({ key: c.key, loc: c.loc, slot: c.slot, tare: c.tare, c: c.c, heat: c.heat || null })) };
   }
   function autosave() { if (S.demo || S.stage === "intro") return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot())); } catch (e) { /* storage blocked: file save still works */ } }
   function restore(sn, quiet) {
     Object.assign(S.ppe, sn.S.ppe); S.inv = sn.S.inv; S.srcKey = sn.S.srcKey; S.plateOn = sn.S.plateOn; S.plateC = sn.S.plateC; S.safety = sn.S.safety; S.sel = sn.S.sel;
-    for (const k of ["stage", "prelab", "cer", "submitted", "cerDone", "touched", "nbSeen", "lockExits", "lockAway", "heat", "scat", "speed", "paused", "interval"]) if (sn.S[k] !== undefined) S[k] = sn.S[k];
+    for (const k of ["stage", "prelab", "cer", "submitted", "cerDone", "touched", "nbSeen", "lockExits", "lockAway", "heat", "scat", "flame", "speed", "paused", "interval"]) if (sn.S[k] !== undefined) S[k] = sn.S[k];
     for (const r of sn.cont) { const c = byKey(r.key); c.loc = r.loc; c.slot = r.slot; c.tare = r.tare; c.c = r.c; c.heat = r.heat || null; }
     Object.assign(P, sn.P); sn.visited.forEach((v) => visited.add(v));
     ACT.set(sn.activeSec || 0); log.events = sn.events; log.started = sn.started; log.t0 = performance.now() - sn.elapsed * 1000;
     S.student = sn.student || S.student;   // the intro box is not on screen after a resume, so the name has to come from the save
     { const stEl = $("#student"); if (stEl) stEl.value = sn.student || ""; }
     table.querySelectorAll("select").forEach((x) => { const v = (sn.notebook[x.dataset.u] || {})[x.dataset.t]; if (v) x.value = v; });
-    if (!HEAT) $("#plate").value = S.plateC; if (book) book.refresh(); syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
+    if (FL) { S.flame = fixFlame(S.flame); fl.syncSources(sources); } else if (!HEAT) $("#plate").value = S.plateC; if (book) book.refresh(); syncUnit(); renderPPE(); renderInv(); renderControls(); renderSafety();
     if (SCAT) { fixScat(S.scat); S.scat.firing = false; scat.scope.sync(S.scat.scope); scat.refresh(); }
     lockTable(); if (!quiet) { log.add("resume", { savedAt: sn.savedAt }); say("Welcome back. Your saved lab is restored."); }
   }
@@ -679,6 +710,15 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       S.cerDone ? h("div", {}, h("h2", {}, "Claim, Evidence, Reasoning"), h("p", {}, h("b", {}, "Claim: "), S.cer.claim), h("p", {}, h("b", {}, "Evidence:")), h("ul", {}, (S.cer.evidence || []).map((x) => h("li", {}, x)), S.cer.note ? h("li", {}, S.cer.note) : null), h("p", {}, h("b", {}, "Reasoning: "), S.cer.reasoning)) : null
     ); window.print();
   }
+  function printFlame() {
+    const rec = record(), U = lab.ui, f = S.flame, B = FE.byId(lab.flameData), say2 = (r) => [r.color || "—", r.brightness || "—", r.flagged ? U.flagWord : ""];
+    $("#report").replaceChildren(h("h1", {}, U.printTitle), h("p", {}, `${S.student || "Student"} · ${new Date(log.started).toLocaleString()} · active lab time ${Math.round(rec.activeSec / 60)} min`),
+      h("h2", {}, U.printKnowns), h("table", {}, h("thead", {}, h("tr", {}, [U.saltHead, U.colorHead, U.brightHead, ""].map((x) => h("th", {}, x)))), h("tbody", {}, FE.benchIds(lab.flameData).map((id) => h("tr", {}, h("td", {}, B[id].formula), ...say2(f.rows[id] || {}).map((x) => h("td", {}, x)))))),
+      h("h2", {}, U.printUnknowns), h("table", {}, h("thead", {}, h("tr", {}, [U.unknownWord, U.colorHead, U.brightHead, "", U.linesHead, U.identHead].map((x) => h("th", {}, x)))), h("tbody", {}, Object.entries(f.unk).map(([l, u]) => h("tr", {}, h("td", {}, l), ...say2(u).map((x) => h("td", {}, x)), h("td", {}, u.lines || "—"), h("td", {}, u.identity === "cannot" ? U.cannotTell : u.identity || "—"))))),
+      S.cerDone ? h("div", {}, h("h2", {}, "Claim, Evidence, Reasoning"), h("p", {}, h("b", {}, `Unknown ${S.cer.unknown}. Claim: `), S.cer.claim), h("p", {}, h("b", {}, "Evidence:")), h("ul", {}, (S.cer.evidence || []).map((x) => h("li", {}, x)), S.cer.note ? h("li", {}, S.cer.note) : null), h("p", {}, h("b", {}, "Reasoning: "), S.cer.reasoning)) : null,
+      h("h2", {}, U.printPractice), h("p", {}, Object.entries(f.items.res).map(([id, r]) => `${id}: ${r.ok ? "right" : r.closed ? "closed" : "open"}, tries ${r.tries}, hints ${r.hints}`).join("; ") || "—"));
+    window.print();
+  }
   function printHeat() {
     const rec = record(), nm = (id) => (lab.reference.find((x) => x.id === id) || {}).name || "(not chosen)";
     $("#report").replaceChildren(
@@ -691,6 +731,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     ); window.print();
   }
   $("#print").addEventListener("click", () => {
+    if (FL) return printFlame();
     if (SCAT) return printScat();
     if (HEAT) return printHeat();
     const rec = record(), r = buildReport(rec, truth, H), mm = (sec) => `${Math.floor(sec / 60)} min ${sec % 60} s`, mark = (ok) => (ok === null ? "—" : ok ? "✔" : "✘");
@@ -741,12 +782,13 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const nbReq = () => nbCells().filter((x) => !x.closest("tr[data-ch]"));
   const nbFilled = () => nbReq().filter((x) => x.value).length;
   const chFilled = () => nbCells().filter((x) => x.closest("tr[data-ch]") && x.value).length;
-  function lockTable() { if (HEAT || SCAT) return; nbCells().forEach((x) => { x.disabled = S.submitted; }); const b = $("#nbSubmit"); if (b) b.hidden = S.submitted; $("#nbDone").hidden = !S.submitted; }
+  function lockTable() { if (HEAT || SCAT || FL) return; nbCells().forEach((x) => { x.disabled = S.submitted; }); const b = $("#nbSubmit"); if (b) b.hidden = S.submitted; $("#nbDone").hidden = !S.submitted; }
   function finishData() {
     if (S.stage === "lab") { S.stage = "postlab"; log.add("data_done", {}); }
     closeDlg("dlgNotebook"); say("Data finished. Now write your Claim, Evidence, Reasoning.", "obs"); openCER(); renderQuests();
   }
   function openNotebook() {
+    if (FL) return openFlNb("table");
     if (SCAT) return openScatter();
     if (HEAT) { if (!S.paused) { S.paused = true; S.stepTo = null; say("The clock pauses while your notebook is open. Press Play at the bench to continue."); } const hc = cur(); if (hc.heat && S.heat[hc.heat.sample]) book.select(hc.heat.sample); else book.refresh(); log.add("notebook_open"); return openDlg("dlgNotebook"); }
     S.nbSeen = log.events.filter((e) => e.type === "conductivity" || e.type === "observe").length; log.add("notebook_open");
@@ -765,30 +807,58 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     say("Answers submitted. Now write your Claim, Evidence, Reasoning.", "obs"); openCER();
   });
   function openCER() { (SCAT ? renderCERScatter : HEAT ? renderCERHeat : renderCER)($("#cerBody"), stageCtx); openDlg("dlgCER"); }
+  const drawPrelab = () => (FL ? fl.renderPrelab : renderPrelab)($("#prelabBody"), stageCtx);
   const stageCtx = {
-    lab, S, seed, unknowns,
-    getNotebook: () => { collectNotebook(); return S.notebook; },
+    lab, S, seed, get unknowns() { return FL ? fl.answered().map((label) => ({ label })) : unknowns; }, evidenceItems: FL ? (l) => fl.evidence(l) : null,
+    getNotebook: () => { if (FL) return {}; collectNotebook(); return S.notebook; },
     getRows: () => Object.fromEntries(Object.keys(S.heat).map((k) => [k, goodRows(S.heat[k])])),
     onDemo: () => demoStart(),
-    onIntroDone: (name) => { S.student = name; lockStart(() => { S.stage = "prelab"; log.add("stage", { to: "prelab", name }); closeDlg("dlgIntro"); renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); }); },
+    onIntroDone: (name) => { S.student = name; lockStart(() => { S.stage = "prelab"; log.add("stage", { to: "prelab", name }); closeDlg("dlgIntro"); drawPrelab(); openDlg("dlgPrelab"); }); },
     onAnswer: (id, choice, correct) => log.add("prelab_answer", { q: id, choice, correct }),
-    onPrelabDone: () => { S.stage = "lab"; log.add("prelab_done", { prediction: S.prelab.prediction, placement: S.prelab.placement }); closeDlg("dlgPrelab"); renderQuests(); say(NOPPE ? "Pre-lab done. The dark-room curtain is open." : "Pre-lab done. The lab door will open once you have goggles and an apron."); },
-    onCerDone: (c) => { if (!gateOk()) return showGate(); S.cer = c; S.cerDone = true; S.stage = "done"; log.add("cer", c); closeDlg("dlgCER"); lockFinish(); openDone(); },
+    onPrelabDone: () => { if (FL) { S.stage = "huddle1"; log.add("prelab_done", { prediction: S.prelab.prediction }); closeDlg("dlgPrelab"); renderQuests(); return openHuddle(1); } S.stage = "lab"; log.add("prelab_done", { prediction: S.prelab.prediction, placement: S.prelab.placement }); closeDlg("dlgPrelab"); renderQuests(); say(NOPPE ? "Pre-lab done. The dark-room curtain is open." : "Pre-lab done. The lab door will open once you have goggles and an apron."); },
+    onCerDone: (c) => { if (FL) { S.cer = c; S.cerDone = true; S.flame.cerDone = true; log.add("cer", c); closeDlg("dlgCER"); say("Claim, evidence and reasoning saved.", "obs"); renderQuests(); autosave(); if (S.flame.huddle2) finishFlame(); return; } if (!gateOk()) return showGate(); S.cer = c; S.cerDone = true; S.stage = "done"; log.add("cer", c); closeDlg("dlgCER"); lockFinish(); openDone(); },
     onCerClose: () => closeDlg("dlgCER"), onFinish: () => finishData()
   };
   $("#theoryBody").replaceChildren(...theoryNodes(lab));
   $("#btnTheory").addEventListener("click", () => openDlg("dlgTheory")); $("#btnTasks").addEventListener("click", toggleTasks); $("#btnTasks").classList.add("on"); $("#btnNotebook").addEventListener("click", openNotebook);
   if (SCAT) { $("#btnNotebook").firstChild.textContent = "📓 Apparatus"; $("#btnMicro").textContent = "🔬 Atom scope"; $("#btnMicro").title = "Atom microscope (M)"; $("#ppe").hidden = true; $("#modeLine").hidden = true; }
-  $("#btnMicro").addEventListener("click", () => (SCAT ? openScope() : openMicro())); $("#btnDemo").addEventListener("click", () => demoStart());
+  $("#btnMicro").addEventListener("click", () => (SCAT ? openScope() : FL ? openSpec() : openMicro())); $("#btnDemo").addEventListener("click", () => demoStart());
   $("#btnMenu").addEventListener("click", () => openDlg("dlgMenu")); $("#btnCER").addEventListener("click", () => (S.stage === "done" ? openDone() : openCER()));
   $("#donePrint").addEventListener("click", () => $("#print").click());
   $("#doneDl").addEventListener("click", () => $("#download").click());
 
+  // ---------- huddles: the daily code (MrD.codes), a note outside class time, the code shown in the teacher build ----------
+  const isKey = () => TEACHER || /(?:^|[#&])(key|preview)\b/.test(location.hash);
+  function openHuddle(n) {
+    const U = lab.ui, box = $("#huddleBody"), clock = window.MrD && MrD.bell ? MrD.bell.clock("chem") : { gates: true }, code = window.MrD && MrD.codes ? MrD.codes.gate(lab.id, "h" + n) : "";
+    const finish = () => { S.flame["huddle" + n] = true; log.add("huddle", { n }); closeDlg("dlgHuddle"); renderQuests(); autosave();
+      if (n === 1) { S.stage = "lab"; renderQuests(); say("Huddle 1 done. The step card is on the left. Start at the locker.", "obs"); } else if (S.cerDone) finishFlame(); else { say("Huddle 2 code accepted. Write your claim, evidence and reasoning.", "obs"); openCER(); } };
+    const title = h("h2", {}, n === 1 ? U.huddle1Title : U.huddle2Title);
+    if (n === 2 && !fl.recordComplete()) { box.replaceChildren(title, h("p", {}, U.huddle2NotReady), h("div", { class: "controls" }, h("button", { class: "primary", onclick: () => closeDlg("dlgHuddle") }, U.closeWord))); return openDlg("dlgHuddle"); }
+    const msg = h("p", { class: "hint", role: "status" }), inp = h("input", { id: "huddleCode", type: "text", inputmode: "numeric", maxlength: "4", autocomplete: "off", "aria-label": U.codeLabel, style: "width:6em" });
+    const go = h("button", { id: "huddleGo", class: "primary", onclick: () => { if (inp.value.trim() === code) finish(); else msg.textContent = U.codeWrong; } }, U.codeGo);
+    inp.addEventListener("keydown", (e) => { if (e.key === "Enter") go.click(); });
+    const body = isKey() ? [h("p", {}, U.keyShows.replace("{code}", code)), h("div", { class: "controls" }, h("button", { id: "huddleGo", class: "primary", onclick: finish }, U.codeGo))]
+      : !clock.gates ? [h("p", {}, n === 1 ? U.huddle1Text : U.huddle2Text), h("p", { class: "hint" }, U.codeNote), h("div", { class: "controls" }, h("button", { id: "huddleGo", class: "primary", onclick: finish }, U.codeGo))]
+      : [h("p", {}, n === 1 ? U.huddle1Text : U.huddle2Text), h("label", {}, U.codeLabel + " ", inp), msg, h("div", { class: "controls" }, go, n === 2 ? h("button", { onclick: () => closeDlg("dlgHuddle") }, U.closeWord) : null)];
+    box.replaceChildren(title, ...body); openDlg("dlgHuddle"); (inp.isConnected ? inp : box.querySelector("button")).focus();
+  }
+  function finishFlame() { S.stage = "done"; log.add("done", {}); lockFinish(); renderQuests(); autosave(); openDone(); }
+  // hint pictures for the first five quests, and the HUD buttons that depend on the record
+  let picId = null;
+  function renderFlHud(items) {
+    const act = items.find((i) => !i.done), tut = S.stage === "lab" && act && act.q.tutorial && fl.hintPicture(act.q.id) ? act.q.id : null; picId = tut; $("#btnPic").hidden = !tut;
+    const rc = fl.recordComplete(); $("#btnCER").hidden = !(rc || S.cerDone); $("#btnCER").textContent = S.stage === "done" ? "Hand in" : "✍ Write CER";
+    $("#btnHuddle").hidden = !(rc && !S.flame.huddle2 && S.stage === "lab");
+  }
+  $("#btnPic").addEventListener("click", () => { if (!picId) return; $("#picTitle").textContent = lab.ui.picTitle; $("#picBody").replaceChildren(fl.hintPicture(picId), h("p", {}, lab.quests.find((q) => q.id === picId).hint)); openDlg("dlgPic"); });
+  $("#btnHuddle").addEventListener("click", () => openHuddle(2));
   // quest list and coach bar
   const needSec = () => (lab.minActiveMin || 0) * 60, gateOk = () => TEACHER || ACT.sec >= needSec();
   const minTxt = () => `${Math.floor(ACT.sec / 60)} of ${lab.minActiveMin || 0} active minutes`;
   function showGate() { $("#gateMsg").textContent = `You have ${minTxt()}. Your answers are kept. Use the rest of the time to recheck a reading, retest a sample, or try the Challenge, then submit again.`; closeDlg("dlgCER"); openDlg("dlgGate"); }
   function openDone() {
+    if (FL) { $("#badge").hidden = true; $("#doneInfo").textContent = lab.ui.doneInfo + " " + lab.ui.exitHead + ": " + lab.content.exit.prompt; return openDlg("dlgDone"); }
     const r = record(), mins = Math.round(r.activeSec / 60);
     drawBadge($("#badge"), { title: lab.badgeTitle || lab.title, student: S.student, gold: r.challenge, minutes: mins, code: r.code, date: new Date().toLocaleDateString() });
     $("#doneInfo").textContent = SCAT ? (r.challenge ? "You finished the lab and the challenge." : "You finished the lab. The challenge is still open if you want the gold badge.") : r.challenge ? "You finished the required samples and the challenge." : "You finished the required samples. The challenge sample is still open if you want the gold badge.";
@@ -822,6 +892,22 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       case "plotX": case "lineX": return E(document.querySelector("#dlgNotebook[open]") ? btnText("Graph") : $("#btnNotebook"), "Graph tab: click to plot, then Line to draw");
     }
     if (SCAT) return scatGuide(id);
+    if (FL) return flGuide(id);
+    return null;
+  }
+  function flGuide(id) {
+    const E = (e, x) => (e ? ["el", e, x] : null), f = S.flame, inRoom = S.view === "room", open = !!document.querySelector("#dlgNotebook[open]"), first = lab.firstSample, nm = lab.content ? "" : "";
+    switch (id) {
+      case "flamebench": return ["tile", "bench", "Walk to the flame bench and press E"];
+      case "firsttest": {
+        if (inRoom) return ["tile", "bench", "Face the flame bench and press E"];
+        if (f.hold) return null;
+        if (!f.splint || f.splint.used) return E($("#flFresh"), "Take a fresh splint");
+        if (!f.splint.dipped) return E($("#flDip"), "Choose " + FE.byId(lab.flameData)[first].formula + " in the list, then dip");
+        return E($("#flHold"), "Hold it at the flame edge");
+      }
+      case "record": { if (inRoom) return ["tile", "bench", "Go to the flame bench"]; if (!open) return E($("#flNb"), "Open your notebook"); const row = document.querySelector('#flSheet tr[data-sample="' + first + '"]'); return row ? E([...row.querySelectorAll("select")].find((x) => !x.value), "Pick the color, then the brightness") : null; }
+    }
     return null;
   }
   function scatGuide(id) {
@@ -845,7 +931,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const it = items.find((i) => i.q.tutorial && !(i.done || (i.prog || 0) >= 1 && i.q.count <= 3 && !["rowsX", "plotX", "lineX"].includes(i.q.id)));
     if (!it) { guide.hide(); if (!tutAnnounced && items.some((i) => i.q.tutorial)) { tutAnnounced = true; say(SCAT ? "Tutorial done. The arrows are off. The challenge is optional and yours to run." : `Tutorial done. Repeat these steps for the other samples; the arrows are off from here.`, "obs"); } return; }
     const open = document.querySelector("#stage dialog[open]"); if (open && open.id !== "dlgNotebook" && open.id !== "dlgChest") return guide.hide();
-    if (open && open.id === "dlgNotebook" && !SCAT && !["rowsX", "plotX", "lineX", "runX"].includes(it.q.id)) return guide.hide();
+    if (open && open.id === "dlgNotebook" && !SCAT && !FL && !["rowsX", "plotX", "lineX", "runX"].includes(it.q.id)) return guide.hide();
     if (open && open.id === "dlgMicro") return guide.hide();
     if (open && open.id === "dlgChest" && !["gear", "tongs", "jars", "liquids"].includes(it.q.id)) return guide.hide();
     let g; try { g = guideFor(it.q.id); } catch (e) { g = null; }
@@ -860,21 +946,22 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   const lastPoke = () => ACT.last();
   function qstate() {
-    const hk = Object.keys(S.heat); return { ppe: S.ppe, notebookFilled: nbFilled(), challengeFilled: chFilled(), submitted: S.submitted, cerDone: S.cerDone, scat: SCAT ? { tally: tallyDone(S.scat, lab), match: matchDone(S.scat, lab), challenge: !!S.scat.ch.done } : null, heat: { rows: Object.fromEntries(hk.map((k) => [k, goodRows(S.heat[k]).length])), plot: Object.fromEntries(hk.map((k) => [k, S.heat[k].items.filter((i) => i.k === "p").length])), lines: Object.fromEntries(hk.map((k) => [k, S.heat[k].items.filter((i) => i.k === "l").length])) } };
+    const hk = Object.keys(S.heat); return { ppe: S.ppe, notebookFilled: nbFilled(), challengeFilled: chFilled(), submitted: S.submitted, cerDone: S.cerDone, scat: SCAT ? { tally: tallyDone(S.scat, lab), match: matchDone(S.scat, lab), challenge: !!S.scat.ch.done } : null, flame: FL ? fl.questState(log.events) : null, heat: { rows: Object.fromEntries(hk.map((k) => [k, goodRows(S.heat[k]).length])), plot: Object.fromEntries(hk.map((k) => [k, S.heat[k].items.filter((i) => i.k === "p").length])), lines: Object.fromEntries(hk.map((k) => [k, S.heat[k].items.filter((i) => i.k === "l").length])) } };
   }
   const challengeDone = () => { const st = qstate(); return lab.quests.filter((q) => q.optional).every((q) => questDone(q, log.events, st)); };
   function renderQuests() {
     const st = qstate();
     const items = lab.quests.map((q) => ({ q, done: questDone(q, log.events, st), prog: questProgress(q, log.events, st) }));
     updateGuide(items);
+    if (FL) renderFlHud(items);
     const ai = items.findIndex((i) => !i.done && !i.q.optional), stage = S.stage, obs = log.events.filter((e) => e.type === "conductivity" || e.type === "observe").length;
     const sig = stage + "|" + items.map((i) => (i.done ? 1 : 0) + ":" + (i.prog ?? "")).join("|") + "|" + (obs > S.nbSeen);
-    $("#nbDot").hidden = HEAT || SCAT || !(obs > S.nbSeen) || S.submitted; $("#btnCER").hidden = stage !== "postlab" && stage !== "done"; $("#btnCER").textContent = stage === "done" ? "🏅 Hand in" : "✍ Write CER";
+    $("#nbDot").hidden = HEAT || SCAT || FL || !(obs > S.nbSeen) || S.submitted; if (!FL) { $("#btnCER").hidden = stage !== "postlab" && stage !== "done"; $("#btnCER").textContent = stage === "done" ? "🏅 Hand in" : "✍ Write CER"; }
     if (sig === qsig) return; qsig = sig;
     const reqI = items.filter((i) => !i.q.optional), doneN = reqI.filter((i) => i.done).length, from = Math.max(0, (ai < 0 ? items.length : ai) - 1), shown = items.slice(from, from + 5);
     $("#questHead").textContent = `Tasks (${doneN} of ${reqI.length})`;
     $("#quests").replaceChildren(...shown.map((i) => h("li", { class: i.done ? "done" : i === items[ai] ? "active" : "" }, h("span", { class: "tick" }, i.done ? "✔" : i === items[ai] ? "▶" : "○"), " ", i.q.text, i.q.count > 1 && i.prog !== null && !i.done ? ` (${i.prog}/${i.q.count})` : "")), ...(items.length - from - 5 > 0 ? [h("li", { class: "more" }, `+ ${items.length - from - 5} more`)] : []));
-    $("#coachText").textContent = stage === "intro" || stage === "prelab" ? "Finish the pre-lab. The lab door stays locked until you do." : stage === "done" ? "Lab complete. Open Save / Print to hand in your record." : stage === "postlab" && ai < 0 ? "Write your CER with the button at the top." : ai >= 0 ? items[ai].q.hint : "All tasks done.";
+    $("#coachText").textContent = stage === "huddle1" ? lab.ui.coachHuddle1 : stage === "intro" || stage === "prelab" ? "Finish the pre-lab. The lab door stays locked until you do." : stage === "done" ? "Lab complete. Open Save / Print to hand in your record." : stage === "postlab" && ai < 0 ? "Write your CER with the button at the top." : ai >= 0 ? items[ai].q.hint : "All tasks done.";
   }
 
   // microscope: click a container twice (or press M) to zoom in
@@ -929,7 +1016,11 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   function renderKey() {
     const rows = [];
-    if (SCAT) {
+    if (FL) {
+      const D = lab.flameData, B = FE.byId(D), asg = FE.assignUnknowns(D, studentKey());
+      for (const id of FE.benchIds(D)) rows.push(h("tr", {}, h("th", {}, B[id].formula), h("td", {}, `${B[id].flame.name}, ${B[id].flame.brightness}`), h("td", {}, B[id].needs_review ? "Needs review: " + B[id].needs_review : "")));
+      rows.push(h("tr", {}, h("th", {}, "Unknown A, B for this student"), h("td", {}, `${asg.A}, ${asg.B}`), h("td", {}, "Seeded by the student ID, so neighbors differ.")), h("tr", {}, h("th", {}, "Ca spectroscope row"), h("td", {}, "NIST atomic lines only"), h("td", {}, "Needs review before it ships: " + D.meta.notes[3])));
+    } else if (SCAT) {
       const fm = (m, t, th, E) => { const st = { i: 0, r1: 0.3, r2: 0.7 }, o = FMfire(st, 20000, m, t, th, null, E); return { s: FMsum(o.hist, "straight"), d: FMsum(o.hist, "deflected"), r: FMsum(o.hist, "rebound") }; };
       for (const [name, m, t, th, E] of [["Plum pudding", "plum", "Au", 1, 5], ["Real gold foil", "nuc", "Au", 1, 5], ["Challenge: gold, 2× thick", "nuc", "Au", 2, 5], ["Challenge: gold at 3 MeV", "nuc", "Au", 1, 3], ["Challenge: gold at 10 MeV", "nuc", "Au", 1, 10], ["Challenge: aluminum", "nuc", "Al", 1, 5], ["Challenge: lead", "nuc", "Pb", 1, 5]]) { const x = fm(m, t, th, E); rows.push(h("tr", {}, h("th", {}, name), h("td", {}, `20,000 fired: ${x.s} straight (${(x.s / 200).toFixed(2)}%), ${x.d} deflected (${(x.d / 200).toFixed(2)}%), ${x.r} rebound${x.r ? ` (1 in ${Math.round(20000 / x.r)})` : ""}`), h("td", {}, name === "Plum pudding" ? "Each student's seed shifts the particle stream, so counts differ slightly (rebound is about 5 ± 3 in 20,000). Accepted: percents ±0.3, 1-in-N ±12%." : ""))); }
       rows.push(h("tr", {}, h("th", {}, "Match"), h("td", {}, lab.match.rows.map((r) => `${r.result} → ${lab.match.meanings.find((x) => x.id === r.answer).text}`).join("; ")), h("td", {}, "")));
@@ -958,8 +1049,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   say(SCAT ? "Manchester, 1909. Read the chalkboard if you like, then go through the curtain to the dark room and press E at the foil apparatus." : "Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
   if (resume) restore(resume);
   renderQuests();
-  if (TEACHER) { $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
-  if (S.stage === "intro") intro(); else if (S.stage === "prelab") { renderPrelab($("#prelabBody"), stageCtx); openDlg("dlgPrelab"); }
+  if (TEACHER) { $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab" || S.stage === "huddle1") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
+  if (S.stage === "intro") intro(); else if (S.stage === "prelab") { drawPrelab(); openDlg("dlgPrelab"); } else if (S.stage === "huddle1") openHuddle(1);
   lockGate();
   setInterval(autosave, 5000);
   $("#boot").hidden = true; $("#app").hidden = false; 
@@ -974,14 +1065,15 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     stepAll(sdt); tickIncident(now);
     if (HEAT && S.stepTo != null) { const c = cur(); if (!c.heat || c.loc !== "hotplate" || !S.plateOn) S.stepTo = null; else if (c.heat.E / hsub(c).power >= S.stepTo - 1e-6) { S.stepTo = null; S.paused = true; say(`Paused at ${mmss(c.heat.E / hsub(c).power)}. Write the reading down.`); } }
     if (SCAT) { scat.step(dt); scat.draw(); }
-    if (S.view === "room") roomR.draw(P, S.ppe, NOPPE || hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
-    ACT.tick(now / 1000, !document.hidden, (S.stage === "lab" || S.stage === "postlab") && !S.demo && !TEACHER, (HEAT && S.plateOn && !S.paused) || (SCAT && S.scat.firing));
+    if (FL) fl.step(dt);
+    if (S.view === "room") roomR.draw(P, S.ppe, NOPPE || hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else if (FL) fl.draw((now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
+    ACT.tick(now / 1000, !document.hidden, (S.stage === "lab" || S.stage === "postlab") && !S.demo && !TEACHER, (HEAT && S.plateOn && !S.paused) || (SCAT && S.scat.firing) || (FL && fl.holding()));
     tickRoute(now);
     if (now - lastCtl > 250) { renderControls(); renderQuests(); renderTimer(now / 1000); lastCtl = now; }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  window.__vl = { scat, SCAT, walk, tickRoute, route, findRoute, walkable, roomR, ACT, H, S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE }, stageCtx, demoApi, openMicro, openNotebook, openCER, quests: () => lab.quests, nbCells, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
+  window.__vl = { fl, FL, scat, SCAT, walk, tickRoute, route, findRoute, walkable, roomR, ACT, H, S, P, room, take, CONT, sources, unknowns, truth, world, seed, log, actions: { moveTo, addSubstance, stir, tare, conduct, empty, skip, setPlate, togglePPE }, stageCtx, demoApi, openMicro, openNotebook, openCER, quests: () => lab.quests, nbCells, select: (k) => { S.sel = k; }, source: (k) => { S.srcKey = k; syncUnit(); } };
 }
 
 boot();

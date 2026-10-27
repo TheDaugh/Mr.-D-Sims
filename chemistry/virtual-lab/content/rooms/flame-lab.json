@@ -1,0 +1,115 @@
+{
+  "id": "flame-lab",
+  "start": {
+    "x": 4,
+    "y": 10,
+    "face": "u"
+  },
+  "rows": [
+    "############",
+    "#.1.......Y#",
+    "#K.........#",
+    "#..........#",
+    "#H.BBBBBB..#",
+    "#..........#",
+    "#W........F#",
+    "####D#######",
+    "#L....A....#",
+    "#..........#",
+    "#..........#",
+    "############"
+  ],
+  "legend": {
+    "#": {
+      "type": "wall",
+      "solid": true
+    },
+    ".": {
+      "type": "floor"
+    },
+    "D": {
+      "type": "door",
+      "id": "door",
+      "label": "DOOR",
+      "text": "The lab door. It stays shut unless you are wearing goggles and an apron.",
+      "name": "Lab door"
+    },
+    "L": {
+      "type": "locker",
+      "solid": true,
+      "id": "locker",
+      "label": "LOCKER",
+      "items": [
+        "goggles",
+        "apron"
+      ],
+      "name": "PPE locker",
+      "text": "Goggles and aprons. Suit up here before you go in."
+    },
+    "A": {
+      "type": "info",
+      "solid": true,
+      "id": "first_aid",
+      "label": "FIRST AID",
+      "text": "First-aid kit: bandages, burn gel and gauze. Burns get cool running water first.",
+      "name": "First-aid kit"
+    },
+    "1": {
+      "type": "shelf",
+      "solid": true,
+      "id": "shelf_unknown",
+      "label": "UNKNOWNS",
+      "group": "Unknown samples",
+      "name": "Unknown bottles shelf",
+      "text": "The unknown bottles. They unlock when all six salts and NaNO3 are recorded."
+    },
+    "K": {
+      "type": "info",
+      "solid": true,
+      "id": "sink",
+      "label": "SINK",
+      "text": "The sink. Rinse glassware here. Never pour anything down it unless your teacher says it is safe.",
+      "name": "Sink"
+    },
+    "H": {
+      "type": "info",
+      "solid": true,
+      "id": "hood",
+      "label": "HOOD",
+      "text": "The fume hood. Not needed for today's lab, but vapors that smell or sting belong in here.",
+      "name": "Fume hood"
+    },
+    "Y": {
+      "type": "info",
+      "solid": true,
+      "id": "eyewash",
+      "label": "EYEWASH",
+      "text": "The eyewash station. If a chemical gets in your eye, you rinse here for 15 minutes.",
+      "name": "Eyewash station"
+    },
+    "W": {
+      "type": "info",
+      "solid": true,
+      "id": "waste",
+      "label": "WASTE",
+      "text": "Waste bins: broken glass in the hard box, chemical waste in the labeled jug.",
+      "name": "Waste bins"
+    },
+    "F": {
+      "type": "info",
+      "solid": true,
+      "id": "extinguisher",
+      "label": "EXTING.",
+      "text": "A fire extinguisher. Pull the pin, aim at the base, squeeze, sweep.",
+      "name": "Fire extinguisher"
+    },
+    "B": {
+      "type": "station",
+      "solid": true,
+      "id": "bench",
+      "label": "FLAME BENCH",
+      "text": "The flame bench: a burner, a box of splints, seven salt bottles and a spectroscope.",
+      "name": "Flame bench"
+    }
+  }
+}

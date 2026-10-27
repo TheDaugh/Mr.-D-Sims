@@ -26,7 +26,7 @@ const TARGETS = [
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#btn-next'); } })),
   { name: 'chem electron-config-1', url: '/chemistry/unit-3-atoms-ions/electron-config-1.html', clockAt: '2026-10-21T10:45:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#btn-next'); } },
-  ...[['unknown-solids', ''], ['heating', '?lab=heating'], ['rutherford', '?lab=rutherford']].map(([id, q]) => ({
+  ...[['unknown-solids', ''], ['heating', '?lab=heating'], ['rutherford', '?lab=rutherford'], ['flame', '?lab=flame']].map(([id, q]) => ({
     name: 'virtual lab ' + id, url: '/chemistry/virtual-lab/index.html' + q, clockAt: '2026-10-21T10:45:00-04:00', student: 'Lockie Test', teacherBuild: true, saveMs: 6000,
     begin: async page => { await page.waitForTimeout(900); await page.fill('#student', 'Lockie Test'); await page.click('button:has-text("Start the pre-lab")'); },
     reopen: async page => { const b = page.locator('button:has-text("Continue where I left off")'); if (await b.count()) await b.click(); },

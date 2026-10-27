@@ -16,6 +16,7 @@
       <a class="back" href="../" title="Back to the chemistry hub">←</a>
       <h1 id="title">Virtual Lab</h1>
       <div id="coach"><b>Next:</b><span id="coachText"></span></div>
+      <button class="hudbtn" id="btnPic" hidden title="A picture of this step">🖼 Picture</button>
       <div id="timer" title="Active lab time. It only counts while you are working in the lab." hidden></div>
       <div class="hud">
         <button class="hudbtn" id="btnKey" hidden title="Teacher answer key">🔑 Key</button>
@@ -24,6 +25,7 @@
         <button class="hudbtn" id="btnNotebook" title="Notebook (N)">📓 Notebook<i class="dot" id="nbDot" hidden></i></button>
         <button class="hudbtn" id="btnMicro" title="Microscope (M)">🔬 Scope</button>
         <button class="hudbtn" id="btnCER" hidden>✍ CER</button>
+        <button class="hudbtn" id="btnHuddle" hidden>Huddle 2 code</button>
         <button class="hudbtn" id="btnDemo" title="Watch the demo">▶ Demo</button>
         <button class="hudbtn" id="btnMenu" title="Save, print, hand in">💾 Menu</button>
       </div>
@@ -36,6 +38,7 @@
         <button id="leaveBench" class="worldbtn" hidden>← Back to the room (Esc)</button>
         <section id="taskPanel" aria-label="Tasks"><h2><span id="questHead">Tasks</span><span class="hint" style="text-transform:none;letter-spacing:0;color:#93a1b0">J hides</span></h2><ul id="quests"></ul></section>
         <p id="viewHint"></p>
+        <aside id="stepCard" aria-label="Step card" hidden></aside>
       </div>
       <div id="side">
         <section class="card" id="incident" role="alert" hidden></section>
@@ -85,6 +88,9 @@
   <p>Turn in <b>one</b> of these: the printed report (choose Save as PDF), or the record file for your teacher's data page.</p>
   <div class="controls"><button class="primary" id="donePrint">Print / Save as PDF</button><button id="doneDl">Download record (.json)</button><button data-close>Close</button></div></div></dialog>
 <dialog class="dlg" id="dlgKey"><div class="body"><button class="x" data-close>Close ✕</button><h2>Teacher key</h2><div id="keyBody"></div></div></dialog>
+<dialog class="dlg small" id="dlgHuddle" data-gate><div class="body" id="huddleBody"></div></dialog>
+<dialog class="dlg small" id="dlgPic"><div class="body"><button class="x" data-close>Close ✕</button><h2 id="picTitle"></h2><div id="picBody"></div></div></dialog>
+<dialog class="dlg" id="dlgTut2" data-wide><div class="body" id="tut2Body"></div></dialog>
 <dialog class="dlg chest" id="dlgChest"><div class="body" id="chestBody"></div></dialog>
 <dialog class="dlg small" id="dlgGate"><div class="body"><h2>Not enough lab time yet</h2><p id="gateMsg"></p><div class="controls"><button class="primary" data-close>Back to the lab</button></div></div></dialog>
 
