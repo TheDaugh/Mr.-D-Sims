@@ -22,6 +22,19 @@ Doubts for Ian (the card's list of what I added or interpreted):
 8. Check tab is the card's exit (X1 to X3) and the report code field 7 is now the three first-try bits (`1-1-1`). Exit labels (secure, developing, not yet) are teacher-only.
 9. The gate uses the standard huddle code; `gate.items` are listed in the Huddle teacher panel only. Ink on the board is not built (decision 2).
 10. Not done: `portal/standards.json` has no strand for electron configurations, so write/read/rules are unmapped. `tools/build-keys.mjs` was not run (no `pdflatex` here), so no key PDFs. The board page is not linked from any hub.
+## 2026-10-27: calculus 3.1 The Chain Rule (v2), first lesson of Unit 3
+
+Built from the calc template: `calculus/unit-3-composite-implicit-inverse/3-1-chain-rule.{html,spec.js,content.js}`, registered in `shared/lessons.js`, keys in `keys/calc/3-1-chain-rule-{makeup,teacher}.pdf`.
+
+- Skills: differentiate a composite (typed, four bands, named traps), name the inside (choice), read a table (inside/outside swap at band 3, tangent estimate at band 4), slope at a point.
+- Explore: `y = sin(x²)` with a movable point; the readout splits the slope into dy/du and du/dx.
+- `tests/unit/chain-rule.test.js` checks every generated answer against a numeric derivative of the function itself (no chain rule used), and every trap against its answer.
+- `tests/lock.e2e.js` has a target for the lesson.
+- Engine: `standard.js` hardcoded the Build target as "I can use a = F / m on a new problem." for every lesson. It now reads an optional `SPEC.buildTarget` and keeps the old text as the default, so 2.6, 2.8 and the other lessons are unchanged. Set `buildTarget` in each new spec; the old default is wrong for everything outside physics.
+- Choice-skill options do not render `$...$`; write them as plain text or unicode.
+- Checks run: unit tests (123 of 123), `check-lessons --strict` (0 errors), template e2e on the lesson and on the calc template, lock e2e, smoke (33 pages), screenshots of Start, Explore, Huddle and Build at 1366x768.
+- Not on `main` yet: pushed on branch `calc-3-1-chain-rule` with a PR. Netlify deploys only when Ian merges.
+- Source for the content was the Unit 3 concept summary and the Math Medic lesson packets; the questions, numbers and wording are original.
 
 ## 2026-10-26 (later): locked mode on for every spec-built lesson
 

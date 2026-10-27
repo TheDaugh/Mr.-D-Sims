@@ -74,7 +74,7 @@
   /* Build: the rule in the student's own words, as short items. LE.items() shrinks the count when the class runs behind. */
   steps.push({ id: 'build', label: T.build,
     render: function (card, c) {
-      K.head(card, T.build, SPEC.buildTarget || 'I can use a = F / m on a new problem.', 'Up next: endless practice at your level.');   // buildTarget: a lesson names its own; the default is the physics template's
+      K.head(card, T.build, SPEC.buildTarget || 'I can use a = F / m on a new problem.', 'Up next: endless practice at your level.');   /* buildTarget is optional; the old default is kept so existing lessons do not change */
       var n = LE.items('build', 4), b = LE.band();
       for (var i = 0; i < n; i++) LE.ask(card, skillQ(SPEC.skills[i % SPEC.skills.length], b, 'b', i));
     },
