@@ -47,6 +47,8 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
 
   <section class="card" style="margin-bottom:14px"><h2>Today's huddle code</h2>
     <p><a href="#" id="hc" class="code" style="font-size:3rem;text-decoration:none"></a></p>
+    <p class="hint">Huddle 2 code (new v3 lessons only; huddle 1 and every older lesson use the code above):</p>
+    <p><a href="#" id="hc2" class="code" style="font-size:2rem;text-decoration:none"></a></p>
     <p class="hint" id="gate-note"></p>
     <table id="codes"></table>
   </section>
@@ -111,7 +113,7 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
     }).join("");
     $("status-body").innerHTML="<table>"+rows+"</table><p class=\"hint\">"+(B.gatesOn()?"Huddle codes are being asked for now (weekdays 7:00 AM to 3:00 PM).":"Huddle codes are off now: students finishing at home are never stopped for a code.")+"</p>";
     $("ov").textContent=MrD.codes.override();
-    var hc=MrD.codes.huddle();$("hc").textContent=hc;
+    var hc=MrD.codes.huddle();$("hc").textContent=hc;var hc2=MrD.codes.huddle2();$("hc2").textContent=hc2;$("hc2").onclick=function(e){e.preventDefault();$("fsc").textContent=hc2;$("fsd").textContent="Huddle 2 code · v3 lessons";$("fs").hidden=false};
     $("gate-note").textContent="One code for every class, course and lesson. It changes at 7:00 AM and is readable from then on. Tap it to show it large for the board.";
     $("hc").onclick=function(e){e.preventDefault();$("fsc").textContent=hc;$("fsd").textContent="Huddle code · all classes";$("fs").hidden=false};
     $("codes").innerHTML="<tr><th>Lesson</th><th>Teacher view</th></tr>"+L.map(function(l){

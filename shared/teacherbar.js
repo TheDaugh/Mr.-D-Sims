@@ -60,6 +60,7 @@
     host.append(e("span", "dim", mode));
 
     var hw = e("span"); hw.append("Huddle code (every class) "); hw.append(e("span", "code", MrD.codes.huddle())); host.append(hw);
+    var hw2 = e("span"); hw2.append("Huddle 2 code (v3 lessons) "); hw2.append(e("span", "code", MrD.codes.huddle2())); host.append(hw2);
     var u = e("span"); u.append("Unlock any locked student "); u.append(e("span", "code", MrD.codes.override())); host.append(u);
     if (!c.gates) host.append(e("span", "dim", "(codes are not asked for right now)"));
 
