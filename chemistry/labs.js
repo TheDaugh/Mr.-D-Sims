@@ -95,6 +95,16 @@ window.UNITS = [
         blurb: "Predict, then change charges and distances in a sim and fill ratio tables. Use the two proportions to explain why an electron near the nucleus is held harder than one far away.",
         tags: ["Coulomb's law", "proportional reasoning", "shell model", "HS-PS1-1", "HS-PS1-2"],
         teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/coulombs-law.html#key" }, { label: "Projector page", href: "unit-3-atoms-ions/coulombs-law-board.html" }, { label: "Teacher page", href: "teacher.html" }]
+      },
+      {
+        title: "Electron Configurations I",
+        type: "lesson",
+        day: 9,
+        icon: "⚛️",
+        href: "unit-3-atoms-ions/electron-config-1.html",
+        blurb: "Drag electrons into an energy ladder, watch the filling rules say no, then write full configurations and draw the boxes through Z = 36.",
+        tags: ["electron configuration", "Aufbau", "Hund's rule", "orbital diagrams"],
+        teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/electron-config-1.html#key" }, { label: "Board page", href: "unit-3-atoms-ions/electron-config-1-board.html" }, { label: "Teacher page", href: "teacher.html" }]
       }
     ]
   }
