@@ -2,6 +2,27 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-10-27: Unit 3 slot 11, stats 3.6 Finding Boundary Values (first v2 stats lesson from a Day Card)
+
+Built from `node tools/new-lesson.mjs stats 3-6-boundary-values ... --unit unit-3-normal-distribution`, wiring `day-cards/stats-11.card.md` and `stats-11.content.js`. Nothing in the content was rewritten.
+
+- Page, spec, Explore and wiring: `3-6-boundary-values.{html,spec.js,content.js}`; Models tab: `.models.js`; board page: `3-6-boundary-values-board.html`.
+- New shared files: `stats/shared/normal-figure.js` (normal curve on the data axis as an SVG string, Node-safe; draws every item `figure`, the huddle label and the board) and `stats/shared/boundary-kit.js` (`NK.boundary`, the minutes-axis target-area sim). `normal-kit.js` is untouched.
+- Tests: `tests/unit/stats-11-content.test.js` (card test, require paths only), `tests/unit/stats-11-wiring.test.js`, `tests/lessons/3-6-boundary-values.e2e.js`, `tests/fixtures/ppf-scipy.json`, lock target. `specs.test.js` now accepts 2-option choice items (the card's Area-or-boundary sort has two).
+- Hub and portal: `stats/sims.js` PLAN id `3-6-percentiles` became `3-6-boundary-values` (it had to match the registry id); skills mapped to `STAT-NORMAL-5`.
+- Engine: none. Card `tol` is absolute, the engine's is relative, so `dress()` puts it in `abs`.
+
+Doubts for Ian:
+1. Models: the card words no questions for typed moves. M2 moves 2 and 3, M3 all five, M5 moves 3 and 4 are asked from the model's numbers (area, the `invNorm(...)` entry, the equation `40 = 30 + (1.28)(SD)`, SD). Wrong tries show the card's misconception `fix` text.
+2. Models have no pacing step, so they are unbudgeted (same as chem slot 9).
+3. Huddle: definitions are `board.reveal` 1 to 3, the example is M1 with three blanks. The three label lines on the curve are mine. Concepts (four) are built from the card's lines; their equations are mine.
+4. Explore: start at 18 min, match within 0.01 of the target area, arrows move 0.5 min, a drag snaps to 0.1. The wording of the target line and the miss/match messages is mine.
+5. Build: item i is card part i; the tail parts pick a seeded boundary item on that side where the band allows (bands 3 and 4 may give a two-answer or error-find item).
+6. Two-answer items accept either order (engine); the card says lower then upper.
+7. Warm-up placement follows chem slot 9: band 2 only if all six are first try, else band 1.
+8. Flag 2 (Table tab in the Concepts panel) left as the kit default pending your decision. Gate rule and board ink are pending too.
+9. Not done: `tools/build-keys.mjs` (no `pdflatex` here), so no key PDFs; the board page is not linked from any hub.
+
 ## 2026-10-27: Unit 3 slot 9, Electron Configurations I (first v2 chemistry lesson)
 
 Built from `node tools/new-lesson.mjs chem electron-config-1 ... --unit unit-3-atoms-ions`, wiring the Day Card (`chemistry/unit-3-atoms-ions/day-cards/slot-09.card.md`, `slot-09.content.js`). Nothing in the content was rewritten.
