@@ -147,11 +147,17 @@
     K.huddleStep = function (opts) {
       return { id: 'huddle', label: K.TABS.huddle, optional: true, timed: true,
         render: function (card, c) {
-          var S = c.S; K.head(card, opts.title || 'Huddle with Mr. D', opts.target, 'Listen, then fill in the blanks as Mr. D writes them.');
+          var S = c.S, P = LE.cfg().pacing, key = S.hkey || opts.gateKey || 'h1';
+          if (window.MrD && MrD.pace && MrD.pace.huddleMode(P, key) === 'hold') {   // v3 huddle 1: Mr. D is talking; nothing to write
+            K.head(card, 'Huddle 1: eyes up', null, 'Mr. D is talking. There is nothing to do here until he gives you the code.');
+            K.codeBox(card, c, 'h1', 'Huddle 1 code');
+            return;
+          }
+          K.head(card, opts.title || 'Huddle with Mr. D', opts.target, 'Listen, then fill in the blanks as Mr. D writes them.');
           S.d.hud = S.d.hud || {};
           var host = el('div'); card.appendChild(host);
           MrD.huddle.render(host, opts.spec, S.d.hud, { key: c.key, onChange: function () { LE.save(); } });
-          K.codeBox(card, c, opts.gateKey || 'h1', 'Huddle code');
+          K.codeBox(card, c, (P && P.clock === 'v3') ? key : (opts.gateKey || 'h1'), (P && P.clock === 'v3') ? 'Huddle 2 code' : 'Huddle code');
         },
         canLeave: function (c) { return true; },
         teacher: opts.teacher };

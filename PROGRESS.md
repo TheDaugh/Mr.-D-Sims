@@ -2,6 +2,16 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-10-27: Opt-in v3 clock (huddle 1 at minute 3, huddle 2 at minute 25)
+
+Branch `feat/clock-v3`, not merged. A lesson opts in with `pacing: { budgetMin: 42, clock: 'v3' }`; lab days override with `huddles: [{key:'h1',atMin:3},{key:'h2',atMin:33}]`.
+
+- `shared/pace.js`: `isV3`, `huddlesOf`, `huddleMode` ("hold" for v3 huddle 1, else "write"). v3 validates the huddles only and never trims or skips (no 60% rule).
+- `shared/codes.js`: `huddle2()` and `gateV3()`. Legacy `gate()` is unchanged, so every old lesson keeps one code and its own `atMin`.
+- Engine: `lesson.js` picks `gateV3` for v3; `standard.js` uses `huddlesOf`; `lesson-kit.js` shows a hold screen at v3 huddle 1 and the writable tab at huddle 2. Teacher page and bar show a Huddle 2 code.
+- Not done: templates still use `atMin: 18` (new lessons set `clock:'v3'` themselves); `LESSON-STANDARD.md` v3 table covers the rules.
+- Checks run: unit 186/186, `check-lessons --strict` 0 errors, template e2e passed for physics, chem, calc and stats, lock e2e passed, smoke 35 pages clean.
+
 ## 2026-10-27: Unit 3 slot 11, stats 3.6 Finding Boundary Values (first v2 stats lesson from a Day Card)
 
 Built from `node tools/new-lesson.mjs stats 3-6-boundary-values ... --unit unit-3-normal-distribution`, wiring `day-cards/stats-11.card.md` and `stats-11.content.js`. Nothing in the content was rewritten.

@@ -21,7 +21,7 @@
   LE.pick = function (r, arr) { return arr[Math.floor(r() * arr.length)]; };
   LE.today = function () { return new Date().toLocaleDateString('en-CA'); };
   /* Huddle codes come from the shared module, so the teacher bar and the teacher dashboard always agree. */
-  LE.codeFor = function (lessonId, cp) { return MrD.codes.gate(lessonId, cp); };
+  LE.codeFor = function (lessonId, cp) { return (CFG && CFG.pacing && CFG.pacing.clock === 'v3') ? MrD.codes.gateV3(lessonId, cp) : MrD.codes.gate(lessonId, cp); };   // v3 lessons have two codes a day
   /* Huddle codes are asked for only 7:00 AM to 3:00 PM on school days, and never in the #key view. */
   LE.gatesOn = function () { return !KEY && MrD.bell.gatesOn(); };
   LE.clock = function () { return MrD.bell.clock(CFG.course); };
