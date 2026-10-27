@@ -1,11 +1,12 @@
-/* End-to-end: a lesson template through a simulated class period (Wed 2026-10-21; physics 9:00-9:50, calc 12:10-1:00; stats 10:00-10:50 placeholder).
+/* End-to-end: a lesson template through a simulated class period (Wed 2026-10-21; physics 9:00-9:50, calc 12:10-1:00; stats 1:00-1:50).
    Needs a static server on :8123 (python3 -m http.server 8123).
      node tests/template.e2e.js              physics template
      TEMPLATE=calc node tests/template.e2e.js
      TEMPLATE=stats node tests/template.e2e.js */
 const TEMPLATE = process.env.TEMPLATE || 'physics', CALC = TEMPLATE === 'calc', CHEM = TEMPLATE === 'chem', STATS = TEMPLATE === 'stats',
-  CLK = CALC ? ['12:15', '12:29', '12:35', '12:43', '12:56'] : STATS ? ['10:05', '10:19', '10:25', '10:33', '10:46'] : CHEM ? ['10:45', '10:59', '11:05', '11:13', '11:26'] : ['09:05', '09:19', '09:25', '09:33', '09:44'],
+  CLK = CALC ? ['12:15', '12:29', '12:35', '12:43', '12:56'] : STATS ? ['13:05', '13:19', '13:25', '13:33', '13:46'] : CHEM ? ['10:45', '10:59', '11:05', '11:13', '11:26'] : ['09:05', '09:19', '09:25', '09:33', '09:44'],
   T0 = CLK[0], T18 = CLK[1], T25 = CLK[2], T33 = CLK[3], T44 = CLK[4], PFX = CALC ? 'TPC-' : STATS ? 'TPS-' : CHEM ? 'TPK-' : 'TPL-';
+const plus = (hm, m) => { const [h, mi] = hm.split(':').map(Number), t = h * 60 + mi + m; return new Date('2026-10-21T' + String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0') + ':00-04:00'); };   // T0 is minute 5 of the period
 const fs = require('fs'), path = require('path'), assert = require('assert');
 const PW = process.env.PLAYWRIGHT_DIR || ['/opt/npm-tools/node_modules/playwright', '/home/claude/.npm-global/lib/node_modules/playwright'].find(p => fs.existsSync(p));
 const { chromium } = require(PW);
@@ -77,11 +78,13 @@ const next = async page => { await page.locator('#btn-next').click(); await tick
     assert.ok(await r.page.evaluate(() => LE.S().d.place.asked <= 2)); await r.ctx.close();
   });
 
-  await t('Timed huddle: at minute 18 the clock pulls the class in, blanks can be written, Continue returns', async () => {
+  await t('Timed huddle: at minute 10 after the bell (global) the clock pulls the class in, blanks can be written, Continue returns', async () => {
     const { ctx, page, errs } = await open(br); await tick(page); await start(page, myId, '3'); await next(page);
     await page.evaluate(() => { LE.S().band0 = 2; LE.S().band = 2; LE.S().d.place = { done: true, placed: 2, log: [], asked: 3, band: 2, misses: 0, cleared: 2, maxBand: 4, maxItems: 8 }; LE.save(); }); await page.evaluate(() => LE.render());
     await next(page); assert.strictEqual(await step(page), 'predict');
-    await page.clock.setSystemTime(new Date('2026-10-21T' + T18 + ':00-04:00')); await tick(page, 2500);
+    await page.clock.setSystemTime(plus(T0, 4)); await tick(page, 2500);
+    assert.strictEqual(await step(page), 'predict', 'no huddle before minute 10');
+    await page.clock.setSystemTime(plus(T0, 6)); await tick(page, 2500);
     assert.strictEqual(await step(page), 'huddle');
     const blanks = await page.evaluate(() => { const sp = Object.values(window.SPECS)[0], out = []; (sp.huddle.defs || []).forEach(d => MrD.huddle.parse(d.text).forEach(p => p.b && out.push(p.b))); return out; });
     await page.locator('.hd-line input').first().fill(blanks[0]); await page.locator('.hd-line input').nth(1).fill(blanks[1]);

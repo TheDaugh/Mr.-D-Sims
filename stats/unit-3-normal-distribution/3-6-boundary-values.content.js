@@ -79,7 +79,7 @@
   };
   hs.teacher = function (c) {
     var items = SP.gate.items.map(function (id) { return id + gateStatus(id); }).join(', ');
-    return '<p><b>Huddle code: ' + LE.codeFor(ID, 'h1') + '.</b> Pulled in at minute ' + SP.pacing.huddles[0].atMin + ' by the clock. Open with: “' + LK.plain(SP.talk[0]) + '” Then walk the three definitions, work model M1 (the 90th percentile) on the board, and label the curve. Students fill the blanks as you write them. The board page (3-6-boundary-values-board.html) runs the same lines on the projector.</p>' +
+    return '<p><b>Huddle code: ' + LE.codeFor(ID, 'h1') + '.</b> Pulled in at minute ' + LE.huddlePlan(SP.pacing).huddles[0].atMin + ' by the clock. Open with: “' + LK.plain(SP.talk[0]) + '” Then walk the three definitions, work model M1 (the 90th percentile) on the board, and label the curve. Students fill the blanks as you write them. The board page (3-6-boundary-values-board.html) runs the same lines on the projector.</p>' +
       '<p>Items that count toward the gate: ' + items + '. The clear/hold rule is pending your decision; until then this is the standard huddle code, one per day for every class.</p>';
   };
 

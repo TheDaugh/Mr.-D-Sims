@@ -9,6 +9,9 @@
      3. Which "school day" is it for code purposes?  The day rolls over at 7:00 AM, not midnight,
         so the teacher can read the day's codes from 7:00 AM on.
 
+   The huddle is global: every class, every guided lesson, pulls its students into the huddle tab huddleMin (10) minutes
+   after the bell, by the clock and not by how far a student has got. Change CFG.huddleMin to move it everywhere.
+
    To change a period time, edit SCHEDULE below.  Nothing else needs to change.
 
    Testing: add  #now=2026-10-20T09:10  (local time) to any lesson address to pretend it is that moment.
@@ -21,11 +24,11 @@
     physics: { label: "Physics",   weekday: [["09:00", "09:50"]],                   friday: [["09:00", "09:40"]] },
     chem:    { label: "Chemistry", weekday: [["10:40", "11:30"], ["13:50", "14:40"]], friday: [["09:40", "10:20"], ["14:00", "14:40"]] },
     calc:    { label: "Calculus",  weekday: [["12:10", "13:00"]],                   friday: [["12:40", "13:20"]] },
-    /* TODO(Ian): these stats times are PLACEHOLDERS, not the real bell. Replace the two pairs below (weekday, friday) with the real period.
-       Both are 50 minutes. Friday needs no 42-minute mark, so a 50-minute Friday just means the lesson stays locked to the bell. */
-    stats:   { label: "Statistics", weekday: [["10:00", "10:50"]],                  friday: [["10:00", "10:50"]] }  // TODO(Ian): real times
+    /* Stats runs right after calculus and ends where chemistry's second period begins: 1:00-1:50 Mon-Thu, 1:20-2:00 Friday.
+       The Friday pair is inferred from the gap between calculus (ends 1:20) and chemistry (starts 2:00). */
+    stats:   { label: "Statistics", weekday: [["13:00", "13:50"]],                   friday: [["13:20", "14:00"]] }
   };
-  var CFG = { endMinute: 42, earlyOpenMin: 5, gatesFrom: "07:00", gatesUntil: "15:00" };
+  var CFG = { endMinute: 42, huddleMin: 10, earlyOpenMin: 5, gatesFrom: "07:00", gatesUntil: "15:00" };
 
   function hm(s) { var p = s.split(":"); return +p[0] * 60 + +p[1]; }
   function minutesOf(d) { return d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60; }

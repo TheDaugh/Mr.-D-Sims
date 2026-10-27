@@ -212,7 +212,7 @@
   var pacing = { budgetMin: 42, steps: [
     { id: 'start', prio: 1, min: 2 }, { id: 'warmup', prio: 1, min: 4 }, { id: 'predict', prio: 1, min: 4 },
     { id: 'explore', prio: 3, min: 8 }, { id: 'build', prio: 2, min: 8, minItems: 2, parts: 4 },
-    { id: 'practice', prio: 1, min: 8 }, { id: 'check', prio: 1, min: 4 }], huddles: [{ key: 'h1', atMin: 18 }],
+    { id: 'practice', prio: 1, min: 8 }, { id: 'check', prio: 1, min: 4 }], huddles: [{ key: 'h1', atMin: 10 }],
     buildParts: ['direction', 'boundary-upper-tail', 'boundary-lower-tail', 'missing-mean-or-sd'], note: 'The last build part (T14) is cut first when the class is behind. Stage 1 trim option 4 holds T14 for a later review day.' };
 
   var CONTENT = { id: 'stats-unit3-slot11', ppf: ppf, cdf: cdf, CTX: CTX, skills: skills, warmup: warmup, talk: talk, predicts: predicts, explore: explore, MOVES: MOVES, models: models,

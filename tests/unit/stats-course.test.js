@@ -4,12 +4,12 @@ const root = path.resolve(__dirname, '../..'), read = f => fs.readFileSync(path.
 const spec = require('../../templates/stats/spec.js');
 function rng(seed) { let a = seed; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
-test('bell: stats has 50-minute weekday and Friday periods, flagged TODO(Ian)', () => {
+test('bell: stats runs 1:00-1:50 Mon-Thu and 1:20-2:00 Friday', () => {
   const win = { }; win.window = win; vm.createContext(win); vm.runInContext(read('shared/bell.js'), win);
   const S = win.MrD.bell.SCHEDULE.stats; assert.ok(S);
   const mins = p => (h => h(p[1]) - h(p[0]))(s => +s.split(':')[0] * 60 + +s.split(':')[1]);
-  S.weekday.concat(S.friday).forEach(p => assert.strictEqual(mins(p), 50));
-  assert.ok(/TODO\(Ian\)/.test(read('shared/bell.js')));
+  assert.strictEqual(JSON.stringify(S.weekday), '[["13:00","13:50"]]'); assert.strictEqual(JSON.stringify(S.friday), '[["13:20","14:00"]]');
+  S.weekday.forEach(p => assert.strictEqual(mins(p), 50)); S.friday.forEach(p => assert.strictEqual(mins(p), 40));
   ['physics', 'chem', 'calc'].forEach(c => assert.ok(win.MrD.bell.SCHEDULE[c], c + ' untouched'));
 });
 test('registry: the template is registered under course stats', () => {

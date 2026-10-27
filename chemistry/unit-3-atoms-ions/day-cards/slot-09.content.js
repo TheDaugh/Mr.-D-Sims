@@ -215,7 +215,7 @@
   var pacing = { budgetMin: 42, steps: [
     { id: 'start', prio: 1, min: 2 }, { id: 'warmup', prio: 1, min: 4 }, { id: 'predict', prio: 1, min: 4 },
     { id: 'explore', prio: 3, min: 8 }, { id: 'build', prio: 2, min: 8, minItems: 2, parts: 4 },
-    { id: 'practice', prio: 1, min: 8 }, { id: 'check', prio: 1, min: 4 }], huddles: [{ key: 'h1', atMin: 18 }] };
+    { id: 'practice', prio: 1, min: 8 }, { id: 'check', prio: 1, min: 4 }], huddles: [{ key: 'h1', atMin: 10 }] };
 
   var CONTENT = { id: 'unit3-slot09', ORDER: ORDER, NAME: NAME, fill: fill, cfg: cfg, pretty: pretty, occupancy: occupancy, unpairedIn: unpairedIn, totalUnpaired: totalUnpaired,
     parseConfig: parseConfig, sameConfig: sameConfig, skills: skills, warmup: warmup, talk: talk, predicts: predicts, recorded: recorded, MOVES: MOVES, models: models,

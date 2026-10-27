@@ -293,7 +293,7 @@
         { id: 'explore', prio: 3, min: 3 }, { id: 'models', prio: 2, min: 8, minItems: 3, parts: 5 }, { id: 'build', prio: 2, min: 8, minItems: 6, parts: 12 },
         { id: 'practice', prio: 1, min: 5 }, { id: 'check', prio: 1, min: 3 }
       ],
-      huddles: [{ key: 'h1', atMin: 16 }] }
+      huddles: [{ key: 'h1', atMin: 10 }] }
   };
 
   /* the v2 content (models, six-band ladder, sim specs) is authored separately and read from here by the page, the keys and the tests */

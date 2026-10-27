@@ -26,8 +26,24 @@
     });
   }
 
+  /* Safety net: a lesson in shared/lessons.js that this course's data file forgot to list still gets a card, so a lesson
+     that opens by typed link also shows on the hub. Hand-written entries win; templates stay hidden. */
+  function addRegistered(units, o) {
+    var reg = (MrD.lessons || []).filter(function (l) { return l.course === o.course && l.unit !== "Templates"; });
+    if (!reg.length) return units;
+    var abs = function (h) { return new URL(h, location.href).pathname; }, listed = {};
+    units.forEach(function (u) { u.entries.forEach(function (x) { if (x.href && !x.soon) listed[abs(x.href.split("#")[0].split("?")[0])] = 1; }); });
+    var extra = reg.filter(function (l) { return !listed[abs((o.root || "") + l.href)]; }).map(function (l) {
+      return { type: "lesson", icon: "🔔", title: l.title, href: (o.root || "") + l.href, blurb: "Guided lesson.", tags: ["guided lesson"],
+        teacher: [{ label: "Teacher view (#key)", href: (o.root || "") + l.href + "#key" }] };
+    });
+    if (!extra.length) return units;
+    return units.concat([{ id: "more-lessons", title: "More lessons", blurb: "Registered lessons that are not in a unit yet.", entries: extra }]);
+  }
+
   MrD.hub = function (o) {
     var root = o.root || "", units = normalize(o.units || []);
+    units = addRegistered(units, o);
     var host = document.getElementById("hub"), tab = (location.hash.slice(1).split("&")[0] || "");
     try { if (!tab) tab = localStorage.getItem("mrd.hubtab." + o.course) || ""; } catch (err) { }
     var counts = { lesson: 0, lab: 0, sim: 0 };

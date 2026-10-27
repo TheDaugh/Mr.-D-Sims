@@ -2,6 +2,13 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-10-27: Debug, class clock, global huddle start, hubs, stats lock
+
+- Stats bell was a placeholder (10:00). Now 1:00-1:50 Mon-Thu; Friday 1:20-2:00 is inferred from the gap between calculus and chemistry period 2, so Ian should confirm it. Locked mode was already on for stats lessons; it never engaged at 1 PM because the clock was wrong. `lock.e2e.js` and `template.e2e.js` now run stats at 1:05 PM.
+- Huddle: one global start, `MrD.bell.CFG.huddleMin` (10 min after the bell). `LE.huddlePlan` in `lesson.js` applies it to the first huddle of every v2 lesson, so the clock pulls the whole class in together. Spec `atMin` values were set to 10 to match the keys and teacher text; the engine ignores a spec value that disagrees. Legacy lessons (physics Newton 1 and 2, chem atom-discovery, rutherford, counting-particles, coulombs-law, calc product-rule-v2) use their own timing and are not changed.
+- Hubs: physics, chemistry and calculus hubs are hand-listed in their own data file (`sims.js`, `labs.js`) and never read `shared/lessons.js`, so a registered lesson could open by typed link and not appear. `shared/hub.js` now adds any registered lesson missing from its course's list under "More lessons" (templates excluded); the three index pages load the registry. Today nothing is missing, so the section does not appear.
+- Not changed: key PDFs (no `pdflatex`), so keys that print the huddle minute need `tools/build-keys.mjs` rerun.
+
 ## 2026-10-27: Unit 3 slot 11, stats 3.6 Finding Boundary Values (first v2 stats lesson from a Day Card)
 
 Built from `node tools/new-lesson.mjs stats 3-6-boundary-values ... --unit unit-3-normal-distribution`, wiring `day-cards/stats-11.card.md` and `stats-11.content.js`. Nothing in the content was rewritten.

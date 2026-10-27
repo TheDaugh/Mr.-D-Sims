@@ -179,10 +179,16 @@
     var b = $('pacebar'); if (!b) { b = el('div'); b.id = 'pacebar'; b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.style.cssText = 'margin:8px 0;padding:8px 14px;border-radius:8px;background:var(--stage);border:1px solid var(--accent);font-weight:600'; var nav = $('steps'); nav.parentNode.insertBefore(b, nav); }
     b.hidden = !msg; if (msg) b.textContent = msg;
   }
+  /* The first huddle starts at the same minute for every class: MrD.bell.CFG.huddleMin after the bell. Any later huddle keeps its own atMin. */
+  LE.huddlePlan = function (P) {
+    var hs = (P.huddles || []).slice().sort(function (a, b) { return a.atMin - b.atMin; });
+    if (hs.length && MrD.bell && MrD.bell.CFG.huddleMin) hs[0] = { key: hs[0].key, atMin: MrD.bell.CFG.huddleMin };
+    return { budgetMin: P.budgetMin, steps: P.steps, huddles: hs };
+  };
   function paceTick() {
     var P = CFG.pacing; if (!P || KEY || S.ended || !window.MrD || !MrD.pace) return;
     var c = LE.clock(); if (c.mode !== 'class') return;
-    var hd = MrD.pace.huddleDue(P, c.minutesIn, S.hfired || []);
+    var hd = MrD.pace.huddleDue(LE.huddlePlan(P), c.minutesIn, S.hfired || []);
     if (hd) {                                                                      // the clock calls the huddle, not the student's progress
       S.hfired = (S.hfired || []).concat(hd.key); S.hkey = hd.key;
       var ts = CFG.steps.filter(function (x) { return x.timed; })[0];

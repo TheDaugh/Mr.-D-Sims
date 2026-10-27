@@ -85,7 +85,7 @@
   };
   hs.teacher = function (c) {
     var items = SP.gate.items.map(function (id) { return id + (LE.qs(id) && LE.qs(id).done ? (firstTry(id) ? ' (first try)' : ' (missed)') : ' (not reached)'); }).join(', ');
-    return '<p><b>Huddle code: ' + LE.codeFor(ID, 'h1') + '.</b> Pulled in at minute ' + SP.pacing.huddles[0].atMin + ' by the clock. Open with: “' + LK.plain(SP.talk[0]) + '” Then walk the three definitions, work phosphorus (model M1) on the board, and label the ladder. Students fill the blanks as you write them.</p>' +
+    return '<p><b>Huddle code: ' + LE.codeFor(ID, 'h1') + '.</b> Pulled in at minute ' + LE.huddlePlan(SP.pacing).huddles[0].atMin + ' by the clock. Open with: “' + LK.plain(SP.talk[0]) + '” Then walk the three definitions, work phosphorus (model M1) on the board, and label the ladder. Students fill the blanks as you write them.</p>' +
       '<p>Items that count toward the gate: ' + items + '. The clear/hold rule is pending your decision; until then this is the standard huddle code, one per day for every class.</p>';
   };
 

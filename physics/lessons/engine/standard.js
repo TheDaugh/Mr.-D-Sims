@@ -69,7 +69,7 @@
 
   /* Huddle: timed by the clock (spec.pacing.huddles), written on by the student, never blocks. */
   steps.push(K.huddleStep({ target: SPEC.huddleTarget || SPEC.targets[0], spec: SPEC.huddle, gateKey: 'h1',
-    teacher: function () { return '<p>Pulled in at minute ' + SPEC.pacing.huddles[0].atMin + ' by the clock. Walk the definitions, work the example on the board, then label the figure. Students fill the blanks as you write them. The answers are in the make-up key PDF.</p>'; } }));
+    teacher: function () { return '<p>Pulled in at minute ' + LE.huddlePlan(SPEC.pacing).huddles[0].atMin + ' by the clock. Walk the definitions, work the example on the board, then label the figure. Students fill the blanks as you write them. The answers are in the make-up key PDF.</p>'; } }));
 
   /* Build: the rule in the student's own words, as short items. LE.items() shrinks the count when the class runs behind. */
   steps.push({ id: 'build', label: T.build,
