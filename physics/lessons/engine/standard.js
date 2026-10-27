@@ -69,7 +69,7 @@
 
   /* Huddle: timed by the clock (spec.pacing.huddles), written on by the student, never blocks. */
   steps.push(K.huddleStep({ target: SPEC.huddleTarget || SPEC.targets[0], spec: SPEC.huddle, gateKey: 'h1',
-    teacher: function () { return '<p>Pulled in at minute ' + SPEC.pacing.huddles[0].atMin + ' by the clock. Walk the definitions, work the example on the board, then label the figure. Students fill the blanks as you write them. The answers are in the make-up key PDF.</p>'; } }));
+    teacher: function () { return '<p>Pulled in at minute ' + MrD.pace.huddlesOf(SPEC.pacing)[0].atMin + ' by the clock. Walk the definitions, work the example on the board, then label the figure. Students fill the blanks as you write them. The answers are in the make-up key PDF.</p>'; } }));
 
   /* Build: the rule in the student's own words, as short items. LE.items() shrinks the count when the class runs behind. */
   steps.push({ id: 'build', label: T.build,
@@ -123,7 +123,7 @@
   }
 
   var cfg = { id: ID, course: SPEC.course, version: 1, title: SPEC.title, subtitle: 'Online lesson', identity: 'id', keypad: true, lock: true,
-    steps: steps, notes: notesDoc, concepts: SPEC.concepts, conceptTabs: (SPEC.course === 'stats' && window.NK) ? NK.conceptTabs() : null, pacing: SPEC.pacing, gates: (SPEC.pacing.huddles || []).map(function (h) { return { key: h.key, label: 'Huddle' }; }) };
+    steps: steps, notes: notesDoc, concepts: SPEC.concepts, conceptTabs: (SPEC.course === 'stats' && window.NK) ? NK.conceptTabs() : null, pacing: SPEC.pacing, gates: MrD.pace.huddlesOf(SPEC.pacing).map(function (h) { return { key: h.key, label: 'Huddle' }; }) };
   (window.LESSONS_REG = window.LESSONS_REG || {})[ID] = cfg;
   return cfg;
   };

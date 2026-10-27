@@ -27,6 +27,9 @@
     fnv: fnv, norm: norm, day: day,
     huddle: function (d) { return four("huddle|" + day(d)); },
     gate: function (lessonId, key, d) { return four("huddle|" + day(d)); },
+    /* v3 lessons (pacing.clock = "v3") have two codes a day: huddle 1 is the same code as huddle(), huddle 2 is its own. Legacy gate() is unchanged. */
+    huddle2: function (d) { return four("huddle2|" + day(d)); },
+    gateV3: function (lessonId, key, d) { return key === "h2" ? four("huddle2|" + day(d)) : four("huddle|" + day(d)); },
     override: function (d) { return four("override|" + day(d)); },
     lock: function (lessonId, name, n, d) { return four(lessonId + "|" + norm(name) + "|lock" + n + "|" + day(d)); },
     lockOff: function (d) { return four("|off|" + day(d)); },
