@@ -1,0 +1,108 @@
+{
+  "slot": 8,
+  "bands": 3,
+  "bandsNote": "Hidden from students. Band rises only by getting items right; never named on screen.",
+  "hintRule": "Hint 1 points to the step card. Hint 2 does the first step. Hint 3 shows the same move on a different example. No hint gives the answer. Each hint costs a fresh attempt before the next opens.",
+  "items": [
+    {
+      "id": "b1-1", "band": 1, "type": "pick-swatch",
+      "prompt": "This flame is yellow-orange. Which known metal does it match?",
+      "swatchGroup": "yellow-orange",
+      "options": ["Li", "Na", "K", "Ca", "Sr", "Cu"],
+      "check": { "kind": "match", "group": "yellow-orange" },
+      "answer": "Na",
+      "hints": ["Open your table. Find the row whose color says yellow-orange.", "Read down the color column until you see yellow-orange. What metal is in that row?", "Another case: a blue-green flame matches the row that says blue-green. Do the same with yellow-orange."]
+    },
+    {
+      "id": "b1-2", "band": 1, "type": "pick-swatch",
+      "prompt": "This flame is orange-red. Which known metal does it match?",
+      "swatchGroup": "orange-red",
+      "options": ["Li", "Na", "K", "Ca", "Sr", "Cu"],
+      "check": { "kind": "match", "group": "orange-red" },
+      "answer": "Ca",
+      "hints": ["Use your table, not memory.", "Find the row that says orange-red.", "Compare the swatch with each color in your table. Which swatch is the same?"]
+    },
+    {
+      "id": "b1-3", "band": 1, "type": "pick",
+      "prompt": "NaCl and NaNO3 both burn yellow-orange. What sets the flame color?",
+      "options": ["the metal", "the chlorine", "the nitrate", "the splint"],
+      "check": { "kind": "sameColorDifferentAnion", "a": "NaCl", "b": "NaNO3" },
+      "answer": "the metal",
+      "hints": ["Look at what NaCl and NaNO3 have in common.", "The two salts have different second parts. What is the same in both?", "Another case: the same red paint on a door and on a wall. The color comes from the paint, not from the thing it covers. Which part of each salt plays the role of the paint?"]
+    },
+    {
+      "id": "b1-4", "band": 1, "type": "error-find",
+      "prompt": "A student says the chlorine in NaCl makes the yellow color. Which result in your table shows this is wrong?",
+      "options": ["NaNO3 has no chlorine and is also yellow-orange", "KCl is lilac", "CuCl2 is blue-green", "SrCl2 is crimson"],
+      "check": { "kind": "sameColorDifferentAnion", "a": "NaCl", "b": "NaNO3" },
+      "answer": "NaNO3 has no chlorine and is also yellow-orange",
+      "hints": ["The student's claim is about chlorine. Which test has no chlorine?", "Find the salt in your table that lacks Cl.", "To test a claim about one part, change only that part and see whether the result changes."]
+    },
+    {
+      "id": "b2-1", "band": 2, "type": "pick",
+      "prompt": "You see a lilac flame. Which metal is it, and why might yellow hide it?",
+      "options": ["K; sodium's bright yellow can mask it", "Na; lilac is its color", "Li; lilac is its color", "Cu; the yellow is the splint"],
+      "check": { "kind": "masking", "metal": "K", "agent": "Na" },
+      "answer": "K; sodium's bright yellow can mask it",
+      "hints": ["Look up lilac in your table.", "Now look at how bright sodium is compared with that metal.", "Another case: a dim light next to a very bright one is hard to see. Which flame is the dim light here?"]
+    },
+    {
+      "id": "b2-2", "band": 2, "type": "pick",
+      "prompt": "The flame shows a yellow flash, then lilac. Which metal are you burning?",
+      "options": ["K, with a little sodium on the splint", "Na only", "Li", "Sr"],
+      "check": { "kind": "masking", "metal": "K", "agent": "Na" },
+      "answer": "K, with a little sodium on the splint",
+      "hints": ["Which color lasted?", "The color that lasts is the metal. The flash is something extra.", "Another case: a quick yellow flash from a splint is sodium, not your sample."]
+    },
+    {
+      "id": "b2-3", "band": 2, "type": "pick",
+      "prompt": "Which two metals could you mix up if you used only your eyes?",
+      "options": ["Li and Sr", "Na and K", "Ca and Cu", "Na and Cu"],
+      "check": { "kind": "ambiguousPair" },
+      "answer": "Li and Sr",
+      "hints": ["Look for two rows with the same color name.", "Read the color column again. Which two match?", "Rows with identical swatches look identical. Find the identical swatches."]
+    },
+    {
+      "id": "b2-4", "band": 2, "type": "spectrum-read",
+      "prompt": "A spectroscope shows one yellow line at 589 nm. Which metal?",
+      "lines": [589.0, 589.6],
+      "options": ["Li", "Na", "K", "Sr"],
+      "check": { "kind": "spectrumMatch", "linesNm": [589.0] },
+      "answer": "Na",
+      "hints": ["Find the yellow region of the strip.", "Which metal's row has a line at the yellow position?", "Another case: a blue line near 461 nm points to the row that has a blue line. Do the same with yellow."]
+    },
+    {
+      "id": "b3-1", "band": 3, "type": "pick",
+      "prompt": "An unknown burns crimson. Your knowns include Li and Sr, both crimson. Which claim is true to the data?",
+      "options": ["It is Li.", "It is Sr.", "It is Li or Sr; a second test is needed.", "It is neither."],
+      "check": { "kind": "ambiguousPair" },
+      "answer": "It is Li or Sr; a second test is needed.",
+      "hints": ["How many known metals match crimson?", "If two metals match, can the color alone choose between them?", "Another case: two keys fit the same lock. The lock alone cannot tell you which key you hold."]
+    },
+    {
+      "id": "b3-2", "band": 3, "type": "spectrum-read",
+      "prompt": "A spectroscope shows a bright red line near 671 nm and a dimmer orange line near 610 nm. There is no blue line. Which metal?",
+      "lines": [670.8, 610.4],
+      "options": ["Li", "Sr", "Ca", "Cu"],
+      "check": { "kind": "spectrumMatch", "linesNm": [670.8, 610.4] },
+      "answer": "Li",
+      "hints": ["Check each row of the strip for a blue line.", "Which of Li and Sr has a blue line?", "Another case: Na has one yellow line and no blue line. Decide the same way for these two."]
+    },
+    {
+      "id": "b3-3", "band": 3, "type": "spectrum-read",
+      "prompt": "A spectroscope shows a blue line near 461 nm plus red lines. Which metal?",
+      "lines": [460.7, 640.8, 650.4],
+      "options": ["Li", "Sr", "Ca", "Cu"],
+      "check": { "kind": "spectrumMatch", "linesNm": [460.7, 640.8, 650.4] },
+      "answer": "Sr",
+      "hints": ["Find the blue region of the strip.", "Which crimson metal has a blue line?", "The blue line is the difference between the two crimson metals."]
+    },
+    {
+      "id": "b3-4", "band": 3, "type": "explain",
+      "prompt": "In one sentence: what can the flame test not decide?",
+      "grading": "PENDING (decision for Ian): self-compare with the model answer, or you read it",
+      "modelAnswer": "It cannot separate metals that burn the same color, such as Li and Sr.",
+      "hints": ["Think about the Li and Sr rows.", "Finish: The flame cannot decide between metals that ___.", "Another case: two shirts of the same color cannot be told apart by color."]
+    }
+  ]
+}

@@ -233,3 +233,10 @@ Every action appends one small JSON event. The log is the grading record, the te
 - `src/engine/coulomb.js`: real Coulomb dynamics (d0 = 2Z·1.44 MeV·fm / E, tan(θ/2) = d0/2b); `test/coulomb.test.js` checks the integrator against Rutherford's formula.
 - `src/ui/atomscope.js`: PhET-style microscope: nuclear or atomic scale, nuclear atom or plum pudding, protons, neutrons, alpha energy, traces, force arrows (red on the alpha, blue on the nucleus), click to aim. Logs `scat_shot` events (quests: fire 5, aim a rebound).
 - Detector model now scales with element (Z² and atom density), foil thickness and 1/E². Free challenge: pick metal, thickness and energy, predict, fire. De Broglie wavelength (about 1 fm at 5 MeV) is shown so the particle picture is justified.
+
+## Lab 4: Flame Tests (`?lab=flame`)
+- Built from the slot 8 sheet. `content/flame-data.json`, `content/flame-items.json` and `content/flame-lab-content.json` are the sheet's files, byte for byte (`test/flame.test.js` pins their hashes). `content/labs/04-flame-tests.json` only wires them together and holds the wording that is not in the sheet (`ui`), the step card, tutorial captions and reading guides copied from the sheet.
+- `src/engine/flame.js` (pure, no chemistry facts): burn phases, splint rule, unknown assignment seeded by the student, record rules and quest rules, the spectroscope picture as an SVG string (lines, bands and colors from the data), the practice item ladder. `src/ui/flame.js`: bench canvas, notebook (results table, spectroscope, practice), Tutorial 2, pre-lab, hint pictures.
+- Flow: intro, pre-lab (door shut), huddle 1 code, lab (11 quests, step card always on screen), CER, huddle 2 code (accepted only with a complete record), done. No stamp, badge, report code or board.
+- `flame-explore.html` is the paper fallback (swatch row, step card, record table, spectrum picture, card of colors and line positions). It prints from the same data.
+- Tests: `test/flame.test.js` (engine), `test/flame-words.test.js` (word rule), `test/slot-08-content.test.cjs` (the sheet's own test), `test/flame.e2e.js` (a whole period in Chromium; needs `python3 -m http.server 8123`).

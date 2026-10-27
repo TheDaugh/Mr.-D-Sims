@@ -113,3 +113,13 @@ dialog.chest .controls { justify-content: center; }
 #inv .slot canvas { width: 26px; height: 26px; flex: none; image-rendering: pixelated; } #inv .slot { position: relative; cursor: pointer; }
 #inv .slot.sel { border-color: #ffd23f; box-shadow: 0 0 0 1px #ffd23f; } #inv .slot .n { margin-left: auto; font-size: 10px; color: #8a97a6; }
 #inv .slot span { overflow: hidden; text-overflow: ellipsis; }
+
+/* lab 4: step card, flame bench controls, notebook tables */
+#stepCard { position: absolute; left: 10px; top: 52px; width: 262px; z-index: 6; padding: 8px 10px; border-radius: 10px; background: rgba(14, 20, 28, .88); color: #eef3f8; border: 1px solid #4b5b6e; font-size: 12.5px; line-height: 1.3; }
+#stepCard h3 { margin: 0 0 4px; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: #c9b48a; } #stepCard ol { margin: 0; padding-left: 18px; } #stepCard li { margin: 2px 0; }
+#flControls .controls { margin: 0 0 6px; } #flControls select { min-height: 30px; max-width: 12em; }
+.flast { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 4px 0 8px; } .sw { display: inline-block; width: 22px; height: 22px; border-radius: 5px; border: 1px solid #0006; vertical-align: middle; flex: none; } .sw.big { width: 44px; height: 44px; }
+.cs { display: inline-flex; align-items: center; gap: 6px; } table.ftab { border-collapse: collapse; margin: 6px 0 12px; } table.ftab th, table.ftab td { padding: 3px 8px; text-align: left; border-bottom: 1px solid var(--line); } .flag { color: var(--bad); font-weight: 600; font-size: 13px; }
+.pic { margin: 8px 0; } .pic svg { color: var(--ink); background: var(--panel); border-radius: 8px; } .swrow { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+.hintline { background: var(--note-bg); border-radius: 8px; padding: 6px 10px; margin: 6px 0; } .opts button.opt { text-align: left; } .opts button.picked { border-color: var(--accent); background: var(--note-bg); }
+#tut2Body .frame { display: flex; flex-direction: column; align-items: center; gap: 10px; } #tut2Body .cap { font-size: 1.15rem; text-align: center; }

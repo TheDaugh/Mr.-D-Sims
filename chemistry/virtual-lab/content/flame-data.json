@@ -1,0 +1,323 @@
+{
+  "meta": {
+    "slot": 8,
+    "lab": "04-flame-tests",
+    "tier": "qualitative (what you see) plus line positions for the spectroscope",
+    "photonEnergyConstant_eV_nm": 1239.84,
+    "notes": [
+      "colorGroup names come from the UBD fact sheet 'Flame colors (chloride salts)'. swatch hex values, brightness words and the masking rule are AUTHOR-SET display choices, not measurements; each is marked author_set.",
+      "Line wavelengths and relative intensities come from the NIST Atomic Spectra Database handbook tables (air wavelengths, nm). The NIST intensities are spectral-line-table values, NOT flame brightness. The spectroscope picture may use them only to rank lines within one metal.",
+      "Wide bands (Sr 600-700 nm, Cu 500-550 nm) come from physicsopenlab.org 'Flame Test' (author's own spectrometer for Sr; NIST linked for Cu). Draw them as a faint glow behind the lines.",
+      "Ca: a real flame also shows molecular emission not sourced here. Mark Ca as needs_review before it ships."
+    ]
+  },
+  "samples": [
+    {
+      "id": "LiCl",
+      "formula": "LiCl",
+      "metal": "Li",
+      "anion": "Cl",
+      "role": "known",
+      "flame": {
+        "colorGroup": "crimson",
+        "name": "crimson",
+        "swatch": "#D2193C",
+        "brightness": "bright",
+        "author_set": [
+          "swatch",
+          "brightness"
+        ]
+      },
+      "source": "UBD fact sheet: Flame colors (chloride salts), Li crimson"
+    },
+    {
+      "id": "NaCl",
+      "formula": "NaCl",
+      "metal": "Na",
+      "anion": "Cl",
+      "role": "known",
+      "flame": {
+        "colorGroup": "yellow-orange",
+        "name": "intense yellow-orange",
+        "swatch": "#FFB000",
+        "brightness": "very bright",
+        "author_set": [
+          "swatch",
+          "brightness"
+        ]
+      },
+      "source": "UBD fact sheet: Na intense yellow-orange"
+    },
+    {
+      "id": "KCl",
+      "formula": "KCl",
+      "metal": "K",
+      "anion": "Cl",
+      "role": "known",
+      "flame": {
+        "colorGroup": "lilac",
+        "name": "lilac (pale violet)",
+        "swatch": "#B28FD6",
+        "brightness": "faint",
+        "author_set": [
+          "swatch",
+          "brightness"
+        ]
+      },
+      "masking": {
+        "agent": "Na",
+        "effect": "yellow flash for the first 2 seconds, then lilac",
+        "author_set": true,
+        "basis": "UBD fact sheet: K lilac, often masked by sodium"
+      },
+      "source": "UBD fact sheet: K lilac (pale violet, often masked by sodium)"
+    },
+    {
+      "id": "CaCl2",
+      "formula": "CaCl2",
+      "metal": "Ca",
+      "anion": "Cl",
+      "role": "known",
+      "flame": {
+        "colorGroup": "orange-red",
+        "name": "orange-red",
+        "swatch": "#E8541E",
+        "brightness": "moderate",
+        "author_set": [
+          "swatch",
+          "brightness"
+        ]
+      },
+      "source": "UBD fact sheet: Ca orange-red",
+      "needs_review": "spectroscope view uses NIST atomic lines only; molecular bands unsourced"
+    },
+    {
+      "id": "SrCl2",
+      "formula": "SrCl2",
+      "metal": "Sr",
+      "anion": "Cl",
+      "role": "known",
+      "flame": {
+        "colorGroup": "crimson",
+        "name": "crimson",
+        "swatch": "#D2193C",
+        "brightness": "bright",
+        "author_set": [
+          "swatch",
+          "brightness"
+        ]
+      },
+      "source": "UBD fact sheet: Sr crimson; 'Li and Sr look alike to the eye'"
+    },
+    {
+      "id": "CuCl2",
+      "formula": "CuCl2",
+      "metal": "Cu",
+      "anion": "Cl",
+      "role": "known",
+      "flame": {
+        "colorGroup": "blue-green",
+        "name": "blue-green",
+        "swatch": "#1FB5A0",
+        "brightness": "moderate",
+        "author_set": [
+          "swatch",
+          "brightness"
+        ]
+      },
+      "source": "UBD fact sheet: Cu blue-green"
+    },
+    {
+      "id": "NaNO3",
+      "formula": "NaNO3",
+      "metal": "Na",
+      "anion": "NO3",
+      "role": "control",
+      "flame": {
+        "colorGroup": "yellow-orange",
+        "name": "intense yellow-orange",
+        "swatch": "#FFB000",
+        "brightness": "very bright",
+        "author_set": [
+          "swatch",
+          "brightness"
+        ]
+      },
+      "source": "UBD misconception 15: NaCl and NaNO3 burn the same yellow-orange; the metal sets the color"
+    }
+  ],
+  "unknowns": {
+    "assign": "seeded by student id so neighbors differ",
+    "A": {
+      "pool": [
+        "NaCl",
+        "KCl"
+      ],
+      "note": "one Na or K"
+    },
+    "B": {
+      "pool": [
+        "LiCl",
+        "SrCl2"
+      ],
+      "note": "Li against Sr is the ambiguous pair"
+    },
+    "extra": {
+      "pool": [
+        "NaCl",
+        "KCl",
+        "LiCl",
+        "SrCl2",
+        "CaCl2",
+        "CuCl2"
+      ],
+      "note": "After unknowns A and B, a student keeps identifying new mystery bottles (random, labeled by letter), same table, same claim. This is what keeps early finishers working until huddle 2. Never labeled extra, challenge or optional on screen."
+    }
+  },
+  "rules": [
+    {
+      "id": "fresh-splint",
+      "text": "A reused splint carries the last salt. Show sodium yellow first and flag the run.",
+      "author_set": true,
+      "basis": "UBD plan sign-off: a fresh splint each time"
+    },
+    {
+      "id": "known-first",
+      "text": "Unknowns stay locked until all six knowns and the NaNO3 control are recorded.",
+      "author_set": true,
+      "basis": "UBD plan sign-off: known salts first"
+    }
+  ],
+  "spectra": {
+    "Li": {
+      "lines": [
+        {
+          "nm": 670.8,
+          "rel": 1000,
+          "note": "NIST Li I 670.7926 and 670.7775 nm, drawn as one red line"
+        },
+        {
+          "nm": 610.4,
+          "rel": 400,
+          "note": "NIST Li I 610.3667/610.3654/610.3542 nm, orange"
+        }
+      ],
+      "source": "NIST Atomic Spectra Database handbook, lithium table (physics.nist.gov/PhysRefData/Handbook/Tables/lithiumtable2.htm)"
+    },
+    "Na": {
+      "lines": [
+        {
+          "nm": 589.0,
+          "rel": 1000,
+          "note": "NIST Na I 588.995 nm"
+        },
+        {
+          "nm": 589.6,
+          "rel": 500,
+          "note": "NIST Na I 589.592 nm; a hand spectroscope shows the pair as one yellow line"
+        }
+      ],
+      "source": "NIST handbook, sodium table"
+    },
+    "K": {
+      "lines": [
+        {
+          "nm": 404.4,
+          "rel": 700,
+          "note": "NIST K I 404.414 nm, violet"
+        },
+        {
+          "nm": 404.7,
+          "rel": 700,
+          "note": "NIST K I 404.721 nm, violet"
+        },
+        {
+          "nm": 766.5,
+          "rel": 1000,
+          "note": "NIST K I 766.490 nm, deep red at the edge of vision"
+        },
+        {
+          "nm": 769.9,
+          "rel": 1000,
+          "note": "NIST K I 769.896 nm, deep red at the edge of vision"
+        }
+      ],
+      "source": "NIST handbook, potassium table"
+    },
+    "Ca": {
+      "lines": [
+        {
+          "nm": 422.7,
+          "rel": 1000,
+          "note": "NIST Ca I 422.67 nm, violet"
+        },
+        {
+          "nm": 643.9,
+          "rel": 700,
+          "note": "NIST Ca I 643.91 nm, red"
+        },
+        {
+          "nm": 646.3,
+          "rel": 700,
+          "note": "NIST Ca I 646.26 nm, red"
+        }
+      ],
+      "source": "NIST handbook, calcium table",
+      "needs_review": true
+    },
+    "Sr": {
+      "lines": [
+        {
+          "nm": 460.7,
+          "rel": 1000,
+          "note": "NIST Sr I 460.7 nm, blue"
+        },
+        {
+          "nm": 640.8,
+          "rel": 140,
+          "note": "NIST Sr I 640.8 nm, red"
+        },
+        {
+          "nm": 650.4,
+          "rel": 80,
+          "note": "NIST Sr I 650.4 nm, red"
+        }
+      ],
+      "bands": [
+        {
+          "fromNm": 600,
+          "toNm": 700,
+          "note": "physicsopenlab.org Flame Test: wide band 600-700 nm"
+        }
+      ],
+      "source": "NIST handbook, strontium table; band from physicsopenlab.org"
+    },
+    "Cu": {
+      "lines": [
+        {
+          "nm": 510.6,
+          "rel": 150,
+          "note": "NIST Cu I 510.6 nm, green"
+        },
+        {
+          "nm": 515.3,
+          "rel": 200,
+          "note": "NIST Cu I 515.3 nm, green"
+        },
+        {
+          "nm": 521.8,
+          "rel": 250,
+          "note": "NIST Cu I 521.8 nm, green"
+        }
+      ],
+      "bands": [
+        {
+          "fromNm": 500,
+          "toNm": 550,
+          "note": "physicsopenlab.org Flame Test: 500-550 nm"
+        }
+      ],
+      "source": "NIST handbook, copper table; band from physicsopenlab.org"
+    }
+  }
+}

@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Engine, content and tests for the tile-based chemistry virtual lab.",
   "scripts": {
-    "test": "node --test test/*.test.js",
+    "test": "node --test test/*.test.js test/*.test.cjs",
     "review": "node tools/review.js",
     "gate": "node tools/review.js --gate"
   },

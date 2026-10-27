@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flame Tests: paper version</title>
+<meta name="description" content="The flame-test lab on paper: swatch row, step card, record table, and the spectroscope picture. Print it if the lab will not load.">
+<style>
+  :root { color-scheme: light; }
+  body { font: 12pt/1.35 Georgia, "Times New Roman", serif; color: #111; background: #fff; margin: 0 auto; max-width: 7.6in; padding: .4in .3in; }
+  h1 { font-size: 20pt; margin: 0 0 4pt; } h2 { font-size: 13pt; margin: 14pt 0 4pt; } p { margin: 4pt 0; } .hint { color: #444; font-size: 10.5pt; }
+  .sheet { break-after: page; } .sheet:last-of-type { break-after: auto; }
+  .swatches { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6pt; margin: 6pt 0; } .swatch { text-align: center; font-size: 10.5pt; }
+  .swatch i { display: block; height: .45in; border: 1px solid #000; border-radius: 4pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .swatch b { display: block; margin-top: 2pt; }
+  table { border-collapse: collapse; width: 100%; margin: 4pt 0; } th, td { border: 1px solid #000; padding: 4pt 6pt; text-align: left; vertical-align: top; } td.blank { height: .27in; }
+  ol { margin: 4pt 0 4pt 1.2em; padding: 0; } li { margin: 2pt 0; }
+  .card { border: 1.5px solid #000; border-radius: 5pt; padding: 6pt 10pt; margin: 8pt 0; } .card h3 { margin: 0 0 3pt; font-size: 11.5pt; }
+  svg.spectrum { width: 100%; height: auto; color: #000; background: #fff; }
+  #screenOnly { margin: 0 0 12pt; padding: 8pt 12pt; background: #eef3f8; border: 1px solid #99a; border-radius: 8pt; font: 14px system-ui, sans-serif; } #screenOnly button { font-size: 14px; padding: 6px 12px; }
+  @media print { body { padding: 0; max-width: none; font-size: 11pt; } h2 { margin: 10pt 0 3pt; } .card { margin: 6pt 0; } #screenOnly { display: none !important; } @page { margin: .5in; } }
+</style>
+</head>
+<body>
+<div id="screenOnly"><p><b>Paper version.</b> If the lab will not load on your device, print this page. Page 1 is the swatch row, the step card and the record table. Page 2 is the spectroscope picture and a card of colors and line positions.</p><button onclick="window.print()">Print this page</button></div>
+<main id="out"><p>Loading…</p></main>
+<script type="module">
+import * as F from "./src/engine/flame.js";
+const get = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); });
+const [data, lab, content] = await Promise.all([get("content/flame-data.json"), get("content/labs/04-flame-tests.json"), get("content/flame-lab-content.json")]);
+const B = F.byId(data), esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const salts = F.benchIds(data), metals = F.metals(data), U = lab.ui;
+const swatches = salts.map((id) => `<div class="swatch"><i style="background:${B[id].flame.swatch}"></i><b>${esc(B[id].flame.colorGroup)}</b>${esc(B[id].formula)}</div>`).join("");
+const rec = salts.map((id) => `<tr class="rec"><th scope="row">${esc(B[id].formula)}${B[id].role === "control" ? " " + esc(U.controlWord) : ""}</th><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>`).join("");
+const unk = ["A", "B"].map((l) => `<tr><th scope="row">${esc(U.unknownWord)} ${l}</th><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>`).join("");
+const spec = F.spectrumSvg(data, metals.map((m) => ({ label: m, metal: m })), { width: 720, rowH: 34, id: "paper", label: U.specLabel }).replace("<svg ", '<svg class="spectrum" ');
+const card = metals.map((m) => { const g = [...new Set(data.samples.filter((s) => s.metal === m && s.role === "known").map((s) => s.flame.colorGroup))].join(", "), nm = F.mergeLines(data.spectra[m].lines).map((l) => Math.round(l.nm)).join(", "); return `<tr><th scope="row">${m}</th><td>${esc(g)}</td><td>${nm}</td></tr>`; }).join("");
+document.getElementById("out").innerHTML = `
+<section class="sheet"><h1>${esc(lab.title)}</h1><p class="hint">${esc(lab.swatchGuide)}</p>
+<div class="swatches">${swatches}</div>
+<div class="card"><h3>${esc(lab.stepCard.title)}</h3><ol>${lab.stepCard.steps.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></div>
+<h2>${esc(U.printKnowns)}</h2><table><thead><tr><th>${esc(U.saltHead)}</th><th>${esc(U.colorHead)}</th><th>${esc(U.brightHead)}</th><th>${esc(U.identHead)}</th></tr></thead><tbody>${rec}</tbody></table>
+<h2>${esc(U.printUnknowns)}</h2><table><thead><tr><th>${esc(U.unknownWord)}</th><th>${esc(U.colorHead)}</th><th>${esc(U.brightHead)}</th><th>${esc(U.identHead)}</th></tr></thead><tbody>${unk}</tbody></table>
+<p class="hint">${esc(content.postlab.prompt)}</p></section>
+<section class="sheet"><h2>${esc(U.specLabel)}</h2>${spec}<p class="hint">${esc(lab.specGuide)}</p>
+<div class="card"><h3>${esc(U.colorHead)} / ${esc(U.linesHead)} (nm)</h3><table><thead><tr><th></th><th>${esc(U.colorHead)}</th><th>${esc(U.linesHead)}</th></tr></thead><tbody>${card}</tbody></table></div></section>`;
+</script>
+</body>
+</html>
