@@ -61,5 +61,8 @@ window.MrD.lessons = [
     gates: [{ key: "h1", label: "Huddle" }], live: true },
   { course: "calc", id: "3-1-chain-rule", title: "3.1 The Chain Rule", unit: "unit-3-composite-implicit-inverse",
     href: "calculus/unit-3-composite-implicit-inverse/3-1-chain-rule.html", spec: "calculus/unit-3-composite-implicit-inverse/3-1-chain-rule.spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "stats", id: "3-6-boundary-values", title: "3.6 Finding Boundary Values", unit: "unit-3-normal-distribution",
+    href: "stats/unit-3-normal-distribution/3-6-boundary-values.html", spec: "stats/unit-3-normal-distribution/3-6-boundary-values.spec.js",
     gates: [{ key: "h1", label: "Huddle" }], live: true }
 ];

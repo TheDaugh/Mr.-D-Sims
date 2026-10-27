@@ -21,7 +21,7 @@ const TARGETS = [
      not a name, so the target enters one (valid check character) and uses it as the student for the unlock code.
      The stats period in shared/bell.js is a placeholder until Ian sets the real times; update clockAt with it. */
   ...[['physics', 'templates/physics/lesson.html', '2026-10-21T09:05:00-04:00'], ['chem', 'templates/chem/lesson.html', '2026-10-21T10:45:00-04:00'],
-      ['calc', 'templates/calc/lesson.html', '2026-10-21T12:15:00-04:00'], ['calc', 'calculus/unit-3-composite-implicit-inverse/3-1-chain-rule.html', '2026-10-21T12:15:00-04:00'], ['stats', 'templates/stats/lesson.html', '2026-10-21T10:05:00-04:00']].map(([c, url, at]) => ({
+      ['calc', 'templates/calc/lesson.html', '2026-10-21T12:15:00-04:00'], ['calc', 'calculus/unit-3-composite-implicit-inverse/3-1-chain-rule.html', '2026-10-21T12:15:00-04:00'], ['stats', 'templates/stats/lesson.html', '2026-10-21T10:05:00-04:00'], ['stats', 'stats/unit-3-normal-distribution/3-6-boundary-values.html', '2026-10-21T10:05:00-04:00']].map(([c, url, at]) => ({
     name: url.indexOf('templates/') === 0 ? 'v2 template ' + c : 'v2 lesson ' + url.split('/').pop().replace('.html', ''), url: '/' + url, clockAt: at, student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#btn-next'); } })),
   { name: 'chem electron-config-1', url: '/chemistry/unit-3-atoms-ions/electron-config-1.html', clockAt: '2026-10-21T10:45:00-04:00', student: '65J-7TGT',

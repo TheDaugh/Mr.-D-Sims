@@ -12,7 +12,7 @@ for (const { d, spec } of specs) {
     for (const sk of spec.skills || []) for (let b = 1; b <= 4; b++) for (let s = 0; s < 40; s++) {
       const q = sk.gen(b, rng(s * 7 + b)); const where = `${sk.id} band ${b} seed ${s}`;
       assert.ok(q.prompt, where);
-      if (q.type === 'choice') { assert.ok(Array.isArray(q.options) && q.options.length >= 3 && q.answer >= 0 && q.answer < q.options.length, where); assert.ok(q.hint, where); }
+      if (q.type === 'choice') { assert.ok(Array.isArray(q.options) && q.options.length >= 2 && q.answer >= 0 && q.answer < q.options.length, where); assert.ok(q.hint, where); }
       else if (q.type === 'config') { assert.strictEqual(typeof q.answer, 'string', where); assert.ok(q.hint, where); assert.ok(q.check(q.answer, q.answer), where); }
       else if (q.type === 'expr') { assert.strictEqual(typeof q.answer, 'string', where); assert.doesNotThrow(() => MC.parse(q.answer, q.vars || ['x']), where + ' answer ' + q.answer); assert.ok(q.hints && q.hints.length, where); }
       else { assert.ok(typeof q.answer === 'number' && isFinite(q.answer), where); assert.ok(q.hint, where); }

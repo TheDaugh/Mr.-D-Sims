@@ -9,7 +9,7 @@
     { id: "unit-3-review-1-3", title: "Review: 3.1 to 3.3", blurb: "Mixed review of percentiles, z-scores, shifting and stretching data, density curves, and normal fit." },
     { id: "3-4-area-below",     title: "3.4 Area Below and Above",              blurb: "Percent of data below a value, and above it." },
     { id: "3-5-area-between",   title: "3.5 Area Between Two Values",           blurb: "Subtract two table areas to get the percent between." },
-    { id: "3-6-percentiles",    title: "3.6 From a Percentile Back to a Value", blurb: "Work the table backward: start with a percent, end with a value." },
+    { id: "3-6-boundary-values", title: "3.6 Finding Boundary Values",         blurb: "Start with a percent, end with a value: find the cutoff for a percentile." },
     { id: "3-7-normal-context", title: "3.7 Normal Models in Context",          blurb: "Use the normal curve to answer questions about real situations." },
     { id: "3-8-unit-review",    title: "Unit 3 Review",                         blurb: "Mixed practice on every skill in the unit." }
   ];
