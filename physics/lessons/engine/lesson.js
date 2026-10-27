@@ -27,7 +27,7 @@
   LE.clock = function () { return MrD.bell.clock(CFG.course); };
   LE.canEnd = function () { return KEY || LE.clock().canEnd; };
   LE.words = function (s) { var m = String(s || '').trim().match(/\S+/g); return m ? m.length : 0; };
-  LE.fmtN = function (x) { return String(+Number(x).toFixed(3)); };
+  LE.fmtN = function (x) { var n = Number(x); return isNaN(n) ? String(x) : String(+n.toFixed(3)); };
   LE.fmt = function (x, d) { if (!isFinite(x)) return String(x); var s = Number(x).toFixed(d == null ? 2 : d); return s; };
   LE.norm = function (s) { return String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9\u03b1-\u03c9\u03a3\u0394.\- ]/g, ' ').replace(/\s+/g, ' ').trim(); };
   function shuffle(arr, r) { var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(r() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
@@ -243,6 +243,7 @@
     if (q.remember) box.appendChild(el('p', 'hint qremember', 'Remember: ' + q.remember));
     if (q.type === 'choice') askChoice(box, q, st);
     else if (q.type === 'num') askNum(box, q, st);
+    else if (q.type === 'config') askConfig(box, q, st);
     else if (q.type === 'cloze') askCloze(box, q, st);
     else if (q.type === 'text') askText(box, q, st);
     else if (q.type === 'expr') askExpr(box, q, st);
@@ -330,27 +331,57 @@
     var inp = el('input'); inp.type = 'text'; inp.inputMode = 'decimal'; inp.setAttribute('aria-label', q.label || 'Answer'); inp.autocomplete = 'off';
     row.appendChild(inp);
     if (q.unit) row.appendChild(el('span', null, q.unit));
+    if (q.answer2 != null) row.appendChild(el('span', 'hint', 'Separate the two numbers with a comma.'));
     if ((q.keypad || CFG.keypad) && window.MrD && MrD.keypad && !st.done) MrD.keypad.attach(inp, { mode: 'number', after: row });
     var btn = el('button', 'btn', 'Check'); btn.type = 'button'; row.appendChild(btn);
     if (st.done) { inp.value = st.val != null ? st.val : ''; inp.disabled = true; btn.disabled = true; if (q.worked) { var w = el('p', 'msg worked ' + (st.ok ? 'ok' : '')); html(w, (st.ok ? 'Correct. ' : 'Here is the reasoning. ') + q.worked); box.appendChild(w); } }
     function go() {
       if (st.done) return;
-      var v = parseNum(inp.value);
+      var two = q.answer2 != null, vs = two ? String(inp.value).replace(/\band\b/gi, ' ').split(/[\s,;]+/).filter(Boolean).map(parseNum) : null;
+      var v = two ? (vs.length === 2 ? vs[0] : NaN) : parseNum(inp.value);
       var fb = feedbackEl(box);
-      if (isNaN(v)) { fb.className = 'msg bad fb'; fb.textContent = 'Enter a number (digits only, no units).'; return; }
+      if (isNaN(v) || (two && isNaN(vs[1]))) { fb.className = 'msg bad fb'; fb.textContent = two ? 'Give both numbers, separated by a comma.' : 'Enter a number (digits only, no units).'; return; }
       st.val = inp.value;
-      if (LE.numOK(v, q.answer, q.tol, q.abs)) {
+      if (two ? ((LE.numOK(vs[0], q.answer, q.tol, q.abs) && LE.numOK(vs[1], q.answer2, q.tol, q.abs)) || (LE.numOK(vs[0], q.answer2, q.tol, q.abs) && LE.numOK(vs[1], q.answer, q.tol, q.abs))) : LE.numOK(v, q.answer, q.tol, q.abs)) {
         fb.remove(); inp.disabled = true; btn.disabled = true; finish(q, st, box, true);
       } else {
         st.misses++; fb.className = 'msg bad fb';
         var msg = (q.near && q.near(v)) || q.hint || '';
         html(fb, msg ? 'Not quite. ' + msg : 'Not quite.');
-        if (st.misses >= (q.maxMiss || MAXMISS + 1)) { inp.value = q.revealText != null ? q.revealText : LE.fmtN(q.answer); inp.disabled = true; btn.disabled = true; finish(q, st, box, false); }
+        if (st.misses >= (q.maxMiss || MAXMISS + 1)) { inp.value = q.revealText != null ? q.revealText : LE.fmtN(q.answer) + (two ? ' and ' + LE.fmtN(q.answer2) : ''); inp.disabled = true; btn.disabled = true; finish(q, st, box, false); }
         LE.save(); LE.gate();
       }
     }
     btn.onclick = go; inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
-    keyLine(box, (q.revealText != null ? q.revealText : LE.fmtN(q.answer)) + (q.unit ? ' ' + q.unit : ''));
+    keyLine(box, (q.revealText != null ? q.revealText : LE.fmtN(q.answer) + (q.answer2 != null ? ' and ' + LE.fmtN(q.answer2) : '')) + (q.unit ? ' ' + q.unit : ''));
+  }
+
+  /* A typed electron configuration (chemistry). q = { type:'config', answer:'1s2 2s2', check:function(typed, answer)->bool, preview:function(typed)->string, hint, worked }.
+     check and preview come from the lesson (chemistry reads any spacing, ^, superscripts); without check the text must match exactly. */
+  function askConfig(box, q, st) {
+    var row = el('div', 'row'); box.appendChild(row);
+    var inp = el('input'); inp.type = 'text'; inp.setAttribute('aria-label', q.label || 'Configuration'); inp.autocomplete = 'off'; inp.spellcheck = false; inp.style.minWidth = '16em'; row.appendChild(inp);
+    var btn = el('button', 'btn', 'Check'); btn.type = 'button'; row.appendChild(btn);
+    var pv = el('p', 'hint ecfg-preview'); pv.setAttribute('aria-live', 'polite'); box.appendChild(pv);
+    function show() { pv.textContent = q.preview ? q.preview(inp.value) : ''; }
+    inp.addEventListener('input', show);
+    if (st.done) { inp.value = st.val != null ? st.val : ''; inp.disabled = true; btn.disabled = true; if (q.worked) { var w = el('p', 'msg worked ' + (st.ok ? 'ok' : '')); html(w, (st.ok ? 'Correct. ' : 'Here is the reasoning. ') + q.worked); box.appendChild(w); } show(); }
+    function go() {
+      if (st.done) return;
+      var fb = feedbackEl(box);
+      if (!inp.value.trim()) { fb.className = 'msg bad fb'; fb.textContent = 'Type the configuration, for example 1s2 2s2.'; return; }
+      st.val = inp.value;
+      var good = q.check ? q.check(inp.value, q.answer) : LE.norm(inp.value) === LE.norm(q.answer);
+      if (good) { fb.remove(); inp.disabled = true; btn.disabled = true; finish(q, st, box, true); }
+      else {
+        st.misses++; fb.className = 'msg bad fb';
+        html(fb, q.hint ? 'Not quite. ' + q.hint : 'Not quite.');
+        if (st.misses >= (q.maxMiss || MAXMISS + 1)) { inp.value = q.revealText != null ? q.revealText : q.answer; inp.disabled = true; btn.disabled = true; show(); finish(q, st, box, false); }
+        LE.save(); LE.gate();
+      }
+    }
+    btn.onclick = go; inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+    keyLine(box, q.answer);
   }
 
   function askCloze(box, q, st) {

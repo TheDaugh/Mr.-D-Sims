@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Electron Configurations I: board page · Mr. D</title>
+<meta name="description" content="Projector page for Electron Configurations I: the energy ladder, with blanks that fill as Mr. D presses forward.">
+<link rel="stylesheet" href="../../physics/lessons/engine/lesson.css">
+<style>
+  body{font-size:22px}
+  .bd{max-width:1280px;margin:0 auto;padding:12px clamp(12px,3vw,40px)}
+  .bd-grid{display:grid;grid-template-columns:minmax(300px,480px) 1fr;gap:28px;align-items:start;margin-top:10px}
+  .bd-fig{background:var(--stage);border:1px solid var(--line);border-radius:10px;padding:8px}
+  .bd-fig .cl-svg{max-width:none}
+  .bd-count{font:700 1.6rem var(--mono);margin:8px 0 0;min-height:2.2rem;text-align:center}
+  .bd-item{border-left:6px solid var(--line);padding:6px 0 6px 16px;margin:0 0 14px;color:var(--muted)}
+  .bd-item.on{border-left-color:var(--accent);color:var(--ink)}
+  .bd-item h2{margin:0;font-size:1.05rem;font-weight:600;color:var(--muted)}
+  .bd-write{font-size:2.1rem;line-height:1.5;margin:0}
+  .bd-blank{display:inline-block;min-width:3.6em;border-bottom:4px solid var(--ink);text-align:center;color:transparent;padding:0 6px}
+  .bd-blank.on{color:var(--accent);font-weight:700}
+  .bd-steps{margin:0;padding:0;list-style:none}.bd-steps li{font-size:1.5rem;margin:.35rem 0}
+  .bd-bar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+  .bd-bar button{font:inherit;font-size:1.1rem;padding:10px 22px;border-radius:10px;border:2px solid var(--accent);background:var(--surface);color:var(--ink);cursor:pointer;min-height:48px}
+  .bd-bar button.primary{background:var(--accent);color:#fff}.bd-bar button:disabled{opacity:.4;cursor:default}
+  .small{font-size:.9rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="bd">
+  <a class="back" href="../index.html">&larr; Chemistry</a>
+  <h1>Electron Configurations I</h1>
+  <p class="small">Board page. Press Forward and the next blank fills, or write it yourself. Nothing here is sent anywhere.</p>
+  <div class="bd-bar" role="group" aria-label="Board controls">
+    <button id="bk" type="button">&larr; Back</button><button id="fw" class="primary" type="button">Forward &rarr;</button><button id="rs" type="button">Start over</button>
+  </div>
+  <div class="bd-grid">
+    <div><div class="bd-fig" id="fig"></div><p class="bd-count" id="count" aria-live="polite"></p></div>
+    <div id="items"></div>
+  </div>
+</div>
+<script src="../shared/energy-ladder.js"></script>
+<script src="day-cards/slot-09.content.js"></script>
+<script src="electron-config-1.spec.js"></script>
+<script>
+(function () {
+  'use strict';
+  var SP = window.SPECS['electron-config-1'], C = SP.content, L = SP.ladder, R = C.board.reveal, M1 = C.models[0], f15 = C.fill(M1.Z);
+  var $ = function (id) { return document.getElementById(id); };
+  /* one press of Forward = one step. Items 1 to 3: one blank each. Item 4 (phosphorus): the six moves of M1, with move 3 split so the
+     electrons-left counter runs 15, 13, 11, 5, 3, 0 as each subshell fills. */
+  var steps = [];
+  R.forEach(function (it, i) {
+    if (i < R.length - 1) { var n = (it.write.match(/\[\[/g) || []).length; for (var k = 1; k <= n; k++) steps.push({ item: i, blanks: k }); }
+    else { for (var m = 1; m <= 6; m++) { if (m === 3) { for (var s = 1; s <= f15.length; s++) steps.push({ item: i, move: 3, sub: s }); } else steps.push({ item: i, move: m, sub: m > 3 ? f15.length : 0 }); } }
+  });
+  var at = -1;
+
+  function blanksHtml(text, shown) {
+    var k = 0; return text.replace(/\[\[(.+?)\]\]/g, function (_, w) { k++; return '<span class="bd-blank' + (k <= shown ? ' on' : '') + '">' + w + '</span>'; });
+  }
+  function occ(upto) {   // phosphorus filled through the first `upto` subshells
+    var o = {}; C.ORDER.forEach(function (s) { o[s] = [0]; }); var full = C.occupancy(M1.Z);
+    C.ORDER.forEach(function (s) { o[s] = full[s].map(function () { return 0; }); });
+    for (var i = 0; i < upto; i++) o[f15[i][0]] = full[f15[i][0]];
+    return o;
+  }
+  function draw() {
+    var st = at >= 0 ? steps[at] : null, host = $('items'), left = null, sub = 0;
+    host.textContent = '';
+    R.forEach(function (it, i) {
+      var d = document.createElement('div'), on = !!st && st.item === i, past = !!st && st.item > i; d.className = 'bd-item' + (on ? ' on' : '');
+      var h = document.createElement('h2'); h.textContent = it.say; d.appendChild(h);
+      if (i < R.length - 1) {
+        var p = document.createElement('p'); p.className = 'bd-write'; p.innerHTML = blanksHtml(it.write, past ? 99 : on ? st.blanks : 0); d.appendChild(p);
+      } else if (on) {
+        var ul = document.createElement('ul'); ul.className = 'bd-steps';
+        M1.steps.forEach(function (s) { if (s.move < st.move || (s.move === st.move && (s.move !== 3 || st.sub === f15.length))) { var li = document.createElement('li'); li.textContent = s.text; ul.appendChild(li); } });
+        d.appendChild(ul);
+      }
+      host.appendChild(d);
+    });
+    if (st && st.item === R.length - 1) { sub = st.sub; left = M1.Z - f15.slice(0, sub).reduce(function (a, p) { return a + p[1]; }, 0); }
+    $('fig').innerHTML = L.svg(Object.assign({}, C.board.figure, { occupancy: occ(sub) }));
+    $('count').textContent = left == null ? '' : 'Electrons left: ' + left;
+    $('bk').disabled = at < 0; $('fw').disabled = at >= steps.length - 1;
+  }
+  $('fw').onclick = function () { if (at < steps.length - 1) { at++; draw(); } };
+  $('bk').onclick = function () { if (at >= 0) { at--; draw(); } };
+  $('rs').onclick = function () { at = -1; draw(); };
+  document.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'PageDown') $('fw').click(); else if (e.key === 'ArrowLeft' || e.key === 'PageUp') $('bk').click(); });
+  draw();
+})();
+</script>
+</body>
+</html>
