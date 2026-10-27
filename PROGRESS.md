@@ -21,7 +21,8 @@ Doubts for Ian:
 6. Two-answer items accept either order (engine); the card says lower then upper.
 7. Warm-up placement follows chem slot 9: band 2 only if all six are first try, else band 1.
 8. Flag 2 (Table tab in the Concepts panel) left as the kit default pending your decision. Gate rule and board ink are pending too.
-9. Not done: `tools/build-keys.mjs` (no `pdflatex` here), so no key PDFs; the board page is not linked from any hub.
+9. Added after review: the Concepts panel has a Calculator tab (invNorm; normalcdf from a value or z, with percentile) and a Table backward tutorial (`NK.boundaryTabs` in `boundary-kit.js`), ahead of the kit's Table, Routine and Example. This answers flag 2 the other way: the table stays, as a back-up to technology.
+10. Not done: `tools/build-keys.mjs` (no `pdflatex` here), so no key PDFs; the board page is not linked from any hub.
 
 ## 2026-10-27: Unit 3 slot 9, Electron Configurations I (first v2 chemistry lesson)
 
