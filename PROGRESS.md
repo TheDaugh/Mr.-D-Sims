@@ -2,6 +2,10 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-10-27: docs only, v3 day rules (branch docs/day-rules-v3)
+
+Added `docs/DAY-RULES.md`, a "Standard v3" section in `docs/LESSON-STANDARD.md`, and a "Supersedes" block in `CLAUDE.md`. No code, tests or templates changed. The clock itself (huddles at minute 3 and 25) is a separate code branch. Chem slot 9 and stats 3.6 are already on main from the earlier Day Cards and predate these rules.
+
 ## 2026-10-27: Opt-in v3 clock (huddle 1 at minute 3, huddle 2 at minute 25)
 
 Branch `feat/clock-v3`, not merged. A lesson opts in with `pacing: { budgetMin: 42, clock: 'v3' }`; lab days override with `huddles: [{key:'h1',atMin:3},{key:'h2',atMin:33}]`.

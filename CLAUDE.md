@@ -32,6 +32,7 @@ The e2e tests need `python3 -m http.server 8123` running from the repo root. `te
 - `physics/lessons/engine/`: the shared lesson engine, used by physics, chemistry and calculus lessons. `standard.js` builds every v2 tab from a spec.
 - `templates/<course>/`: the runnable examples that new lessons start from.
 - `tests/`: unit tests, template e2e, lock e2e, smoke. `portal/standards.json` maps skills to standards.
+- `docs/DAY-RULES.md`: the daily-materials rules and handoff (run of show, per-slot outputs, state of the build). Read it before building any new slot.
 
 ## Ian's standing decisions (do not reopen)
 
@@ -41,6 +42,15 @@ The e2e tests need `python3 -m http.server 8123` running from the repo root. `te
 - Lesson ends by the clock (42 minutes Mon-Thu, the whole period Friday), with endless practice before the mark.
 - Lab-report grading and feedback make no AI API calls: rubric and proficiency scales Ian clicks. Student records stay on Ian's device; students look up feedback by student ID.
 - Direction: experience first, formalize later. Day 1 is the online guided lesson (two days of material); practice and lab follow until the concepts hold. A formative check happens mid-lesson, not only in a JSON file at the end. `LESSON-STANDARD.md` does not yet describe the Day 1 / Day 2 split.
+
+## Supersedes (2026-10-27, Ian): new slots built from docs/DAY-RULES.md
+
+- Two huddle codes per day. Huddle 1 is called at minute 3, huddle 2 at minute 25; lab days may set huddle 2 later.
+- Placement warm-up is retired. Warm-up is at most 3 easy review items. Explore starts at band 1, rises with success and holds more items than the time allows.
+- No end-of-lesson stamp and no report code. The locally stored scores (`MrD.profile.record`) stay.
+- Three hidden bands, not four. They are a ramp to the regular-level standard, which every student completes. No AP content.
+- No lesson skipping or trimming. The 60% pacing rule and the fixed tab order do not apply to v3 lessons. Legacy lessons are untouched until rebuilt.
+- Where this block disagrees with the rest of this file or `docs/LESSON-STANDARD.md`, this block wins.
 
 ## Working rules
 
