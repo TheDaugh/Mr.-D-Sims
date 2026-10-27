@@ -95,6 +95,22 @@ New lessons start from a template (`templates/README.md`) and get all of the fol
 20. **Keys from one spec.** A lesson's teaching lives in `spec.js` (plain data). The page, the key PDFs and the tests all read it. `node tools/build-keys.mjs <spec>` writes `keys/<course>/<id>-makeup.pdf` (what an absent student copies into their notes; no personal time needed) and `-teacher.pdf` (outline and pacing, huddle script, every level with answers, common misconceptions). The teacher dashboard links both.
 21. **Teacher hub** is `teacher/index.html` (linked from the front page): codes, lock desk, live view, lessons with `#key` links and key PDFs, and the Student IDs tool.
 
+## Standard v3 (2026-10-27): the day, by the bell
+
+New slots follow `docs/DAY-RULES.md`. Where a v3 rule below disagrees with a v1/v2 rule above, v3 wins for a v3 lesson. Older lessons keep their v2 behavior until rebuilt.
+
+| v1/v2 rule | v3 replacement |
+|---|---|
+| 3. One huddle code per day | Two huddle codes: code 1 at the end of huddle 1, code 2 at the end of huddle 2. Still `MrD.codes`, never a local hash. |
+| 4, 9, 10. Stamp, stamp text, report code at the end | No stamp and no report code. Keep the locally stored scores (`MrD.profile.record`, saved on the student's device) for the portal. |
+| 13. Fixed tab order | The day follows the run of show: warm-up, huddle 1, explore, huddle 2, practice, exit ticket (a drawing on paper). |
+| 14. Warm-up places the student (up to 8 items) | Placement is retired. Warm-up is at most 3 easy review items with pictures, ending 3 minutes after the bell. Explore replaces placement: it starts at band 1, rises with success and holds more items than the time allows, so no student runs out before huddle 2. |
+| 16. Pace plan (60% rule, trimming) | No trimming and no skipped tabs. The two huddles are fixed by the clock. Lost time is lost; knowledge ramps during explore and after huddle 2. |
+| 17. Timed huddle at `atMin` | Huddle 1 at minute 3 (a hold screen while Mr. D talks), huddle 2 at minute 25 (the writable Huddle tab). A lab day sets huddle 2 later, after the data. |
+| Bands 1-4 | Three hidden bands, a ramp to the regular-level standard. The top band is the standard. No AP content. |
+
+Also v3: every student completes the regular-level standard; every term, picture and tool a student meets is introduced by Mr. D or by a tutorial of at most 60 seconds (at most two per day); every figure has a reading guide; Mr. D presents models and steps, the site carries the attempt and the hints. The sheet, data and test for each slot are produced under `docs/DAY-RULES.md`.
+
 ### Question extras (engine)
 A question may carry `pic` (an SVG or HTML string drawn before the prompt: picture first) and `remember` (a one-line concept reminder drawn under the prompt). Both are optional; no existing lesson uses them. A mixed review (stats 3.1 to 3.3) uses them with `SPEC.fade(q, band)`, which fades hints as a student's first-try answers climb.
 

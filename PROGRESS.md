@@ -2,6 +2,10 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-10-27: docs only, v3 day rules (branch docs/day-rules-v3)
+
+Added `docs/DAY-RULES.md`, a "Standard v3" section in `docs/LESSON-STANDARD.md`, and a "Supersedes" block in `CLAUDE.md`. No code, tests or templates changed. The clock itself (huddles at minute 3 and 25) is a separate code branch. Chem slot 9 and stats 3.6 are already on main from the earlier Day Cards and predate these rules.
+
 ## 2026-10-27: Unit 3 slot 11, stats 3.6 Finding Boundary Values (first v2 stats lesson from a Day Card)
 
 Built from `node tools/new-lesson.mjs stats 3-6-boundary-values ... --unit unit-3-normal-distribution`, wiring `day-cards/stats-11.card.md` and `stats-11.content.js`. Nothing in the content was rewritten.
