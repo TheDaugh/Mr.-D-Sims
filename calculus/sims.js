@@ -61,6 +61,26 @@ window.UNITS = [
     ]
   },
   {
+    id: "unit-3",
+    title: "Unit 3 · Composite, Implicit and Inverse Functions",
+    blurb: "Differentiating functions of functions, curves that are not functions, and inverses.",
+    entries: [
+      {
+        type: "lesson",
+        icon: "⛓️",
+        title: "3.1 The Chain Rule",
+        href: "unit-3-composite-implicit-inverse/3-1-chain-rule.html",
+        blurb: "Slide a point along a curve built from two functions, see the slope split into two links, then build the chain rule and show you own it.",
+        tags: ["chain rule", "adaptive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-3-composite-implicit-inverse/3-1-chain-rule.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/3-1-chain-rule-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/3-1-chain-rule-makeup.pdf" }
+        ]
+      }
+    ]
+  },
+  {
     id: "unit-6",
     title: "Unit 6 · Integration and Accumulation of Change",
     blurb: "Area as accumulated change, and how a Riemann sum closes in on the exact value.",
