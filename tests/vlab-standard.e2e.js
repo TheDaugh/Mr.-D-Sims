@@ -32,14 +32,14 @@ const check = (c, m) => { if (!c) { fails.push(m); console.log('FAIL ' + m); } e
       check(page.errors.length === 0, lab.name + ': no errors in #key' + page.errors.join('|')); await ctx.close(); }
     if (!lab.huddles) { const { ctx, page } = await open('', '2026-10-21T10:44:00-04:00'); await page.waitForSelector('#student'); await page.fill('#student', 'Clock Test'); await page.waitForTimeout(300); check(!(await page.locator('#dlgHuddle').count()) || !(await page.locator('#dlgHuddle').evaluate((d) => d.open)), lab.name + ': no huddle yet (legacy lab, listed in STANDARD.md)'); await ctx.close(); continue; }
     // the bell calls huddle 1 at minute 3 for a student who is still in the pre-lab
-    const inClass = lab.course === 'physics' ? ['2026-10-21T09:04:00-04:00', '2026-10-21T09:26:00-04:00'] : ['2026-10-21T10:44:00-04:00', '2026-10-21T11:06:00-04:00'];
+    const inClass = lab.course === 'physics' ? ['2026-10-21T09:04:00-04:00', '2026-10-21T09:29:00-04:00'] : ['2026-10-21T10:44:00-04:00', '2026-10-21T11:14:00-04:00'];
     { const { ctx, page } = await open('', inClass[0]); await page.waitForSelector('#student'); await page.fill('#student', 'Clock Test'); await page.click('button:has-text("Start the pre-lab")').catch(() => {});
       await page.waitForFunction(() => document.querySelector('#dlgHuddle') && document.querySelector('#dlgHuddle').open, null, { timeout: 9000 }).catch(() => {});
       check(await page.evaluate(() => !!(document.querySelector('#dlgHuddle') || {}).open), lab.name + ': the bell calls huddle 1 at minute 3'); await ctx.close(); }
     { const { ctx, page } = await open('', inClass[1]); await page.waitForSelector('#student'); await page.fill('#student', 'Clock Test'); await page.click('button:has-text("Start the pre-lab")').catch(() => {}); await page.waitForTimeout(400);
       await page.evaluate(() => { __vl.S.flame.huddle1 = true; __vl.S.flame.forced1 = true; __vl.S.stage = 'lab'; document.querySelectorAll('dialog[open]').forEach((d) => d.close()); });
       await page.waitForFunction(() => document.querySelector('#dlgHuddle') && document.querySelector('#dlgHuddle').open, null, { timeout: 9000 }).catch(() => {});
-      check(await page.evaluate(() => !!(document.querySelector('#dlgHuddle') || {}).open), lab.name + ': the bell calls huddle 2 at minute 25 whatever time the student started'); await ctx.close(); }
+      check(await page.evaluate(() => !!(document.querySelector('#dlgHuddle') || {}).open), lab.name + ': the bell calls huddle 2 at its minute (25 by default; flame 33, fan cart 28 from their sheets) whatever time the student started'); await ctx.close(); }
   }
   await browser.close(); console.log(fails.length ? '\n' + fails.length + ' FAILED' : '\nall passed'); process.exit(fails.length ? 1 : 0);
 })();
