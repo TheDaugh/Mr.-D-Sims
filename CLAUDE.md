@@ -26,6 +26,16 @@ PLAYWRIGHT_DIR=/opt/node-tools/node_modules/playwright node tests/smoke.js
 
 The e2e tests need `python3 -m http.server 8123` running from the repo root. `tests/README.md` has every command. `tools/build-keys.mjs` needs `pdflatex`. Report what ran and what it printed; do not report a check you did not run.
 
+## Before you say a virtual lab is done
+
+A lab Ian cannot find is not done. Besides its own tests, a new lab in `chemistry/virtual-lab` needs all of these:
+
+- A `LABS` entry in `src/ui/app.js` and a file in `content/labs/`.
+- **A card in the hub list `chemistry/labs.js`** (and a row in `teacher/index.html` if Ian uses it). Without this the lab has no button on the site.
+- A target in `tests/lock.e2e.js` (run it with `TZ=America/New_York`), a line in `PLAN.md`, and a `PROGRESS.md` entry.
+- `cd chemistry/virtual-lab && npm test`, plus the lab's own e2e and `node tests/smoke.js`.
+- **It is live only when the branch is merged to `main`** (Netlify deploys `main` only). Never merge without Ian's say-so; end your message by saying it is not on the site until he merges, and give the direct URL (`chemistry/virtual-lab/index.html?lab=<id>`).
+
 ## Where things live
 
 - `shared/`: the clock (`bell.js`), codes (`codes.js`), IDs, pacing, locked mode (`lock.js`), notes, profile, hub, live client. `shared/lessons.js` is the registry; every lesson needs a line there.
