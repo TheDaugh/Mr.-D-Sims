@@ -1,0 +1,32 @@
+<section id="lewis" data-transition="fade" style="background:#12202B;color:#F6F4EE;font-family:'DM Sans', Arial, sans-serif;padding:88px 96px 128px;display:flex;flex-direction:column;justify-content:flex-start;gap:20px">
+<p style="font-size:48px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#6FD0CA">Name it · Lewis dots</p>
+<h2 style="font-size:104px;font-weight:700;line-height:1.1">Dots show valence electrons</h2>
+<x-embed style="position:absolute;left:96px;top:300px;width:1728px;height:650px"><!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;height:100%;background:transparent;font-family:Arial,Helvetica,sans-serif;color:#F6F4EE;overflow:hidden}
+#w{display:flex;gap:80px;height:100%;align-items:center}
+#bx{position:relative;width:554px;height:554px;border:3px solid #7E97A5;border-radius:36px;flex:none}
+#sy{position:absolute;left:0;right:0;top:130px;text-align:center;font:700 250px/290px Arial,sans-serif}
+.d{position:absolute;width:48px;height:48px;border-radius:24px;background:#F2B544;opacity:0;transform:scale(.3);transition:opacity .25s,transform .25s}
+.d.on{opacity:1;transform:scale(1)}
+#R{flex:1;display:flex;flex-direction:column;gap:20px}
+#nm{font:700 84px Arial,sans-serif}
+#cf{font:700 110px 'Courier New',monospace;color:#6FD0CA}
+sup{font-size:.62em;line-height:0;vertical-align:.5em}
+#cn{font:700 84px Arial,sans-serif;color:#F2B544}
+#st{display:flex;gap:12px;margin-top:26px}
+.ch{width:96px;height:96px;border:3px solid #5C7380;border-radius:16px;font:700 48px/90px Arial,sans-serif;text-align:center;color:#DCE6EA}
+.ch.on{background:#F2B544;border-color:#F2B544;color:#12202B}
+</style></head><body><div id="pr" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;align-items:center;justify-content:center;background:#12202B;color:#F2B544;font:700 88px/1.2 Arial,sans-serif;text-align:center;padding:0 80px;z-index:5">How many dots does phosphorus get, and where? Decide now.</div><div id="w"><div id="bx"><div id="sy"></div></div><div id="R"><div id="nm"></div><div id="cf"></div><div id="cn"></div><div id="st"></div></div></div><script>
+var D=[['Na','sodium','3s<sup>1</sup>',1],['Mg','magnesium','3s<sup>2</sup>',2],['Al','aluminum','3s<sup>2</sup>3p<sup>1</sup>',3],['Si','silicon','3s<sup>2</sup>3p<sup>2</sup>',4],['P','phosphorus','3s<sup>2</sup>3p<sup>3</sup>',5],['S','sulfur','3s<sup>2</sup>3p<sup>4</sup>',6],['Cl','chlorine','3s<sup>2</sup>3p<sup>5</sup>',7],['Ar','argon','3s<sup>2</sup>3p<sup>6</sup>',8]],
+P=[[195,26],[311,26],[480,195],[311,480],[26,311],[480,311],[195,480],[26,195]],T=[],$=function(i){return document.getElementById(i)},bx=$('bx'),dots=[],st=$('st');
+P.forEach(function(p){var d=document.createElement('div');d.className='d';d.style.left=p[0]+'px';d.style.top=p[1]+'px';bx.appendChild(d);dots.push(d)});
+D.forEach(function(d){var c=document.createElement('div');c.className='ch';c.textContent=d[0];st.appendChild(c)});
+function show(i){var d=D[i];$('sy').textContent=d[0];$('nm').textContent=d[1];$('cf').innerHTML=d[2];$('cn').textContent=d[3]+(d[3]==1?' valence electron':' valence electrons');dots.forEach(function(x){x.className='d'});[].forEach.call(st.children,function(c,j){c.className='ch'+(j==i?' on':'')});
+for(var k=0;k<d[3];k++)(function(k){T.push(setTimeout(function(){dots[k].className='d on'},500+380*k))})(k)}
+function run(){T.forEach(clearTimeout);T=[];D.forEach(function(d,i){T.push(setTimeout(function(){show(i)},i*3700))});T.push(setTimeout(run,8*3700+2000))}
+function stop(){T.forEach(clearTimeout);T=[];dots.forEach(function(x){x.className='d'})}
+var G,HOLD=8000;function gate(){clearTimeout(G);var p=document.getElementById('pr');p.style.display='flex';G=setTimeout(function(){p.style.display='none';run()},HOLD)}var _s=stop;stop=function(){clearTimeout(G);document.getElementById('pr').style.display='none';_s()};if('IntersectionObserver' in window){new IntersectionObserver(function(a){a[0].isIntersecting?gate():stop()}).observe(document.body)}else gate();
+</script></body></html></x-embed>
+<p style="position:absolute;right:96px;bottom:44px;font-size:40px;font-weight:700;color:#9FB2BC">11 / 26</p>
+<aside>Predict on the sheet first: how many dots does phosphorus get, and where do they go? The animation walks across period 3 from sodium to argon, one element every few seconds, and each dot lands in the same order: the s pair on top, then the p dots go right, bottom, left one at a time, and only after those three singles do p dots pair up (sulfur is the first to pair). Tie the dot count to the valence configuration in teal. Only valence electrons get dots; the core stays out. Teachers differ on where the s pair sits; here it is on top. Brackets and charges for ions wait until the ionic formulas lesson.</aside>
+</section>

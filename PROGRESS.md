@@ -172,3 +172,7 @@ Built from `docs/slot-07/` (the sheet's three JSON files and the content test ar
 - Day rules: hold screen forced at minute 3, huddle 2 at minute 28 with blanks, code 2 never blocked by the record, no stamp or report code, `MrD.profile.record` kept, three hidden bands, three-hint ladder, predictions logged and locked.
 - Judgment calls for Ian: huddle 2's third blank and W3 contain 1/m, so they appear only once code 2 is entered; generated Checks problems have no hints in the sheet, so they borrow the bank item's hints 1 and 3 and template hint 2; bars 0 on setting 4 would roll past the 2 m rail (the picture stops the cart; the sheet never asks for it); flame lab still uses legacy `gate()` so its two codes are equal.
 - Paper fallback: `physics/virtual-lab/fan-cart-paper.html`. `slot-07.sheet.pdf` was not attached and pdflatex is not installed, so only the `.tex` is in `docs/slot-07/`.
+
+## 2026-10-28: shared slides exemplar (chem Unit 3, slot 10), branch `shared-slides-exemplar`
+
+Added `shared-slides/` with `README.md`, `WORKFLOW.md` and the first exemplar `chem-unit3-lesson10/` (26-slide Claude Slides deck, 2-page notes sheet with key and `.tex`, formula font). Not part of the site and not linked anywhere; nothing here is live until Ian merges. Open for Ian: the three Stretch items and the "why does 4s leave first" question conflict with the no-extension rule and the regular-level standard; "isoelectronic" appears only in speaker notes.

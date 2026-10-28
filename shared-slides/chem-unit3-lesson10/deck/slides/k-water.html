@@ -1,0 +1,28 @@
+<section id="k-water" data-transition="fade" style="background:#12202B;color:#F6F4EE;font-family:'DM Sans', Arial, sans-serif;padding:88px 96px 128px;display:flex;flex-direction:column;justify-content:flex-start;gap:20px">
+<p style="font-size:48px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#6FD0CA">Real life · side by side</p>
+<h2 style="font-size:96px;font-weight:700;line-height:1.1;width:1700px">Same element. Two particles.</h2>
+<x-embed style="position:absolute;left:96px;top:290px;width:1728px;height:660px"><!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:transparent;overflow:hidden"><canvas id="c" width="1728" height="660" style="display:block"></canvas><script>
+var cv=document.getElementById('c'),x=cv.getContext('2d'),P=11000,t0=0,pt=0,bub=[],ions=[],raf=0,i;
+for(i=0;i<16;i++)ions.push({x:910+Math.random()*760,y:350+Math.random()*190,vx:(Math.random()-.5)*.8,vy:(Math.random()-.5)*.8});
+function lab(parts,cx,y,sz,col){x.font='700 '+sz+'px Arial';var w=0,k;for(k=0;k<parts.length;k++){x.font='700 '+(parts[k][1]?sz*.62:sz)+'px Arial';w+=x.measureText(parts[k][0]).width}var px=cx-w/2;x.fillStyle=col;for(k=0;k<parts.length;k++){x.font='700 '+(parts[k][1]?sz*.62:sz)+'px Arial';x.fillText(parts[k][0],px,y-(parts[k][1]?sz*.38:0));px+=x.measureText(parts[k][0]).width}}
+function water(l,col){x.fillStyle=col;x.fillRect(l,300,816,270);x.strokeStyle='#7E97A5';x.lineWidth=6;x.beginPath();x.moveTo(l,120);x.lineTo(l,570);x.lineTo(l+816,570);x.lineTo(l+816,120);x.stroke()}
+function frame(now){raf=requestAnimationFrame(frame);if(!t0)t0=now;var t=(now-t0)%P;if(t<pt){bub=[]}pt=t;x.clearRect(0,0,1728,660);
+water(24,'#1E5C7A');water(888,'#2A6A64');x.textAlign='left';
+x.textAlign='left';lab([['Potassium metal',0]],432,70,56,'#F2B544');lab([['Potassium in a banana',0]],1296,70,56,'#6FD0CA');
+var bx=432,s=1,top;
+if(t<1200){top=100+120*Math.pow(t/1200,2)}else{top=222;var u=t-1200;bx=432+150*Math.sin(u/240)*Math.exp(-u/5000);s=1-Math.min(1,Math.max(0,(t-1500)/5200))}
+if(s>0.02){var w=110*s,h=80*s,bt=t<1200?top:300-h*.7;var g=x.createLinearGradient(0,bt,0,bt+h);g.addColorStop(0,'#F6F4EE');g.addColorStop(1,'#9FB2BC');x.fillStyle=g;x.fillRect(bx-w/2,bt,w,h)}
+if(t>1200&&t<6700){if(Math.random()<.7)bub.push({x:bx+(Math.random()-.5)*90,y:340+Math.random()*60,r:6+Math.random()*9,v:1.4+Math.random()*1.6})}
+for(i=bub.length-1;i>=0;i--){var b=bub[i];b.y-=b.v;if(b.y<306){bub.splice(i,1);continue}x.fillStyle='rgba(220,230,234,.75)';x.beginPath();x.arc(b.x,b.y,b.r,0,6.283);x.fill()}
+if(t>2200&&t<6700&&s>0.05){var f=Math.random()*14;x.fillStyle='rgba(183,156,255,.85)';x.beginPath();x.ellipse(bx,300-60*s-10,26+f,44+f*2,0,0,6.283);x.fill();x.fillStyle='rgba(235,225,255,.9)';x.beginPath();x.ellipse(bx,300-60*s-4,12,22+f,0,0,6.283);x.fill()}
+if(t>4300&&t<4800){var q=(t-4300)/500;x.fillStyle='rgba(255,255,255,'+(1-q)+')';x.beginPath();x.arc(bx,285,20+150*q,0,6.283);x.fill()}
+for(i=0;i<ions.length;i++){var n=ions[i];n.x+=n.vx;n.y+=n.vy;if(n.x<920||n.x>1660)n.vx=-n.vx;if(n.y<340||n.y>540)n.vy=-n.vy;x.fillStyle='#6FD0CA';x.beginPath();x.arc(n.x,n.y,24,0,6.283);x.fill();x.fillStyle='#12202B';x.font='700 34px Arial';x.fillText('+',n.x-10,n.y+12)}
+lab([['K  [Ar]4s',0],['1',1]],432,620,52,'#F2B544');lab([['K',0],['+',1],['  [Ar]',0]],1296,620,52,'#6FD0CA');
+if(t>7000){x.globalAlpha=Math.min(1,(t-7000)/600);lab([['Gives up the electron fast',0]],432,200,48,'#F6F4EE');x.globalAlpha=1}
+x.globalAlpha=1}
+function go(){cancelAnimationFrame(raf);t0=0;pt=0;bub=[];raf=requestAnimationFrame(frame)}function halt(){cancelAnimationFrame(raf);x.clearRect(0,0,1728,660)}
+if('IntersectionObserver' in window){new IntersectionObserver(function(a){a[0].isIntersecting?go():halt()}).observe(document.body)}else go();
+</script></body></html></x-embed>
+<p style="position:absolute;right:96px;bottom:44px;font-size:40px;font-weight:700;color:#9FB2BC">21 / 26</p>
+<aside>This is a schematic, not footage: a silver block of potassium skitters on water, hydrogen bubbles rise, a lilac flame flickers, and there is a pop. On the right, potassium ions float in banana water and nothing happens. If you want the real thing, drop a short clip of the demo onto this slide and keep this animation for the labels. Ask first: what is different about the particle on the left? Then click forward to the banana answer.</aside>
+</section>
