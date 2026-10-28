@@ -77,6 +77,15 @@ window.UNITS = [
         tags: ["beta", "Rutherford", "nuclear atom", "CER"]
       },
       {
+        title: "Virtual Lab: Flame Tests (BETA)",
+        type: "lab",
+        icon: "🔥",
+        href: "virtual-lab/index.html?lab=flame",
+        blurb: "Test seven salts in a flame, record the colors, then name two unknown salts. Use the spectroscope when two colors match.",
+        tags: ["beta", "flame test", "spectroscope", "CER"],
+        teacher: [{ label: "Paper version (print)", href: "virtual-lab/flame-explore.html" }]
+      },
+      {
         title: "Counting Particles: Atoms, Ions, Isotopes",
         type: "lesson",
         day: 4,
