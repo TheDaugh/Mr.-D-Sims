@@ -47,8 +47,7 @@ await page.fill("#huddleCode", "0000"); await page.click("#huddleGo"); check((aw
 const code = await vl(() => MrD.codes.gate("flame-tests", "h1")); check(code === (await vl(() => MrD.codes.huddle())), "huddle 1 code is the one daily code");
 await page.fill("#huddleCode", code); await page.click("#huddleGo"); await page.waitForFunction(() => !document.querySelector("#dlgHuddle").open);
 check(await vl(() => __vl.S.stage) === "lab", "code 1 opens the lab");
-check(await page.locator("#stepCard").isVisible(), "the step card is on screen"); check((await page.locator("#stepCard li").count()) === 8, "step card has the sheet's 8 steps");
-check((await page.locator("#stepCard li").allInnerTexts()).join("|") === lab.stepCard.steps.join("|"), "step card wording matches");
+check(await page.locator("#stepCard").count() === 0, "no step card panel takes up the screen");
 
 // ---- suit up, walk to the bench
 check(await vl(() => __vl.S.view) === "room", "starts in the room");
@@ -78,7 +77,6 @@ const nUnk = await vl(() => { __vl.fl.ensureUnknowns(); return __vl.fl.unlocked(
 
 // ---- notebook: record every salt
 await page.click("#flNb"); await page.waitForSelector("#flSheet table.ftab");
-check(await page.locator("#flSheet .stepcard, #flSheet details").count() >= 1, "the step card is in the notebook too");
 for (const s of data.samples) {
   const row = page.locator(`#flSheet tr[data-sample="${s.id}"]`), sel = row.locator("select");
   await sel.nth(0).selectOption(s.flame.colorGroup); await page.locator(`#flSheet tr[data-sample="${s.id}"] select`).nth(1).selectOption(s.flame.brightness);

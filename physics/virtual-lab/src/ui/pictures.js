@@ -1,5 +1,5 @@
 // Small SVG pictures for the pre-lab and the Checks tab. Drawn in code, no images.
-import { h } from "../../../../chemistry/virtual-lab/src/ui/dom.js";
+import { h } from "../../../../shared/virtual-lab/dom.js";
 
 export const svg = (inner, w = 320, hgt = 150, label = "") => { const d = h("div", { class: "pic" }); d.innerHTML = `<svg viewBox="0 0 ${w} ${hgt}" width="${w}" role="img" aria-label="${label}" style="max-width:100%;height:auto">${inner}</svg>`; return d; };
 const T = (s, x, y, a = "middle", sz = 12) => `<text x="${x}" y="${y}" text-anchor="${a}" font-size="${sz}" font-family="system-ui,sans-serif" fill="currentColor">${s}</text>`;

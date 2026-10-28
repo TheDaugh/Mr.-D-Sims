@@ -240,3 +240,7 @@ Every action appends one small JSON event. The log is the grading record, the te
 - Flow: intro, pre-lab (door shut), huddle 1 code, lab (11 quests, step card always on screen), CER, huddle 2 code (accepted only with a complete record), done. No stamp, badge, report code or board.
 - `flame-explore.html` is the paper fallback (swatch row, step card, record table, spectrum picture, card of colors and line positions). It prints from the same data.
 - Tests: `test/flame.test.js` (engine), `test/flame-words.test.js` (word rule), `test/slot-08-content.test.cjs` (the sheet's own test), `test/flame.e2e.js` (a whole period in Chromium; needs `python3 -m http.server 8123`).
+
+## Shared virtual lab folder
+- Generic engine, stage and UI moved to `shared/virtual-lab/` (see `STANDARD.md` there): `clock.js` (the global huddle clock), `quests.js`, `room.js`, `hazards.js`, `active.js`, `integrity.js`, `log.js`, `mode.js`, `dom.js`, `fit.js`, `guide.js`, `chest.js`, `roomview.js`, `icons.js`, `badge.js`, `stage.css`. Every import was rewritten; `app.js` stays here as the host.
+- `#key` is now a creative mode in every lab, and the hash change restarts an open page. The bell calls huddle 1 at minute 3 and huddle 2 at minute 25 in labs with huddles (4 and 5); the fan cart's own clock watcher is gone.

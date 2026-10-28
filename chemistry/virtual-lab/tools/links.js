@@ -1,7 +1,7 @@
 // Usage: node tools/links.js <teacher-code> [base-url]
 // Writes content/config.json (hashes only, safe to commit) and prints one link per mode.
 import { writeFileSync } from "node:fs";
-import { makeSig, sha256Hex } from "../src/mode.js";
+import { makeSig, sha256Hex } from "../../../shared/virtual-lab/mode.js";
 const [code, base = "https://thedaugh.github.io/Mr.-D-Sims/chemistry/virtual-lab/index.html"] = process.argv.slice(2);
 if (!code) { console.error("Give a teacher code: node tools/links.js <code>"); process.exit(1); }
 const verifiers = {}, links = { guided: base };

@@ -1,7 +1,7 @@
 // The atom microscope: real Coulomb forces on alpha particles, drawn the way PhET draws them (black field, dashed electron levels, magenta traces).
 // Everything is computed, not scripted: each alpha is pushed by 2Z·1.44 MeV·fm / r² from the nucleus (or by the pudding's harmonic force), and
 // the angle you see is the angle the integrator produced. engine/coulomb.js checks that against Rutherford's formula.
-import { h } from "./dom.js";
+import { h } from "../../../../shared/virtual-lab/dom.js";
 import { ELEMENTS, closestApproach, nuclearRadius, thetaFromB, speed, wavelengthFm, accel, stepAlpha, forceMeVFm, MEV_FM_TO_N } from "../engine/coulomb.js";
 
 export const newScope = () => ({ model: "nuc", scale: "nuclear", Z: 79, N: 118, E: 5, traces: true, forces: true });

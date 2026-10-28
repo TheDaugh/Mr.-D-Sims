@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { makeSig, sha256Hex, resolveMode } from "../src/mode.js";
-import { validateHazards } from "../src/engine/hazards.js";
+import { makeSig, sha256Hex, resolveMode } from "../../../shared/virtual-lab/mode.js";
+import { validateHazards } from "../../../shared/virtual-lab/hazards.js";
 
 const J = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url)));
 test("hazard data is complete and every treatment station exists in the room", () => {

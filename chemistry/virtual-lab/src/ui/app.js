@@ -1,10 +1,10 @@
 // Bench + lab sheet for Lab 1. Chemistry comes from the engine and content files, never from this file.
 import { buildWorld, newContainer, add, advance, heat, conductivity, describe, dissolvedGrams, massAccounting } from "../engine/sim.js";
 import { fingerprint } from "../engine/lab1.js";
-import { Log, downloadJSON } from "../log.js";
+import { Log, downloadJSON } from "../../../../shared/virtual-lab/log.js";
 import { createRenderer, SLOTS } from "./render.js";
-import { createRoomRenderer } from "./roomview.js";
-import { $, h, mulberry32 } from "./dom.js";
+import { createRoomRenderer } from "../../../../shared/virtual-lab/roomview.js";
+import { $, h, mulberry32 } from "../../../../shared/virtual-lab/dom.js";
 import { createMicroView } from "./micro.js";
 import { microModel, legend } from "../engine/micro.js";
 import { renderIntro, renderPrelab, renderCER, renderCERHeat, renderCERScatter, theoryNodes } from "./stages.js";
@@ -15,18 +15,19 @@ import { profile, stateAt, reading, assign } from "../engine/heating.js";
 import { runDemo } from "./demo.js";
 import { createFlame, newFlame, fixFlame } from "./flame.js";
 import * as FE from "../engine/flame.js";
-import { questDone, questProgress } from "../engine/quests.js";
-import { drawIcon } from "./icons.js";
-import { fitStage } from "./fit.js";
-import { createGuide } from "./guide.js";
-import { createChest } from "./chest.js";
-import { createActive } from "../engine/active.js";
-import { checkCode } from "../engine/integrity.js";
-import { drawBadge } from "./badge.js";
+import { huddleDue, huddleTimes } from "../../../../shared/virtual-lab/clock.js";
+import { questDone, questProgress } from "../../../../shared/virtual-lab/quests.js";
+import { drawIcon } from "../../../../shared/virtual-lab/icons.js";
+import { fitStage } from "../../../../shared/virtual-lab/fit.js";
+import { createGuide } from "../../../../shared/virtual-lab/guide.js";
+import { createChest } from "../../../../shared/virtual-lab/chest.js";
+import { createActive } from "../../../../shared/virtual-lab/active.js";
+import { checkCode } from "../../../../shared/virtual-lab/integrity.js";
+import { drawBadge } from "../../../../shared/virtual-lab/badge.js";
 import { buildReport } from "../report.js";
-import { resolveMode } from "../mode.js";
-import { indexHazards, losePoints } from "../engine/hazards.js";
-import { parseRoom, step, facingTile, hasPPE, tileAt } from "../engine/room.js";
+import { resolveMode } from "../../../../shared/virtual-lab/mode.js";
+import { indexHazards, losePoints } from "../../../../shared/virtual-lab/hazards.js";
+import { parseRoom, step, facingTile, hasPPE, tileAt } from "../../../../shared/virtual-lab/room.js";
 
 const FIT = fitStage($("#stage"));
 let CAP = 10;
@@ -454,8 +455,8 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   const scat = SCAT ? createScatter({ lab, S, log, say, seed, onChange: () => { if (ready) { renderQuests(); autosave(); } }, onFinish: () => finishData() }) : null;
   if (SCAT) $("#sheet").replaceChildren(h("button", { class: "x", "data-close": "" }, "Close ✕"), h("h2", {}, "Foil apparatus and notebook"), h("details", {}, h("summary", {}, h("b", {}, "Steps")), h("ol", {}, lab.introSteps.map((t) => h("li", {}, t)))), scat.el);
   if (FL) { $("#sheet").replaceChildren(fl.sheet); $("#btnTheory").hidden = true; $("#btnDemo").hidden = !!lab.noDemo;
-    if (KIND) { $("#btnMicro").hidden = true; $("#ppe").hidden = true; $("#modeLine").hidden = true; } else { $("#btnMicro").textContent = "🔭 Spectroscope"; $("#btnMicro").title = "Spectroscope (M)"; $("#ppe").hidden = false; }
-    $("#stepCard").hidden = false; $("#stepCard").replaceChildren(h("h3", {}, lab.stepCard.title), h("ol", {}, lab.stepCard.steps.map((t) => h("li", {}, t)))); }
+    if (KIND) { $("#btnMicro").hidden = true; $("#ppe").hidden = true; $("#modeLine").hidden = true; } else { $("#btnMicro").textContent = "🔭 Spectroscope"; $("#btnMicro").title = "Spectroscope (M)"; $("#ppe").hidden = false; } }
+
   const flStageOk = () => ["lab", "postlab", "done"].includes(S.stage) || S.demo;
   function openFlNb(t) { if (!flStageOk() || (KIND && !fl.canOpen())) return; if (!dlg("dlgNotebook").open) log.add("notebook_open", { tab: t }); fl.showTab(t || "table"); openDlg("dlgNotebook"); }
   function openSpec() { if (!flStageOk()) return; const f = S.flame; if (f.last) log.add("spec_open", { sample: f.last.label || f.last.sample }); if (f.last && !f.tut2) { f.tut2 = true; log.add("tut2_open"); fl.tutorial2(); } else openFlNb("spec"); autosave(); renderQuests(); }
@@ -629,7 +630,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   // and off with #nolock=<code> from the lock desk. Fullscreen starts from the click that leaves the intro. A saved lab
   // that is reopened (page closed, or a new day) meets a gate first: a code if the page was closed, a Continue button otherwise.
   let lockArmed = false, lockGateEl = null;
-  const lockClockOn = () => !!window.LessonLock && !TEACHER && !(FL && isKey()) && (/nolock=(\d+)/.exec(location.hash) || [])[1] !== LessonLock.offCode() && !!MrD.bell.clock(COURSE).lockOn;
+  const lockClockOn = () => !!window.LessonLock && !TEACHER && !isKey() && (/nolock=(\d+)/.exec(location.hash) || [])[1] !== LessonLock.offCode() && !!MrD.bell.clock(COURSE).lockOn;
   const lockWanted = () => lockClockOn() && !!(S.student || "").trim() && !S.cerDone && S.stage !== "done";
   function lockChip() {
     let c = $("#lockchip");
@@ -824,7 +825,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     onDemo: () => demoStart(),
     onIntroDone: (name) => { S.student = name; lockStart(() => { S.stage = "prelab"; log.add("stage", { to: "prelab", name }); closeDlg("dlgIntro"); drawPrelab(); openDlg("dlgPrelab"); }); },
     onAnswer: (id, choice, correct) => log.add("prelab_answer", { q: id, choice, correct }),
-    onPrelabDone: () => { if (FL) { S.stage = KIND && S.flame.huddle1 ? "lab" : "huddle1"; log.add("prelab_done", { prediction: S.prelab.prediction }); closeDlg("dlgPrelab"); renderQuests(); return S.stage === "lab" ? say(fl.text("huddle1Done"), "obs") : openHuddle(1); } S.stage = "lab"; log.add("prelab_done", { prediction: S.prelab.prediction, placement: S.prelab.placement }); closeDlg("dlgPrelab"); renderQuests(); say(NOPPE ? "Pre-lab done. The dark-room curtain is open." : "Pre-lab done. The lab door will open once you have goggles and an apron."); },
+    onPrelabDone: () => { if (FL) { S.stage = S.flame.huddle1 ? "lab" : "huddle1"; log.add("prelab_done", { prediction: S.prelab.prediction }); closeDlg("dlgPrelab"); renderQuests(); return S.stage === "lab" ? say(KIND ? fl.text("huddle1Done") : "Huddle 1 is done. Start at the locker.", "obs") : openHuddle(1); } S.stage = "lab"; log.add("prelab_done", { prediction: S.prelab.prediction, placement: S.prelab.placement }); closeDlg("dlgPrelab"); renderQuests(); say(NOPPE ? "Pre-lab done. The dark-room curtain is open." : "Pre-lab done. The lab door will open once you have goggles and an apron."); },
     onCerDone: (c) => { if (FL) { S.cer = c; S.cerDone = true; S.flame.cerDone = true; log.add("cer", c); closeDlg("dlgCER"); say("Claim, evidence and reasoning saved.", "obs"); renderQuests(); autosave(); if (S.flame.huddle2) finishFlame(); return; } if (!gateOk()) return showGate(); S.cer = c; S.cerDone = true; S.stage = "done"; log.add("cer", c); closeDlg("dlgCER"); lockFinish(); openDone(); },
     onCerClose: () => closeDlg("dlgCER"), onFinish: () => finishData()
   };
@@ -841,7 +842,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   function openHuddle(n) {
     const U = lab.ui, box = $("#huddleBody"), clock = window.MrD && MrD.bell ? MrD.bell.clock(COURSE) : { gates: true }, code = window.MrD && MrD.codes ? (KIND && MrD.codes.gateV3 ? MrD.codes.gateV3(lab.id, "h" + n) : MrD.codes.gate(lab.id, "h" + n)) : "";   // a lab from another folder is a v3 day: two codes
     const finish = () => { S.flame["huddle" + n] = true; log.add("huddle", { n }); closeDlg("dlgHuddle"); renderQuests(); autosave();
-      if (n === 1) { S.stage = "lab"; renderQuests(); say(KIND ? fl.text("huddle1Done") : "Huddle 1 done. The step card is on the left. Start at the locker.", "obs"); } else if (KIND) say(fl.text("huddle2Done"), "obs"); else if (S.cerDone) finishFlame(); else { say("Huddle 2 code accepted. Write your claim, evidence and reasoning.", "obs"); openCER(); } };
+      if (n === 1) { const early = !KIND && S.stage === "prelab"; if (!early) S.stage = "lab"; renderQuests(); if (early) { drawPrelab(); openDlg("dlgPrelab"); return; } say(KIND ? fl.text("huddle1Done") : "Huddle 1 done. The step card is on the left. Start at the locker.", "obs"); } else if (KIND) say(fl.text("huddle2Done"), "obs"); else if (S.cerDone) finishFlame(); else { say("Huddle 2 code accepted. Write your claim, evidence and reasoning.", "obs"); openCER(); } };
     if (KIND) return fl.huddle(n, { box, code, gates: clock.gates, isKey: isKey(), finish, open: () => openDlg("dlgHuddle"), close: () => closeDlg("dlgHuddle"), dlg: dlg("dlgHuddle") });
     const title = h("h2", {}, n === 1 ? U.huddle1Title : U.huddle2Title);
     if (n === 2 && !fl.recordComplete() && !isKey()) { box.replaceChildren(title, h("p", {}, U.huddle2NotReady), h("div", { class: "controls" }, h("button", { class: "primary", onclick: () => closeDlg("dlgHuddle") }, U.closeWord))); return openDlg("dlgHuddle"); }
@@ -852,6 +853,15 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
       : !clock.gates ? [h("p", {}, n === 1 ? U.huddle1Text : U.huddle2Text), h("p", { class: "hint" }, U.codeNote), h("div", { class: "controls" }, h("button", { id: "huddleGo", class: "primary", onclick: finish }, U.codeGo))]
       : [h("p", {}, n === 1 ? U.huddle1Text : U.huddle2Text), h("label", {}, U.codeLabel + " ", inp), msg, h("div", { class: "controls" }, go, n === 2 ? h("button", { onclick: () => closeDlg("dlgHuddle") }, U.closeWord) : null)];
     box.replaceChildren(title, ...body); openDlg("dlgHuddle"); (inp.isConnected ? inp : box.querySelector("button")).focus();
+  }
+  // the global huddle clock (shared/virtual-lab/clock.js): called by the bell, not by when this student started
+  let hacc = 0; const HAT = huddleTimes({ clock: (KIND && fl.clock) || (lab.content && lab.content.clock) || lab.clock });
+  function huddleWatch(dt) {
+    hacc += dt; if (hacc < 1) return; hacc = 0;
+    if (!FL || isKey() || S.demo || S.incident || document.querySelector("#dlgHuddle[open]") || !window.MrD || !MrD.bell || !S.student) return;
+    const c = MrD.bell.clock(COURSE); if (!c.session) return;
+    const f = S.flame, due = huddleDue({ minutesIn: c.minutesIn, stage: S.stage, done: { 1: f.huddle1, 2: f.huddle2 }, forced: { 1: f.forced1 || f.h1Forced, 2: f.forced2 || f.h2Auto }, at: HAT });
+    if (due) { f["forced" + due] = true; log.add("huddle_called", { n: due, minute: Math.round(c.minutesIn) }); document.querySelectorAll("#stage dialog[open]").forEach((d) => { if (d.id !== "dlgPrelab" && d.id !== "dlgHuddle") d.close(); }); openHuddle(due); }
   }
   function finishFlame() { S.stage = "done"; log.add("done", {}); lockFinish(); renderQuests(); autosave(); openDone(); }
   // hint pictures for the first five quests, and the HUD buttons that depend on the record
@@ -972,7 +982,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const reqI = items.filter((i) => !i.q.optional), doneN = reqI.filter((i) => i.done).length, from = Math.max(0, (ai < 0 ? items.length : ai) - 1), shown = items.slice(from, from + 5);
     $("#questHead").textContent = `Tasks (${doneN} of ${reqI.length})`;
     $("#quests").replaceChildren(...shown.map((i) => h("li", { class: i.done ? "done" : i === items[ai] ? "active" : "" }, h("span", { class: "tick" }, i.done ? "✔" : i === items[ai] ? "▶" : "○"), " ", i.q.text, i.q.count > 1 && i.prog !== null && !i.done ? ` (${i.prog}/${i.q.count})` : "")), ...(items.length - from - 5 > 0 ? [h("li", { class: "more" }, `+ ${items.length - from - 5} more`)] : []));
-    $("#coachText").textContent = FL && isKey() ? (KIND ? fl.text("coachKey") : lab.ui.coachKey) : stage === "huddle1" ? lab.ui.coachHuddle1 : stage === "intro" || stage === "prelab" ? "Finish the pre-lab. The lab door stays locked until you do." : stage === "done" ? "Lab complete. Open Save / Print to hand in your record." : stage === "postlab" && ai < 0 ? "Write your CER with the button at the top." : ai >= 0 ? items[ai].q.hint : "All tasks done.";
+    $("#coachText").textContent = isKey() ? (KIND ? fl.text("coachKey") : FL ? lab.ui.coachKey : "Teacher key (creative mode): everything is open and the pre-lab is skipped. Open Key for the answers.") : stage === "huddle1" ? lab.ui.coachHuddle1 : stage === "intro" || stage === "prelab" ? "Finish the pre-lab. The lab door stays locked until you do." : stage === "done" ? "Lab complete. Open Save / Print to hand in your record." : stage === "postlab" && ai < 0 ? "Write your CER with the button at the top." : ai >= 0 ? items[ai].q.hint : "All tasks done.";
   }
 
   // microscope: click a container twice (or press M) to zoom in
@@ -1071,9 +1081,9 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   say(SCAT ? "Manchester, 1909. Read the chalkboard if you like, then go through the curtain to the dark room and press E at the foil apparatus." : KIND ? fl.text("welcome") : "Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
   if (resume) restore(resume);
   renderQuests();
-  if (FL) addEventListener("hashchange", () => location.reload());   // adding or removing #key on an open page restarts it in the right mode
-  if (FL && isKey()) $("#btnKey").hidden = false;   // #key is the teacher switch on a page from another folder
-  if (TEACHER || (FL && isKey())) { if (!KIND) Object.assign(S.ppe, { goggles: true, apron: true }), renderPPE(); $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab" || S.stage === "huddle1") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
+  addEventListener("hashchange", () => location.reload());   // adding or removing #key on an open page restarts it in the right mode
+  if (isKey()) $("#btnKey").hidden = false;   // #key is the teacher switch on a page from another folder
+  if (TEACHER || isKey()) { if (!KIND) Object.assign(S.ppe, { goggles: true, apron: true }), renderPPE(); $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab" || S.stage === "huddle1") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
   if (S.stage === "intro") intro(); else if (S.stage === "prelab") { drawPrelab(); openDlg("dlgPrelab"); } else if (S.stage === "huddle1") openHuddle(1);
   lockGate();
   setInterval(autosave, 5000);
@@ -1089,7 +1099,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     stepAll(sdt); tickIncident(now);
     if (HEAT && S.stepTo != null) { const c = cur(); if (!c.heat || c.loc !== "hotplate" || !S.plateOn) S.stepTo = null; else if (c.heat.E / hsub(c).power >= S.stepTo - 1e-6) { S.stepTo = null; S.paused = true; say(`Paused at ${mmss(c.heat.E / hsub(c).power)}. Write the reading down.`); } }
     if (SCAT) { scat.step(dt); scat.draw(); }
-    if (FL) fl.step(dt);
+    if (FL) { fl.step(dt); huddleWatch(dt); }
     if (S.view === "room") roomR.draw(P, S.ppe, KIND ? !["intro", "prelab"].includes(S.stage) : NOPPE || hasPPE(S.ppe), facingTile(room, P), (now - t0) / 1000); else if (FL) fl.draw((now - t0) / 1000); else renderer.draw(view(), (now - t0) / 1000);
     ACT.tick(now / 1000, !document.hidden, (S.stage === "lab" || S.stage === "postlab") && !S.demo && !TEACHER, (HEAT && S.plateOn && !S.paused) || (SCAT && S.scat.firing) || (FL && fl.holding()));
     tickRoute(now);

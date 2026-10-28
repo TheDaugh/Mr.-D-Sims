@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { buildWorld, newContainer, add, advance } from "../src/engine/sim.js";
 import { microModel } from "../src/engine/micro.js";
-import { questDone, validateQuests } from "../src/engine/quests.js";
+import { questDone, validateQuests } from "../../../shared/virtual-lab/quests.js";
 
 const J = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url)));
 const species = J("../content/species.json"), reactions = J("../content/reactions.json"), lab = J("../content/labs/01-unknown-solids.json");
@@ -57,7 +57,7 @@ test("micro: an unknown's identity is hidden, reagents stay named", async () => 
 
 test("heating lab quests validate and every quest has text and a hint", async () => {
   const { readFileSync } = await import("node:fs");
-  const { validateQuests } = await import("../src/engine/quests.js");
+  const { validateQuests } = await import("../../../shared/virtual-lab/quests.js");
   const lab2 = JSON.parse(readFileSync(new URL("../content/labs/02-heating-curves.json", import.meta.url)));
   assert.deepEqual(validateQuests(lab2.quests), []);
   assert.ok(lab2.prelab.questions.length === 4);

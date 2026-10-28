@@ -2,9 +2,9 @@
 import { buildWorld } from "./engine/sim.js";
 import { fingerprint } from "./engine/lab1.js";
 import { buildReport } from "./report.js";
-import { downloadJSON } from "./log.js";
+import { downloadJSON } from "../../../shared/virtual-lab/log.js";
 import { profile, stateAt, checkData } from "./engine/heating.js";
-import { checkCode } from "./engine/integrity.js";
+import { checkCode } from "../../../shared/virtual-lab/integrity.js";
 import "../../../portal/adapters.js";   // sets window.PortalAdapters (also used by the review portal)
 // Active minutes and whether the record's check code still matches its facts.
 const activeTag = (rec) => rec.code ? `${Math.round((rec.activeSec || 0) / 60)} min active ${checkCode({ student: rec.student, lab: rec.lab, seed: rec.seed, activeSec: rec.activeSec, events: rec.codeEvents, cerDone: !!rec.cer }) === rec.code ? "✔" : "✘ edited?"}` : "no timer";

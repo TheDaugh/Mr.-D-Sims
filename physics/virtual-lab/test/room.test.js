@@ -3,8 +3,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { parseRoom, reachable, step, facingTile, tileAt } from "../../../chemistry/virtual-lab/src/engine/room.js";
-import { createRoomRenderer } from "../../../chemistry/virtual-lab/src/ui/roomview.js";
+import { parseRoom, reachable, step, facingTile, tileAt } from "../../../shared/virtual-lab/room.js";
+import { createRoomRenderer } from "../../../shared/virtual-lab/roomview.js";
 import { art, icons } from "../src/ui/art.js";
 
 const J = (f) => JSON.parse(readFileSync(new URL("../content/" + f, import.meta.url), "utf8"));

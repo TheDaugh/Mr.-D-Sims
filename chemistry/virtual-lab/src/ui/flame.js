@@ -1,6 +1,6 @@
 // Lab 4 UI: the flame bench, the notebook (results table, spectroscope, practice), the two tutorials, the pre-lab and the huddle gates.
 // All student-facing wording is in content/labs/04-flame-tests.json (lab.ui) or the sheet's own content files. No chemistry facts here.
-import { h, mulberry32 } from "./dom.js";
+import { h, mulberry32 } from "../../../../shared/virtual-lab/dom.js";
 import * as F from "../engine/flame.js";
 
 export const newFlame = () => ({ rows: {}, unk: {}, splint: null, splintN: 0, last: null, tut2: false, items: { band: 1, done: [], res: {}, text: {} }, huddle1: false, huddle2: false, cerDone: false, salt: null, specSeen: false });
@@ -146,10 +146,9 @@ export function createFlame(ctx) {
   const $id = (i) => controls.querySelector("#" + i);
 
   // ---------- the notebook ----------
-  const sheet = h("div", { id: "flSheet" }), stepCardCopy = () => stepCardEl();
+  const sheet = h("div", { id: "flSheet" });
   let tab = "table";
   const tabBtn = (k, label) => h("button", { class: tab === k ? "on" : "", "data-tab": k, onclick: () => (k === "spec" ? ctx.openSpectroscope() : ctx.openNotebook(k)) }, label);
-  function stepCardEl() { return h("div", { class: "stepcard" }, h("h3", {}, lab.stepCard.title), h("ol", {}, lab.stepCard.steps.map((s) => h("li", {}, s)))); }
   const colorSel = (cur, on, dis) => { const sw = h("span", { class: "sw", style: `background:${cur ? swatchFor(cur) : "transparent"}` }), s = h("select", { disabled: dis, "aria-label": U.colorHead, onchange: (e) => { on(e.target.value); } }, h("option", { value: "" }, "—"), colorOpts.map(([v, l]) => h("option", { value: v }, l))); s.value = cur || ""; return h("span", { class: "cs" }, sw, s); };
   const brightSel = (cur, on, dis) => { const s = h("select", { disabled: dis, "aria-label": U.brightHead, onchange: (e) => on(e.target.value) }, h("option", { value: "" }, "—"), brightOpts.map((v) => h("option", { value: v }, v))); s.value = cur || ""; return s; };
   function tableView() {
@@ -189,7 +188,7 @@ export function createFlame(ctx) {
     return [h("h3", {}, U.practiceHead), box];
   }
   function view() {
-    sheet.replaceChildren(h("button", { class: "x", "data-close": "" , onclick: (e) => e.target.closest("dialog").close() }, U.closeWord), h("h2", {}, U.notebookTitle), h("details", { open: true }, h("summary", {}, h("b", {}, lab.stepCard.title)), h("ol", {}, lab.stepCard.steps.map((s) => h("li", {}, s)))),
+    sheet.replaceChildren(h("button", { class: "x", "data-close": "" , onclick: (e) => e.target.closest("dialog").close() }, U.closeWord), h("h2", {}, U.notebookTitle),
       h("div", { class: "tabs" }, tabBtn("table", U.tabTable), tabBtn("spec", U.tabSpec), F.knownsRecorded(data, G().rows) ? tabBtn("practice", U.tabPractice) : null),
       ...(tab === "table" ? tableView() : tab === "spec" ? specView() : practiceView()));
   }

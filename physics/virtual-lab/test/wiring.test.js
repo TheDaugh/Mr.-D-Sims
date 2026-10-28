@@ -37,7 +37,7 @@ test("the page loads the host before the shared app, with the clock, codes, lock
 test("no physics file sits in the chemistry folder; the chemistry files this lab touches are the five hook files", () => {
   const found = []; const walk = (d) => { for (const f of readdirSync(root + d)) { const p = d + "/" + f; if (statSync(root + p).isDirectory()) { if (f !== "node_modules") walk(p); } else if (/fancart|fan-cart|physics-lab|slot-07/i.test(f)) found.push(p); } };
   walk("chemistry"); assert.deepEqual(found, []);
-  const host = rd("chemistry/virtual-lab/src/ui/app.js"); assert.match(host, /window\.VLAB_HOST/); assert.ok(!/fancart/i.test(host + rd("chemistry/virtual-lab/src/ui/roomview.js") + rd("chemistry/virtual-lab/src/ui/demo.js") + rd("chemistry/virtual-lab/src/ui/icons.js") + rd("chemistry/virtual-lab/src/engine/quests.js")), "the hooks name no physics lab");
+  const host = rd("chemistry/virtual-lab/src/ui/app.js"); assert.match(host, /window\.VLAB_HOST/); assert.ok(!/fancart/i.test(host + rd("shared/virtual-lab/roomview.js") + rd("chemistry/virtual-lab/src/ui/demo.js") + rd("shared/virtual-lab/icons.js") + rd("shared/virtual-lab/quests.js")), "the hooks name no physics lab");
 });
 test("the three bands and the day rules are in the content: two codes, clock at 3 and 28, no stamp, no report code", () => {
   assert.equal(L.clock.huddle1AtMin, 3); assert.equal(L.clock.huddle2AtMin, 28); assert.equal(J("physics/virtual-lab/content/slot-07-items.json").bands, 3);

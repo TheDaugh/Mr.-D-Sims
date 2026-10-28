@@ -1,6 +1,6 @@
 // Isometric pixel room. Draws map + player from state; knows no chemistry.
 // Grid x runs down-right on screen, grid y runs down-left. Arrow keys move along the grid axes.
-import { tileAt } from "../engine/room.js";
+import { tileAt } from "./room.js";
 
 const OX = 156, OY = 22, TX = 12, TY = 6, ZS = 1.5;   // tile half-width, half-height, height scale
 const HEIGHT = { shelf: 14, locker: 18, rack: 15, first_aid: 13, sink: 8, hood: 18, eyewash: 14, waste: 9, extinguisher: 13, station: 10, door: 14, chalkboard: 16, radon: 12, pump: 14, valves: 10, gold_leaf: 8, marsden_desk: 9, notice: 14, tea: 8, foil_rig: 10 };

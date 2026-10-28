@@ -26,22 +26,17 @@ PLAYWRIGHT_DIR=/opt/node-tools/node_modules/playwright node tests/smoke.js
 
 The e2e tests need `python3 -m http.server 8123` running from the repo root. `tests/README.md` has every command. `tools/build-keys.mjs` needs `pdflatex`. Report what ran and what it printed; do not report a check you did not run.
 
-## Before you say a virtual lab is done
+## Virtual labs
 
-A lab Ian cannot find is not done. Besides its own tests, a new lab in `chemistry/virtual-lab` needs all of these:
-
-- A `LABS` entry in `src/ui/app.js` and a file in `content/labs/`.
-- **A card in the hub list `chemistry/labs.js`** (and a row in `teacher/index.html` if Ian uses it). Without this the lab has no button on the site.
-- A target in `tests/lock.e2e.js` (run it with `TZ=America/New_York`), a line in `PLAN.md`, and a `PROGRESS.md` entry.
-- `cd chemistry/virtual-lab && npm test`, plus the lab's own e2e and `node tests/smoke.js`.
-- **It is live only when the branch is merged to `main`** (Netlify deploys `main` only). Never merge without Ian's say-so; end your message by saying it is not on the site until he merges, and give the direct URL (`chemistry/virtual-lab/index.html?lab=<id>`).
+Every virtual lab follows `shared/virtual-lab/STANDARD.md` (read it before building or changing a lab): a demo, `#key` creative mode that skips the pre-lab, and the global huddle clock (minute 3 and 25, from the bell, in `shared/virtual-lab/clock.js`). Shared lab code lives in `shared/virtual-lab/`; the host is `chemistry/virtual-lab/src/ui/app.js`. A lab Ian cannot find is not done: it needs a hub card (`chemistry/labs.js`), the checks in the STANDARD, and it is live only when merged to `main` (never merge without Ian's say-so; end by saying it is not on the site until he merges, with the direct URL).
 
 ## Where things live
 
 - `shared/`: the clock (`bell.js`), codes (`codes.js`), IDs, pacing, locked mode (`lock.js`), notes, profile, hub, live client. `shared/lessons.js` is the registry; every lesson needs a line there.
 - `physics/lessons/engine/`: the shared lesson engine, used by physics, chemistry and calculus lessons. `standard.js` builds every v2 tab from a spec.
 - `templates/<course>/`: the runnable examples that new lessons start from.
-- `tests/`: unit tests, template e2e, lock e2e, smoke. `portal/standards.json` maps skills to standards.
+- `shared/virtual-lab/`: what every virtual lab shares (engine, stage, huddle clock) and its standard.
+- `tests/`: unit tests, template e2e, lock e2e, `vlab-standard.e2e.js`, smoke. `portal/standards.json` maps skills to standards.
 - `docs/DAY-RULES.md`: the daily-materials rules and handoff (run of show, per-slot outputs, state of the build). Read it before building any new slot.
 
 ## Ian's standing decisions (do not reopen)
