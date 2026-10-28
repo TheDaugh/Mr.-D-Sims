@@ -1,0 +1,66 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 3.2 Implicit Differentiation}\fancyhead[R]{\small Make-up key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{3.2 Implicit Differentiation}
+\textbf{You missed this lesson. Copy this into your notes. That is all you need to do.}\par\medskip
+\subsection*{Question of the day}
+How do you find the slope of a curve that is not a function?\par
+\subsection*{Targets}\begin{itemize}\item I can differentiate both sides of an equation with x and y.
+\item I can solve for dy/dx and find a slope at a point.
+\item I can write the tangent line at a point on the curve.\end{itemize}
+\subsection*{Concepts}\begin{itemize}
+\item \textbf{Implicit form} (x\textsuperscript{2} + y\textsuperscript{2} = 25): x and y are mixed in one equation. Near a point, y still behaves as a function of x.
+\item \textbf{The y-factor} (d/dx (y\textsuperscript{2}) = 2y $\cdot$ dy/dx): y depends on x, so every y-term is a composite. Differentiate it, then multiply by dy/dx.
+\item \textbf{Products} (d/dx (xy) = y + x $\cdot$ dy/dx): A term with x and y needs the product rule. Both parts give a piece.
+\item \textbf{Collect, factor, divide} (dy/dx = --(2x) / (2y)): Move every dy/dx term to one side. Factor out dy/dx, then divide.
+\item \textbf{A slope needs a point} (y -- b = (dy/dx)(x -- a)): The answer has x and y in it. Use both coordinates of the point on the curve.
+\end{itemize}
+\subsection*{What the class predicted, and what is true}\begin{itemize}
+\item The circle $x^2+y^2=25$ passes through $(3,4)$ and $(3,-4)$. The tangent slopes at those two points are... \A{opposite in sign.} The upper arc falls at $x=3$ and the lower arc rises there: the slopes are $-\tfrac34$ and $+\tfrac34$. One $x$ cannot name the slope.
+\item Suppose $y=x^3$. Then $y^2=x^6$, so $\dfrac{d}{dx}(y^2)=6x^5$. Which expression gives $6x^5$? \A{$2y\cdot\dfrac{dy}{dx}$.} $2y\cdot\frac{dy}{dx}=2x^3\cdot3x^2=6x^5$. The chain rule puts $\frac{dy}{dx}$ on every $y$-term.
+\end{itemize}
+\section*{Huddle notes (answers filled in)}
+\subsection*{Definitions}\begin{itemize}
+\item \textbf{Implicit form:} An equation where x and y are \A{mixed} together.
+\item \textbf{The y-factor:} Every y-term gets a factor of \A{dy/dx}.
+\item \textbf{Solving:} Collect the dy/dx terms, \A{factor} it out, then divide.
+\end{itemize}
+\subsection*{Worked example}
+Find dy/dx for x\textsuperscript{2} + y\textsuperscript{2} = 25.\\
+\begin{itemize}
+\item Differentiate both sides: 2x + 2y$\cdot$dy/dx = \A{0}
+\item Isolate: 2y$\cdot$dy/dx = \A{--2x}
+\item Divide by 2y: dy/dx = \A{--x/y}
+\end{itemize}
+\subsection*{Label the tangent}
+\begin{enumerate}
+\item The point (3, 4) lies on the \A{curve}.
+\item The \A{tangent line} touches the curve at that point.
+\item Its slope at (3, 4) is \A{--3/4}.
+\end{enumerate}
+\section*{One worked sample of each skill}
+\subsection*{Find dy/dx}
+\noindent\textbf{Level 1.} Differentiate both sides, then solve for $\frac{dy}{dx}$.\\ \A{Answer: $\frac{4}{2 y}$} \quad $2y\,\dfrac{dy}{dx}=4$, so $\dfrac{dy}{dx}=\dfrac{4}{2y}$.\par\medskip
+\noindent\textbf{Level 2.} Differentiate both sides, then solve for $\frac{dy}{dx}$.\\ \A{Answer: $\frac{-x}{2 y}$} \quad $2x+4y\,\dfrac{dy}{dx}=0$, so $\dfrac{dy}{dx}=\dfrac{-2x}{4y}=-\dfrac{x}{2y}$.\par\medskip
+\noindent\textbf{Level 3.} Differentiate both sides. Collect the $\frac{dy}{dx}$ terms, factor, and divide.\\ \A{Answer: $\frac{5 x^{4} - 4 x}{9 y^{2} - 1}$} \quad $9y^{2}y'+4x-y'=5x^{4}$, so $y'(9y^{2}-1)=5x^{4}-4x$.\par\medskip
+\noindent\textbf{Level 4.} Differentiate both sides. The right side needs the product rule.\\ \A{Answer: $\frac{6 y - 3 x^{2}}{3 y^{2} - 6 x}$} \quad $3x^{2}+3y^{2}y'=6y+6x\,y'$, so $y'(3y^{2}-6x)=6y-3x^{2}$.\par\medskip
+\subsection*{Differentiate a y-term}
+\noindent\textbf{Level 1.} $\dfrac{d}{dx}\left(y^{3}\right)$ equals...\\ \A{(A) 3y\textsuperscript{2} $\cdot$ dy/dx} \quad (B) 3x\textsuperscript{2} \quad (C) 3y\textsuperscript{2} $\cdot$ dx/dy \quad (D) 3y\textsuperscript{2}\\ \A{Answer: A} \quad Power rule gives $3y^{2}$. The chain rule adds the factor $\frac{dy}{dx}$.\par\medskip
+\noindent\textbf{Level 2.} $\dfrac{d}{dx}\left(6y^{2}\right)$ equals...\\ (A) 12y \quad (B) 6y $\cdot$ dy/dx \quad \A{(C) 12y $\cdot$ dy/dx} \quad (D) 12x\\ \A{Answer: C} \quad Coefficient: 6 times 2 is 12. Then the factor $\frac{dy}{dx}$.\par\medskip
+\noindent\textbf{Level 3.} $\dfrac{d}{dx}\left(x^{3}y\right)$ equals...\\ (A) 3x\textsuperscript{2}y \quad (B) 3x\textsuperscript{2} $\cdot$ dy/dx \quad (C) x\textsuperscript{3} $\cdot$ dy/dx \quad \A{(D) 3x\textsuperscript{2}y + x\textsuperscript{3} $\cdot$ dy/dx}\\ \A{Answer: D} \quad Product rule: (derivative of the first)(second) + (first)(derivative of the second). The $y$ part brings $\frac{dy}{dx}$.\par\medskip
+\noindent\textbf{Level 4.} $\dfrac{d}{dx}\left(x^{2}e^{y}\right)$ equals...\\ (A) x\textsuperscript{2} $\cdot$ e\textasciicircum{}y $\cdot$ dy/dx \quad (B) 2x $\cdot$ e\textasciicircum{}y \quad \A{(C) 2x $\cdot$ e\textasciicircum{}y + x\textsuperscript{2} $\cdot$ e\textasciicircum{}y $\cdot$ dy/dx} \quad (D) 2x $\cdot$ e\textasciicircum{}y $\cdot$ dy/dx\\ \A{Answer: C} \quad Product rule: $2x\,e^{y}$ plus $x^{2}e^{y}\frac{dy}{dx}$.\par\medskip
+\subsection*{Slope at a point}
+\noindent\textbf{Level 1.} The point $(6,-8)$ is on the curve $x^{2}+y^{2}=100$. Find $\dfrac{dy}{dx}$ there.\\ \A{Answer: 0.75} \quad Implicit differentiation gives a slope formula in $x$ and $y$. At $(6,-8)$ it equals $\dfrac{3}{4}$.\par\medskip
+\noindent\textbf{Level 2.} The point $(-1,2)$ is on the curve $x^{2}+2y^{2}=9$. Find $\dfrac{dy}{dx}$ there.\\ \A{Answer: 0.25} \quad Implicit differentiation gives a slope formula in $x$ and $y$. At $(-1,2)$ it equals $\dfrac{1}{4}$.\par\medskip
+\noindent\textbf{Level 3.} The point $(4,-1)$ is on the curve $x^{2}+xy+y^{2}=13$. Find $\dfrac{dy}{dx}$ there.\\ \A{Answer: -3.5} \quad Implicit differentiation gives a slope formula in $x$ and $y$. At $(4,-1)$ it equals $\dfrac{-7}{2}$.\par\medskip
+\noindent\textbf{Level 4.} The point $(1,4)$ is on the curve $6xy=8+y^{2}$. Find $\dfrac{dy}{dx}$ there.\\ \A{Answer: 12} \quad Implicit differentiation gives a slope formula in $x$ and $y$. At $(1,4)$ it equals $12$.\par\medskip
+\subsection*{Tangent line}
+\noindent\textbf{Level 1.} Write the tangent line to the curve at the point.\\ \A{Answer: $\frac{5}{12} \left(x - \left(-5\right)\right) + 12$} \quad Slope at the point: $\dfrac{5}{12}$. Then $y=m(x-(-5))+(12)$.\par\medskip
+\noindent\textbf{Level 2.} Write the tangent line to the curve at the point.\\ \A{Answer: $\frac{1}{4} \left(x - \left(-1\right)\right) + 2$} \quad Slope at the point: $\dfrac{1}{4}$. Then $y=m(x-(-1))+(2)$.\par\medskip
+\noindent\textbf{Level 3.} Write the tangent line to the curve at the point.\\ \A{Answer: $\frac{-7}{2} \left(x - 4\right) - 1$} \quad Slope at the point: $\dfrac{-7}{2}$. Then $y=m(x-(4))+(-1)$.\par\medskip
+\noindent\textbf{Level 4.} Write the tangent line to the curve at the point. Keep the radicals exact.\\ \A{Answer: $\frac{3}{\sqrt{7}} \left(x - 3\right) - \sqrt{7}$} \quad Slope: $-\dfrac{3}{-\sqrt{7}}$. Then $y=m(x-3)+(-\sqrt{7})$.\par\medskip
+\end{document}

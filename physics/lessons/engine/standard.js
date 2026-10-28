@@ -55,7 +55,7 @@
       });
     },
     canLeave: function () { return SPEC.predicts.every(function (p) { return qdone(p.id); }); },
-    teacher: function () { return '<p>Correct: ' + SPEC.predicts.map(function (p) { return p.id + ' = ' + p.options[p.answer]; }).join('; ') + '. One try each; the answer is explained after.</p>'; } });
+    teacher: function () { return '<p>Correct: ' + SPEC.predicts.map(function (p) { return p.id + ' = ' + opt(p.options[p.answer]); }).join('; ') + '. One try each; the answer is explained after.</p>'; } });
 
   /* Explore: the lesson's own picture or sim (opts.explore). Optional and lowest priority: pacing skips it first. */
   steps.push({ id: 'explore', label: T.explore, optional: true,
