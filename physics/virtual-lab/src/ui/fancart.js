@@ -38,8 +38,9 @@ export function create(ctx) {
   const live = () => ["lab", "postlab", "done"].includes(S.stage) || ctx.isDemo();
   const ev = (type, data) => { if (!ctx.isDemo()) log.add(type, data); };
   const $in = (root, sel) => root.querySelector(sel);
-  const carried = () => ctx.carried().filter((k) => /^bar\d+$/.test(k)).length;
+  const carried = () => (god() ? E.MAX_BARS(D) : ctx.carried().filter((k) => /^bar\d+$/.test(k)).length);
   const pctx = () => ctx.studentKey();
+  const god = () => !!ctx.isKey();   // #key: teacher creative mode, everything open
 
   // ---------- the shelf: six mass bars ----------
   const bars = () => Array.from({ length: D.cart.bars_on_shelf.value }, (_, i) => ({ key: "bar" + (i + 1), id: "bar", label: U.barWord + " " + (i + 1), short: U.barShort + " " + (i + 1), group: C.room.legend.B.group, phase: "s", shelf: 0, idx: i, color: "#3b3f46", icon: "bar", log: { id: "bar" } }));
@@ -61,7 +62,7 @@ export function create(ctx) {
     if (t.id === "balance") { ev("station", { id: "balance" }); S.panel = t; ctx.refreshPanel(); return true; }
     return false;
   }
-  function canOpen() { if (G().trackSeen || ctx.isDemo()) return true; say(U.notebookAtTrack, "warn"); return false; }
+  function canOpen() { if (god() || G().trackSeen || ctx.isDemo()) return true; say(U.notebookAtTrack, "warn"); return false; }
 
   // ---------- the apparatus ----------
   const labels = { track: U.lblTrack, sensor: U.lblSensor, cart: U.lblCart, fan: U.lblFan, bars: U.lblBars, forceSensor: U.lblForceSensor, force: U.lblForce };
@@ -112,7 +113,7 @@ export function create(ctx) {
 
   function doRun() {
     const g = G(); if (!live() || g.anim) return;
-    const block = R.runBlock(D, g, g.cfg.bars);
+    const block = god() ? null : R.runBlock(D, g, g.cfg.bars);
     if (block) { notice(block === "after" ? U.afterCode2 : C.messages.predictLock, "warn"); if (block === "predict") { g.tab = "table"; renderTab(); } return; }
     const seed = E.freshSeed(); g.last = { setting: g.cfg.setting, bars: g.cfg.bars, seed, F: E.forceOf(D, g.cfg.setting) };
     g.mk = [0.9, 1.1]; g.anim = { t: 0 }; g.atEnd = false; g.runs++; g.lastRead = null; recMsg.textContent = ""; notice("");
@@ -164,7 +165,7 @@ export function create(ctx) {
 
   let lsig = "";
   function syncLeft(force) {
-    const g = G(), have = carried(), rn = lastRun(), rd = reading(), rs = recordState(), blk = R.runBlock(D, g, g.cfg.bars);
+    const g = G(), have = carried(), rn = lastRun(), rd = reading(), rs = recordState(), blk = god() ? null : R.runBlock(D, g, g.cfg.bars);
     const sig = JSON.stringify([g.cfg, g.last && g.last.seed, !!g.anim, g.mk, rd && rd.ok && rd.a, have, rs.ok, rs.part, !!massIn.value, g.huddle2, blk, g.atEnd]);
     if (!force && sig === lsig && !dirty) return; lsig = sig;
     barBtns.forEach((b, n) => { b.disabled = n > have || !!g.anim; b.classList.toggle("on", g.cfg.bars === n); b.setAttribute("aria-pressed", g.cfg.bars === n); });
@@ -314,19 +315,13 @@ export function create(ctx) {
   }
   // the scores stay on the student's own device (shared/profile.js); nothing else is issued at the end
   function saveProfile() {
-    if (ctx.isDemo() || !window.MrD || !MrD.profile || !S.student) return;
+    if (god() || ctx.isDemo() || !window.MrD || !MrD.profile || !S.student) return;
     const g = G(), st = g.checks, items = Object.entries(st.res).map(([id, r]) => ({ skill: "fan-cart/" + id.replace(/#\d+$/, ""), title: id, band: r.band, firstTry: !!r.firstTry, ok: !!r.ok }));
     const rows = R.rowCount(g.rows, "1") + R.rowCount(g.rows, "2") + (g.rows.test ? 1 : 0);
     MrD.profile.record({ course: "physics", lesson: "fan-cart", title: lab.title, first: String(S.student).split(/\s+/)[0], period: "", day: MrD.bell ? MrD.bell.dayKey() : new Date().toISOString().slice(0, 10), reached: rows, of: D.part1.length + D.part2.length + 1, items });
   }
 
   // ---------- the step card: the two steps after code 2 are added once code 2 is in ----------
-  let cardSig = "";
-  function syncCard() {
-    const el = document.getElementById("stepCard"), after = G().huddle2; if (!el || cardSig === String(after)) return; cardSig = String(after);
-    const steps = [...lab.stepCard.steps, ...(after ? lab.stepCard.afterCode2 : [])]; el.replaceChildren(h("h3", {}, lab.stepCard.title), h("ol", {}, steps.map((t) => h("li", {}, t))));
-  }
-
   // ---------- pre-lab: three pictures and a one-try prediction that reveals nothing ----------
   function renderPrelab(box, c) {
     const pre = C.prelab, qs = pre.questions, P = S.prelab, btn = h("button", { id: "preGo", class: "primary", disabled: true, onclick: () => c.onPrelabDone() }, U.enterLab), progress = h("p", { class: "hint", role: "status" });
@@ -440,7 +435,7 @@ export function create(ctx) {
   let acc = 0;
   function clockWatch(dt) {
     acc += dt; if (acc < 1) return; acc = 0;
-    if (ctx.isDemo() || !window.MrD || !MrD.bell || (document.querySelector("#dlgHuddle[open]"))) return;
+    if (god() || ctx.isDemo() || !window.MrD || !MrD.bell || (document.querySelector("#dlgHuddle[open]"))) return;
     const c = MrD.bell.clock(lab.course), g = G(); if (!c.session) return;
     if (c.minutesIn >= C.clock.huddle1AtMin && !g.huddle1 && !g.h1Forced && S.stage === "prelab" && S.student) { g.h1Forced = true; ctx.openHuddle(1); }
     else if (c.minutesIn >= C.clock.huddle2AtMin && !g.huddle2 && !g.h2Auto && S.stage === "lab") { g.h2Auto = true; ctx.openHuddle(2); }
@@ -457,10 +452,11 @@ export function create(ctx) {
   let wasEarly = null;
   function syncEarly() {
     const early = ["intro", "prelab"].includes(S.stage) && !ctx.isDemo(), card = document.getElementById("stepCard"), tp = document.getElementById("taskPanel");
+    if (card) card.hidden = true;   // the task list says the same thing and can be hidden; the hold screen still shows the steps
     if (early === wasEarly) return; const first = wasEarly === null; wasEarly = early;
-    if (card) card.hidden = early; if (tp && (early || !first)) tp.hidden = early;   // the task list comes up once after the pre-lab; the student's own J key rules after that
+    if (tp && (early || !first)) tp.hidden = early;
   }
-  function refresh() { syncEarly(); syncCard(); syncLeft(false); }
+  function refresh() { syncEarly(); if (god() && !G().huddle2) { G().huddle1 = G().huddle2 = true; } syncLeft(false); }
   const visible = (q) => q.phase !== "after" || G().huddle2 || (q.id === "code2" && !!S.cerDone);
   const questState = () => ({});
   const recordComplete = () => R.tablesDone(D, G().rows);
@@ -472,6 +468,9 @@ export function create(ctx) {
     const g = G(), rows = [], tr = (th, ...tds) => h("tr", {}, h("th", {}, th), ...tds.map((t) => h("td", {}, t)));
     rows.push(tr(U.keyStandard, I.standard, ""));
     rows.push(tr(U.keyCodes, `${U.keyCode1}: ${MrD.codes.gateV3(lab.id, "h1")}`, `${U.keyCode2}: ${MrD.codes.gateV3(lab.id, "h2")}`));
+    const H2 = C.huddle2Tab;
+    rows.push(tr(U.keyHuddle2, h("div", {}, h("p", {}, H2.tested), h("h4", {}, U.blanksHead), h("ul", {}, H2.blanks.map((b) => h("li", {}, b.text + " → " + b.answer))), h("h4", {}, U.cruxHead), h("ol", {}, H2.crux.map((c) => h("li", {}, c.q + " → " + c.answer)))),
+      h("div", {}, h("h4", {}, U.workedHead), ...H2.worked.map((w) => h("div", {}, h("p", {}, h("b", {}, w.id + ". "), w.problem), h("ol", {}, w.steps.map((x) => h("li", {}, x))))), h("h4", {}, U.keySays), h("ul", {}, H2.mrDSays.map((x) => h("li", {}, x))))));
     for (const it of I.items) {
       const opts = it.options ? h("ol", {}, it.options.map((o, i) => h("li", { class: i === it.answer ? "fcAns" : "" }, o))) : h("span", {}, `${it.answer} ± ${it.tol} ${it.unit}`);
       rows.push(tr(`${it.id} · ${bandName(it.band)}`, h("div", {}, h("p", {}, it.prompt), opts), h("div", {}, h("ol", {}, it.hints.map((x) => h("li", {}, x))), h("p", { class: "hint" }, it.misc))));

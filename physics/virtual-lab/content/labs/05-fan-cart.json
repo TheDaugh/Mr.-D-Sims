@@ -225,6 +225,9 @@
     "guideTrack": "Picture guide",
     "guideSpeed": "Graph guide",
     "tutorialDone": "Tutorial done. The arrows are off from here.",
-    "tutReplay": "Replay:"
+    "tutReplay": "Replay:",
+    "coachKey": "Teacher key: everything is open. Click anything. Key shows the answers and today's codes.",
+    "keyHuddle2": "Huddle 2 (worked solutions)",
+    "keySays": "Mr. D says"
   }
 }

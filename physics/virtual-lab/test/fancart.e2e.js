@@ -47,8 +47,8 @@ const c1 = await k.code("h1"), c2 = await k.code("h2");
 check(c1 === (await vl(() => MrD.codes.huddle())) && c2 === (await vl(() => MrD.codes.huddle2())) && c1 !== c2, "two codes a day: code 1 is the daily huddle code, code 2 is its own");
 await k.shot("03-hold");
 await page.fill("#huddleCode", c1); await page.click("#huddleGo"); await page.waitForFunction(() => __vl.S.stage === "lab");
-await page.waitForFunction(() => !document.querySelector("#stepCard").hidden && !document.querySelector("#taskPanel").hidden);
-check(await page.locator("#stepCard").isVisible() && (await page.locator("#stepCard li").count()) === 9 && (await page.locator("#stepCard li").allInnerTexts()).join("|") === L.stepCard.steps.join("|"), "the step card stays on the left, nine steps");
+await page.waitForFunction(() => !document.querySelector("#taskPanel").hidden);
+check(!(await page.locator("#stepCard").isVisible()), "there is no separate step card panel: the task list carries the steps and can be hidden");
 check(await page.locator("#taskPanel").isVisible(), "the task list comes up after huddle 1");
 await page.keyboard.press("n"); await page.waitForTimeout(200);
 check(!(await vl(() => document.querySelector("#dlgNotebook").open)) && (await page.locator("#feed").innerText()).includes(U.notebookAtTrack), "N before the track does nothing but say the notebook opens at the track");
@@ -203,8 +203,6 @@ await page.fill("#huddleCode", c1); await page.click("#huddleGo"); check((await 
 await k.enterCode("h2"); const h2b = await page.locator("#huddleBody").innerText();
 check(H.worked.every((w) => w.steps.every((s) => h2b.includes(s))) && H.crux.every((c) => h2b.includes(c.answer)) && h2b.includes(H.blanks[2].text.split("______")[0]) && /1\/m/.test(h2b), "with the code in, the answers show, and 1/m with them"); await k.shot("20-huddle2-after");
 check((await vl(() => __vl.S.flame.huddle2)) && (await vl(() => __vl.S.flame.h2.h1)) === "double", "code 2 is accepted with the typed blanks kept"); await page.click("#huddleClose"); await k.snap("after");
-await page.waitForFunction(() => document.querySelectorAll("#stepCard li").length === 11).catch(() => {});
-check((await page.locator("#stepCard li").count()) === 11 && (await page.locator("#stepCard li").allInnerTexts()).slice(9).join("|") === L.stepCard.afterCode2.join("|"), "the step card grows by the sheet's two steps after code 2");
 await coachIs(Q.graphInv.hint, "after code 2 the next task is the 1/m graph, with the sheet's hint"); check(!(await page.locator("#btnHuddle").isVisible()), "the huddle button is gone once code 2 is in");
 
 // ---------- after code 2: the 1/m graph, the test run, hand-in ----------
@@ -235,7 +233,7 @@ await page.click("#dlgDoneClose");
 
 // ---------- resume, then the teacher key ----------
 const before = JSON.stringify(await vl(() => ({ rows: __vl.S.flame.rows, pred: __vl.S.flame.pred, stage: __vl.S.stage, cer: __vl.S.cer, inv: __vl.S.inv })));
-await page.goto(URL_ + "#key"); await page.reload(); await page.waitForSelector("#boot button"); check((await page.locator("#boot").innerText()).includes("saved lab"), "reopening offers the saved lab");
+await Promise.all([page.waitForEvent("load"), page.evaluate(() => { location.hash = "#key"; })]); await page.waitForSelector("#boot button"); check((await page.locator("#boot").innerText()).includes("saved lab"), "reopening offers the saved lab");
 await page.click('#boot button:has-text("Continue where I left off")'); await page.waitForFunction(() => !document.querySelector("#app").hidden); await page.waitForTimeout(500);
 check(JSON.stringify(await vl(() => ({ rows: __vl.S.flame.rows, pred: __vl.S.flame.pred, stage: __vl.S.stage, cer: __vl.S.cer, inv: __vl.S.inv }))) === before, "resume restores the tables, predictions, CER, stage and the bars carried");
 await page.keyboard.press("n"); await page.waitForSelector("#dlgNotebook[open]"); check((await page.locator("#fcTable1 tr[data-setting='3'] td").first().innerText()) === "0.45", "the saved rows are back in the notebook"); await page.click("#fcClose");
@@ -270,4 +268,12 @@ await inPeriod("2026-10-21T09:28:30-04:00", async (e, kk) => {
   check((await e.page.evaluate(() => __vl.fl.recordComplete())) === false, "…and the record is empty, yet code 2 is accepted: it is never blocked by the table");
   await e.page.click("#btnHuddle"); await kk.enterCode("h2"); check(await e.page.evaluate(() => __vl.S.flame.huddle2), "an empty table still gets code 2");
 });
+await (async () => {
+  const e = await open(browser, "2026-10-21T09:28:30-04:00"), p = e.page; await Promise.all([p.waitForEvent("load"), p.evaluate(() => { location.hash = "#key"; })]); await p.waitForFunction(() => window.__vl && !document.querySelector("#app").hidden);
+  check((await p.evaluate(() => __vl.S.stage)) === "lab" && !(await p.evaluate(() => document.querySelector("#dlgIntro").open)), "#key: teacher creative mode skips the intro, the pre-lab and the huddles and never asks for a name");
+  await p.keyboard.press("n"); await p.waitForSelector("#dlgNotebook[open]"); check(await p.locator("#fcBar4").isEnabled() && await p.locator("#fcBar3").isEnabled(), "#key: every bar button works with nothing carried");
+  await p.click("#fcBar3"); await p.click("#fcSet3"); await p.click("#fcRun"); await p.waitForFunction(() => __vl.S.flame.last && !__vl.S.flame.anim); check((await p.evaluate(() => __vl.S.flame.runs)) === 1, "#key: the test run opens with no code and no prediction");
+  await p.click("#fcTab_graph"); check((await p.locator("#fcAcross option").allInnerTexts()).includes(U.xInvm) && await p.locator("#fcHandIn").isVisible(), "#key: 1/m and Hand in are open");
+  await e.ctx.close();
+})();
 await done(browser);

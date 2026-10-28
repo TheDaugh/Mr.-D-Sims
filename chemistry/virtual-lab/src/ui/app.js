@@ -359,7 +359,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     canAct: () => S.stage === "lab" && !S.demo && ppeOk(), running: () => S.stage === "lab" && S.view === "bench" && !document.querySelector("#stage dialog[open]"), ppeOn: () => hasPPE(S.ppe),
     onChange: () => { fl.syncSources(sources); if (ready) { renderInv(); renderQuests(); autosave(); } }, openNotebook: (t) => openFlNb(t), openSpectroscope: () => openSpec(), showTutorial2: (fr) => showTut2(fr),
     // only a lab from another folder uses these
-    seed, isDemo: () => S.demo, openHuddle: (n) => openHuddle(n), finish: () => finishFlame(), refreshPanel: () => renderPanel(), closeNotebook: () => closeDlg("dlgNotebook") }) : null;
+    seed, isKey: () => /(?:^|[#&])(key|preview)\b/.test(location.hash), isDemo: () => S.demo, openHuddle: (n) => openHuddle(n), finish: () => finishFlame(), refreshPanel: () => renderPanel(), closeNotebook: () => closeDlg("dlgNotebook") }) : null;
   canvas.addEventListener("click", (ev) => {
     if (FL) return;
     const r = canvas.getBoundingClientRect();
@@ -972,7 +972,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const reqI = items.filter((i) => !i.q.optional), doneN = reqI.filter((i) => i.done).length, from = Math.max(0, (ai < 0 ? items.length : ai) - 1), shown = items.slice(from, from + 5);
     $("#questHead").textContent = `Tasks (${doneN} of ${reqI.length})`;
     $("#quests").replaceChildren(...shown.map((i) => h("li", { class: i.done ? "done" : i === items[ai] ? "active" : "" }, h("span", { class: "tick" }, i.done ? "✔" : i === items[ai] ? "▶" : "○"), " ", i.q.text, i.q.count > 1 && i.prog !== null && !i.done ? ` (${i.prog}/${i.q.count})` : "")), ...(items.length - from - 5 > 0 ? [h("li", { class: "more" }, `+ ${items.length - from - 5} more`)] : []));
-    $("#coachText").textContent = stage === "huddle1" ? lab.ui.coachHuddle1 : stage === "intro" || stage === "prelab" ? "Finish the pre-lab. The lab door stays locked until you do." : stage === "done" ? "Lab complete. Open Save / Print to hand in your record." : stage === "postlab" && ai < 0 ? "Write your CER with the button at the top." : ai >= 0 ? items[ai].q.hint : "All tasks done.";
+    $("#coachText").textContent = KIND && isKey() ? fl.text("coachKey") : stage === "huddle1" ? lab.ui.coachHuddle1 : stage === "intro" || stage === "prelab" ? "Finish the pre-lab. The lab door stays locked until you do." : stage === "done" ? "Lab complete. Open Save / Print to hand in your record." : stage === "postlab" && ai < 0 ? "Write your CER with the button at the top." : ai >= 0 ? items[ai].q.hint : "All tasks done.";
   }
 
   // microscope: click a container twice (or press M) to zoom in
@@ -1047,7 +1047,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
         rows.push(h("tr", {}, h("th", {}, `Unknown ${u.label}${CH.includes(u.label) ? " (challenge)" : ""}`), h("td", {}, sp.name), h("td", {}, lab.tests.map((x) => `${x.name}: ${optLabel(x, t[x.key])}`).join("; ")))); }
     }
     const labSel = h("select", {}, Object.keys(LABS).map((k) => h("option", { value: k, selected: k === (params.get("lab") || "unknown-solids") ? "" : null }, k))), seedIn = h("input", { type: "number", value: seed, style: "width:130px" });
-    $("#keyBody").replaceChildren(h("table", { class: "keys" }, h("tbody", {}, rows)), h("p", { class: "hint" }, `Seed ${seed}. The same seed gives the same unknowns, so you can match a student's record.`),
+    $("#keyBody").replaceChildren(h("table", { class: "keys" }, h("tbody", {}, rows)), KIND ? h("span") : h("p", { class: "hint" }, `Seed ${seed}. The same seed gives the same unknowns, so you can match a student's record.`),
       h("div", { class: "controls" }, labSel, seedIn, h("button", { onclick: () => { location.search = `?lab=${labSel.value}&seed=${seedIn.value}`; } }, "Load lab and seed"), h("button", { onclick: () => { location.search = `?lab=${labSel.value}&seed=${Math.floor(Math.random() * 1e9)}`; } }, "New random samples")));
   }
   $("#btnKey").addEventListener("click", () => { renderKey(); openDlg("dlgKey"); });
@@ -1063,8 +1063,9 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   say(SCAT ? "Manchester, 1909. Read the chalkboard if you like, then go through the curtain to the dark room and press E at the foil apparatus." : KIND ? fl.text("welcome") : "Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
   if (resume) restore(resume);
   renderQuests();
+  if (KIND) addEventListener("hashchange", () => location.reload());   // adding or removing #key on an open page restarts it in the right mode
   if (KIND && isKey()) $("#btnKey").hidden = false;   // #key is the teacher switch on a page from another folder
-  if (TEACHER) { $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab" || S.stage === "huddle1") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
+  if (TEACHER || (KIND && isKey())) { $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab" || S.stage === "huddle1") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
   if (S.stage === "intro") intro(); else if (S.stage === "prelab") { drawPrelab(); openDlg("dlgPrelab"); } else if (S.stage === "huddle1") openHuddle(1);
   lockGate();
   setInterval(autosave, 5000);
