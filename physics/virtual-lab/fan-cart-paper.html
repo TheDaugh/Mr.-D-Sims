@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab 5: paper version</title>
+<meta name="description" content="The virtual lab on paper: the step card, the two tables and the nine run cards. Print it if the Chromebooks fail.">
+<style>
+  :root { color-scheme: light; }
+  body { font: 12pt/1.35 Georgia, "Times New Roman", serif; color: #111; background: #fff; margin: 0 auto; max-width: 7.6in; padding: .4in .3in; }
+  h1 { font-size: 20pt; margin: 0 0 4pt; } h2 { font-size: 13pt; margin: 14pt 0 4pt; } p { margin: 4pt 0; } .hint { color: #444; font-size: 10.5pt; }
+  .sheet { break-after: page; } .sheet:last-of-type { break-after: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 4pt 0; } th, td { border: 1px solid #000; padding: 4pt 6pt; text-align: left; vertical-align: top; } td.blank { height: .27in; }
+  ol { margin: 4pt 0 4pt 1.2em; padding: 0; } li { margin: 2pt 0; }
+  .card { border: 1.5px solid #000; border-radius: 5pt; padding: 6pt 10pt; margin: 8pt 0; break-inside: avoid; } .card h3 { margin: 0 0 3pt; font-size: 11.5pt; }
+  .card table { margin: 3pt 0 0; } .card td, .card th { text-align: center; }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12pt; }
+  .after { border-style: dashed; }
+  #screenOnly { margin: 0 0 12pt; padding: 8pt 12pt; background: #eef3f8; border: 1px solid #99a; border-radius: 8pt; font: 14px system-ui, sans-serif; } #screenOnly button { font-size: 14px; padding: 6px 12px; }
+  @media print { body { padding: 0; max-width: none; font-size: 11pt; } h2 { margin: 10pt 0 3pt; } .card { margin: 6pt 0; } #screenOnly { display: none !important; } @page { margin: .5in; } }
+</style>
+</head>
+<body>
+<div id="screenOnly"><p><b>Paper version.</b> If the lab will not load on your device, print this page. Page 1 is the step card, how to read a card and the two tables. Page 2 holds the eight run cards. Page 3 is the test card: hand it out only after code 2.</p><button id="printBtn" onclick="window.print()">Print this page</button></div>
+<main id="out"><p>Loading…</p></main>
+<script type="module">
+const get = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); });
+const [data, lab, content] = await Promise.all([get("content/slot-07-data.json"), get("content/labs/05-fan-cart.json"), get("content/slot-07-lab-content.json")]);
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"), f2 = (x) => Number(x).toFixed(2), U = lab.ui;
+const cards = data.paperRuns.cards, early = cards.filter((c) => !c.heldUntilHuddle2), late = cards.filter((c) => c.heldUntilHuddle2);
+const card = (c) => `<div class="card${c.heldUntilHuddle2 ? " after" : ""}" id="card-${esc(c.id)}"><h3>${esc(c.id)} · ${c.part === "test" ? esc(U.testWord) : esc(U.partWord) + " " + c.part} · ${esc(U.xForce.replace("(N)", "").trim().toLowerCase())} ${f2(c.F_N)} N · ${esc(U.massLabel.replace("(kg)", "").trim().toLowerCase())} ${f2(c.m_kg)} kg</h3>
+  <table><thead><tr><th>time (s)</th>${c.t_s.map((t) => `<th>${Number(t).toFixed(1)}</th>`).join("")}</tr></thead><tbody><tr><th>speed (m/s)</th>${c.v_mps.map((v) => `<td>${f2(v)}</td>`).join("")}</tr></tbody></table></div>`;
+const blanks = (n, k) => Array.from({ length: n }, () => `<tr><td class="blank"></td>${"<td class=\"blank\"></td>".repeat(k)}</tr>`).join("");
+const t1 = `<table><thead><tr>${content.record.part1Columns.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${data.part1.map((_, i) => `<tr><th scope="row">${i + 1}</th><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>`).join("")}</tbody></table>`;
+const t2 = `<table><thead><tr>${content.record.part2Columns.map((c) => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${data.part2.map((r) => `<tr><th scope="row">${r.bars}</th><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>`).join("")}</tbody></table>`;
+document.getElementById("out").innerHTML = `
+<section class="sheet"><h1>${esc(lab.title)}: ${esc(U.run).toLowerCase()} cards</h1>
+<div class="card"><h3>${esc(lab.stepCard.title)}</h3><ol>${lab.stepCard.steps.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></div>
+<h2>How to read a card</h2><p>Each card gives the speed of the cart at five times. The acceleration is the speed at 2.0 s minus the speed at 0 s, divided by 2.0 s. Fill in the same two tables as the lab.</p>
+<h2>${esc(U.part1Head)}</h2><p class="hint">${esc(content.quests.find((q) => q.id === "part1").hint)}</p>${t1}
+<h2>${esc(U.part2Head)}</h2><p class="hint">${esc(content.quests.find((q) => q.id === "part2").hint)}</p>${t2}
+<p class="hint">${esc(content.postlab.prompt)}</p></section>
+<section class="sheet"><h2>${esc(U.part1Head)}</h2><div class="cards">${early.filter((c) => c.part === 1).map(card).join("")}</div><h2>${esc(U.part2Head)}</h2><div class="cards">${early.filter((c) => c.part === 2).map(card).join("")}</div></section>
+<section class="sheet"><h2>${esc(U.testHead)} (hand out after code 2)</h2><p class="hint">${esc(content.predictions[2].q)}</p><div class="cards">${late.map(card).join("")}</div><p class="hint">${esc(content.exit.prompt)}</p></section>`;
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "physics-virtual-lab",
+  "private": true,
+  "type": "module",
+  "description": "Physics virtual labs. Lab 5 (the fan cart) runs on the shared lab app in chemistry/virtual-lab and registers itself through src/host.js.",
+  "scripts": {
+    "test": "node --test test/*.test.js test/*.test.cjs"
+  }
+}

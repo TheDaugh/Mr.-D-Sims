@@ -1,0 +1,697 @@
+{
+  "slot": 7,
+  "lab": "05-fan-cart",
+  "dayShape": "lab day (virtual, replaces the real second-law lab)",
+  "course": "Honors Physics",
+  "floor": "Every student completes the regular-level standard (T5): state in words, with numbers from their own tables, how acceleration changes when the fan force doubles and when the mass doubles. Bands are hidden. The top band is this standard.",
+  "clock": {
+    "warmupMin": 3,
+    "huddle1AtMin": 3,
+    "labStartsMin": 11,
+    "huddle2AtMin": 28,
+    "afterHuddle2": "1/m graph, then predict and run 3 bars (about 5 min)",
+    "exitTicketMin": "40-42",
+    "note": "Lab day: huddle 2 comes after the data at minute 28, not 25. Code 2 is never blocked by record state: a student who is behind still gets the huddle."
+  },
+  "gates": {
+    "huddle1Code": "the door stays shut until the pre-lab is done (existing mechanic); code 1 is given by Mr. D at the end of huddle 1 and ends the hold screen",
+    "huddle2Code": "entered at the end of huddle 2. It unlocks the 1/m axis, the test run and the exit ticket. It is not blocked by an unfinished table. Mr. D decides who is ready by reading the room.",
+    "holdScreen": "Huddle 1 shows a hold screen with the step card. Huddle 2 shows the formalizing tab (huddle2Tab below) with the write-on blanks."
+  },
+  "terms": [
+    {
+      "term": "fan cart",
+      "introducedBy": "huddle1",
+      "say": "a cart with a fan on top that pushes it along"
+    },
+    {
+      "term": "fan force",
+      "introducedBy": "huddle1",
+      "say": "the push of the fan, in N"
+    },
+    {
+      "term": "fan setting",
+      "introducedBy": "huddle1",
+      "say": "setting 1 to 4; each is a different push"
+    },
+    {
+      "term": "force sensor",
+      "introducedBy": "huddle1",
+      "say": "reads the fan force in N"
+    },
+    {
+      "term": "track",
+      "introducedBy": "huddle1",
+      "say": "the flat rail the cart rolls on"
+    },
+    {
+      "term": "mass bar",
+      "introducedBy": "huddle1",
+      "say": "0.25 kg bar that loads the cart"
+    },
+    {
+      "term": "balance",
+      "introducedBy": "huddle1",
+      "say": "reads a mass in kg"
+    },
+    {
+      "term": "motion sensor",
+      "introducedBy": "huddle1",
+      "say": "draws the cart's speed as it rolls"
+    },
+    {
+      "term": "run",
+      "introducedBy": "huddle1",
+      "say": "one trial: set the cart, press Run, the cart rolls 2 s"
+    },
+    {
+      "term": "acceleration",
+      "introducedBy": "earlier lesson (motion and graphs); huddle1 reviews",
+      "say": "how much the speed grows each second, in m/s²"
+    },
+    {
+      "term": "speed graph",
+      "introducedBy": "tutorial 1",
+      "say": "speed up, time across"
+    },
+    {
+      "term": "marker",
+      "introducedBy": "tutorial 1",
+      "say": "a movable line on the speed graph; two of them read the acceleration"
+    },
+    {
+      "term": "graph builder",
+      "introducedBy": "tutorial 2",
+      "say": "the panel that plots your table"
+    },
+    {
+      "term": "guide line",
+      "introducedBy": "tutorial 2",
+      "say": "the straight line through the dots"
+    },
+    {
+      "term": "claim",
+      "introducedBy": "huddle1"
+    },
+    {
+      "term": "evidence",
+      "introducedBy": "huddle1"
+    },
+    {
+      "term": "reasoning",
+      "introducedBy": "huddle1"
+    },
+    {
+      "term": "net force",
+      "introducedBy": "earlier lesson (slot 4)",
+      "say": "pre-lab only"
+    },
+    {
+      "term": "free-body",
+      "introducedBy": "earlier lesson (slot 4)",
+      "say": "pre-lab only"
+    },
+    {
+      "term": "friction",
+      "introducedBy": "earlier lesson (slot 4)",
+      "say": "Mr. D names it at huddle 2: the tiny drag on the track"
+    },
+    {
+      "term": "1/m",
+      "introducedBy": "huddle2",
+      "say": "one divided by the mass; held until after code 2"
+    },
+    {
+      "term": "per kg",
+      "introducedBy": "huddle2",
+      "say": "unit of 1/m; held until after code 2"
+    }
+  ],
+  "prelab": {
+    "doorStaysShutUntilDone": true,
+    "note": "This is the 3-minute warm-up: three easy picture items, review only, then one prediction.",
+    "questions": [
+      {
+        "id": "w1",
+        "picture": "a cart with a long arrow pointing right and a short arrow pointing left",
+        "q": "Which way does the net force point?",
+        "options": [
+          "left",
+          "right",
+          "there is no net force"
+        ],
+        "correct": 1,
+        "explain": "The longer arrow wins, so the net force points right."
+      },
+      {
+        "id": "w2",
+        "picture": "two straight speed graphs from 0: line A climbs steeply, line B climbs gently",
+        "q": "Which cart gains speed faster?",
+        "options": [
+          "cart A",
+          "cart B",
+          "the same"
+        ],
+        "correct": 0,
+        "explain": "A steeper line means the speed grows faster."
+      },
+      {
+        "id": "w3",
+        "picture": "a cart with two equal arrows pointing opposite ways",
+        "q": "What does the cart do?",
+        "options": [
+          "speeds up to the right",
+          "slows down",
+          "keeps its speed, or stays at rest"
+        ],
+        "correct": 2,
+        "explain": "Equal arrows cancel, so the net force is zero."
+      }
+    ],
+    "prediction": {
+      "id": "force",
+      "q": "A cart is pushed with a steady push. You make the push twice as strong. The acceleration will be:",
+      "options": [
+        "about half as big",
+        "about the same",
+        "about twice as big",
+        "about four times as big"
+      ],
+      "oneTry": true,
+      "afterTry": "Good. You will test this in the lab.",
+      "note": "Do not reveal the answer here. The lab shows it. Log the choice."
+    }
+  },
+  "stepCard": {
+    "title": "Step card",
+    "steps": [
+      "Go to the shelf and take four mass bars.",
+      "At the balance, read the mass of the cart and of one bar.",
+      "At the track, load 2 bars on the cart. The mass is the cart plus the bars.",
+      "Set a fan setting and press Run.",
+      "Place the two markers far apart on the straight part of the speed graph. Read the acceleration.",
+      "Part 1: keep 2 bars. Run fan settings 1, 2, 3 and 4. Record each.",
+      "Predict, then Part 2: set the fan to 3 and run 0, 1, 2 and 4 bars. Record each.",
+      "Graph acceleration against fan force, then against mass.",
+      "Write your claim, evidence and reasoning. Use numbers from your tables."
+    ],
+    "afterCode2": [
+      "Graph acceleration against 1/m.",
+      "Use your line to predict the acceleration with 3 bars. Then run it."
+    ]
+  },
+  "quests": [
+    {
+      "id": "door",
+      "text": "Go through the door into the lab",
+      "hint": "The light on the DOOR turns green when the pre-lab is done.",
+      "state": "entered_lab",
+      "tutorial": true
+    },
+    {
+      "id": "bars",
+      "text": "Take four mass bars from the BAR SHELF",
+      "hint": "Walk to the BAR SHELF, face it and press E. Take four bars.",
+      "event": "take",
+      "where": {
+        "id": "bar"
+      },
+      "count": 4,
+      "tutorial": true
+    },
+    {
+      "id": "weigh",
+      "text": "Read the mass of the cart and of one bar on the BALANCE",
+      "hint": "The BALANCE is the small scale on the bench. Press E and read both masses.",
+      "event": "weigh",
+      "distinct": "item",
+      "count": 2,
+      "tutorial": true
+    },
+    {
+      "id": "track",
+      "text": "Go to the TRACK",
+      "hint": "It is the long rail with the cart on it. Face it and press E.",
+      "event": "station",
+      "where": {
+        "id": "track"
+      },
+      "tutorial": true
+    },
+    {
+      "id": "firstrun",
+      "text": "Load 2 bars, pick fan setting 2 and press Run",
+      "hint": "Use the bar buttons to load 2 bars. Pick setting 2. Press Run and watch the speed graph.",
+      "event": "run",
+      "tutorial": true
+    },
+    {
+      "id": "markers",
+      "text": "Place both markers on the straight part of the speed graph and read the acceleration",
+      "hint": "Drag the two markers far apart on the dots. The box shows the acceleration in m/s².",
+      "event": "read",
+      "tutorial": true
+    },
+    {
+      "id": "record",
+      "text": "Record the run: type the mass, then press Record",
+      "hint": "The mass is 0.50 kg for the cart plus 0.25 kg for each bar. The fan force and the acceleration fill in for you.",
+      "event": "record",
+      "tutorial": true
+    },
+    {
+      "id": "part1",
+      "text": "Part 1: keep 2 bars and record fan settings 1, 2, 3 and 4",
+      "hint": "Change only the fan setting. Run, read, record. Four rows.",
+      "event": "record",
+      "where": {
+        "part": "1"
+      },
+      "distinct": "setting",
+      "count": 4
+    },
+    {
+      "id": "predict2",
+      "text": "Predict what a bigger mass does to the acceleration (one try)",
+      "hint": "Part 2 stays locked until you answer. There is no wrong answer to log.",
+      "event": "predict",
+      "where": {
+        "id": "mass"
+      }
+    },
+    {
+      "id": "part2",
+      "text": "Part 2: set the fan to 3 and record 0, 1, 2 and 4 bars",
+      "hint": "Change only the number of bars. The mass is 0.50 kg plus 0.25 kg for each bar.",
+      "event": "record",
+      "where": {
+        "part": "2"
+      },
+      "distinct": "bars",
+      "count": 4
+    },
+    {
+      "id": "graphF",
+      "text": "Graph acceleration against fan force",
+      "hint": "In the graph builder pick fan force across and acceleration up. Press Guide line.",
+      "event": "plot",
+      "where": {
+        "x": "F"
+      },
+      "tutorial": true
+    },
+    {
+      "id": "graphM",
+      "text": "Graph acceleration against mass",
+      "hint": "Pick mass across and acceleration up. If the dots bend, press Connect the dots.",
+      "event": "plot",
+      "where": {
+        "x": "m"
+      }
+    },
+    {
+      "id": "cer",
+      "text": "Write your claim, evidence and reasoning",
+      "hint": "Use two numbers from each table. Open the checklist.",
+      "state": "cer_done"
+    },
+    {
+      "id": "code2",
+      "text": "Enter code 2 from Mr. D",
+      "hint": "Mr. D gives code 2 at the end of huddle 2.",
+      "state": "huddle2",
+      "phase": "after"
+    },
+    {
+      "id": "graphInv",
+      "text": "Graph acceleration against 1/m",
+      "hint": "Pick 1/m across and acceleration up. Press Guide line. The line passes through the corner.",
+      "event": "plot",
+      "where": {
+        "x": "invm"
+      },
+      "phase": "after"
+    },
+    {
+      "id": "testrun",
+      "text": "Predict the acceleration with 3 bars from your line (one try), then run it",
+      "hint": "3 bars is 1.25 kg. Find 1/m for 1.25 kg, then read up to the line.",
+      "event": "run",
+      "where": {
+        "part": "test"
+      },
+      "phase": "after"
+    },
+    {
+      "id": "submit",
+      "text": "Hand in your record",
+      "hint": "Press Hand in on the notebook.",
+      "state": "submitted",
+      "phase": "after"
+    }
+  ],
+  "record": {
+    "part1Columns": [
+      "fan setting",
+      "fan force (N)",
+      "mass (kg)",
+      "acceleration (m/s²)"
+    ],
+    "part2Columns": [
+      "bars",
+      "mass (kg)",
+      "fan force (N)",
+      "acceleration (m/s²)"
+    ],
+    "autoFill": [
+      "fan force",
+      "acceleration"
+    ],
+    "studentTypes": "mass (kg). Accepted within 0.01 of 0.50 + 0.25 × bars. A wrong mass shows: The cart is 0.50 kg and each bar adds 0.25 kg.",
+    "readingRule": "Markers closer than 0.5 s apart show: Spread the markers apart. A short stretch is shaky. No reading is given."
+  },
+  "messages": {
+    "predictLock": "Predict first. The Run button opens when you answer.",
+    "markersClose": "Spread the markers apart. A short stretch is shaky.",
+    "massWrong": "The cart is 0.50 kg and each bar adds 0.25 kg.",
+    "needBars": "Take the mass bars from the shelf first.",
+    "guideLineNeedsDots": "Record at least three runs for this graph first.",
+    "codeAsk": "Mr. D gives you the code.",
+    "tableGood": "Your table has all four rows."
+  },
+  "predictions": [
+    {
+      "id": "force",
+      "when": "pre-lab",
+      "q": "A cart is pushed with a steady push. You make the push twice as strong. The acceleration will be:",
+      "options": [
+        "about half as big",
+        "about the same",
+        "about twice as big",
+        "about four times as big"
+      ],
+      "log": "choice only"
+    },
+    {
+      "id": "mass",
+      "when": "before part 2",
+      "q": "You double the mass and keep the fan force. The acceleration will be:",
+      "options": [
+        "about half as big",
+        "about the same",
+        "about twice as big",
+        "about four times as big"
+      ],
+      "log": "choice only; one try; no hint on a wrong choice"
+    },
+    {
+      "id": "test",
+      "when": "after code 2",
+      "q": "Use your line. What acceleration will 3 bars give?",
+      "type": "number (m/s²)",
+      "expect": 0.35,
+      "tol": 0.03,
+      "log": "typed value and the run result"
+    }
+  ],
+  "figures": [
+    {
+      "id": "track-picture",
+      "title": "The fan cart on the track",
+      "axes": "none: this is a picture",
+      "oneMark": "each part is labeled: fan, cart, bars on top, track, motion sensor at the far end, force sensor on the fan",
+      "lookFirst": "the fan on top of the cart and the bars sitting on the cart",
+      "wrongReading": "thinking something pulls the cart: nothing pulls it, the fan pushes it"
+    },
+    {
+      "id": "speed-graph",
+      "title": "The speed graph from one run",
+      "axes": "across: time in seconds, 0 to 2.0. Up: speed in m/s.",
+      "oneMark": "one dot is one reading of the cart's speed at one moment",
+      "lookFirst": "whether the dots climb in a straight line, and how steep it is",
+      "wrongReading": "reading the height of the last dot as the acceleration: that is the final speed. Acceleration is how much the speed grows each second."
+    },
+    {
+      "id": "a-vs-F",
+      "title": "Acceleration against fan force (Part 1)",
+      "axes": "across: fan force in N. Up: acceleration in m/s².",
+      "oneMark": "one dot is one run: the fan force and the acceleration it gave",
+      "lookFirst": "do the dots climb, and do they sit near a straight line?",
+      "wrongReading": "reading a dot's height as a fan force: height is acceleration"
+    },
+    {
+      "id": "a-vs-m",
+      "title": "Acceleration against mass (Part 2)",
+      "axes": "across: mass in kg. Up: acceleration in m/s².",
+      "oneMark": "one dot is one run at one mass, with the fan force fixed",
+      "lookFirst": "do the dots fall, and do they fall straight or bend?",
+      "wrongReading": "calling it a straight line because the first two dots look straight: look at all four"
+    },
+    {
+      "id": "a-vs-invm",
+      "title": "Acceleration against 1/m",
+      "afterCode2": true,
+      "axes": "across: 1/m, which is one divided by the mass, in per kg. Up: acceleration in m/s².",
+      "oneMark": "one dot is one run: its 1/m and its acceleration",
+      "lookFirst": "do the dots sit on a straight line that passes through the corner?",
+      "wrongReading": "reading 1/m as the mass: a heavy cart has a small 1/m"
+    }
+  ],
+  "tutorials": {
+    "tutorial1": {
+      "name": "Read the speed graph",
+      "seconds": 45,
+      "captions": [
+        "The motion sensor draws the cart's speed as it rolls.",
+        "Each dot is one reading of the speed.",
+        "A steeper line means the speed grows faster.",
+        "Drag the two markers far apart on the dots. The box shows the acceleration.",
+        "Markers close together give a shaky reading, so spread them out."
+      ]
+    },
+    "tutorial2": {
+      "name": "Build a graph",
+      "seconds": 40,
+      "captions": [
+        "Pick what goes across and what goes up.",
+        "Every row in your table adds one dot.",
+        "Press Guide line to draw the straight line through the dots.",
+        "If the dots bend, press Connect the dots instead."
+      ]
+    }
+  },
+  "postlab": {
+    "prompt": "How does the cart's acceleration change when the fan force doubles? When the mass doubles? Use numbers from your tables.",
+    "minWords": {
+      "claim": 8,
+      "evidence": 12,
+      "reasoning": 15
+    },
+    "starters": {
+      "claim": [
+        "When the fan force doubles, the acceleration ",
+        "When the mass doubles, the acceleration "
+      ],
+      "reasoning": [
+        "This evidence supports my claim because ",
+        "The numbers are not exact because "
+      ]
+    },
+    "wordBank": [
+      "acceleration",
+      "fan force",
+      "mass",
+      "about double",
+      "about half",
+      "my table"
+    ],
+    "checklist": [
+      "My claim answers both parts: the fan force and the mass.",
+      "My evidence has two numbers from Part 1 and two from Part 2.",
+      "I say about double and about half, not exactly.",
+      "My reasoning says why the numbers point to my claim."
+    ],
+    "wordsHeldForHuddle2": [
+      "1/m",
+      "per kg"
+    ]
+  },
+  "huddle2Tab": {
+    "tested": "What will be tested: say how acceleration changes when the fan force doubles and when the mass doubles, using numbers from a table. Read a straight line to predict a new acceleration.",
+    "blanks": [
+      {
+        "id": "h1",
+        "text": "Double the fan force, same cart: the acceleration is about ______.",
+        "answer": "double"
+      },
+      {
+        "id": "h2",
+        "text": "Double the mass, same fan force: the acceleration is about ______.",
+        "answer": "half"
+      },
+      {
+        "id": "h3",
+        "text": "Acceleration against 1/m is a ______ line through the corner.",
+        "answer": "straight"
+      }
+    ],
+    "worked": [
+      {
+        "id": "W1",
+        "problem": "A 1.00 kg cart at fan force 0.15 N has acceleration 0.14 m/s². Predict the acceleration at 0.45 N.",
+        "steps": [
+          "0.45 N ÷ 0.15 N = 3 times the force.",
+          "3 × 0.14 m/s² = 0.42 m/s².",
+          "Check: your table says about 0.44. Close."
+        ],
+        "answer": 0.42
+      },
+      {
+        "id": "W2",
+        "problem": "A 0.50 kg cart at 0.45 N has acceleration 0.88 m/s². Predict the acceleration of a 1.50 kg cart at 0.45 N.",
+        "steps": [
+          "1.50 kg ÷ 0.50 kg = 3 times the mass.",
+          "Three times the mass gives one third the acceleration.",
+          "0.88 m/s² ÷ 3 = 0.29 m/s²."
+        ],
+        "answer": 0.29
+      },
+      {
+        "id": "W3",
+        "problem": "On your acceleration-against-1/m line, 1/m = 1.00 per kg gives 0.44 m/s². Predict the acceleration of a 1.25 kg cart.",
+        "steps": [
+          "1/m = 1 ÷ 1.25 kg = 0.80 per kg.",
+          "The line passes through the corner, so 0.80 gives 0.80 × 0.44 m/s².",
+          "0.80 × 0.44 = 0.35 m/s²."
+        ],
+        "answer": 0.35
+      }
+    ],
+    "crux": [
+      {
+        "id": "c1",
+        "q": "Same cart, the fan force triples. About how many times bigger is the acceleration?",
+        "answer": "about 3 times"
+      },
+      {
+        "id": "c2",
+        "q": "Same fan force, the mass triples. What happens to the acceleration?",
+        "answer": "it becomes about one third"
+      },
+      {
+        "id": "c3",
+        "q": "Which of your graphs are straight lines?",
+        "answer": "acceleration against fan force, and acceleration against 1/m. Not acceleration against mass."
+      }
+    ],
+    "mrDSays": [
+      "friction: the track has a tiny drag. That is why the force line misses the corner by a hair.",
+      "1/m: one divided by the mass. Per kg."
+    ],
+    "note": "Mr. D does these on the pen display. The site shows the blanks and the answers after he finishes. ΣF = ma and the newton are slot 8."
+  },
+  "exit": {
+    "type": "draw",
+    "prompt": "Draw two small graphs, both with acceleration going up. On the first put fan force across. On the second put mass across, with the fan force fixed. Sketch the dots and label the axes.",
+    "look": [
+      "first graph: dots climb in a straight line from near the corner",
+      "second graph: dots fall, steep at first and then flatter",
+      "axes labeled with the quantity on each"
+    ],
+    "scan": "Mr. D scans by eye"
+  },
+  "room": {
+    "id": "physics-lab",
+    "theme": {
+      "wall": "#7d8b99"
+    },
+    "noPPE": true,
+    "start": {
+      "x": 6,
+      "y": 8,
+      "face": "u"
+    },
+    "rows": [
+      "############",
+      "#C.........#",
+      "#..........#",
+      "#B.W.TTTT..#",
+      "#..........#",
+      "#..........#",
+      "####D#######",
+      "#..........#",
+      "#N.........#",
+      "#..........#",
+      "############"
+    ],
+    "legend": {
+      "#": {
+        "type": "wall",
+        "solid": true
+      },
+      ".": {
+        "type": "floor"
+      },
+      "D": {
+        "type": "door",
+        "id": "door",
+        "label": "DOOR",
+        "name": "Lab door",
+        "text": "The lab door. It opens when the pre-lab is done."
+      },
+      "N": {
+        "type": "info",
+        "solid": true,
+        "id": "notice",
+        "label": "NOTICE",
+        "name": "Notice board",
+        "text": "Today: how does a cart's acceleration change with the fan force, and with the mass? The door light turns green when your pre-lab is done."
+      },
+      "C": {
+        "type": "chalkboard",
+        "solid": true,
+        "id": "stepcard",
+        "label": "STEP CARD",
+        "name": "Step card",
+        "text": "The step card lists every step of the lab, in order."
+      },
+      "B": {
+        "type": "shelf",
+        "solid": true,
+        "id": "bar_shelf",
+        "label": "BAR SHELF",
+        "group": "Mass bars",
+        "items": [
+          "bar"
+        ],
+        "name": "Mass bar shelf",
+        "text": "Mass bars. Take four. Each bar is for loading the cart."
+      },
+      "W": {
+        "type": "station",
+        "solid": true,
+        "id": "balance",
+        "label": "BALANCE",
+        "name": "Balance",
+        "text": "The balance reads a mass in kg. Read the cart and one bar."
+      },
+      "T": {
+        "type": "station",
+        "solid": true,
+        "id": "track",
+        "label": "TRACK",
+        "name": "Fan cart track",
+        "text": "The track, the fan cart, the force sensor and the motion sensor. Press E to open the notebook."
+      }
+    },
+    "newArt": [
+      "track (four tiles wide: rail, cart with fan on top, bars stacked on the cart, motion sensor at the far end)",
+      "balance (small scale with a pan)",
+      "bar_shelf (dark bars on a shelf)"
+    ]
+  },
+  "teacherKey": {
+    "shows": "every item in slot-07-items.json next to the lesson, plus the three generated samples per band; each lab record row; the three predictions; the CER with a count check (two numbers from each table)",
+    "cerCheck": "evidence cites two numbers from Part 1 and two from Part 2 (accept the student's own table values; ignore numbers under 0.1 that match by luck)"
+  }
+}

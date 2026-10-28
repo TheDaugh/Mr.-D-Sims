@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Lab 5</title>
+<meta name="description" content="A virtual physics lab for Mr. D's class: walk the room, take your own data and write what you find.">
+<link rel="stylesheet" href="../../chemistry/shared/lab.css">
+<link rel="stylesheet" href="../../chemistry/virtual-lab/src/ui/stage.css">
+<link rel="stylesheet" href="src/ui/fancart.css">
+</head>
+<body>
+<div id="stage">
+  <div id="boot" class="note">Loading the lab…</div>
+  <div id="app" hidden>
+    <div id="hud">
+      <a class="back" href="../" title="Back to the physics hub">←</a>
+      <h1 id="title">Virtual Lab 5</h1>
+      <div id="coach"><b>Next:</b><span id="coachText"></span></div>
+      <button class="hudbtn" id="btnPic" hidden title="A picture of this step">🖼 Picture</button>
+      <div id="timer" title="Active lab time. It only counts while you are working in the lab." hidden></div>
+      <div class="hud">
+        <button class="hudbtn" id="btnKey" hidden title="Teacher answer key">🔑 Key</button>
+        <button class="hudbtn" id="btnTasks" title="Tasks (J)">✔ Tasks</button>
+        <button class="hudbtn" id="btnTheory" title="Theory (T)" hidden>📖 Theory</button>
+        <button class="hudbtn" id="btnNotebook" title="Notebook (N)">📓 Notebook<i class="dot" id="nbDot" hidden></i></button>
+        <button class="hudbtn" id="btnMicro" title="Microscope (M)" hidden>🔬 Scope</button>
+        <button class="hudbtn" id="btnCER" hidden>✍ CER</button>
+        <button class="hudbtn" id="btnHuddle" hidden>Huddle 2 code</button>
+        <button class="hudbtn" id="btnDemo" title="Watch the demo">▶ Demo</button>
+        <button class="hudbtn" id="btnMenu" title="Save, print, hand in">💾 Menu</button>
+      </div>
+    </div>
+    <div id="main">
+      <div id="world">
+        <canvas id="room" aria-label="Isometric view of the lab. Walk with the arrow keys or WASD and press E to use what you face."></canvas>
+        <canvas id="bench" hidden aria-label="Lab bench with the jars you carry, containers, a balance, a hot plate and a tester."></canvas>
+        <div id="demoBar" hidden><span id="demoText"></span><button id="demoStop">Stop demo</button></div>
+        <button id="leaveBench" class="worldbtn" hidden>← Back to the room (Esc)</button>
+        <section id="taskPanel" aria-label="Tasks"><h2><span id="questHead">Tasks</span><span class="hint" style="text-transform:none;letter-spacing:0;color:#93a1b0">J hides</span></h2><ul id="quests"></ul></section>
+        <p id="viewHint"></p>
+        <aside id="stepCard" aria-label="Step card" hidden></aside>
+      </div>
+      <div id="side">
+        <section class="card" id="incident" role="alert" hidden></section>
+        <section class="card" id="panelCard" hidden><h2 id="panelTitle"></h2><div id="panelBody"></div><button id="panelClose">Close</button></section>
+        <section class="card" id="controlsCard" aria-label="Controls" hidden><div id="controls"></div><p class="hint" style="margin:6px 0 0">Click a container, then click it again to zoom in on its particles.</p></section>
+        <section class="card" id="helpCard"><h2>How to play</h2>
+          <table class="keys"><tbody>
+            <tr><td><kbd>← ↑ → ↓</kbd></td><td>Walk (or W A S D)</td></tr><tr><td><kbd>E</kbd></td><td>Use what you face</td></tr>
+            <tr><td><kbd>J</kbd></td><td>Show or hide tasks</td></tr><tr><td><kbd>N</kbd></td><td>Notebook (see the step card)</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Back, or close a window</td></tr></tbody></table>
+          <label class="hint"><input type="checkbox" id="guideOn" checked> Show tutorial arrows</label>
+          <p class="hint" style="margin:6px 0 0">Hover over anything to see its name. The yellow arrow shows the next thing to use.</p></section>
+      </div>
+    </div>
+    <div id="bottom">
+      <div id="hotbar"><h2>Carrying <span id="invCount"></span></h2><div id="inv"></div><div id="ppe"></div><p id="modeLine"></p></div>
+      <div id="logwrap" role="log" aria-live="polite"><h2>What happened</h2><div id="feed"></div></div>
+    </div>
+  </div>
+  <div id="veil" hidden></div>
+<dialog class="dlg" id="dlgIntro"><div class="body" id="introBody"></div></dialog>
+<dialog class="dlg" id="dlgPrelab" data-gate><div class="body" id="prelabBody"></div></dialog>
+<dialog class="dlg" id="dlgTheory"><div class="body"><button id="dlgTheoryClose" class="x" data-close>Close ✕</button><h2>Theory</h2><div id="theoryBody"></div></div></dialog>
+<dialog class="dlg" id="dlgNotebook" data-wide><div class="body" id="sheet">
+  <button id="dlgNotebookClose" class="x" data-close>Close ✕</button><h2>Notebook</h2>
+  <details><summary><b>Steps</b></summary><ol id="steps"></ol></details>
+  <details><summary><b>The five tests</b></summary><ol id="tests"></ol></details>
+  <h3>Record what you observed</h3><p class="hint">Only what you saw. Choose an identity for each unknown once you have enough evidence.</p>
+  <div class="scrollx"><table id="table"></table></div>
+  <p class="hint" id="nbCount" role="status"></p>
+  <div class="controls"><button id="nbSubmit" class="primary" disabled>Submit answers</button><span id="nbDone" hidden>✔ Submitted. Open ✍ Write CER to finish.</span></div>
+</div></dialog>
+<dialog class="dlg" id="dlgCER" data-wide><div class="body" id="cerBody"></div></dialog>
+<dialog class="dlg" id="dlgMicro"><div class="body"><button id="dlgMicroClose" class="x" data-close>Close ✕</button><h2 id="microTitle">Microscope</h2><p class="hint" id="microNote"></p>
+  <div id="microWrap"><canvas id="microCanvas"></canvas><div><h3>Key</h3><ul id="microLegend"></ul></div></div></div></dialog>
+<dialog class="dlg" id="dlgMenu"><div class="body"><button id="dlgMenuClose" class="x" data-close>Close ✕</button><h2>Save, print, hand in</h2>
+  <div class="controls" style="flex-direction:column;align-items:stretch;max-width:340px">
+    <button id="save">Save progress (download file)</button>
+    <button id="fullscreen">Full screen (toggle)</button>
+    <button id="zoomBase">Use this browser zoom as normal size</button>
+    <label class="btnlike">Load a saved lab <input id="load" type="file" accept=".json,application/json" hidden></label>
+    <button id="print">Print report</button>
+    <button id="download" class="primary">Download lab record (hand this in)</button></div>
+  <p class="hint">Your progress also saves automatically in this browser. The lab record is the file you turn in.</p></div></dialog>
+<dialog class="dlg small" id="dlgDone"><div class="body"><h2>Hand in your lab</h2><canvas id="badge" width="480" height="360" style="width:300px;height:225px;display:block;margin:0 auto"></canvas>
+  <p id="doneInfo" class="hint" style="text-align:center"></p>
+  <p>Turn in <b>one</b> of these: the printed report (choose Save as PDF), or the record file for your teacher's data page.</p>
+  <div class="controls"><button class="primary" id="donePrint">Print / Save as PDF</button><button id="doneDl">Download record (.json)</button><button id="dlgDoneClose" data-close>Close</button></div></div></dialog>
+<dialog class="dlg" id="dlgKey"><div class="body"><button id="dlgKeyClose" class="x" data-close>Close ✕</button><h2>Teacher key</h2><div id="keyBody"></div></div></dialog>
+<dialog class="dlg small" id="dlgHuddle" data-gate><div class="body" id="huddleBody"></div></dialog>
+<dialog class="dlg small" id="dlgPic"><div class="body"><button id="dlgPicClose" class="x" data-close>Close ✕</button><h2 id="picTitle"></h2><div id="picBody"></div></div></dialog>
+<dialog class="dlg" id="dlgTut2" data-wide><div class="body" id="tut2Body"></div></dialog>
+<dialog class="dlg chest" id="dlgChest"><div class="body" id="chestBody"></div></dialog>
+<dialog class="dlg small" id="dlgGate"><div class="body"><h2>Not enough lab time yet</h2><p id="gateMsg"></p><div class="controls"><button id="dlgGateClose" class="primary" data-close>Back to the lab</button></div></div></dialog>
+
+</div>
+<div id="tip" role="tooltip" hidden><canvas id="tipIcon" width="48" height="48"></canvas><div><b id="tipName"></b><span id="tipBlurb"></span></div></div>
+<div id="report"></div>
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
+<script src="../../shared/lock.js"></script>
+<script src="../../shared/profile.js"></script>
+<script type="module" src="src/host.js"></script>
+<script type="module" src="../../chemistry/virtual-lab/src/ui/app.js"></script>
+</body>
+</html>

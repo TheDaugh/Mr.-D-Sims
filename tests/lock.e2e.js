@@ -31,6 +31,11 @@ const TARGETS = [
     begin: async page => { await page.waitForTimeout(900); await page.fill('#student', 'Lockie Test'); await page.click('button:has-text("Start the pre-lab")'); },
     reopen: async page => { const b = page.locator('button:has-text("Continue where I left off")'); if (await b.count()) await b.click(); },
     gateInput: 'input[aria-label="Unlock code from Mr. D"]', gateButton: 'button:has-text("Unlock")' })),
+  /* the physics virtual lab runs on the shared lab app from physics/virtual-lab, in physics' own period; #key is its teacher switch */
+  { name: 'virtual lab physics 05-fan-cart', url: '/physics/virtual-lab/index.html?lab=05-fan-cart', clockAt: '2026-10-21T09:05:00-04:00', student: 'Lockie Test', saveMs: 6000,
+    begin: async page => { await page.waitForTimeout(900); await page.fill('#student', 'Lockie Test'); await page.click('#introGo'); },
+    reopen: async page => { const b = page.locator('button:has-text("Continue where I left off")'); if (await b.count()) await b.click(); },
+    gateInput: 'input[aria-label="Unlock code from Mr. D"]', gateButton: 'button:has-text("Unlock")' },
 ];
 
 const STUB = () => {

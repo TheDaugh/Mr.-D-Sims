@@ -12,7 +12,7 @@ export function renderIntro(box, ctx) {
   const { lab } = ctx;
   const key = (k, t) => h("tr", {}, h("td", {}, h("kbd", {}, k)), h("td", {}, t));
   const name = h("input", { id: "student", type: "text", autocomplete: "name", style: "width:18em", placeholder: "First and last name" });
-  const go = h("button", { class: "primary", disabled: true, onclick: () => ctx.onIntroDone(name.value.trim()) }, "Start the pre-lab →");
+  const go = h("button", { id: "introGo", class: "primary", disabled: true, onclick: () => ctx.onIntroDone(name.value.trim()) }, "Start the pre-lab →");
   name.addEventListener("input", () => { go.disabled = name.value.trim().length < 3; });
   if (ctx.S.student) { name.value = ctx.S.student; go.disabled = name.value.trim().length < 3; }
   box.replaceChildren(
@@ -25,7 +25,7 @@ export function renderIntro(box, ctx) {
       key("Esc", "Step away from the bench, or close a window."), key("Hover", "Point at anything to see its name and picture."), ...(lab.introKeys || []).map(([k, t]) => key(k, t))])),
     h("p", { class: "hint" }, "The bar along the bottom is your log. It tells you what happened and why. Read it."),
     h("label", { style: "display:block;margin:12px 0" }, "Your name ", name),
-    h("div", { class: "controls foot" }, lab.noDemo ? null : h("button", { onclick: ctx.onDemo }, "▶ Watch the demo"), go));
+    h("div", { class: "controls foot" }, lab.noDemo ? null : h("button", { id: "introDemo", onclick: ctx.onDemo }, "▶ Watch the demo"), go));
 }
 
 export function renderPrelab(box, ctx) {

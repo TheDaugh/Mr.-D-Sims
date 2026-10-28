@@ -20,6 +20,7 @@ const ICONS = {
   door: (R) => { R(5, 2, 14, 20, "#a3804c"); R(7, 4, 10, 16, "#c9a066"); R(15, 12, 2, 2, "#3a3a3a"); R(10, 5, 4, 3, "#3ecf6a"); },
   bench: (R) => { R(2, 10, 20, 4, "#c99c6d"); R(2, 14, 20, 6, "#97704a"); R(4, 5, 5, 5, "#58606b"); R(13, 4, 4, 6, "#9db6c7"); R(18, 8, 3, 2, "#e0472c"); }
 };
+if (typeof window !== "undefined" && window.VLAB_HOST && window.VLAB_HOST.icons) Object.assign(ICONS, window.VLAB_HOST.icons);   // a lab from another folder adds its own pictures
 const ALIAS = { tongs_rack: "tongs", first_aid: "firstaid", shelf_unknown: "shelf", shelf_liquids: "shelf", shelf_known: "shelf" };
 const SHELF_COLOR = { shelf_liquids: "#78b9eb", shelf_known: "#e8e0c8", shelf_unknown: "#f4f4f0" };
 
