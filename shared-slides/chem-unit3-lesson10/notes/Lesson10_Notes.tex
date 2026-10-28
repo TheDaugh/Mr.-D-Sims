@@ -1,0 +1,129 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[top=0.4in,bottom=0.35in,left=0.45in,right=0.45in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{helvet}\renewcommand{\familydefault}{\sfdefault}
+\usepackage[helvet]{sfmath}
+\usepackage{amssymb,xcolor,tikz,tcolorbox,array}
+\tcbuselibrary{skins}
+\pagestyle{empty}\setlength{\parindent}{0pt}\setlength{\parskip}{2pt}
+\newif\ifkey \ifdefined\KEY\keytrue\fi
+\definecolor{ink}{HTML}{12202B}\definecolor{teal}{HTML}{146A6D}\definecolor{key}{HTML}{B00020}
+\newcommand{\cf}[1]{\ensuremath{\mathsf{#1}}}
+\newcommand{\A}[1]{\ifkey\textcolor{key}{\textbf{#1}}\fi}
+\newcommand{\bl}[2]{\underline{\hbox to #1{\hfil\A{#2}\hfil}}}
+\newcommand{\sbar}[2][]{\vspace{3pt}\colorbox{gray!22}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small\textbf{#2}\hfill{\footnotesize #1}}}\par\vspace{1pt}}
+\newcommand{\bx}[1]{\begin{tcolorbox}[enhanced,colback=white,colframe=gray!70,boxrule=0.5pt,left=3pt,right=3pt,top=2pt,bottom=2pt,arc=0pt,#1]\raggedright}
+\newcommand{\ebx}{\end{tcolorbox}}
+\newcommand{\dash}{\begin{tcolorbox}[enhanced,colback=white,colframe=black,boxrule=0.6pt,left=4pt,right=4pt,top=2pt,bottom=2pt,arc=0pt,borderline={0.6pt}{0pt}{white,dash pattern=on 4pt off 3pt}]}
+\newcommand{\edash}{\end{tcolorbox}}
+\newcommand{\tile}[4]{\begin{tikzpicture}[baseline=0]
+\draw[gray!70,dashed](0,0)rectangle(1.45,1.45);
+\node[font=\bfseries\Large]at(.725,.725){#1};
+\foreach \x/\y [count=\i] in {.395/.09,.605/.09,.91/.395,.605/.91,.09/.605,.91/.605,.395/.91,.09/.395}{%
+\ifnum\i>#2 \fill[gray!25](1.45*\x,1.45-1.45*\y)circle(.065);\else
+\ifnum\numexpr#3+\ifkey1\else0\fi\relax>0 \fill[black](1.45*\x,1.45-1.45*\y)circle(.095);\else \fill[gray!25](1.45*\x,1.45-1.45*\y)circle(.065);\fi\fi}
+\ifnum#4=1 \node[font=\footnotesize]at(.725,-.3){#2 valence};\else\node[font=\footnotesize]at(.725,-.3){\bl{.6cm}{#2} valence};\fi
+\end{tikzpicture}}
+\begin{document}\raggedright
+\colorbox{gray!30}{\parbox{\dimexpr\linewidth-2\fboxsep}{\Large\textbf{Unit 3 \ $\cdot$ \ Lesson 10 \quad Electron Configurations II}\\[1pt]\normalsize\textbf{Ions, shorthand, valence, Lewis dots}\hfill Name \bl{5cm}{} \ Per \bl{1.2cm}{}}}\par
+{\footnotesize\textbf{Keywords:} ion, cation, anion, noble-gas shorthand, core electrons, valence electrons, Lewis dots, isoelectronic. \hfill\textit{Pencil. Fix wrong answers in a second color. Printed text is yours to read; every blank is a decision.}}\par
+
+\sbar[Do before the bell rings; revisit at the end]{Question of the day}
+\dash\small\textbf{Why doesn't your lunch blow up?} Circle one: \textbf{A} It isn't really potassium. \ \textbf{B} The potassium already lost an electron. \ \textbf{C} Too little of it to react. \ \textbf{D} The peel keeps the water out. \A{(B is the best answer)}\\[2pt]
+My reason: \bl{9.5cm}{}\ \ After the lesson I would change to: \bl{1.4cm}{}\edash
+
+\sbar[5 min, no notes]{Retrieve}
+\small\textbf{1.} Config of P (Z\,=\,15): \bl{5cm}{\cf{1s^22s^22p^63s^23p^3}} \ \textbf{2.} Electrons in a d subshell: \bl{1cm}{10}\ \textbf{3.} 17 p$^+$, 18 e$^-$. Charge: \bl{1cm}{\cf{1-}}
+
+\sbar[commit before the animation]{Predict, then watch}
+\small Argon has 18 electrons: \cf{1s^22s^22p^63s^23p^6}. Potassium has one more. Electron 19 goes to (circle): \textbf{A} 3d \quad \textbf{B} 4s \quad \textbf{C} 4p. Because \bl{7cm}{}\\
+After watching: electron 19 went to \bl{1.2cm}{4s}; the outermost shell holds \bl{.8cm}{1} electron.
+
+\sbar{Ions and shorthand}
+\small An \textbf{ion} is an atom that has gained or lost electrons. \textbf{Protons never change}; electrons leave from, and join, the \textbf{outermost shell} (the highest $n$). A \textbf{cation} lost electrons (positive). An \textbf{anion} gained electrons (negative).
+\textbf{Shorthand} swaps the core for the noble gas that comes \textbf{before} the element: \cf{Na = [Ne]3s^1}, not \cf{[Ar]3s^1}.\\[2pt]
+\cf{K^+}: protons \bl{.8cm}{19} \ electrons \bl{.8cm}{18} \ charge \bl{.8cm}{\cf{1+}} \hfill Shorthand for Al (Z\,=\,13): \bl{3cm}{\cf{[Ne]3s^23p^1}}
+
+\sbar[predict first: how many valence electrons does gallium have?   My guess: \bl{.8cm}{3}]{Core vs valence: gallium, Z\,=\,31}
+\small \textbf{Valence electrons} are in the outermost shell (highest $n$). Everything inside is \textbf{core}. The 3d fills after 4s, but its shell number is 3.\par\vspace{2pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}|c|l|c|c|@{}}\hline
+Shell $n$ & Subshells in that shell & Electrons & Circle one\\\hline
+1 & \cf{1s^2} & \bl{1cm}{2} & core \ valence\\
+2 & \cf{2s^22p^6} & \bl{1cm}{8} & core \ valence\\
+3 & \cf{3s^23p^63d^{10}} & \bl{1cm}{18} & core \ valence\\
+4 & \cf{4s^24p^1} & \bl{1cm}{3} & core \ valence\\\hline
+\end{tabular}\quad
+\parbox[b]{7.8cm}{\small Ga has \bl{.8cm}{3} valence electrons.\\ Check: do the shell counts add to 31? \bl{1.5cm}{2+8+18+3}}
+
+\sbar[atoms only: no brackets or charges yet]{Lewis dots}
+\small Dots show \textbf{valence electrons only}. Place the s pair on \textbf{top}, then one dot each on the \textbf{right, bottom, left}, then pair up. Na and Mg are drawn; do Al to Ar. P should get \bl{.6cm}{5} dots.\par\vspace{3pt}
+\hspace{-2pt}\tile{Na}{1}{1}{1}\hfill\tile{Mg}{2}{1}{1}\hfill\tile{Al}{3}{0}{0}\hfill\tile{Si}{4}{0}{0}\hfill\tile{P}{5}{0}{0}\hfill\tile{S}{6}{0}{0}\hfill\tile{Cl}{7}{0}{0}\hfill\tile{Ar}{8}{0}{0}\par\vspace{10pt}
+
+\sbar[finished early? start here]{Stretch}
+\footnotesize
+\textbf{Stretch 1} \ Draw the orbital boxes for N (Z\,=\,7). Unpaired electrons: \bl{.7cm}{3} \ Full configuration of Ca: \bl{4.6cm}{\cf{1s^22s^22p^63s^23p^64s^2}}\\
+\textbf{Stretch 2} \ \cf{S^{2-}}, \cf{Cl^-}, \cf{K^+}, \cf{Ca^{2+}} and Ar share one configuration. Protons in each: \bl{.6cm}{16}, \bl{.6cm}{17}, \bl{.6cm}{19}, \bl{.6cm}{20}, \bl{.6cm}{18}. What differs? \bl{3.2cm}{protons}\\
+\textbf{Stretch 3} \ Fe is \cf{[Ar]3d^64s^2}. Write \cf{Fe^{2+}}: \bl{2cm}{\cf{[Ar]3d^6}} \ and \cf{Fe^{3+}}: \bl{2cm}{\cf{[Ar]3d^5}} \ Which electrons left first? \bl{1.2cm}{4s}
+
+\newpage
+\sbar[3 marks each]{Worked examples: I do, we do, you do}
+\small
+\begin{minipage}[t]{.325\linewidth}\vspace{0pt}\bx{title={I do: \cf{Mg^{2+}}},height=3.35cm}\small
+1. Atom has 12 electrons: \cf{[Ne]3s^2}\\
+2. Lose 2 from $n=3$: \cf{[Ne]3s^2\to[Ne]}\\
+3. Same as neon: \cf{Mg^{2+}=[Ne]}\\
+\textit{Protons stay 12.}\ebx\end{minipage}\hfill
+\begin{minipage}[t]{.325\linewidth}\vspace{0pt}\bx{title={We do: \cf{Cl^{-}}},height=3.35cm}\small
+1. Electrons in the atom: \bl{.7cm}{17}\\
+2. Gain 1: \cf{[Ne]3s^23p}\bl{.5cm}{6}\\
+3. Matches: \cf{[}\bl{.8cm}{Ar}\cf{]}\\
+\cf{Cl^-=}\bl{1.6cm}{\cf{[Ar]}}\ebx\end{minipage}\hfill
+\begin{minipage}[t]{.325\linewidth}\vspace{0pt}\bx{title={You do: \cf{S^{2-}}},height=3.35cm}\small
+1. Electrons: \bl{1.5cm}{18}\\
+2. Full: \bl{4cm}{\cf{1s^22s^22p^63s^23p^6}}\\
+3. Shorthand: \bl{2cm}{\cf{[Ar]}}\\
+\textit{Two ways to get 18. Which did you use?}\ebx\end{minipage}
+
+\sbar[write your four, swap, check with the table]{Pair trade}
+\small Do the four ions in your letter's rows. Then check your partner's four. Disagree? Find the \textbf{first} line where you differ.\par\vspace{2pt}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{}|c|c|l|l|c|@{}}\hline
+ & Ion & Electrons & Shorthand & Partner OK?\\\hline
+A & \cf{N^{3-}} & \bl{2cm}{10} & \bl{5cm}{\cf{[Ne]}} & $\square$\\
+A & \cf{Li^{+}} & \bl{2cm}{2} & \bl{5cm}{\cf{[He]}} & $\square$\\
+A & \cf{K^{+}} & \bl{2cm}{18} & \bl{5cm}{\cf{[Ar]}} & $\square$\\
+A & \cf{Br^{-}} & \bl{2cm}{36} & \bl{5cm}{\cf{[Kr]}} & $\square$\\\hline
+B & \cf{Al^{3+}} & \bl{2cm}{10} & \bl{5cm}{\cf{[Ne]}} & $\square$\\
+B & \cf{O^{2-}} & \bl{2cm}{10} & \bl{5cm}{\cf{[Ne]}} & $\square$\\
+B & \cf{Ca^{2+}} & \bl{2cm}{18} & \bl{5cm}{\cf{[Ar]}} & $\square$\\
+B & \cf{Se^{2-}} & \bl{2cm}{36} & \bl{5cm}{\cf{[Kr]}} & $\square$\\\hline
+\end{tabular}\hfill\parbox[b]{5.6cm}{\footnotesize \cf{Br^-} and \cf{Se^{2-}} hide the \cf{3d^{10}} trap: is the 3d inside the bracket?}
+
+\sbar[name the flaw, then fix it]{Error hunt}
+\small
+\renewcommand{\arraystretch}{1.75}
+\begin{tabular}{@{}|c|p{4.6cm}|p{6.8cm}|p{4.8cm}|@{}}\hline
+ & Claim & What is wrong? & Fix\\\hline
+A & \cf{Na=[Ar]3s^1} & \A{Argon comes after sodium; the noble gas before it is neon.} & \A{\cf{[Ne]3s^1}}\\\hline
+B & \cf{Ca^{2+}=[Ar]4s^2} & \A{That is the atom. Both 4s electrons are gone.} & \A{\cf{[Ar]}}\\\hline
+C & Gallium has 13 valence electrons. & \A{Counted the 3d (and core). Valence is only $n=4$.} & \A{4s$^2$ + 4p$^1$ = 3}\\\hline
+D & Sulfur's Lewis symbol has 16 dots. & \A{16 is the atomic number. Dots are valence only.} & \A{6 dots}\\\hline
+\end{tabular}
+
+\sbar[whiteboards up on three]{Hinge: arsenic, \cf{[Ar]3d^{10}4s^24p^3}}
+\small How many valence electrons? \textbf{A} 3 \ \ \textbf{B} 5 \ \ \textbf{C} 15 \ \ \textbf{D} 33 \hfill My board: \bl{.8cm}{} \ Right answer: \bl{.8cm}{B} \ If I missed it, my error was: \bl{5cm}{}
+
+\sbar[no wrong thinking here: argue it]{Open questions}
+\begin{minipage}[t]{.49\linewidth}\bx{title={Do Lewis dots work for d electrons? What breaks?},fonttitle=\footnotesize\bfseries}\footnotesize
+\ifkey\textcolor{key}{Dots track only s and p: 2 + 6 = 8. A d subshell holds 10 more, so the octet has no room. Fe forms Fe$^{2+}$ and Fe$^{3+}$, so ``valence'' is unclear.}\else\rule{0pt}{2.2em}\fi\par\vspace{1.4em}\hrule\vspace{1.2em}\hrule\ebx\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}\bx{title={4s fills before 3d. Why does it leave first?},fonttitle=\footnotesize\bfseries}\footnotesize
+\ifkey\textcolor{key}{Once 3d electrons are present, repulsion and the larger shell make the 4s electrons the outermost, so they go first. (Left open on purpose.)}\else\rule{0pt}{2.2em}\fi\par\vspace{1.4em}\hrule\vspace{1.2em}\hrule\ebx\end{minipage}
+
+\sbar[tear off and hand in]{Exit ticket}
+\small\begin{minipage}[t]{.62\linewidth}\vspace{0pt}
+\textbf{1.} \cf{Ca^{2+}} shorthand: \bl{2cm}{\cf{[Ar]}} \quad \textbf{2.} One particle with the same configuration: \bl{2cm}{Ar, K$^+$, Cl$^-$, S$^{2-}$ \textrm{or} P$^{3-}$}\\[4pt]
+\textbf{3.} Draw the Lewis dots for phosphorus in the box. Valence electrons: \bl{.8cm}{5}
+\end{minipage}\hfill\begin{minipage}[t]{.3\linewidth}\vspace{0pt}\hfill\tile{P}{5}{0}{0}\end{minipage}
+
+\end{document}
