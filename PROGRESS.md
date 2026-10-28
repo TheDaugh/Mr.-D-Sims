@@ -2,6 +2,19 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-10-28: calculus 3.2 Implicit Differentiation (v2)
+
+Built from the calc template: `calculus/unit-3-composite-implicit-inverse/3-2-implicit.{html,spec.js,content.js}`, keys in `keys/calc/3-2-implicit-{makeup,teacher}.pdf`. Listed in both places: `shared/lessons.js` (teacher hub, added by the scaffolder) and `calculus/sims.js` (the student page). `templates/README.md` now says so as step 5.
+
+- Skills, in this order (the template keypad test needs the first item to be typed): find dy/dx (typed in x and y, four bands, named traps), differentiate a y-term (choice), slope at a point (clean decimals only: the digit keypad has no fraction key), tangent line (typed, exact fractions; band 4 keeps radicals exact).
+- Explore: x² + y² = 25 with one slider; the upper and lower point share an x, each has its own tangent and slope, so −x/y needs both coordinates.
+- `tests/unit/implicit.test.js` checks every generated item against the curve itself, never against implicit differentiation: each item carries `F(x,y)` and the true slope is −Fx/Fy from numeric partials. Checked: dy/dx answers at several (x, y); points lie on the curve; tangent lines pass through the point with the true slope; the marked y-term option equals Tx + Ty·p and every wrong option differs. I broke two answers on purpose and the test failed on both.
+- Engine: the Predict teacher line printed `$...$` options raw. `standard.js` now renders them with the same `opt()` the student page uses. No effect on lessons without math options.
+- Choice-skill options are plain text and unicode; the typed labels use `\tfrac` so the dy/dx fraction clears the input box.
+- Checks run: unit tests 200 of 200, `check-lessons --strict` 0 errors, template e2e on the lesson and on the calc template, lock e2e (target added), smoke 36 pages, screenshots of Predict, Explore, Huddle and Build at 1366x768.
+- Source for scope: the Unit 3 concept summary and the Math Medic 3.2 packet (circle, product-rule term, tangent line). Questions, numbers and wording are original.
+- Not on `main` yet: branch `calc-3-2-implicit`, PR open. Netlify deploys when it merges.
+
 ## 2026-10-28: Lab 4 (Flame Tests) teacher key, creative mode, student demo, hub card
 
 Ian could not use `#key` on lab 4 (nothing changed on the name screen), the students had no demo, and there was no huddle script or worked solutions for him.

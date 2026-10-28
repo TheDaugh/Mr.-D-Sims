@@ -77,6 +77,19 @@ window.UNITS = [
           { label: "Teacher key PDF", href: "../keys/calc/3-1-chain-rule-teacher.pdf" },
           { label: "Make-up notes PDF", href: "../keys/calc/3-1-chain-rule-makeup.pdf" }
         ]
+      },
+      {
+        type: "lesson",
+        icon: "⭕",
+        title: "3.2 Implicit Differentiation",
+        href: "unit-3-composite-implicit-inverse/3-2-implicit.html",
+        blurb: "Two points on a circle share one x but not one slope. See why, then build implicit differentiation and show you own it.",
+        tags: ["implicit differentiation", "adaptive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-3-composite-implicit-inverse/3-2-implicit.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/3-2-implicit-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/3-2-implicit-makeup.pdf" }
+        ]
       }
     ]
   },
