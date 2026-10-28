@@ -1,6 +1,6 @@
 // The foil apparatus for the Rutherford lab: beam, detector table, the three data questions, the match, the nucleus rebuild and the challenge.
 // State lives in S.scat (plain JSON, so it saves and restores). The checks are exported pure functions so a test can run them.
-import { h, mulberry32 } from "./dom.js";
+import { h, mulberry32 } from "../../../../shared/virtual-lab/dom.js";
 import * as FM from "../engine/foil.js";
 import { createAtomScope, newScope } from "./atomscope.js";
 import { ELEMENTS, element } from "../engine/coulomb.js";

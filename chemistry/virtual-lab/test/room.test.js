@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { parseRoom, tileAt, step, reachable, facingTile } from "../src/engine/room.js";
+import { parseRoom, tileAt, step, reachable, facingTile } from "../../../shared/virtual-lab/room.js";
 
 const room = parseRoom(JSON.parse(readFileSync(new URL("../content/rooms/main-lab.json", import.meta.url))));
 const none = {}, geared = { goggles: true, apron: true };

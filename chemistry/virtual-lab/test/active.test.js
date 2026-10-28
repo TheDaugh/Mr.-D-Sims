@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createActive, IDLE } from "../src/engine/active.js";
-import { checkCode } from "../src/engine/integrity.js";
+import { createActive, IDLE } from "../../../shared/virtual-lab/active.js";
+import { checkCode } from "../../../shared/virtual-lab/integrity.js";
 test("active clock counts only while recent activity, visible and in a lab stage", () => {
   const a = createActive(); a.poke(0);
   for (let t = 0; t <= 30; t += 0.5) a.tick(t, true, true);
@@ -18,7 +18,7 @@ test("check code depends on the facts it covers", () => {
   assert.notEqual(checkCode(r), checkCode({ ...r, activeSec: 1200 }));
   assert.match(checkCode(r), /^VL-[0-9A-F]{8}$/);
 });
-import { stageScale } from "../src/ui/fit.js";
+import { stageScale } from "../../../shared/virtual-lab/fit.js";
 test("browser zoom changes the stage size instead of cancelling out", () => {
   const at100 = stageScale(1280, 720, 1, 1) * 1 * 1;      // fits exactly
   const at200 = stageScale(640, 360, 2, 1);                // window in CSS px halves when zoomed to 200%

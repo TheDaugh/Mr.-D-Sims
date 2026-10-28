@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import * as FM from "../src/engine/foil.js";
 import { newScat, newRun, checkData, groupSum, citesCount, evidenceItems, tallyDone, matchDone, per100 } from "../src/ui/scatter.js";
-import { validateQuests, questDone } from "../src/engine/quests.js";
+import { validateQuests, questDone } from "../../../shared/virtual-lab/quests.js";
 const lab = JSON.parse(readFileSync(new URL("../content/labs/03-rutherford-gold-foil.json", import.meta.url)));
 const shared = createRequire(import.meta.url)("../../shared/foil-model.js");
 

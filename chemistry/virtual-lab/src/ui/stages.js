@@ -1,5 +1,5 @@
 // The screens around the lab: intro, pre-lab, theory, and the CER write-up. Content comes from the lab JSON.
-import { h, mulberry32, wordCount } from "./dom.js";
+import { h, mulberry32, wordCount } from "../../../../shared/virtual-lab/dom.js";
 import { citesCount, evidenceItems } from "./scatter.js";
 
 export function theoryNodes(lab) {

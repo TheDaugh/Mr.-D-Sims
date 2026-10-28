@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { deflection, thetaFromB, closestApproach, wavelengthFm, ELEMENTS } from "../src/engine/coulomb.js";
 import * as FM from "../src/engine/foil.js";
-import { parseRoom, step, reachable, tileAt } from "../src/engine/room.js";
+import { parseRoom, step, reachable, tileAt } from "../../../shared/virtual-lab/room.js";
 
 test("integrated Coulomb trajectories match Rutherford's formula", () => {
   for (const [Z, E, b] of [[79, 5, 5], [79, 5, 45], [79, 5, 200], [13, 5, 10], [79, 10, 30], [47, 3, 60]]) {

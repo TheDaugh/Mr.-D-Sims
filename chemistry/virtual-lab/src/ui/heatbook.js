@@ -1,6 +1,6 @@
 // The heating-lab notebook: a table the student types into, and a blank graph the student plots on by hand.
 // The computer never draws the curve. It only keeps the dots and lines the student places.
-import { h } from "./dom.js";
+import { h } from "../../../../shared/virtual-lab/dom.js";
 
 const STATES = ["", "solid", "solid + liquid", "liquid", "liquid + gas", "solid + gas", "gas"];
 const M = { l: 66, r: 16, t: 34, b: 56 };

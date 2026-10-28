@@ -3,7 +3,7 @@
 // scripted demo. It answers the same calls as the flame lab's controller, so the shared lab app can host it from this folder.
 // All student-facing wording is in content/labs/05-fan-cart.json (lab.ui) or the sheet's own content files.
 // The model's formula lives in engine/fancart.js only.
-import { h, mulberry32 } from "../../../../chemistry/virtual-lab/src/ui/dom.js";
+import { h, mulberry32 } from "../../../../shared/virtual-lab/dom.js";
 import * as E from "../engine/fancart.js";
 import * as R from "../engine/record.js";
 import * as K from "../engine/checks.js";
@@ -431,22 +431,13 @@ export function create(ctx) {
     return null;
   }
 
-  // ---------- the clock: hold screen at minute 3, huddle 2 at minute 28 ----------
-  let acc = 0;
-  function clockWatch(dt) {
-    acc += dt; if (acc < 1) return; acc = 0;
-    if (god() || ctx.isDemo() || !window.MrD || !MrD.bell || (document.querySelector("#dlgHuddle[open]"))) return;
-    const c = MrD.bell.clock(lab.course), g = G(); if (!c.session) return;
-    if (c.minutesIn >= C.clock.huddle1AtMin && !g.huddle1 && !g.h1Forced && S.stage === "prelab" && S.student) { g.h1Forced = true; ctx.openHuddle(1); }
-    else if (c.minutesIn >= C.clock.huddle2AtMin && !g.huddle2 && !g.h2Auto && S.stage === "lab") { g.h2Auto = true; ctx.openHuddle(2); }
-  }
+  // The huddle clock is shared (shared/virtual-lab/clock.js): the host calls huddle 1 and huddle 2 from the bell.
 
   // ---------- the app's calls ----------
   function step(dt) {
     const g = G();
     if (g.anim) { g.anim.t += dt; spin += dt * 30; dirty = true; if (g.anim.t >= RUN_ANIM_S) { g.anim = null; afterRun(); } }
     if (dirty) paintAll();
-    clockWatch(dt);
   }
   // Before the pre-lab is done the step card and the task list are off the screen: the step card is shown to the class at huddle 1 (the hold screen has it).
   let wasEarly = null;
@@ -517,7 +508,7 @@ export function create(ctx) {
   }
 
   const api = { answered: () => [], evidence: () => [], draw: () => {}, step, refresh, controls: h("div", { id: "fcControls" }), sheet, view: renderTab, showTab, hintPicture: () => null, renderPrelab, questState, recordComplete,
-    bottles: bars, syncSources, holding: () => !!G().anim, unlocked: () => true, station, panel, canOpen, guide, huddle, key, print, record, demo, visible, text,
+    clock: C.clock, bottles: bars, syncSources, holding: () => !!G().anim, unlocked: () => true, station, panel, canOpen, guide, huddle, key, print, record, demo, visible, text,
     // for the browser tests and the demo
     setBars, setSetting, doRun, doRecord, moveMarker, commitRead, weigh, startTutorial, tutorialText: () => (document.getElementById("fcTutText") || {}).textContent || "", lastRun, reading, massIn, handIn, afterRun, get tab() { return G().tab; } };
   drawTabs(); renderTab();
