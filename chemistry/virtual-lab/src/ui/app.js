@@ -359,7 +359,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     canAct: () => S.stage === "lab" && !S.demo && ppeOk(), running: () => S.stage === "lab" && S.view === "bench" && !document.querySelector("#stage dialog[open]"), ppeOn: () => hasPPE(S.ppe),
     onChange: () => { fl.syncSources(sources); if (ready) { renderInv(); renderQuests(); autosave(); } }, openNotebook: (t) => openFlNb(t), openSpectroscope: () => openSpec(), showTutorial2: (fr) => showTut2(fr),
     // only a lab from another folder uses these
-    seed, isDemo: () => S.demo, openHuddle: (n) => openHuddle(n), finish: () => finishFlame(), refreshPanel: () => renderPanel(), closeNotebook: () => closeDlg("dlgNotebook") }) : null;
+    seed, isKey: () => /(?:^|[#&])(key|preview)\b/.test(location.hash), isDemo: () => S.demo, openHuddle: (n) => openHuddle(n), finish: () => finishFlame(), refreshPanel: () => renderPanel(), closeNotebook: () => closeDlg("dlgNotebook") }) : null;
   canvas.addEventListener("click", (ev) => {
     if (FL) return;
     const r = canvas.getBoundingClientRect();
@@ -1064,7 +1064,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   if (resume) restore(resume);
   renderQuests();
   if (KIND && isKey()) $("#btnKey").hidden = false;   // #key is the teacher switch on a page from another folder
-  if (TEACHER) { $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab" || S.stage === "huddle1") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
+  if (TEACHER || (KIND && isKey())) { $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab" || S.stage === "huddle1") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
   if (S.stage === "intro") intro(); else if (S.stage === "prelab") { drawPrelab(); openDlg("dlgPrelab"); } else if (S.stage === "huddle1") openHuddle(1);
   lockGate();
   setInterval(autosave, 5000);
