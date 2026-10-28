@@ -1,0 +1,426 @@
+{
+  "slot": 7,
+  "lab": "05-fan-cart",
+  "room": "physics-lab",
+  "course": "Honors Physics",
+  "unit": "Forces and Newton's Laws",
+  "targets": [
+    "F5"
+  ],
+  "tier": "quantitative: acceleration read from a noisy speed-time line; the model formula is never shown to students (slot 8 owns it)",
+  "notes": [
+    "Replaces the real second-law lab at slot 7. Mr. D has no fan or cart. Fan cart, not hanging mass: no string, pulley or changing system mass (slots 14 and 19).",
+    "The formula the engine uses is a = (F - f) / m. It lives in the engine and in this file's test only. No student screen shows it. Slot 8 turns the two slopes into the law and names the newton.",
+    "Every number below is author_set: this is a virtual apparatus, so there is no outside source to cite. Each has a basis."
+  ],
+  "model": {
+    "formula": "a = (F_fan - f_track) / m",
+    "studentsNeverSeeFormula": true
+  },
+  "cart": {
+    "mass_kg": {
+      "value": 0.5,
+      "author_set": true,
+      "basis": "round number; a light lab cart"
+    },
+    "bar_mass_kg": {
+      "value": 0.25,
+      "author_set": true,
+      "basis": "round number; four bars double a 0.50 kg cart twice"
+    },
+    "bars_on_shelf": {
+      "value": 6,
+      "author_set": true,
+      "basis": "covers the 0 to 4 bars of part 2 and the 3 bars of the test, with spare"
+    }
+  },
+  "track": {
+    "length_m": {
+      "value": 2,
+      "author_set": true,
+      "basis": "longest run is a = 0.88 for 2.0 s: 1.76 m"
+    },
+    "friction_N": {
+      "value": 0.01,
+      "author_set": true,
+      "basis": "tiny drag so the line misses the origin by a hair; a real track is never perfect"
+    }
+  },
+  "fan": {
+    "settings": [
+      {
+        "setting": 1,
+        "F_N": 0.15
+      },
+      {
+        "setting": 2,
+        "F_N": 0.3
+      },
+      {
+        "setting": 3,
+        "F_N": 0.45
+      },
+      {
+        "setting": 4,
+        "F_N": 0.6
+      }
+    ],
+    "note": "The force sensor reads the fan force to 0.01 N. Students record it; the fan force does not vary during a run.",
+    "author_set": true,
+    "basis": "0.15 N per setting, four settings, round numbers"
+  },
+  "run": {
+    "duration_s": {
+      "value": 2,
+      "author_set": true,
+      "basis": "two seconds keeps v under 1.8 m/s and the track under 2 m"
+    },
+    "sensor_hz": {
+      "value": 20,
+      "author_set": true,
+      "basis": "smooth graph on a Chromebook"
+    },
+    "noise_sigma_mps": {
+      "value": 0.008,
+      "author_set": true,
+      "basis": "about 2 to 6 percent error on a: students see scatter but the pattern holds"
+    },
+    "noise_rng": "mulberry32(seed) with Box-Muller; a fresh seed each run",
+    "display_decimals": 2
+  },
+  "markers": {
+    "read": "least-squares slope of the speed points between the two markers",
+    "minSeparation_s": {
+      "value": 0.5,
+      "author_set": true,
+      "basis": "markers closer than this give a warning, not a number"
+    }
+  },
+  "part1": [
+    {
+      "F_N": 0.15,
+      "m_kg": 1,
+      "a_expected": 0.14
+    },
+    {
+      "F_N": 0.3,
+      "m_kg": 1,
+      "a_expected": 0.29
+    },
+    {
+      "F_N": 0.45,
+      "m_kg": 1,
+      "a_expected": 0.44
+    },
+    {
+      "F_N": 0.6,
+      "m_kg": 1,
+      "a_expected": 0.59
+    }
+  ],
+  "part2": [
+    {
+      "bars": 0,
+      "m_kg": 0.5,
+      "F_N": 0.45,
+      "a_expected": 0.88,
+      "inv_m_per_kg": 2
+    },
+    {
+      "bars": 1,
+      "m_kg": 0.75,
+      "F_N": 0.45,
+      "a_expected": 0.59,
+      "inv_m_per_kg": 1.33
+    },
+    {
+      "bars": 2,
+      "m_kg": 1,
+      "F_N": 0.45,
+      "a_expected": 0.44,
+      "inv_m_per_kg": 1
+    },
+    {
+      "bars": 4,
+      "m_kg": 1.5,
+      "F_N": 0.45,
+      "a_expected": 0.29,
+      "inv_m_per_kg": 0.67
+    }
+  ],
+  "test": {
+    "bars": 3,
+    "m_kg": 1.25,
+    "F_N": 0.45,
+    "a_expected": 0.35,
+    "inv_m_per_kg": 0.8,
+    "how": "read 1/m = 0.80 on the a-against-1/m line; a = 0.35 m/s2"
+  },
+  "tolerance": {
+    "a_vs_expected": {
+      "relative": 0.1,
+      "absolute_mps2": 0.03,
+      "rule": "accept the larger of the two",
+      "author_set": true,
+      "basis": "covers sensor noise and a sloppy marker placement"
+    }
+  },
+  "derived": {
+    "a_vs_F": {
+      "x": "F_N",
+      "slope_expected": 1,
+      "intercept_expected": -0.01,
+      "note": "Slope is 1/m with m = 1.00 kg. The intercept is -f/m. Close to the origin."
+    },
+    "a_vs_m": {
+      "shape": "falling curve; a(0.50)/a(1.00) = 2.0 and a(0.75)/a(1.50) = 2.0 for the same force"
+    },
+    "a_vs_invm": {
+      "x": "inv_m_per_kg",
+      "slope_expected": 0.44,
+      "intercept_expected": 0,
+      "note": "Slope is F minus f at setting 3. Passes through the origin exactly. The only graph in the lab that does."
+    },
+    "doubling": {
+      "F": "force x2 -> a x2.07 and x2.03 (friction); read as 'about double'",
+      "m": "mass x2 -> a x0.50 exactly in the model; read as 'about half'"
+    }
+  },
+  "paperRuns": {
+    "note": "Paper fallback (rule 14). Each card gives speed at five times. Student reads a = (v at 2.0 s - v at 0) / 2.0 s. Seeds 700 to 708. Test card T-1 is handed out only after code 2.",
+    "sensorDecimals": 2,
+    "cards": [
+      {
+        "id": "P1-1",
+        "part": 1,
+        "setting": 1,
+        "bars": 2,
+        "F_N": 0.15,
+        "m_kg": 1,
+        "a_true": 0.14,
+        "t_s": [
+          0,
+          0.5,
+          1,
+          1.5,
+          2
+        ],
+        "v_mps": [
+          0,
+          0.06,
+          0.13,
+          0.22,
+          0.28
+        ],
+        "a_from_card": 0.14
+      },
+      {
+        "id": "P1-2",
+        "part": 1,
+        "setting": 2,
+        "bars": 2,
+        "F_N": 0.3,
+        "m_kg": 1,
+        "a_true": 0.29,
+        "t_s": [
+          0,
+          0.5,
+          1,
+          1.5,
+          2
+        ],
+        "v_mps": [
+          0,
+          0.15,
+          0.29,
+          0.43,
+          0.58
+        ],
+        "a_from_card": 0.29
+      },
+      {
+        "id": "P1-3",
+        "part": 1,
+        "setting": 3,
+        "bars": 2,
+        "F_N": 0.45,
+        "m_kg": 1,
+        "a_true": 0.44,
+        "t_s": [
+          0,
+          0.5,
+          1,
+          1.5,
+          2
+        ],
+        "v_mps": [
+          0,
+          0.21,
+          0.44,
+          0.66,
+          0.88
+        ],
+        "a_from_card": 0.44
+      },
+      {
+        "id": "P1-4",
+        "part": 1,
+        "setting": 4,
+        "bars": 2,
+        "F_N": 0.6,
+        "m_kg": 1,
+        "a_true": 0.59,
+        "t_s": [
+          0,
+          0.5,
+          1,
+          1.5,
+          2
+        ],
+        "v_mps": [
+          0,
+          0.29,
+          0.59,
+          0.87,
+          1.18
+        ],
+        "a_from_card": 0.59
+      },
+      {
+        "id": "P2-1",
+        "part": 2,
+        "setting": 3,
+        "bars": 0,
+        "F_N": 0.45,
+        "m_kg": 0.5,
+        "a_true": 0.88,
+        "t_s": [
+          0,
+          0.5,
+          1,
+          1.5,
+          2
+        ],
+        "v_mps": [
+          0,
+          0.43,
+          0.89,
+          1.33,
+          1.77
+        ],
+        "a_from_card": 0.89
+      },
+      {
+        "id": "P2-2",
+        "part": 2,
+        "setting": 3,
+        "bars": 1,
+        "F_N": 0.45,
+        "m_kg": 0.75,
+        "a_true": 0.59,
+        "t_s": [
+          0,
+          0.5,
+          1,
+          1.5,
+          2
+        ],
+        "v_mps": [
+          0,
+          0.29,
+          0.58,
+          0.87,
+          1.17
+        ],
+        "a_from_card": 0.59
+      },
+      {
+        "id": "P2-3",
+        "part": 2,
+        "setting": 3,
+        "bars": 2,
+        "F_N": 0.45,
+        "m_kg": 1,
+        "a_true": 0.44,
+        "t_s": [
+          0,
+          0.5,
+          1,
+          1.5,
+          2
+        ],
+        "v_mps": [
+          0,
+          0.23,
+          0.44,
+          0.65,
+          0.87
+        ],
+        "a_from_card": 0.44
+      },
+      {
+        "id": "P2-4",
+        "part": 2,
+        "setting": 3,
+        "bars": 4,
+        "F_N": 0.45,
+        "m_kg": 1.5,
+        "a_true": 0.29,
+        "t_s": [
+          0,
+          0.5,
+          1,
+          1.5,
+          2
+        ],
+        "v_mps": [
+          0,
+          0.16,
+          0.29,
+          0.45,
+          0.59
+        ],
+        "a_from_card": 0.3
+      },
+      {
+        "id": "T-1",
+        "part": "test",
+        "setting": 3,
+        "bars": 3,
+        "heldUntilHuddle2": true,
+        "F_N": 0.45,
+        "m_kg": 1.25,
+        "a_true": 0.35,
+        "t_s": [
+          0,
+          0.5,
+          1,
+          1.5,
+          2
+        ],
+        "v_mps": [
+          0,
+          0.2,
+          0.37,
+          0.53,
+          0.7
+        ],
+        "a_from_card": 0.35
+      }
+    ]
+  },
+  "rules": [
+    {
+      "id": "ratio-words",
+      "text": "Ratio wording on every student screen is 'about double' and 'about half', never 'exactly'. The data carry noise and a tiny drag.",
+      "author_set": true,
+      "basis": "honest wording for noisy data"
+    },
+    {
+      "id": "markers-apart",
+      "text": "Two markers closer than 0.5 s apart give a warning and no reading. Students learn that a short stretch is noisy.",
+      "author_set": true,
+      "basis": "teaches why a long stretch is better, with no new term"
+    }
+  ]
+}

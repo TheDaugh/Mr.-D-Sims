@@ -6,6 +6,7 @@ const STATE = {
   notebook: (s, q) => (s.notebookFilled || 0) >= (q.count || 1),
   challenge: (s, q) => (s.challengeFilled || 0) >= (q.count || 1),
   submitted: (s) => !!s.submitted,
+  huddle2: (s) => !!s.huddle2,
   cer_done: (s) => !!s.cerDone,
   flame: (s, q) => !!(s.flame && s.flame[q.rule]),
   scat_tally: (s) => !!(s.scat && s.scat.tally),

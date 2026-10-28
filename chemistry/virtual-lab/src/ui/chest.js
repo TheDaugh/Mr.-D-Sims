@@ -10,10 +10,10 @@ export function createChest({ dlg, onClose }) {
     if (!st) return;
     const cells = st.items.map((it, i) => {
       const cv = h("canvas", { width: 48, height: 48 }); drawIcon(cv, it.icon, it.color);
-      return h("button", { class: "slot" + (it.has ? " has" : "") + (i === cur ? " cur" : ""), "data-i": i, title: it.label, onclick: () => { cur = i; use(); } }, cv, h("span", {}, it.short || it.label), it.has ? h("i", { class: "ck" }, "✔") : null);
+      return h("button", { id: "chestSlot" + i, class: "slot" + (it.has ? " has" : "") + (i === cur ? " cur" : ""), "data-i": i, title: it.label, onclick: () => { cur = i; use(); } }, cv, h("span", {}, it.short || it.label), it.has ? h("i", { class: "ck" }, "✔") : null);
     });
     body.replaceChildren(h("h2", {}, st.title), st.items.length ? h("div", { class: "grid", style: `grid-template-columns:repeat(${cols()},84px)` }, cells) : h("p", { class: "hint" }, "Nothing here is needed for today's lab."),
-      h("div", { class: "controls" }, st.onAll ? h("button", { id: "chestAll", class: "primary", onclick: () => st.onAll() }, "Take all (Q)") : null, h("button", { onclick: close }, "Close (Esc)")),
+      h("div", { class: "controls" }, st.onAll ? h("button", { id: "chestAll", class: "primary", onclick: () => st.onAll() }, "Take all (Q)") : null, h("button", { id: "chestClose", onclick: close }, "Close (Esc)")),
       h("p", { class: "hint" }, st.items[cur] ? st.items[cur].label + (st.items[cur].blurb ? ". " + st.items[cur].blurb : "") : ""), h("p", { class: "hint" }, "Arrows to move, Enter to " + (st.verb || "take") + ", Esc to close."));
   }
   function use() { const it = st && st.items[cur]; if (it) st.onUse(it); }

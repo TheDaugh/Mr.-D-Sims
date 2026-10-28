@@ -13,7 +13,7 @@ export async function runDemo(api) {
   const walk = async (route) => { for (const d of path(route)) { live(); api.walk(d); await wait(230); } };
   const total = 9;
   try {
-    if (api.scat) await scatScript({ say, walk, wait, live, api }); else if (api.heat) await heatScript({ say, walk, wait, live, api }); else {
+    if (api.scat) await scatScript({ say, walk, wait, live, api }); else if (api.kind) await api.kind.demo({ say, walk, wait, live, api }); else if (api.heat) await heatScript({ say, walk, wait, live, api }); else {
     await say(1, "Welcome. This tour shows every control. None of it counts toward your lab.", 2800);
     await say(2, "Walk with the arrow keys or WASD. The blue locker holds your goggles and apron.", 1400); await walk("ULLUL");
     await say(2, "Press E to use what you are facing. Put on goggles and an apron.", 1500); api.interact(); await wait(900); api.togglePPE("goggles"); await wait(700); api.togglePPE("apron"); await say(2, "Both are on. Now the door light is green.", 1800); api.closePanel();

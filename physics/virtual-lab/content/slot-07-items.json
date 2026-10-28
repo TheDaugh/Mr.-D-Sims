@@ -1,0 +1,452 @@
+{
+  "slot": 7,
+  "lab": "05-fan-cart",
+  "bands": 3,
+  "bandsNote": "Hidden from students. Band 1 starts the Checks tab and rises only by clean first tries. The top band IS the regular-level standard: no AP content, nothing labeled extension, challenge or optional.",
+  "standard": "T5 (the standard every student completes): state in words, with numbers from your own tables, how acceleration changes when the fan force doubles and when the mass doubles.",
+  "hintRule": "Hint 1 points to the step card. Hint 2 does the first step. Hint 3 shows the same move on another example. No hint gives the answer. Each hint costs a fresh attempt.",
+  "tolerance": "num items accept the answer plus or minus tol (m/s2); ratio answers are from the doubling rule, so tol covers the tiny drag in the data",
+  "items": [
+    {
+      "id": "b1-1",
+      "band": 1,
+      "type": "choice",
+      "prompt": "Two carts start at rest. Speed graph A reaches 1.2 m/s after 2.0 s. Speed graph B reaches 0.6 m/s after 2.0 s. Which cart has the bigger acceleration?",
+      "figure": {
+        "kind": "speed-graph",
+        "axes": {
+          "x": "time (s)",
+          "y": "speed (m/s)"
+        },
+        "lines": [
+          {
+            "id": "A",
+            "points": [
+              [
+                0,
+                0
+              ],
+              [
+                2,
+                1.2
+              ]
+            ]
+          },
+          {
+            "id": "B",
+            "points": [
+              [
+                0,
+                0
+              ],
+              [
+                2,
+                0.6
+              ]
+            ]
+          }
+        ]
+      },
+      "options": [
+        "Cart A",
+        "Cart B",
+        "They are the same"
+      ],
+      "answer": 0,
+      "hints": [
+        "Open your step card, step 4. Acceleration is how much the speed grows each second.",
+        "First step: find how much the speed of cart A grew. It started at 0 and reached 1.2 m/s.",
+        "Same move on another pair: one cart grows 0.4 m/s in 2.0 s and another grows 0.8 m/s in 2.0 s. The second one gains more every second, so it has the bigger acceleration."
+      ],
+      "misc": "Students compare the final speeds without noticing both carts took the same time, or pick the cart whose line starts higher.",
+      "source": "data"
+    },
+    {
+      "id": "b1-2",
+      "band": 1,
+      "type": "num",
+      "prompt": "A cart's speed grows from 0 to 1.20 m/s in 2.0 s. What is its acceleration?",
+      "answer": 0.6,
+      "unit": "m/s²",
+      "tol": 0.03,
+      "hints": [
+        "Open your step card, step 4. The markers read speed gained per second.",
+        "First step: the speed gained is 1.20 − 0 = 1.20 m/s. Next, divide by the time.",
+        "Same move on another cart: speed grows from 0 to 0.90 m/s in 3.0 s. Gained 0.90 m/s. Divide by 3.0 s. Acceleration 0.30 m/s²."
+      ],
+      "misc": "Students give the final speed as the acceleration, or multiply by the time instead of dividing.",
+      "source": "data"
+    },
+    {
+      "id": "b1-3",
+      "band": 1,
+      "type": "choice",
+      "prompt": "A 1.00 kg cart is run at fan force 0.15 N and then at 0.30 N. The acceleration goes from 0.14 to 0.29 m/s². About how many times bigger is the acceleration?",
+      "options": [
+        "about half",
+        "about the same",
+        "about 2 times",
+        "about 4 times"
+      ],
+      "answer": 2,
+      "hints": [
+        "Open your step card, step 6. Compare the acceleration at two fan settings.",
+        "First step: divide the new acceleration by the old one: 0.29 ÷ 0.14.",
+        "Same move on another pair: force 0.10 N gave 0.10 m/s² and force 0.30 N gave 0.31 m/s². 0.31 ÷ 0.10 is about 3 times."
+      ],
+      "misc": "Students say the acceleration went up by 0.15, the same as the force, instead of comparing how many times bigger.",
+      "source": "data"
+    },
+    {
+      "id": "b1-4",
+      "band": 1,
+      "type": "choice",
+      "prompt": "The fan force stays at 0.45 N. The mass goes from 0.50 kg to 1.00 kg. The acceleration goes from 0.88 to 0.44 m/s². What happened to the acceleration when the mass doubled?",
+      "options": [
+        "It about doubled",
+        "It stayed the same",
+        "It about halved",
+        "It about quadrupled"
+      ],
+      "answer": 2,
+      "hints": [
+        "Open your step card, step 8. Compare the acceleration at two masses.",
+        "First step: divide the new acceleration by the old one: 0.44 ÷ 0.88.",
+        "Same move on another pair: mass 1.0 kg gave 0.60 m/s² and mass 3.0 kg gave 0.20 m/s². 0.20 ÷ 0.60 is about one third."
+      ],
+      "misc": "Students expect more mass to give more acceleration, the same way more force does.",
+      "source": "data"
+    },
+    {
+      "id": "b2-1",
+      "band": 2,
+      "type": "num",
+      "prompt": "A fan force of 0.15 N gave a 1.00 kg cart 0.14 m/s². A force of 0.30 N gave it 0.29 m/s². Predict the acceleration for a force of 0.60 N.",
+      "answer": 0.58,
+      "unit": "m/s²",
+      "tol": 0.04,
+      "hints": [
+        "Open your step card, step 6. Each time the force doubles, so does the acceleration.",
+        "First step: how many times bigger is 0.60 N than 0.30 N?",
+        "Same move: 0.10 N gave 0.20 m/s². Predict 0.30 N. It is 3 times the force, so 3 × 0.20 = 0.60 m/s²."
+      ],
+      "misc": "Students add 0.30 to the acceleration instead of scaling it.",
+      "source": "data"
+    },
+    {
+      "id": "b2-2",
+      "band": 2,
+      "type": "num",
+      "prompt": "The fan force stays the same. A 0.75 kg cart accelerates at 0.59 m/s². Predict the acceleration of a 1.50 kg cart.",
+      "answer": 0.3,
+      "unit": "m/s²",
+      "tol": 0.03,
+      "hints": [
+        "Open your step card, step 8. Each time the mass doubles, the acceleration is cut in half.",
+        "First step: how many times bigger is 1.50 kg than 0.75 kg?",
+        "Same move: a 0.40 kg cart gave 0.80 m/s². Predict 0.80 kg. It is 2 times the mass, so half the acceleration: 0.40 m/s²."
+      ],
+      "misc": "Students double the acceleration because the mass doubled.",
+      "source": "data"
+    },
+    {
+      "id": "b2-3",
+      "band": 2,
+      "type": "pick-shape",
+      "prompt": "Part 1: acceleration on the up axis, fan force across, mass fixed. Which picture shows the shape of your data?",
+      "figure": {
+        "kind": "shape-pick",
+        "options": [
+          "rise-line",
+          "fall-curve",
+          "flat"
+        ]
+      },
+      "options": [
+        "rising straight line from near the corner",
+        "falling curve",
+        "flat line"
+      ],
+      "answer": 0,
+      "hints": [
+        "Open your step card, step 8. Graph acceleration against fan force.",
+        "First step: plot the first two points: (0.15, 0.14) and (0.30, 0.29). Did the point go up or down?",
+        "Same move: points (1, 2) and (2, 4) go up, and the next point (3, 6) keeps going up in a straight line."
+      ],
+      "misc": "Students draw a curve through points that lie on a line.",
+      "source": "data"
+    },
+    {
+      "id": "b2-4",
+      "band": 2,
+      "type": "pick-shape",
+      "prompt": "Part 2: acceleration on the up axis, mass across, fan force fixed. Which picture shows the shape of your data?",
+      "figure": {
+        "kind": "shape-pick",
+        "options": [
+          "rise-line",
+          "fall-curve",
+          "fall-line"
+        ]
+      },
+      "options": [
+        "rising straight line",
+        "falling curve, steep then flatter",
+        "falling straight line"
+      ],
+      "answer": 1,
+      "hints": [
+        "Open your step card, step 8. Graph acceleration against mass.",
+        "First step: plot the first two points: (0.50, 0.88) and (0.75, 0.59). Did the point go up or down, and by how much?",
+        "Same move: points (1.0, 0.60) and (2.0, 0.30) and (3.0, 0.20) fall fast and then slowly."
+      ],
+      "misc": "Students draw a straight falling line because the first two points look straight.",
+      "source": "data"
+    },
+    {
+      "id": "b3-1",
+      "band": 3,
+      "type": "num",
+      "prompt": "A 1.00 kg cart at 0.30 N accelerates at 0.29 m/s². A stronger fan makes the force 0.60 N and the cart is loaded to 2.00 kg. Predict the new acceleration.",
+      "answer": 0.29,
+      "unit": "m/s²",
+      "tol": 0.03,
+      "hints": [
+        "Open your step card, steps 6 and 8. Change one thing at a time.",
+        "First step: double the force alone. What happens to the acceleration?",
+        "Same move: a = 0.20 m/s². Force triples, then mass triples. Tripling the force triples a to 0.60. Tripling the mass cuts it by 3 to 0.20 again."
+      ],
+      "misc": "Students double the acceleration for the force and forget the mass, or add the two changes.",
+      "source": "data"
+    },
+    {
+      "id": "b3-2",
+      "band": 3,
+      "type": "choice",
+      "prompt": "Which sentence do the Part 1 and Part 2 data support?",
+      "options": [
+        "Doubling the fan force about doubles the acceleration, and doubling the mass about halves it.",
+        "Doubling the fan force about halves the acceleration, and doubling the mass about doubles it.",
+        "Doubling the fan force about doubles the acceleration, and doubling the mass changes nothing.",
+        "Doubling the fan force or doubling the mass about doubles the acceleration."
+      ],
+      "answer": 0,
+      "hints": [
+        "Open your step card, step 9. Your claim must match the numbers in your table.",
+        "First step: in your table, find two rows where only the force changed. What did the acceleration do?",
+        "Same move on another table: force 0.10 N gave 0.20 m/s² and force 0.20 N gave 0.40 m/s². Only the force changed, and a doubled."
+      ],
+      "misc": "Students reverse the two relationships.",
+      "source": "data"
+    },
+    {
+      "id": "b3-3",
+      "band": 3,
+      "type": "num",
+      "prompt": "The fan force stays at 0.45 N. A 0.50 kg cart accelerated at 0.88 m/s² and a 1.00 kg cart at 0.44 m/s². Predict the acceleration of a 2.00 kg cart.",
+      "answer": 0.22,
+      "unit": "m/s²",
+      "tol": 0.03,
+      "hints": [
+        "Open your step card, step 8. Compare the mass to a mass you already ran.",
+        "First step: how many times bigger is 2.00 kg than 1.00 kg?",
+        "Same move: 0.30 kg gave 1.20 m/s². Predict 0.90 kg. It is 3 times the mass, so one third the acceleration: 0.40 m/s²."
+      ],
+      "misc": "Students halve from the 0.50 kg value instead of the 1.00 kg value, or subtract.",
+      "source": "data"
+    },
+    {
+      "id": "b3-4",
+      "band": 3,
+      "type": "choice",
+      "prompt": "A student says: \"The fan force was the same 0.45 N for the 0.50 kg cart and the 1.50 kg cart, so their accelerations should match.\" What do the data say?",
+      "options": [
+        "The 1.50 kg cart had about one third the acceleration (0.29 versus 0.88 m/s²), so the same force does not give the same acceleration.",
+        "The student is right: the same force gives the same acceleration.",
+        "The 1.50 kg cart had about three times the acceleration.",
+        "The 1.50 kg cart had about half the acceleration."
+      ],
+      "answer": 0,
+      "hints": [
+        "Open your step card, step 8. Look up both masses in your Part 2 table.",
+        "First step: find the acceleration of the 0.50 kg cart and of the 1.50 kg cart in your table.",
+        "Same move: a 0.20 kg cart had 1.50 m/s² and a 0.60 kg cart had 0.50 m/s². The heavier cart had a third of the acceleration, so the same force does not match."
+      ],
+      "misc": "Students think equal force means equal motion.",
+      "source": "data"
+    }
+  ],
+  "generators": {
+    "note": "The teacher key shows these next to the lesson, three samples per band. Seeded by student ID in the app; the samples below use fixed seeds and are checked by the content test.",
+    "g1": {
+      "band": 1,
+      "template": "A cart's speed grows from 0 to {v} m/s in {t} s. What is its acceleration?",
+      "ranges": {
+        "v": [
+          0.6,
+          0.9,
+          1.2,
+          1.5,
+          1.8,
+          2.4
+        ],
+        "t": [
+          1,
+          2,
+          3
+        ]
+      },
+      "answer": "v / t"
+    },
+    "g2": {
+      "band": 2,
+      "template": "A fan force of {F1} N gives a 1.00 kg cart {a1} m/s². Predict the acceleration for {k*F1} N on the same cart.",
+      "ranges": {
+        "F1": [
+          0.15,
+          0.3
+        ],
+        "k": [
+          2,
+          3
+        ]
+      },
+      "answer": "a1 * k",
+      "a1": "model at 1.00 kg"
+    },
+    "g3": {
+      "band": 3,
+      "template": "A {m1} kg cart with a fan force of 0.15 N accelerates at {a1} m/s². Force becomes {kF} times bigger and mass {km} times bigger. Predict the new acceleration.",
+      "ranges": {
+        "m1": [
+          0.5,
+          0.75,
+          1
+        ],
+        "kF": [
+          2,
+          3,
+          4
+        ],
+        "km": [
+          2,
+          3
+        ]
+      },
+      "answer": "a1 * kF / km"
+    },
+    "samples": {
+      "g1": [
+        {
+          "prompt": "A cart's speed grows from 0 to 0.60 m/s in 3.0 s. What is its acceleration?",
+          "answer": 0.2,
+          "unit": "m/s²",
+          "tol": 0.03,
+          "inputs": {
+            "v": 0.6,
+            "t": 3
+          }
+        },
+        {
+          "prompt": "A cart's speed grows from 0 to 1.80 m/s in 3.0 s. What is its acceleration?",
+          "answer": 0.6,
+          "unit": "m/s²",
+          "tol": 0.03,
+          "inputs": {
+            "v": 1.8,
+            "t": 3
+          }
+        },
+        {
+          "prompt": "A cart's speed grows from 0 to 0.90 m/s in 2.0 s. What is its acceleration?",
+          "answer": 0.45,
+          "unit": "m/s²",
+          "tol": 0.03,
+          "inputs": {
+            "v": 0.9,
+            "t": 2
+          }
+        }
+      ],
+      "g2": [
+        {
+          "prompt": "A fan force of 0.30 N gives a 1.00 kg cart an acceleration of 0.29 m/s². Predict the acceleration for a fan force of 0.90 N on the same cart.",
+          "answer": 0.87,
+          "unit": "m/s²",
+          "tol": 0.04,
+          "inputs": {
+            "F1": 0.3,
+            "k": 3,
+            "a1": 0.29
+          },
+          "model": 0.89
+        },
+        {
+          "prompt": "A fan force of 0.15 N gives a 1.00 kg cart an acceleration of 0.14 m/s². Predict the acceleration for a fan force of 0.30 N on the same cart.",
+          "answer": 0.28,
+          "unit": "m/s²",
+          "tol": 0.04,
+          "inputs": {
+            "F1": 0.15,
+            "k": 2,
+            "a1": 0.14
+          },
+          "model": 0.29
+        },
+        {
+          "prompt": "A fan force of 0.30 N gives a 1.00 kg cart an acceleration of 0.29 m/s². Predict the acceleration for a fan force of 0.90 N on the same cart.",
+          "answer": 0.87,
+          "unit": "m/s²",
+          "tol": 0.04,
+          "inputs": {
+            "F1": 0.3,
+            "k": 3,
+            "a1": 0.29
+          },
+          "model": 0.89
+        }
+      ],
+      "g3": [
+        {
+          "prompt": "A 0.75 kg cart with a fan force of 0.15 N accelerates at 0.19 m/s². A stronger fan makes the force 4 times bigger, and the cart is loaded to 3 times the mass. Predict the new acceleration.",
+          "answer": 0.25,
+          "unit": "m/s²",
+          "tol": 0.04,
+          "inputs": {
+            "m1": 0.75,
+            "kF": 4,
+            "km": 3,
+            "a1": 0.19
+          },
+          "model": 0.26
+        },
+        {
+          "prompt": "A 0.50 kg cart with a fan force of 0.15 N accelerates at 0.28 m/s². A stronger fan makes the force 2 times bigger, and the cart is loaded to 3 times the mass. Predict the new acceleration.",
+          "answer": 0.19,
+          "unit": "m/s²",
+          "tol": 0.04,
+          "inputs": {
+            "m1": 0.5,
+            "kF": 2,
+            "km": 3,
+            "a1": 0.28
+          },
+          "model": 0.19
+        },
+        {
+          "prompt": "A 0.75 kg cart with a fan force of 0.15 N accelerates at 0.19 m/s². A stronger fan makes the force 4 times bigger, and the cart is loaded to 3 times the mass. Predict the new acceleration.",
+          "answer": 0.25,
+          "unit": "m/s²",
+          "tol": 0.04,
+          "inputs": {
+            "m1": 0.75,
+            "kF": 4,
+            "km": 3,
+            "a1": 0.19
+          },
+          "model": 0.26
+        }
+      ]
+    }
+  }
+}

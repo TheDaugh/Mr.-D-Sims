@@ -140,3 +140,12 @@ Nine pages in lesson folders are not registered in `shared/lessons.js`: six sims
 2. Enter the real stats bell times.
 3. Register or retire the nine unregistered pages.
 4. Migrate legacy lessons one at a time as they come up for rebuild.
+
+## 2026-10-28: virtual lab 5, the fan cart (slot 7), branch `slot-07-fan-cart`
+
+Built from `docs/slot-07/` (the sheet's three JSON files and the content test are copied unchanged into `physics/virtual-lab/content/` and `test/`; content test 39 of 39). Lives in `physics/virtual-lab/` (`index.html?lab=05-fan-cart`), runs on the shared lab app in `chemistry/virtual-lab` through `window.VLAB_HOST` (`src/host.js`).
+
+- Chemistry files touched, hooks only: `src/ui/app.js` (host registry, lab-kind calls, shared content base, course, `gateV3` codes, door/welcome/tutorial strings via `fl.text`), `roomview.js` (art keyed by tile id), `icons.js` (extra icons), `quests.js` (`huddle2` state), `demo.js` (kind script), `chest.js` and `stages.js` (ids on controls). `tests/lock.e2e.js` has a physics target.
+- Day rules: hold screen forced at minute 3, huddle 2 at minute 28 with blanks, code 2 never blocked by the record, no stamp or report code, `MrD.profile.record` kept, three hidden bands, three-hint ladder, predictions logged and locked.
+- Judgment calls for Ian: huddle 2's third blank and W3 contain 1/m, so they appear only once code 2 is entered; generated Checks problems have no hints in the sheet, so they borrow the bank item's hints 1 and 3 and template hint 2; bars 0 on setting 4 would roll past the 2 m rail (the picture stops the cart; the sheet never asks for it); flame lab still uses legacy `gate()` so its two codes are equal.
+- Paper fallback: `physics/virtual-lab/fan-cart-paper.html`. `slot-07.sheet.pdf` was not attached and pdflatex is not installed, so only the `.tex` is in `docs/slot-07/`.

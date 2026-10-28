@@ -10,7 +10,7 @@ function shade(c, f) {
   return `rgb(${v[0]},${v[1]},${v[2]})`;
 }
 
-export function createRoomRenderer(canvas, room) {
+export function createRoomRenderer(canvas, room, extraArt) {   // extraArt(kit) -> { tileId: draw(x, y, s, tile) } lets a lab in another folder draw its own objects
   canvas.width = 640; canvas.height = 360;
   const ctx = canvas.getContext("2d"); ctx.setTransform(2, 0, 0, 2, 0, 0);
   const P = (gx, gy, z = 0) => [Math.round(OX + (gx - gy) * TX), Math.round(OY + (gx + gy) * TY - z * ZS)];
@@ -69,6 +69,7 @@ export function createRoomRenderer(canvas, room) {
     }
   };
   const artKey = (t) => (t.type === "info" ? t.id : t.type);
+  const EXTRA = extraArt ? extraArt({ P, R, poly, box, fl, T, ctx, room, shade, tileAt }) : {};
 
   let ax = room.start.x, ay = room.start.y, lastT = 0;
   function player(p, ppe) {
@@ -102,7 +103,7 @@ export function createRoomRenderer(canvas, room) {
         for (let x = 0; x < room.w; x++) {
           const y = d - x; if (y < 0 || y >= room.h) continue;
           const tile = tileAt(room, x, y);
-          if (tile.type !== "floor") ART[tile.type === "info" ? artKey(tile) : tile.type](x, y, s, tile);
+          if (tile.type !== "floor") (EXTRA[tile.id] || ART[tile.type === "info" ? artKey(tile) : tile.type])(x, y, s, tile);
         }
         if (d === pd) { player(p, ppe); drawn = true; }
       }

@@ -1,0 +1,90 @@
+{
+  "id": "physics-lab",
+  "theme": {
+    "wall": "#7d8b99"
+  },
+  "noPPE": true,
+  "start": {
+    "x": 6,
+    "y": 8,
+    "face": "u"
+  },
+  "rows": [
+    "############",
+    "#C.........#",
+    "#..........#",
+    "#B.W.TTTT..#",
+    "#..........#",
+    "#..........#",
+    "####D#######",
+    "#..........#",
+    "#N.........#",
+    "#..........#",
+    "############"
+  ],
+  "legend": {
+    "#": {
+      "type": "wall",
+      "solid": true
+    },
+    ".": {
+      "type": "floor"
+    },
+    "D": {
+      "type": "door",
+      "id": "door",
+      "label": "DOOR",
+      "name": "Lab door",
+      "text": "The lab door. It opens when the pre-lab is done."
+    },
+    "N": {
+      "type": "info",
+      "solid": true,
+      "id": "notice",
+      "label": "NOTICE",
+      "name": "Notice board",
+      "text": "Today: how does a cart's acceleration change with the fan force, and with the mass? The door light turns green when your pre-lab is done."
+    },
+    "C": {
+      "type": "chalkboard",
+      "solid": true,
+      "id": "stepcard",
+      "label": "STEP CARD",
+      "name": "Step card",
+      "text": "The step card lists every step of the lab, in order."
+    },
+    "B": {
+      "type": "shelf",
+      "solid": true,
+      "id": "bar_shelf",
+      "label": "BAR SHELF",
+      "group": "Mass bars",
+      "items": [
+        "bar"
+      ],
+      "name": "Mass bar shelf",
+      "text": "Mass bars. Take four. Each bar is for loading the cart."
+    },
+    "W": {
+      "type": "station",
+      "solid": true,
+      "id": "balance",
+      "label": "BALANCE",
+      "name": "Balance",
+      "text": "The balance reads a mass in kg. Read the cart and one bar."
+    },
+    "T": {
+      "type": "station",
+      "solid": true,
+      "id": "track",
+      "label": "TRACK",
+      "name": "Fan cart track",
+      "text": "The track, the fan cart, the force sensor and the motion sensor. Press E to open the notebook."
+    }
+  },
+  "newArt": [
+    "track (four tiles wide: rail, cart with fan on top, bars stacked on the cart, motion sensor at the far end)",
+    "balance (small scale with a pan)",
+    "bar_shelf (dark bars on a shelf)"
+  ]
+}
