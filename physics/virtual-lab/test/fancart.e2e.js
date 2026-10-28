@@ -233,7 +233,7 @@ await page.click("#dlgDoneClose");
 
 // ---------- resume, then the teacher key ----------
 const before = JSON.stringify(await vl(() => ({ rows: __vl.S.flame.rows, pred: __vl.S.flame.pred, stage: __vl.S.stage, cer: __vl.S.cer, inv: __vl.S.inv })));
-await page.goto(URL_ + "#key"); await page.reload(); await page.waitForSelector("#boot button"); check((await page.locator("#boot").innerText()).includes("saved lab"), "reopening offers the saved lab");
+await Promise.all([page.waitForEvent("load"), page.evaluate(() => { location.hash = "#key"; })]); await page.waitForSelector("#boot button"); check((await page.locator("#boot").innerText()).includes("saved lab"), "reopening offers the saved lab");
 await page.click('#boot button:has-text("Continue where I left off")'); await page.waitForFunction(() => !document.querySelector("#app").hidden); await page.waitForTimeout(500);
 check(JSON.stringify(await vl(() => ({ rows: __vl.S.flame.rows, pred: __vl.S.flame.pred, stage: __vl.S.stage, cer: __vl.S.cer, inv: __vl.S.inv }))) === before, "resume restores the tables, predictions, CER, stage and the bars carried");
 await page.keyboard.press("n"); await page.waitForSelector("#dlgNotebook[open]"); check((await page.locator("#fcTable1 tr[data-setting='3'] td").first().innerText()) === "0.45", "the saved rows are back in the notebook"); await page.click("#fcClose");
@@ -269,7 +269,7 @@ await inPeriod("2026-10-21T09:28:30-04:00", async (e, kk) => {
   await e.page.click("#btnHuddle"); await kk.enterCode("h2"); check(await e.page.evaluate(() => __vl.S.flame.huddle2), "an empty table still gets code 2");
 });
 await (async () => {
-  const e = await open(browser, "2026-10-21T09:28:30-04:00"), p = e.page; await p.evaluate(() => { location.hash = "#key"; }); await p.reload(); await p.waitForFunction(() => window.__vl && !document.querySelector("#app").hidden);
+  const e = await open(browser, "2026-10-21T09:28:30-04:00"), p = e.page; await Promise.all([p.waitForEvent("load"), p.evaluate(() => { location.hash = "#key"; })]); await p.waitForFunction(() => window.__vl && !document.querySelector("#app").hidden);
   check((await p.evaluate(() => __vl.S.stage)) === "lab" && !(await p.evaluate(() => document.querySelector("#dlgIntro").open)), "#key: teacher creative mode skips the intro, the pre-lab and the huddles and never asks for a name");
   await p.keyboard.press("n"); await p.waitForSelector("#dlgNotebook[open]"); check(await p.locator("#fcBar4").isEnabled() && await p.locator("#fcBar3").isEnabled(), "#key: every bar button works with nothing carried");
   await p.click("#fcBar3"); await p.click("#fcSet3"); await p.click("#fcRun"); await p.waitForFunction(() => __vl.S.flame.last && !__vl.S.flame.anim); check((await p.evaluate(() => __vl.S.flame.runs)) === 1, "#key: the test run opens with no code and no prediction");

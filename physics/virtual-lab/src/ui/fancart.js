@@ -468,6 +468,9 @@ export function create(ctx) {
     const g = G(), rows = [], tr = (th, ...tds) => h("tr", {}, h("th", {}, th), ...tds.map((t) => h("td", {}, t)));
     rows.push(tr(U.keyStandard, I.standard, ""));
     rows.push(tr(U.keyCodes, `${U.keyCode1}: ${MrD.codes.gateV3(lab.id, "h1")}`, `${U.keyCode2}: ${MrD.codes.gateV3(lab.id, "h2")}`));
+    const H2 = C.huddle2Tab;
+    rows.push(tr(U.keyHuddle2, h("div", {}, h("p", {}, H2.tested), h("h4", {}, U.blanksHead), h("ul", {}, H2.blanks.map((b) => h("li", {}, b.text + " → " + b.answer))), h("h4", {}, U.cruxHead), h("ol", {}, H2.crux.map((c) => h("li", {}, c.q + " → " + c.answer)))),
+      h("div", {}, h("h4", {}, U.workedHead), ...H2.worked.map((w) => h("div", {}, h("p", {}, h("b", {}, w.id + ". "), w.problem), h("ol", {}, w.steps.map((x) => h("li", {}, x))))), h("h4", {}, U.keySays), h("ul", {}, H2.mrDSays.map((x) => h("li", {}, x))))));
     for (const it of I.items) {
       const opts = it.options ? h("ol", {}, it.options.map((o, i) => h("li", { class: i === it.answer ? "fcAns" : "" }, o))) : h("span", {}, `${it.answer} ± ${it.tol} ${it.unit}`);
       rows.push(tr(`${it.id} · ${bandName(it.band)}`, h("div", {}, h("p", {}, it.prompt), opts), h("div", {}, h("ol", {}, it.hints.map((x) => h("li", {}, x))), h("p", { class: "hint" }, it.misc))));

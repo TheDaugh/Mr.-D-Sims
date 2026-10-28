@@ -1063,6 +1063,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   say(SCAT ? "Manchester, 1909. Read the chalkboard if you like, then go through the curtain to the dark room and press E at the foil apparatus." : KIND ? fl.text("welcome") : "Welcome. Open the locker (walk up to it, press E) and put on goggles and an apron. Then go through the door.");
   if (resume) restore(resume);
   renderQuests();
+  if (KIND) addEventListener("hashchange", () => location.reload());   // adding or removing #key on an open page restarts it in the right mode
   if (KIND && isKey()) $("#btnKey").hidden = false;   // #key is the teacher switch on a page from another folder
   if (TEACHER || (KIND && isKey())) { $("#btnKey").hidden = false; $("#guideOn").checked = false; guideOn = false; $("#helpCard").hidden = false; if (S.stage === "intro" || S.stage === "prelab" || S.stage === "huddle1") { S.stage = "lab"; S.student = S.student || "Teacher"; log.add("teacher_start"); renderQuests(); say("Teacher key: intro, pre-lab, timer and submit gate are skipped. Open Key for the answers.", "obs"); } }
   if (S.stage === "intro") intro(); else if (S.stage === "prelab") { drawPrelab(); openDlg("dlgPrelab"); } else if (S.stage === "huddle1") openHuddle(1);
