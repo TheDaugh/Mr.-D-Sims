@@ -972,7 +972,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
     const reqI = items.filter((i) => !i.q.optional), doneN = reqI.filter((i) => i.done).length, from = Math.max(0, (ai < 0 ? items.length : ai) - 1), shown = items.slice(from, from + 5);
     $("#questHead").textContent = `Tasks (${doneN} of ${reqI.length})`;
     $("#quests").replaceChildren(...shown.map((i) => h("li", { class: i.done ? "done" : i === items[ai] ? "active" : "" }, h("span", { class: "tick" }, i.done ? "✔" : i === items[ai] ? "▶" : "○"), " ", i.q.text, i.q.count > 1 && i.prog !== null && !i.done ? ` (${i.prog}/${i.q.count})` : "")), ...(items.length - from - 5 > 0 ? [h("li", { class: "more" }, `+ ${items.length - from - 5} more`)] : []));
-    $("#coachText").textContent = stage === "huddle1" ? lab.ui.coachHuddle1 : stage === "intro" || stage === "prelab" ? "Finish the pre-lab. The lab door stays locked until you do." : stage === "done" ? "Lab complete. Open Save / Print to hand in your record." : stage === "postlab" && ai < 0 ? "Write your CER with the button at the top." : ai >= 0 ? items[ai].q.hint : "All tasks done.";
+    $("#coachText").textContent = KIND && isKey() ? fl.text("coachKey") : stage === "huddle1" ? lab.ui.coachHuddle1 : stage === "intro" || stage === "prelab" ? "Finish the pre-lab. The lab door stays locked until you do." : stage === "done" ? "Lab complete. Open Save / Print to hand in your record." : stage === "postlab" && ai < 0 ? "Write your CER with the button at the top." : ai >= 0 ? items[ai].q.hint : "All tasks done.";
   }
 
   // microscope: click a container twice (or press M) to zoom in
@@ -1047,7 +1047,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
         rows.push(h("tr", {}, h("th", {}, `Unknown ${u.label}${CH.includes(u.label) ? " (challenge)" : ""}`), h("td", {}, sp.name), h("td", {}, lab.tests.map((x) => `${x.name}: ${optLabel(x, t[x.key])}`).join("; ")))); }
     }
     const labSel = h("select", {}, Object.keys(LABS).map((k) => h("option", { value: k, selected: k === (params.get("lab") || "unknown-solids") ? "" : null }, k))), seedIn = h("input", { type: "number", value: seed, style: "width:130px" });
-    $("#keyBody").replaceChildren(h("table", { class: "keys" }, h("tbody", {}, rows)), h("p", { class: "hint" }, `Seed ${seed}. The same seed gives the same unknowns, so you can match a student's record.`),
+    $("#keyBody").replaceChildren(h("table", { class: "keys" }, h("tbody", {}, rows)), KIND ? h("span") : h("p", { class: "hint" }, `Seed ${seed}. The same seed gives the same unknowns, so you can match a student's record.`),
       h("div", { class: "controls" }, labSel, seedIn, h("button", { onclick: () => { location.search = `?lab=${labSel.value}&seed=${seedIn.value}`; } }, "Load lab and seed"), h("button", { onclick: () => { location.search = `?lab=${labSel.value}&seed=${Math.floor(Math.random() * 1e9)}`; } }, "New random samples")));
   }
   $("#btnKey").addEventListener("click", () => { renderKey(); openDlg("dlgKey"); });
