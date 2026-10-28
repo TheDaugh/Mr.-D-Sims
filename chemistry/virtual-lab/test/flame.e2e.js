@@ -169,6 +169,28 @@ await page.goto(ORIGIN + "/chemistry/virtual-lab/index.html?lab=flame&resume=1")
 const back = await vl(() => ({ stage: __vl.S.stage, nacl: __vl.S.flame.rows.NaCl.color, a: __vl.S.flame.unk.A.identity, h2: __vl.S.flame.huddle2, band: __vl.S.flame.items.band, cer: __vl.S.cerDone, inv: __vl.S.inv.join() }));
 check(back.stage === "done" && back.nacl === colorOf("NaCl").colorGroup && !!back.a && back.h2 === true && back.cer === true && back.inv === "uA,uB", "reload with resume brings back the whole record: " + JSON.stringify(back));
 
+// ---- the student demo: plays on a clean bench and leaves the student's own record alone
+await page.evaluate(() => localStorage.clear()); await page.goto(ORIGIN + "/chemistry/virtual-lab/index.html?lab=flame"); await page.waitForSelector("#student");
+await page.click('button:has-text("Watch the demo")'); await page.waitForSelector("#demoBar:not([hidden])");
+const caps = new Set(); for (let i = 0; i < 90 && caps.size < 9; i++) { const t = await page.locator("#demoText").innerText().catch(() => ""); if (t) caps.add(t.split("·")[0].trim()); await page.waitForTimeout(500); }
+check(caps.size >= 7, "the demo shows its captions (" + [...caps].join(", ") + ")");
+await page.waitForFunction(() => document.querySelector("#demoBar").hidden, null, { timeout: 60000 });
+check(await vl(() => __vl.log.events.every((e) => e.type !== "flame_test" && e.type !== "splint")), "the demo logs nothing");
+
+// ---- #key: creative mode, no name screen, everything open, the huddle guide and both codes in the key
+await page.goto(ORIGIN + "/chemistry/virtual-lab/index.html?lab=flame#key"); await page.waitForFunction(() => window.__vl && __vl.S);
+check(await vl(() => __vl.S.stage) === "lab" && !(await page.locator("#dlgIntro").evaluate((d) => d.open)), "#key skips the name screen");
+check(await page.locator("#btnKey").isVisible(), "the Key button shows");
+check(await vl(() => __vl.fl.unlocked()), "in #key the unknowns are open");
+await page.click("#btnKey"); const keyText = await page.locator("#keyBody").innerText();
+check(/Code 1/.test(keyText) && /Code 2/.test(keyText) && /Three worked problems/.test(keyText) && /Three crux questions/.test(keyText) && /Exit ticket/.test(keyText) && /Wrong answers to expect/.test(keyText), "the key holds both codes, the worked problems, the crux questions and the exit ticket");
+await page.keyboard.press("Escape");
+await page.evaluate(() => { location.hash = ""; }); await page.waitForFunction(() => window.__vl && __vl.S && __vl.S.stage === "intro", null, { timeout: 8000 }).catch(() => {});
+check(await page.locator("#student").isVisible(), "removing #key on the open page restarts it as a student page");
+await page.evaluate(() => { location.hash = "#key"; }); await page.waitForFunction(() => window.__vl && __vl.S && __vl.S.stage === "lab", null, { timeout: 8000 }).catch(() => {});
+check(await vl(() => __vl.S.stage) === "lab", "adding #key to an open page restarts it in creative mode");
+check(errors.length === 0, "no page errors after demo and key" + (errors.length ? ": " + errors.slice(0, 3).join(" | ") : ""));
+
 // ---- the paper fallback
 const paper = await ctx.newPage(); paper.setDefaultTimeout(8000);
 await paper.goto(ORIGIN + "/chemistry/virtual-lab/flame-explore.html");

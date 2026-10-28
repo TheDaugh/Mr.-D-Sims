@@ -2,6 +2,16 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-10-28: Lab 4 (Flame Tests) teacher key, creative mode, student demo, hub card
+
+Ian could not use `#key` on lab 4 (nothing changed on the name screen), the students had no demo, and there was no huddle script or worked solutions for him.
+
+- `#key` is now a creative mode like the fan cart lab: no name screen, goggles and apron on, unknowns open, codes skipped, Key button shown. Adding or removing `#key` on an open page restarts it in the right mode.
+- The Key dialog lists both codes (the one daily code), the huddle 1 script, pre-lab answers, the huddle 2 picture, definitions, three worked problems with the think-aloud lines, three crux questions with the wrong answers to expect, the exit ticket and what to look for, the wrong-answers table, and the practice answers. All copied from the sheet into `content/labs/04-flame-tests.json` (`huddle`); not shown to students.
+- Student demo (nine captions on the real bench, nothing kept): `flameScript` in `src/ui/demo.js`.
+- Hub card added in `chemistry/labs.js`. `CLAUDE.md` now has a done-checklist for virtual labs.
+- Tests: `test/flame.e2e.js` covers the demo, `#key`, and the restart on hash change. Lock e2e (with `TZ=America/New_York`), chemistry and physics virtual-lab suites and the fan cart e2e pass.
+
 ## 2026-10-27: Chemistry virtual lab 4, Flame Tests (slot 8, lab day)
 
 Built as a new module in `chemistry/virtual-lab` (`?lab=flame`), from the slot 8 sheet. Nothing in the three content files was rewritten.

@@ -13,7 +13,7 @@ export async function runDemo(api) {
   const walk = async (route) => { for (const d of path(route)) { live(); api.walk(d); await wait(230); } };
   const total = 9;
   try {
-    if (api.scat) await scatScript({ say, walk, wait, live, api }); else if (api.kind) await api.kind.demo({ say, walk, wait, live, api }); else if (api.heat) await heatScript({ say, walk, wait, live, api }); else {
+    if (api.scat) await scatScript({ say, walk, wait, live, api }); else if (api.kind) await api.kind.demo({ say, walk, wait, live, api }); else if (api.flame) await flameScript({ say, walk, wait, live, api }); else if (api.heat) await heatScript({ say, walk, wait, live, api }); else {
     await say(1, "Welcome. This tour shows every control. None of it counts toward your lab.", 2800);
     await say(2, "Walk with the arrow keys or WASD. The blue locker holds your goggles and apron.", 1400); await walk("ULLUL");
     await say(2, "Press E to use what you are facing. Put on goggles and an apron.", 1500); api.interact(); await wait(900); api.togglePPE("goggles"); await wait(700); api.togglePPE("apron"); await say(2, "Both are on. Now the door light is green.", 1800); api.closePanel();
@@ -67,4 +67,18 @@ async function scatScript({ say, walk, wait, live, api }) {
   await say(8, "The detector table counts every hit by group. Tally the straight, deflected and rebounding hits, then match each result to what it showed.", 1400); D.scroll("table"); await wait(2200); D.scroll("tally"); await wait(2200); D.scroll("match"); await wait(2200);
   await say(8, "Then you rebuild the atom: size a nucleus until your model matches the real foil. The challenge changes the metal, the energy and the foil thickness.", 1400); D.scroll("rebuild"); await wait(2400); D.scroll("challenge"); await wait(2600);
   await say(9, "Last, write a Claim, Evidence, Reasoning that cites your own counts. That is the tour. In the lab, yellow arrows walk you through each step.", 3600);
+}
+
+// The flame-lab tour: suit up, the flame bench, one 10-second test, the notebook row, a reused splint, the spectroscope. Nothing is kept.
+async function flameScript({ say, walk, wait, live, api }) {
+  const F = api.flame, A = F.act;
+  await say(1, "Welcome. This tour shows the flame bench. None of it counts toward your lab.", 2800);
+  await say(2, "Walk with the arrow keys or WASD. The blue locker holds your goggles and apron. Press E to use it.", 1400); await walk("ULLUL"); api.interact(); await wait(900); api.togglePPE("goggles"); await wait(600); api.togglePPE("apron"); await say(2, "Both are on. The door light is green.", 1800); api.closePanel();
+  await say(3, "Walk through the door and up to the flame bench. Press E to step up to it.", 1000); await walk("DRRUUUUU"); api.interact(); await wait(1400);
+  await say(4, "The step card on the left is always there. Take a fresh splint from the box, then dip it in NaCl.", 1600); A.fresh(); await wait(1400); A.dip("NaCl"); await wait(1800);
+  await say(5, "Hold the splint at the edge of the flame for 10 seconds. Watch the ring and the color.", 600); A.hold(); await wait(4200); A.step(6.5); await wait(1400);
+  await say(6, "Open the notebook (N). Record the color and the brightness. Here the row is filled for you.", 1200); F.state().rows.NaCl = { color: "yellow-orange", brightness: "very bright", tested: 1, flagged: false }; F.openNb("table"); await wait(3000); F.closeNb(); await wait(500);
+  await say(7, "Use a fresh splint every time. A reused splint flashes sodium yellow and the run is flagged.", 1200); A.dip("NaCl"); await wait(600); A.dip("NaCl"); A.hold(); await wait(1500); A.step(1); await wait(1800); A.step(9); await wait(1000);
+  await say(8, "If two flames match, the spectroscope on the bench shows each color's lines. Open it from the bench or the Spectroscope button.", 1400); F.openNb("spec"); await wait(3200); F.closeNb(); await wait(400);
+  await say(9, "That is the tour. Test all six salts and NaNO3, then bottles A and B. Yellow arrows will walk you through your first test.", 3600);
 }

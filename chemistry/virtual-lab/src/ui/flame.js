@@ -25,7 +25,7 @@ export function createFlame(ctx) {
     const f = G(), a = F.assignUnknowns(data, keyOf());
     labelsOpen().forEach((l, n) => { if (!f.unk[l]) f.unk[l] = { sample: n === 0 ? a.A : n === 1 ? a.B : F.extraSample(data, keyOf(), n - 2), color: "", brightness: "", tested: 0, flagged: false, lines: "", identity: "" }; });
   }
-  const unlocked = () => F.unknownsOpen(data, G().rows);
+  const unlocked = () => (ctx.isKey && ctx.isKey()) || F.unknownsOpen(data, G().rows);
   const bottles = () => (unlocked() ? (ensureUnknowns(), labelsOpen()) : []).map((l, i) => ({ key: "u" + l, id: l, label: U.unknownWord + " " + l, short: l, group: "Unknown samples", phase: "s", shelf: 0, idx: i, color: SW }));
   function syncSources(sources) { sources.length = 0; sources.push(...bottles()); }
 

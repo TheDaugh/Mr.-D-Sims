@@ -3,7 +3,6 @@
   "kind": "flame",
   "title": "Flame Tests",
   "roomFile": "flame-lab",
-  "noDemo": true,
   "carry": 6,
   "firstSample": "NaCl",
   "files": {
@@ -182,6 +181,92 @@
     "printTitle": "Flame Tests",
     "printKnowns": "Known salts",
     "printUnknowns": "Unknowns",
-    "printPractice": "Practice"
+    "printPractice": "Practice",
+    "coachKey": "Teacher key (creative mode): everything is open and the codes are skipped. Open Key for the codes and the huddle guide."
+  },
+  "huddle": {
+    "h1": {
+      "title": "Huddle 1 (minute 3, about 8 min)",
+      "script": [
+        "Review (3 min): the three pre-lab items and the prediction. Do not give the prediction away.",
+        "First contact (4 min): a flame test puts a pinch of a salt in a flame, and you watch the color.",
+        "Say the three rules: known salts first, a fresh splint each time, and record everything in the notebook.",
+        "Say: if two flames look the same, there is a second tool on the bench (the spectroscope).",
+        "Show the swatches so no color name arrives unexplained. Look first at the two Na boxes: they match on purpose. Watch for Li and Sr: identical too, and that is the problem the lab ends on.",
+        "Give code 1 at the end."
+      ]
+    },
+    "h2": {
+      "title": "Huddle 2 (about minute 33, 6 min)",
+      "picture": "Three energy levels as horizontal lines, an electron dot on level 3, a long straight arrow down to level 1 with a wavy blue arrow (bluer light), a short arrow down to level 2 with a wavy red arrow (redder light). The straight arrow is a drop between two energies, not a path through space.",
+      "definitions": [
+        [
+          "energy level",
+          "a specific energy an electron can have"
+        ],
+        [
+          "emission",
+          "light given off when an electron drops to a lower level"
+        ],
+        [
+          "the flame color identifies the",
+          "metal, not the other part of the salt"
+        ]
+      ],
+      "worked": [
+        {
+          "problem": "NaCl and NaNO3 both burn yellow-orange.",
+          "say": "Claim: the metal sets the color. Evidence: two different salts, one color. Reasoning: the only part they share is sodium."
+        },
+        {
+          "problem": "A flame flashes yellow, then shows lilac.",
+          "say": "Claim: potassium, with a little sodium on the splint. Evidence: the color that lasts is lilac. Reasoning: sodium is very bright and can hide a faint color."
+        },
+        {
+          "problem": "An unknown burns crimson; Li and Sr are both crimson.",
+          "say": "Claim first: I cannot tell from the flame alone, both match. PAUSE: students say how the spectroscope settled it (the blue line). Then say: an honest answer says what the data cannot decide. That is part of the evidence."
+        }
+      ],
+      "crux": [
+        {
+          "q": "Picture: an electron dropping between two levels. What comes out?",
+          "answer": "light",
+          "expect": "heat; the flame makes it"
+        },
+        {
+          "q": "Picture: two flames, same color, labeled NaCl and NaNO3. What sets the color?",
+          "answer": "the metal",
+          "expect": "the chlorine"
+        },
+        {
+          "q": "Table: an unknown is crimson. Write a claim true to the data.",
+          "answer": "Li or Sr; a second test is needed",
+          "expect": "Li, because it is listed first"
+        }
+      ],
+      "note": "Give code 2 at the end. Code 2 only works on a student whose record is complete (seven flame tests recorded, both unknowns answered). In creative mode the code is shown instead."
+    },
+    "wrong": [
+      [
+        "The flame makes the color.",
+        "No picture of electrons gaining and losing energy yet. Return to the drop picture."
+      ],
+      [
+        "The chlorine / nitrate makes it.",
+        "They have not isolated the metal. NaNO3 is the counterexample."
+      ],
+      [
+        "Electrons circle in rings.",
+        "Slot 7's shell picture carried over. Say: levels are energies, not racetracks."
+      ],
+      [
+        "Yellow, so it is Na. (for a K flash)",
+        "They missed that sodium hides faint colors."
+      ],
+      [
+        "Li, it was listed first.",
+        "They picked a name instead of stating what the data cannot decide."
+      ]
+    ]
   }
 }
