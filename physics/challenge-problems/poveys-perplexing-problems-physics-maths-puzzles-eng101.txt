@@ -1,0 +1,3633 @@
+﻿lOMoARcPSD|62437317
+
+Poveys-perplexing-problems
+
+English (Mahavajiravudh Changwatsongkhla School)
+
+messages.pdf_cover_qr_code_label
+
+messages.studocu_not_sponsored_or_endorsed_by_college
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+THOMAS POVEY is Professor of In Professor Povey’s Perplexing Problems, Thomas 
+Engineering Science at the University of ‘Entry to selective universities will often require students to demonstrate that THOMAS POVEY Povey shares 109 of his favourite problems 
+Oxford, where he researches jet-engine and they have engaged in super-curricular activities which develop their awareness in physics and maths. A tour de force of 
+rocket technology. His science puzzles have and understanding of their subject. Tom Povey has provided in this book imagination and exposition, he takes us by the 
+
+enough super-curricular content to keep an aspiring mathematician, physicist, hand and guides us through uncompromisingly 
+appeared in the Guardian newspaper and been 
+
+challenging territory that expands our minds and 
+featured on BBC Radio 4. engineer or material scientist (and their teachers) happy for months. For a 
+
+encourages a playful and exploratory approach 
+parent or teacher who wants to pro-actively support a student in preparing for to study. The puzzles, he says, are like toys. We 
+entry to a competitive science or maths course this is a no-brainer purchase.’ should pick up the one we most enjoy, and play 
+Mike Nicholson, Director of Undergraduate Admissions and with it. 
+Outreach, University of Oxford (2006-14), Director of Student 
+Recruitment and Admissions, University of Bath Professor Whether you are an aspiring scientist or an old-
+
+hand, pitting yourself against these problems will 
+‘This book is about the excitement of mathematics and physics at the school/ test your ability to think, and inspire you with 
+university boundary. It contains a remarkable collection of intriguing intellectual curiosity and enthusiasm for physics. Presented 
+challenges, all with complete solutions. You can read it to increase your ability Povey’s with charm and wit, the questions span the 
+in maths and physics; you can read it to develop your problem-solving skills; but gap between high-school and university-
+most of all you can read it for fun.’ Professor Richard Prager, Head of the entrance standard material. Detailed answers are 
+School of Technology, University of Cambridge lightened with a fascinating and refreshing blend 
+
+of scientific history, application and personal 
+‘This instructive book will allow aspiring young anecdote.
+
+scientists to test and expand their knowledge of Perplexing On this delightful and idiosyncratic romp 
+physics and mathematics, and gain greater
+
+through pre-university maths and physics, the 
+confidence in their abilities.’ Professor Sir Chris Problems author shows us that behind every single one 
+Llewellyn Smith FRS, Director General of these questions lies a new way of thinking 
+of CERN (1994-98) about subjects we thought we had understood. 
+
+He argues that engaging with the unfamiliar is 
+key to forming deeper insights and developing 
+intellectual independence. Professor Povey’s 
+Perplexing Problems is a manifesto that science 
+should be playful, and a celebration of the 
+curious.
+
+O N E W O R L D Pre-University Physics and Maths 
+MATHEMATICS / SCIENCE Puzzles with Solutions
+
+www.oneworld-publications.com £25/$30
+jacket illustrations courtesy of the author
+
+messages.downloaded_by
+
+Professor Povey’s Perplexing Problems  THOMAS POVEY
+
+
+
+lOMoARcPSD|62437317
+
+Praise for Professor Povey’s Perplexing Problems
+
+“Entry to selective universities will often require students to demonstrate that
+they have engaged in super-curricular activities which develop their awareness
+and understanding of their subject. Thomas Povey has provided in this book
+enough super-curricular content to keep an aspiring mathematician, physicist,
+engineer or material scientist (and their teachers) happy for months. For a
+parent or teacher who wants to proactively support a student in preparing for
+entry to a competitive science or maths course this is a no-brainer purchase.”
+
+—Mike Nicholson, Director of Undergraduate Admissions and Outreach,
+University of Oxford (2006-14), Director of Student Recruitment and
+Admissions, University of Bath
+
+“This book is about the excitement of mathematics and physics at the school-
+university boundary. It contains a remarkable collection of intriguing intellec-
+tual challenges, all with complete solutions. You can read it to increase your
+ability in maths and physics; you can read it to develop your problem-solving
+skills; but most of all you can read it for fun.”
+
+—Professor Richard Prager, Head of Cambridge University School of
+Technology
+
+“This instructive book will allow aspiring young scientists to test and expand
+their knowledge of physics and mathematics, and gain greater confidence in
+their abilities.”
+
+—Professor Sir Chris Llewellyn Smith FRS, Director General of CERN
+(1994-98)
+
+“By challenging students with unfamiliar but engaging problems, I hope Pro-
+fessor Povey inspires many more budding physicists and mathematicians to
+realise their potential.”
+
+—Sir Peter Lampl, Founder and Chairman of the Sutton Trust
+
+“A real tour de force of scientific problems. Thomas Povey is clearly a master
+at this kind of conundrum ... Fascinating.”
+
+—John Farndon, author of Do You Think You’re Clever?
+
+“This book will amuse those who like puzzles. The topics vary from the prac-
+tical to the quirky. Readers with a basic knowledge of maths and physics will
+be entertained and encouraged by the interesting and challenging questions
+they are able to solve.”
+
+—Professor Dame Ann Dowling DBE FRS FREng, President of the Royal
+Academy of Engineering
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+Professor Povey’s
+Perplexing Problems
+
+Pre-University Physics and Maths Puzzles
+with Solutions
+
+Thomas Povey
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+A Oneworld Book
+
+First published in North America, Great Britain and Australia by
+
+Oneworld Publications, 2015
+
+Copyright © Thomas Povey 2015
+
+The moral right of Thomas Povey to be identified as the Author of this work has been
+asserted by him in accordance with the Copyright, Designs, and Patents Act 1988
+
+All rights reserved
+
+Copyright under the Berne Convention
+
+A CIP record for this title is available from the British Library
+
+ISBN 978-1-78074-775-0
+
+Printed and bound by CPI Group (UK) Ltd, Croydon CR0 4YY
+
+Oneworld Publications
+
+10 Bloomsbury Street, London WC1B 3SR, England
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+To Mike Leask and Terry Jones—brilliant teachers, insatiable adventurers.
+With thanks to Tet Amaya, for substantial contributions throughout.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+Contents
+
+Introduction 1
+
+Acknowledgements 5
+
+An odd journey 7
+
+1 Geometry 19
+1.1 Shortest walk F . . . . . . . . . . . . . . . . . . . . . . . . 20
+1.2 Intercontinental telephone cable F . . . . . . . . . . . . . . 21
+1.3 Chessboard and hoop FF . . . . . . . . . . . . . . . . . . . 22
+1.4 Hexagonal tiles and hoop FF . . . . . . . . . . . . . . . . . 24
+1.5 Intersecting circles FF . . . . . . . . . . . . . . . . . . . . . 26
+1.6 Cube within sphere F . . . . . . . . . . . . . . . . . . . . . 28
+1.7 Polygon inscribed within circle F . . . . . . . . . . . . . . . 30
+1.8 Circle inscribed within polygon FFF . . . . . . . . . . . . 31
+1.9 Triangle inscribed within semicircle F . . . . . . . . . . . . 34
+1.10 Big and small tree trunks FF or FFFF . . . . . . . . . . 36
+1.11 Professor Fuddlethumbs’ stamp FF . . . . . . . . . . . . . 39
+1.12 Captain Fistfulls’ treasure F . . . . . . . . . . . . . . . . . . 41
+1.13 Captain Fistfulls’ treasure II FF . . . . . . . . . . . . . . . 42
+1.14 Captain Fistfulls’ treasure III FFF . . . . . . . . . . . . . . 45
+1.15 The geometry of Koch Island FFFF . . . . . . . . . . . . 49
+1.16 An easyish fencing problem F . . . . . . . . . . . . . . . . . 52
+1.17 A hardish fencing problem FFF . . . . . . . . . . . . . . . 54
+
+2 Mathematics 60
+2.1 Human calculator F . . . . . . . . . . . . . . . . . . . . . . 60
+2.2 Professor Fuddlethumbs’ reports F . . . . . . . . . . . . . . 63
+2.3 More of Professor Fuddlethumbs’ reports F . . . . . . . . . 64
+2.4 Ant on a cube I FF . . . . . . . . . . . . . . . . . . . . . . 65
+2.5 Ant on a cube II FFF . . . . . . . . . . . . . . . . . . . . 66
+2.6 Ant on a cube III FFFF . . . . . . . . . . . . . . . . . . . 67
+2.7 A falling raindrop FF . . . . . . . . . . . . . . . . . . . . . 69
+2.8 The Three Door Problem FF . . . . . . . . . . . . . . . . . 72
+
+vii
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+viii CONTENTS
+
+2.9 Dr Bletchley’s PIN FFF . . . . . . . . . . . . . . . . . . . 74
+2.10 Mr Smith’s coins FFF . . . . . . . . . . . . . . . . . . . . 76
+2.11 The three envelope problem F . . . . . . . . . . . . . . . . . 77
+2.12 A card game FF . . . . . . . . . . . . . . . . . . . . . . . . 79
+
+3 Statics 82
+3.1 Sewage worker’s conundrum F . . . . . . . . . . . . . . . . 83
+3.2 Sewage worker’s escape FF . . . . . . . . . . . . . . . . . . 85
+3.3 Sewage worker’s resolution FFF . . . . . . . . . . . . . . . 89
+3.4 Aztec stone movers FF . . . . . . . . . . . . . . . . . . . . 91
+3.5 The Wheel Wars I FFF . . . . . . . . . . . . . . . . . . . . 96
+3.6 The Wheel Wars II FF . . . . . . . . . . . . . . . . . . . . 100
+3.7 Obelisk raiser FF . . . . . . . . . . . . . . . . . . . . . . . 101
+3.8 Obelisk razer FFFF . . . . . . . . . . . . . . . . . . . . . 108
+3.9 The Ravine of (Not Quite) Certain Death FFF . . . . . . 115
+
+4 Dynamics and collisions 119
+4.1 Pulleys F . . . . . . . . . . . . . . . . . . . . . . . . . . . . 122
+4.2 Dr Lightspeed’s elastotennis match FF . . . . . . . . . . . . 124
+4.3 Accelerating matchbox FFF . . . . . . . . . . . . . . . . . 129
+4.4 The last flight of Monsieur Canard FF . . . . . . . . . . . 132
+4.5 Water-powered funicular F . . . . . . . . . . . . . . . . . . 136
+4.6 Sherlock Holmes and the Bella Fiore emerald FFF . . . . 141
+4.7 Equivalent statements for linear collisions FFF . . . . . . . 147
+
+5 Circular motion 150
+5.1 Friction at the superbike races F . . . . . . . . . . . . . . . 151
+5.2 Pole position at the superbike races FF . . . . . . . . . . . . 153
+5.3 Roller coaster FFF . . . . . . . . . . . . . . . . . . . . . . 155
+5.4 Derailed roller coaster FF . . . . . . . . . . . . . . . . . . . 158
+5.5 The last ride of Professor Lazy FF . . . . . . . . . . . . . . 162
+5.6 Wall of Death: car FFF . . . . . . . . . . . . . . . . . . . 165
+5.7 Wall of Death: motorcycle FF or FFFF . . . . . . . . . 170
+
+6 Simple harmonic motion 176
+6.1 Oscillating sphere FF . . . . . . . . . . . . . . . . . . . . . 180
+6.2 Professor Stopclock’s time-manipulator FFF . . . . . . . . 184
+6.3 Dr Springlove’s Oscillator F . . . . . . . . . . . . . . . . . . 187
+6.4 Dr Springlove’s Infernal Oscillator FF . . . . . . . . . . . . 190
+6.5 Dr Springlove’s Improved Infernal Oscillator FFF . . . . . 192
+
+7 Mad inventions and perpetual motion 196
+7.1 Stevin’s clootcrans F . . . . . . . . . . . . . . . . . . . . . . 197
+7.2 Power-producing speed humps FF . . . . . . . . . . . . . . 201
+7.3 The overbalanced wheel FF . . . . . . . . . . . . . . . . . 203
+7.4 Professor Sinclair’s syphon FF . . . . . . . . . . . . . . . . 209
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+CONTENTS ix
+
+7.5 Boyle’s perpetual vase F . . . . . . . . . . . . . . . . . . . . 214
+7.6 The curious wheel FFF . . . . . . . . . . . . . . . . . . . 217
+
+8 Kinematics 219
+8.1 Professor Lazy FF . . . . . . . . . . . . . . . . . . . . . . . 219
+8.2 The Unflinching Aviator F . . . . . . . . . . . . . . . . . . 222
+8.3 Target shooting F . . . . . . . . . . . . . . . . . . . . . . . 225
+
+9 Electricity 228
+9.1 Resistor pyramid FF . . . . . . . . . . . . . . . . . . . . . 230
+9.2 Resistor tetrahedron F . . . . . . . . . . . . . . . . . . . . . 234
+9.3 Resistor square FFFF . . . . . . . . . . . . . . . . . . . . 235
+9.4 Resistor cube FFF . . . . . . . . . . . . . . . . . . . . . . 237
+9.5 Power transmission F . . . . . . . . . . . . . . . . . . . . . 239
+9.6 RMS power F . . . . . . . . . . . . . . . . . . . . . . . . . 240
+9.7 Boiling time F . . . . . . . . . . . . . . . . . . . . . . . . . 240
+
+10 Gravity 242
+10.1 The hollow moon F . . . . . . . . . . . . . . . . . . . . . . 243
+10.2 Lowest-energy circular orbit FF . . . . . . . . . . . . . . . 245
+10.3 Weightless in space FF . . . . . . . . . . . . . . . . . . . . 247
+10.4 Jump into space FFF . . . . . . . . . . . . . . . . . . . . . 250
+10.5 Space graveyard FFF . . . . . . . . . . . . . . . . . . . . . 254
+10.6 Newton’s cannonball FF . . . . . . . . . . . . . . . . . . . 259
+10.7 De la Terre à la Lune FF . . . . . . . . . . . . . . . . . . . 263
+10.8 Professor Plumb’s Astrolabe-Plumb FFF . . . . . . . . . . 265
+10.9 Jet aircraft diet FF . . . . . . . . . . . . . . . . . . . . . . . 269
+10.10Escape velocity from the Solar System FFF . . . . . . . . . 272
+10.11Mr Megalopolis’ expanding Moon FFF . . . . . . . . . . . 276
+10.12Asteroid games FFFF . . . . . . . . . . . . . . . . . . . . 279
+
+11 Optics 285
+11.1 Mote in a sphere F . . . . . . . . . . . . . . . . . . . . . . 285
+11.2 Diminishing rings of light FFF . . . . . . . . . . . . . . . 286
+11.3 Floating pigs FFF . . . . . . . . . . . . . . . . . . . . . . 288
+11.4 The Martian and the caveman F or FFFF . . . . . . . . . 293
+11.5 Strange fish FFF or FFFF . . . . . . . . . . . . . . . . 298
+
+12 Heat 305
+12.1 The heated plate F . . . . . . . . . . . . . . . . . . . . . . . 306
+12.2 The heated cube F . . . . . . . . . . . . . . . . . . . . . . . 308
+12.3 Fridge in a room FF . . . . . . . . . . . . . . . . . . . . . . 310
+12.4 Ice in the desert FFF . . . . . . . . . . . . . . . . . . . . . 314
+12.5 The cold end of the Earth FF . . . . . . . . . . . . . . . . . 318
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+x CONTENTS
+
+13 Buoyancy and hydrostatics 322
+13.1 Archimedes’ crown and Galileo’s balance F . . . . . . . . . . 323
+13.2 Another Galileo’s balance puzzle FF . . . . . . . . . . . . . 328
+13.3 Balanced scales F . . . . . . . . . . . . . . . . . . . . . . . . 331
+13.4 The floating ball and the sinking ball FF . . . . . . . . . . . 332
+13.5 Floating cylinders FFF . . . . . . . . . . . . . . . . . . . . 333
+13.6 The hydrostatic paradox FF . . . . . . . . . . . . . . . . . 336
+13.7 A quantitative piston puzzle F . . . . . . . . . . . . . . . . 338
+13.8 The floating bar FFFF . . . . . . . . . . . . . . . . . . . 340
+
+14 Estimation 351
+14.1 Mile-high tower F . . . . . . . . . . . . . . . . . . . . . . . 352
+14.2 How long do we have left? FF . . . . . . . . . . . . . . . . 355
+14.3 Midas’ storeroom F . . . . . . . . . . . . . . . . . . . . . . 357
+14.4 Napoleon Bonaparte and the Great Pyramid F . . . . . . . 358
+14.5 Lawnchair Larry FF . . . . . . . . . . . . . . . . . . . . . 360
+14.6 Do we get lighter by breathing? FF . . . . . . . . . . . . . 365
+
+The Deadly Game of Puzzle Points 367
+
+Endnote 374
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+Introduction
+
+This is a personal book which celebrates a passion I have always had for playful
+problems in physics and maths. Questions that rely on material no harder
+than that studied in high school, but which encourage original thinking, and
+stretch us in new and interesting directions.
+
+In practically every country that has an established higher education sys-
+tem, the most competitive universities operate some kind of admissions test
+or interview. These generally have only one object: to distinguish from many
+brilliant applicants those with the greatest potential. To test this potential,
+questions are often designed to test an applicant’s ability to think creatively.
+In many countries, these pre-university tests are set by university professors.
+Whilst the questions might reference a particular high-school syllabus, they
+would not normally be constrained by it. The questions are often deliberately
+off-beat. This is to see if applicants can apply what they have already learnt in
+new and more challenging situations. The questions test the applicants’ ability
+to pick an unusual problem apart, reduce it to its essential components, and
+use standard tools to solve it.
+
+This book is a collection of some of my favourite pre-university problems
+in physics and maths. These questions are devised to encourage curiosity and
+playfulness, and many are of the standard expected in some university entrance
+tests. These questions are perplexing, puzzling, but—most of all—fun. You
+should regard them like toys. Pick up the one that most appeals, and play
+with it. When you have exhausted it, you can entertain a friend with it. It
+might seem impossibly nerdy, but for me almost nothing is as enjoyable as
+being baffled by an apparently simple problem in an area of classical physics I
+thought I understood. This book is a way of sharing the pleasure I have taken
+in some of the physics and maths puzzles I have most enjoyed. The questions
+will appeal to those high-school students who have mastered the basics, and
+feel they have room to play a little with something more unusual. Teachers can
+also use the problems to stretch their pupils with something more challenging
+or unconventional. Here I am grateful to those teachers who allowed their
+classes to pilot these problems, and to the students who bravely attempted
+them.
+
+I invented many of the questions myself. Others were suggested or in-
+spired by friends and colleagues with an interest in this book. Still more are
+
+1
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+2 INTRODUCTION
+
+well-known classics. Even working outside a syllabus however, it is hard to be
+entirely original with questions in physics and maths. Although these ques-
+tions can be asked in essentially unlimited ways, the number of fundamental
+concepts underpinning them is relatively small. Even the ones I am most
+proud of will no doubt have been asked in numerous other forms over the
+years.
+
+There was one problem I was unable to solve. Many of these questions—
+especially the harder ones—work best as discussion problems. They are not
+meant to be asked and answered straight. Instead they should be discussed
+as part of a tutorial-style conversation, with an experienced tutor helping the
+student along, giving hints, correcting mistakes, providing encouragement,
+and so on. There is no real substitute for this kind of help. A question which
+might seem impenetrable can suddenly yield when a tutor provides just the
+right hint. I would encourage you to try the problems with friends, or subject
+tutors, or anyone with a sound knowledge of physics and maths.
+
+I should say a few words about the level of difficulty of the problems.
+Every single one of them is challenging in some way. The publisher asked me
+to use stars to indicate their relative difficulty. Although I think this is quite
+subjective, I had to concede that it would be a shame for someone to happen
+to try all the most difficult problems first and feel defeated. So I have indicated
+how hard I found the problems the first time I tried them. If you think I have
+rated some of them too generously, it simply means your intuition is better
+than mine in that particular area. In general, those questions with one or two
+stars should yield to a student who is on top of the pre-university high-school
+syllabus1 in physics and maths. The following descriptive gradings should give
+you some idea of what to expect.
+
+F Not too difficult. Requires thought, and some insight, but
+should be soluble without hints.
+FF Challenging. Requires considerable thought, and some in-
+sight, and may require simple hints.
+FFF Hard. Requires significant thought, and considerable in-
+sight, and more substantial hints. In some cases, questions with
+three stars are only suitable as discussion problems.
+
+I have also included a handful of exceptionally hard questions, to give the most
+confident students an opportunity for a real challenge.
+
+FFFF Exceptionally hard. Suitable for discussion. May be
+too difficult for most students to solve without substantial help.
+Complex and unusual, these questions allow for different and non-
+standard approaches.
+
+1Here I mean a student who has completed the first year of A-level, International Baccalaur-
+eate, Scottish Highers, SAT, etc., and is about a year away from entering higher education.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+INTRODUCTION 3
+
+This book has been what I call my “Saturday project”, and there are, I increas-
+ingly discover, always fewer Saturdays than I hope there will be. I have not
+had the luxury of someone to work with, so there will certainly be mistakes,
+and errors of logic. They are all my fault. But I hope they are few enough that
+this book brings more enlightenment than confusion. The most challenging
+aspect of putting it together was striking the right balance with the difficulty
+of questions. The questions range from being quite straightforward to really
+quite hard—they are as unpredictable as many university entrance tests. Here
+I am indebted to the many teachers, students and colleagues who were kind
+enough to provide detailed comments on the difficulty of the questions. I
+would be delighted to receive further constructive notes and any genuinely
+unusual questions which could improve a future edition of this book, and
+thank in advance anyone willing to provide this feedback.2 I hope you will
+find friends you can share the fun of these questions with, and argue the case
+for improved or more elegant solutions (many of which exist). To share your
+solutions with a wider audience, and to learn from the ideas of others, you can
+contribute to the Puzzle Forum at
+
+www.PerplexingProblems.com
+
+If you are feeling brave, you can also play The Deadly Game of Puzzle Points,
+which is explained in the final chapter of this book. I’ve provided scoresheets
+and ticklists so you can keep track of your progress.
+
+Finally, good luck, and have fun.
+
+T.P., Oxford, 2015
+
+2You can contact me by emailing tom@tompovey.com
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+Acknowledgements
+
+I am indebted to all the teachers, headteachers, students, parents of students,
+and colleagues who provided many useful comments, particularly on the dif-
+ficulty and range of questions that were eventually included in this book.
+Among those who were kind enough to provide feedback were: Oscar Van
+Nooijen, Brian Smith, Terry Jones, Frances Burge, Julie Summers, Robin Par-
+miter, Elaine Cook, Georgina Allan and Glenn Black. With thanks to Ben
+Sumner for copyediting the manuscript.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+Chapter 1
+
+Geometry
+
+In this chapter we look at problems in geometry.1 This ancient branch of
+mathematics dates back to approximately 600 BC, but advanced most rapidly
+around the time of Euclid,2 who developed results into a logical system based
+on a set of simple axioms.3 Well over two thousand years later, what is now
+known as Euclidean geometry4 is still taught in schools. It is interesting to
+think that when we solve problems in this area we often do so with exactly
+the same logic, tools and methods as the ancient Greeks used. So we are con-
+cerned with developing simple but clever methods for geometric calculations
+(areas and volumes, for example) without recourse to integration. That is,
+without the need to represent the geometry with explicit functions which are
+dealt with using calculus. The latter was developed two thousand years after
+Euclid—in the seventeenth century—by Isaac Newton and Gottfried Leibniz.
+
+Some of these puzzles are well-known, others are based on well-known
+questions, and still more I invented in the last few years. My personal favourite
+is the chess board and hoop question, which I came up with three years ago,
+and which students have found quite satisfying and enjoyable to solve.
+
+1Literally translated from the ancient Greek as earth measurement.
+2Euclid of Alexandria (c. 300 BC) was a Greek mathematician most famous for Elements, a
+
+collection of works on geometry, number theory and logic, said by some to be the most influential
+mathematical work ever written. Euclid is known as the Father of Geometry.
+
+3An axiom is a premise that is assumed to be so simple and obvious that it is self-evidently
+correct. Euclid’s five axioms were as follows: i) A straight line can be drawn from any point to
+any other point; ii) a line segment can be extended continuously in both directions; iii) a circle
+can be drawn with any centre and any radius; iv) all right angles are equal; v) if a straight line falls
+on two straight lines and makes interior angles on the same side that sum to less than the sum
+of two right angles, the two straight lines, if extended indefinitely, intersect on that side (this is
+known as the parallel postulate).
+
+4Non-Euclidean geometries, such as hyperbolic and elliptic geometries, were developed in the
+nineteenth century by relaxing the parallel postulate.
+
+19
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+20 CHAPTER 1. GEOMETRY
+
+1.1 Shortest walk F
+An ant starts at one vertex of a solid cube with side of unity length. Calcu-
+late the distance of the shortest route the ant can take to the furthest vertex
+from the starting point. There is more than one solution to this problem.
+
+Answer
+This is a well-known question, though not one with very much scope for
+discussion.
+
+If we consider unwrapping any pair of sides that connect the starting ver-
+tex A to the furthest vertex from the starting vertex, B, it is clear that the
+unwrapped surface forms a rectangle w√ith sides of length 1 and 2. The shortest
+distance is a straight line with length 5.
+
+This solution is not unique. There are, in fact, six solutions of the same min-
+imum length, which are shown in this diagram of the unwrapped cube.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+1.2. INTERCONTINENTAL TELEPHONE CABLE F 21
+
+1.2 Intercontinental telephone cable F
+This rather neat little question is simple enough that it does not warrant much
+introduction. I have heard of a number of variants over the years.
+
+A telephone company has run a very long telephone cable all the way round
+the middle of the Earth. Assuming the Earth to be a sphere, and without
+recourse to pen and paper, estimate how much additional cable would be re-
+quired to raise the telephone cable to the top of 10 m tall telephone poles.
+
+Answer
+The circumference of the Earth is given by C = 2πRE , where RE is the
+radius of the Earth. The new circumference at the top of 10 m tall telephone
+poles is given by C ′ = 2π (RE + 10). The difference in the circumferences is
+C ′ −C = 20π. We should know that π ≈ 3.14, so we should be able to work
+out in our heads that the additional length of cable is approximately equal to
+62.8 m. The question is designed to be slightly tricky in that we might be
+expecting a big number. If we approach it rationally we see that questions
+don’t come much easier than this!
+
+There are, of course, intercontinental telephone cables, and the history of
+submarine cable-laying started not long after the invention of the telegraph.
+The first commercial telegraph was developed by William Cooke and Charles
+Wheatstone in 1838, and as early as 1840 Samuel Morse was working on the
+concept of submerged cables for transatlantic operation. Experiments under
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+22 CHAPTER 1. GEOMETRY
+
+the waters of New York Harbour in 1842 confirmed the feasibility of such
+a project, and in 1850 the first telephone cable was laid under the English
+Channel (to France), by the Anglo-French Telegraph Company. Numerous
+other submerged telephone cables were laid across the English Channel, the
+Irish Sea and the North Sea in the years that followed, and the first attempt
+at a transatlantic cable was made in 1858. The first successful transatlantic
+project was in 1865, when undersea cables were laid by the SS Great Eastern,
+a huge iron steamship designed by the Bristolian Isambard Kingdom Brunel.
+Now there are numerous fibre-optic cables snaking across the Atlantic seabed.
+
+1.3 Chessboard and hoop FF
+I invented this puzzle a couple of years ago. It is one of my favourites because
+students seem to enjoy it, and can generally make good progress without much
+help, although sometimes they need a hint to get started.
+
+A thin hoop of diameter d is thrown on to an infinitely large chessboard with
+squares of side L. What is the chance of the hoop enclosing two colours?
+
+Answer
+This question can be answered by applying very simple geometry, and should
+be accessible to anyone with a good grasp of GCSE-level maths. The first
+realisation is that if the hoop crosses any tile boundary it will enclose two
+colours. It is easier to first pose the reverse of the question asked—that is,
+“what is the chance of not enclosing two colours?” We then subtract this
+chance from the chance of any outcome, giving the answer to the question
+as posed. We will use notation familiar to students of probability, although
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+1.3. CHESSBOARD AND HOOP FF 23
+
+only the most elementary understanding of that subject is required here. We
+use the notation P (A) to denote the probability of the hoop enclosing two
+colours. By definition 0 ≤ P (A) ≤ 1; that is, the probability lies somewhere
+between 0 (will not happen) and 1 (will definitely happen). We use P (Ā) to
+denote the probability of the hoop not enclosing two colours. There are only
+two possible outcomes, so P (Ā) = 1− P (A).
+
+We are dealing with two-dimensional space, so we will probably need to
+define the landing areas which lead to one outcome or the other. If we were
+dealing with three-dimensional space we would need to define volumes. In
+one-dimensional space, we would need to define distances, and so on. We can
+define the location of the hoop unambiguously by referring to the position of
+the centre of the hoop. We could equally use the location of any identifiable
+point on the rim of the hoop, but then we would also need to express the
+angular orientation of the hoop. This introduces more complexity with no
+benefit.
+
+We will now consider three cases: d > L; the special case d = L; and
+d < L. Let’s consider each in turn.
+
+• The Case of d > L. In this case, in which the diameter is larger than
+the side of a tile, it is perfectly obvious that the hoop must enclose two
+colours. We see that P (A) = 1.
+
+• The Special Case of d = L. For the special case that d = L, it is
+possible for the hoop to land entirely within a single tile, but the chance
+of this happening is 1/∞. In this limiting case the circle touches the tile
+at four points. That is, a single solution out of infinitely many possible
+solutions satisfies the condition that only one colour is enclosed. We
+write P (Ā) = 1, and therefore P (A) = 0.
+
+• The Case of d < L. Consider all the circles that can be drawn entirely
+within a single tile, and which touch the tile boundary either at one
+point (along an edge of the tile) or at two points (in the corner of the
+tile). For now we observe that the circles that touch the edges of the tile
+at either one or two points have centres which lie on a smaller square
+exactly in the middle of the larger tile. The locus of points is shown in
+the diagram. For a circle of diameter d, the shortest distance between the
+locus of points and the tile is d/2 everywhere. The side of the smaller
+square is therefore L− d.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+24 CHAPTER 1. GEOMETRY
+
+We now observe that any circle with a centre within the smaller square
+does not touch the tile boundaries. The locus of all points at which the
+hoop centre can be without touching the border of the tile is defined by
+the smaller square. The probability of the hoop centre landing in the
+smaller square is given by the ratio of the area of the smaller square to
+that of the larger square.
+
+(L− d)2
+P (Ā) = for d ≤ L
+
+L2
+
+So
+P (A) = 1− (L− d)2
+
+for d ≤ L
+L2
+
+1.4 Hexagonal tiles and hoop FF
+An infinitely large floor is tiled with regular hexagonal tiles of side L. Dif-
+ferent colours of tiles are used so that no two tiles of the same colour touch.
+A hoop of diameter d is thrown onto the tiles. What is the chance of the hoop
+enclosing more than one colour?
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+1.4. HEXAGONAL TILES AND HOOP FF 25
+
+Answer
+We can answer this question using a similar method to that used for the chess-
+board and hoop, but the geometry is a little more complex. We start by defin-
+ing the locus of hoop centres that allows a hoop entirely enclosed within a tile
+to touch the edge of the tile at one position (edges) or two positions (corners).
+The locus of such points is defined by the line CDEFGH , which describes a
+smaller hexagon centred on the tile centre. The edges of the smaller hexagon
+are d/2 away from the edges of the large hexagon. That is, the perpendicular
+distance between AB and CD, for example, is d/2. The locus of all hoop
+centres for which the hoop does not intersect the edge of the tile is defined by
+the area CDEFGH .
+
+To calculate the area of the smaller hexagon we need the length of the sideCD,
+which is denoted by |CD|. From the geometry of the regular hexagons we can
+see that |CD| = |AB| −(2x = )L− 2x, where x = (d/2) tan 30◦
+
+(√ )
+√ = d 3/6 .
+
+We have |CD| = L− d 3/3 .
+
+The chance of landing entirely within a tile, P (Ā), is given by the ratio of
+the areas of the smaller tile and the larger tile. We do not need to calculate
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+26 CHAPTER 1. GEOMETRY
+
+the areas explicitly, because we know they are of similar shape, so the area is
+proportional to the square of any characteristic length. For the characteristic
+length we could take the side length. The relevant lengths become |CD| and
+|AB|. This gives ( √ )2
+
+|CD|2 L− d 3
+3 √
+
+P (Ā) = for d ≤ 3L
+|AB|2
+
+=
+L2
+
+The probability of enclosing more than one colour, P (A), is given as P (A) =
+1− P (Ā), or ( √ )2
+
+L− d 3
+3 √
+
+P (A) = 1− for d ≤ 3L
+L2
+
+1.5 Intersecting circles FF
+A friend of mine introduced me to this puzzle some years ago. I like it because
+it is deceptively simple-looking, but it actually took me some time to solve it.
+I think I simply started down the wrong track, and took some time to find my
+way back to a sensible method. Hopefully you will find it easier than I did.
+
+Two circles of radius l and 2l intersect as shown. What is the area of the
+shaded region?
+
+Answer
+Consider first the construction of points A, B, C, D, E and F in the sketch
+below. We note first that the distance between A and C is equal to l, because
+AC forms a radius of the smaller circle. We write |AC| = |AD| = l. A similar
+statement leads to |BC| = |BD| = 2l.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+1.5. INTERSECTING CIRCLES FF 27
+
+The area of the shaded elementCEDFC is equal to the area of sectorADFCA
+plus the area of sector BCEDB minus the area of the quadrilateral BCADB.
+
+We represent these areas by A1 to A4 respectively, and write
+
+A1 = A2 +A3 −A4
+
+Expressing this explicitly we have
+
+A1 = l2α+ 4l2β − |AB| |CD|
+2
+
+To simplify this we require expressions for |AB|, |CD| /2, α and β. We now
+find each of these in turn.
+
+• Find |AB|. We see √that AB is the longest diagonal of the square, and
+has length |AB| = 2 2l.
+
+• Find α. Using the cosin(e rule5
+
+√ )on the tri
+2 (angle A)DBA we see that
+
+√
+2
+
+(2l) = l2 + 2 2l − 2 (l) 2 2l cosα
+
+Simplifying, we get
+5Usually written in the form c2 = a2 + b2 − 2ab cosC, where a, b and c are the lengths of
+
+the sides of a triangle, and C is the angle between the sides of length a and b.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+28 CHAPTER 1. GEOMETRY
+
+√
+4 = 1 + 8− 4 2 cosα
+
+That is
+√
+
+5 2
+cosα =
+
+8
+
+• Find β. We find β using an identical method to the one we used to find
+α, and get
+
+√
+11 2
+
+cosβ =
+16
+
+• Find |CD| /2. We set |CD| /2 = h, and note h in the construction
+ADBA. From the construction we see that
+
+√ √
+1− l 14
+
+h = l sinα = l cos2 (α) =
+8
+
+Now that we have expressions for |AB|, |CD| /2, α and β, we can evaluate
+A1. We write [ ( √ ) ( √ ) √ ]
+
+A1 = l2
+5 2
+
+cos−1
+1
+
++ 4 cos−1
+1 2 − 7
+
+8 16 2
+
+This gives the area of the shaded region as
+
+A1 ≈ 0.108 l2
+
+My original method was considerably longer even than this! I like this prob-
+lem because it is apparently trivial, but it takes some thought to solve with
+relatively compact algebra.
+
+1.6 Cube within sphere F
+
+What is the volume of the largest cube that fits entirely within a sphere of
+unity volume?
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+1.6. CUBE WITHIN SPHERE F 29
+
+Answer
+By symmetry, all eight vertices of the cube must touch the sphere. Again,
+by symmetry, the length of the longest diagonals of the cube, for example
+|ab|, must be equal to the diameter of the sphere D, because the line ab passes
+through the centre of the sphere.
+
+From the geometry of the cube, usi(ng Pyt
+√ )hagoras’ theorem
+
+2
+|ab|2 = 2L + L2
+
+where L is the length of the side of the cube. Thus
+√
+
+|ab| = 3L = D
+
+The volume of the cube is thus given by
+
+D3
+VC = L3 =
+
+33/2
+
+All that remains is to substitute for D3 using the equation for the volume of
+the sphere, VS = (4/3)πr3 = πD3/6 = 1. Rearranging D3 = 6/π. The
+volume of the cube within the sphere is given by
+
+VC = √2 ≈ 0.368
+π 3
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+30 CHAPTER 1. GEOMETRY
+
+1.7 Polygon inscribed within circle F
+What is the area of an n-sided regular polygon inscribed within a circle of
+radius r?
+
+Answer
+This is a straightforward problem really, but one that is a good test of a stu-
+dent’s ability to derive simple formulae for unfamiliar situations. There is rel-
+atively little scope for practising this skill in most high-school courses, so I’ve
+included a number of problems of this type to develop this aspect of problem-
+solving.
+
+Consider the constructions for n = 3, 4 and 5-sided polygons.
+
+The polygons are regular, so using their symmetry we can decompose them
+into 2n right-angled triangles, each with area (xy) /2. The total area of the
+n-sided polygon becomes
+
+xy
+An = 2n = nxy
+
+2
+Noting the angle θ in each of the constructions, we see that sin θ = x/r and
+cos θ = y/r, where θ = (2π) / (2n) = π/n. The area of the polygon now
+becomes
+
+An = nr2
+π π
+
+sin cos
+n n
+
+We can simplify this using the trigonometric identity 2 sinA cosB = sin (A+B)+
+sin (A−B). We get
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+1.8. CIRCLE INSCRIBED WITHIN POLYGON FFF 31
+
+nr2 2π
+An = sin
+
+2 n
+
+As a final note, we see that, for very large n, we can make the approximation
+sin (2π/n) ≈ 2π/n. The expression for area becomes
+
+An ≈ πr2 (for large n)
+
+This is the equation for the area of a circle, as expected.
+
+1.8 Circle inscribed within polygon FFF
+For a circle inscribed inside a regular n-sided polygon, what is the minimum
+n so that Ashaded/Acircle ≤ 1/1000?
+
+This is a variant on the previous question, but has the added problem that the
+final expression cannot be solved by simply rearranging the equation. You can
+use a number of techniques familiar to high-school students, however. And,
+unusually, the suggested methods are now given as hints.
+
+One method is to use a graphical solution—that is, to find two expressions
+so that the intersection defines the solution. A second method is an iterative
+numerical technique—essentially trial and error of a thoughtful sort, in which
+you see if you are getting closer or further from the solution and correct your
+guess up or down accordingly until you converge on a solution. A third tech-
+nique, and certainly the most elegant, is to use a Taylor polynomial approx-
+imation to the function. Taylor series are no longer taught in all high-school
+syllabuses but are certainly taught in some extension papers, and are covered
+in the first year of all university courses. Because the Taylor approximation is
+such an elegant technique we will say a few words about it here.
+
+The first thing to say is that the concept of a Taylor series is very simple,
+so there is no need to be intimidated by it. It says we can represent a func-
+tion about a particular point as an infinite polynomial series. If, for example,
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+32 CHAPTER 1. GEOMETRY
+
+we wish to represent sinx around zero, we start with a linear (or first-order)
+approximation that only applies at very small angles, namely
+
+sinx ≈ x for very small x
+
+This is an approximation that all high-school students should be familiar with,6
+and will use routinely. As we move away from zero the approximation starts
+to fail because, as we well know, the graph of y = sinx has curvature as we
+move away from the origin. To correct for the curvature, we need to add a
+higher-order term which itself is approximately zero when very close to the
+origin, so as not to harm our first-order approximation, but which gets larger
+(either positive or negative in sign) at a greater rate than x as we move away
+from the origin. We skip the second-order term because in this series it is zero,
+so the third-order approximation7 is
+
+sinx ≈ x− x3
+
+3!
+
+where 3! stands for three factorial, or 3 × 2 × 1 = 6. The factorial8 of any
+integer n is simply the product of all positive integers less than or equal to n.
+The third-order approximation extends the region around the origin in which
+the approximation is accurate. We can keep adding terms to get what is called
+the Taylor series for sinx, which is
+
+sinx = x− x3 x5 7
++ − x x9
+
++ − ...
+3! 5! 7! 9!
+
+and so on with infinite terms. Actually, the ninth-order approximation (the
+first five non-zero terms in this case) is very accurate up to x = π. Try it.
+
+The general process by which the series approximation terms are derived
+for a particular function is due to Brook Taylor, a mathematician who worked
+on what later became known as differential calculus. He published this, his
+most famous result, in 1712.
+
+6Here’s a simple geometric proof. If we consider a thin sector of a circle of angle θ and chord
+length l, we see that (in radians) we have l = rθ. The perpendicular distance h is given by
+h = r sin θ. We see from the geometry of the sketch that for very small θ, h ≈ l, and therefore
+sin θ ≈ θ.
+
+7By n-th order we mean including terms up to xn.
+8Zero factorial is equal to unity. The proof is as follows. Noting that (n+ 1)! = (n+ 1) ×
+
+n× ...× 2× 1 = (n+ 1)× n!, and setting n = 0, gives 1! = 1× 0!, so 0! = 1! = 1.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+1.8. CIRCLE INSCRIBED WITHIN POLYGON FFF 33
+
+The Taylor series for cosx and tanx are as follows
+
+x4 6
+cosx = 1− x2
+
++ − x x8
++ − ...
+
+2! 4! 6! 8!
+1
+
+tanx = x+ x3
+2 17 62
+
++ x5 + x7 + x9 − ...
+3 15 315 2835
+
+Answer
+Consider the constructions for n = 3 and 4-sided polygons.
+
+The polygons are regular, so using their symmetry we can decompose them
+into 2n right-angled triangles, each with area (xr) /2, where r is the radius
+of the circle, and x is the half-length of the side of the polygon, given by
+x = r tan θ, where θ = π/n. The total area of the n-sided polygon becomes
+
+An = nxr = nr2
+π
+
+tan
+n
+
+Consider that
+
+Ashaded An
+= − n π
+
+1 = tan − 1
+Acircle Acircle π n
+
+So we require the minimum n that satisfies
+
+n π
+tan − 1 ≤ 1
+
+π n 1000
+Here we must choose either a graphical, numerical (iterative) or series solution
+approach. Let us use the series solution, which is the most elegant, although
+trying the problem in other ways is also instructive. We need to approximate
+tan (π/n) using the Taylor series for tanx. Taking a third-order approxima-
+tion we have
+
+tanx ≈ 1
+x+ x3
+
+3
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+34 CHAPTER 1. GEOMETRY
+
+Our inequality reduces to
+[
+
+n π 1 (π) ]3
++ − 1 ≤ 1
+
+π n 3 n 1000
+
+That is
+
+1 (π)2 ≤ 1
+
+√ 3 n 1000
+
+This gives n ≥ π 1000/3 = 57.4. We require n to be an integer, so the
+minimum n that satisfies this condition is n = 58, an octapentacontagon, or,
+in the language most mathematicians use, a “58-gon”.
+
+Because we have used Taylor series approximations it is very important to
+check this solution directly, to see if it is correct. We do so by recalling the
+condition (n/π) tan (π/n) − 1 ≤ 1/1000, and evaluating this explicitly for
+n = 57 and n = 58. We get
+
+57 ( π ) 1
+tan − 1 = 1.014...× 10−3 
+
+π 57 1000
+
+58 ( π )
+tan − 1 = 9.791...× 10−4 ≤ 1
+
+π 58 1000
+
+We see that this agrees with our result.
+
+1.9 Triangle inscribed within semicircle F
+
+This little problem is an exercise in using vectors.
+
+Give a vector proof that for a triangle inscribed within a semicircle, the
+included angle is always π/2.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+1.9. TRIANGLE INSCRIBED WITHIN SEMICIRCLE F 35
+
+Answer
+Consider the semicircle APB, formed by the intersection of a line AOB with
+a circle. From the centre of the circle, if B is represented by the vector9 a,
+then A is represented by the vector −a. Let point P be represented by the
+vector p.
+
+The lineAP is represented by the vector p+a, and the lineBP is represented
+by the vector p − a. For two general vectors A and B, the dot product is
+defined by A.B = |A| |B| cos θ, where θ is the angle between the vectors.
+Thus, for θ = π/2, A.B = 0. We recall two properties of the dot product. It
+is commutative (that is, A.B = B.A) and distributive (that is, A.(B + C) =
+A.B + B.C ).
+
+Consider the dot product of the two vectors defining AP and BP . Expanding
+using the distributive property we have
+
+(p + a) . (p− a) = p.p− p.a + a.p− a.a
+
+Simplifying using the definition of the dot product and the commutative prop-
+erty, we have
+
+(p + a) . (p− a) = |p|2 − |a|2
+
+We note that both a and p are radii of the circle, so
+9In this book we will use bold symbols to distinguish a vector a from its scalar magnitude |a|,
+
+or a. In handwriting (the hand-drawn diagrams in this book, for example) vectors are denoted
+with underscores (such as a).
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+36 CHAPTER 1. GEOMETRY
+
+|a| = |p|
+We see that the dot product (p + a) . (p− a) = 0. However, |p + a| =6 0 and
+|p− a| 6= 0. So we conclude from the definition of the dot product that for
+(p + a) . (p− a) = 0 to be satisfied we must have θ = π/2. Thus, a triangle
+inscribed within a semicircle is always a right-angled triangle.
+
+A friend who read this question pointed out, quite rightly, that easier solu-
+tions exist that don’t require vector notation. He objected to the use of vectors
+on the basis that they over-complicate the analysis. He was right, of course,
+but I still think it’s a nice exercise for those not entirely familiar with using
+vectors. I did feel obliged to include the alternative solution,10 however.
+
+1.10 Big and small tree trunks FF or FFFF
+Quite a number of maths questions are designed to test a student’s ability
+to set up equations for unfamiliar problems and then solve them. This is an
+extremely useful skill for a numerate person. The question here is one of sev-
+eral similar problems I came up with on a long-haul flight to the US a couple
+of years ago. The geometry is trivial, but I think most high-school students
+would struggle with it, simply because the ability to approach completely un-
+familiar situations is valued too little in most curricula.
+
+A tree trunk has a circular cross section of radius n, where n is an integer. A
+second circular tree trunk has radius m, where m is also an integer. Both tree
+trunks rest on the ground, defined by y = 0, with their axes aligned with the
+z-axis.
+
+1. Derive the general condition that permits both tree trunk centres to lie
+at integer co-ordinates along the x-axis.
+
+2. Give the three smallest solutions for n when m = 1.
+10Noting the construction APBOA, we see that φ = π − 2α and that θ = π − 2β. Adding
+
+these expressions we get φ+ θ = 2π− 2 (α+ β). But φ+ θ = π. Combining these expressions
+we get π = 2π − 2 (α+ β). Simplifying, we get α + β = π/2, as required. This solution is
+undeniably simpler.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+1.10. BIG AND SMALL TREE TRUNKS FF OR FFFF 37
+
+3. Give a general solution for n and m (extension for FFFF).
+
+Answer
+This is a simple geometry problem that I think a lot of students would struggle
+to unpack. Let’s consider each of the three parts in turn.
+1) Derive the general condition that permits both tree trunk centres
+
+to lie at integer co-ordinates along the x-axis
+
+We are told that n and m are integers, so the difference in the y co-ordinates
+of their centres is also an integer, n−m. We require that the difference in the
+x co-ordinate also be an integer. We denote the difference simply as x. We
+note that the tree trunks touch at a mutual point of tangency, so the distance
+between their centres is n+m.
+
+From Pythagoras’ theorem we have
+2 − 2
+
+(n+m) (n−m) = x2
+
+Simplifying, we get
+
+4nm = x2
+
+This is the general condition that must be met.
+2) Give the three smallest solutions for n whenm = 1.
+
+A mathematician would hardly regard it as elegant, but to obtain the first three
+solutions for n when m = 1 we can solve for m = 1 simply by substituting
+this into the expression and trying values for n.
+
+x2
+for m = 1, n =
+
+4
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+38 CHAPTER 1. GEOMETRY
+
+We can probably see the first three solutions to this. If we can’t, we can simply
+try the first few integer values for x. We have
+
+x x2 n = x2/4 Integer?
+1 1 1/4 N
+2 4 1 Y
+3 9 9/4 N
+4 16 4 Y
+5 25 25/4 N
+6 36 9 Y
+
+The first three solutions are n = 1, 4 and 9.
+
+3) Give a general solution for n andm (extension for FFFF).
+
+Conside√r the general condition that we are required to meet, namely 4nm =
+x2, or 2 nm = x. We know that x is an integer. We write this as x ∈ Z. Here
+∈√means is a member of, and Z represents t√he set of all integers. By extension
+2 nm ∈ Z. It is possible to prove11 that k ∈ Z if and only if k is a square
+number.12 From this it follows that there are two possibles cases:
+
+• n or m is equal to unity and the other is a square number.
+
+• m = a2b and n = bc2, where b is not a square number and where a, b
+and c are integers.13
+
+√
+11
+Proof Th√at k ∈ Z if and Only if k is a Square Number.
+
+Theorem: k is an integer if k is a square number, otherwise it is irrational (it cannot be
+expressed as the ratio of two integers). Here k ∈ Z+; that is, it is a member of the set of all
+positive integers. √
+
+Proof: a) If k is a square number we write k = l2√ √ ⇒ k = l ∈ Z; b) We assume that
+k is a rational number, that is, k ∈ Q, and prove that this is impossible by contradiction.
+
+Consider two sets of numbers {ai} and {bi}√in which members are positive integers: ai ∈ Z+
+
+and bi ∈ Z+. We assume that we can write k = ai/bi, where (ai, bi) is an ordered pair of
+positive integers. There must be a unique least element a ∈ {ai}. Similarly, unique least element
+√b ∈ {bi} exists. The least element of {ai} must pair up with the least element of {bi}. Hence
+k = a/b, so k = a2/b2, so b2k = a2. Because a, b, k ∈ Z+, and because the left-hand side is
+
+divisible by k, the right-hand side must also be divisible by k, s√o we can write a = kc (provided
+that k is not a squ√are number, otherwise we could write a√= kc), where c ∈ Z+
+
+√. We write
+b2k = (kc)2 ⇒ k = b/c. But fo√r k ∈ Z
+
++ and k 6= 1, k > 1. Therefore, from √k = a/b,
+we see that a > b. Similarly, from k = b/c, we see that b > c. So we have found k = b/c
+with c < b < a. However, a and b were the least elements of {√ai} and {bi} respectively, which
+leads to a contradiction. {ai} a√nd {bi}must both be empty, so k cannot be written as a rational
+number. We have proved that k ∈/ Q.
+
+12A square number or perfect square is an integer that is the square of an integer.
+13
+To Show That n and m Satisfy This Condition. If m = a2b and n = bc2, then mn =
+
+a2b2c2 = (abc)2. Where a, b, c ∈ Z, then abc ∈ Z, so mn = (abc)2 is a square number.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+Chapter 3
+
+Statics
+
+In this section we look at problems in statics. By definition, statics is the
+study of systems that are stationary, and non-accelerating. In these systems
+the forces acting on individual masses must sum to zero, and the torques (or
+moments) acting on a body must sum to zero. These are requirements for zero
+acceleration (both linear and rotational). We generally look at the systems
+at a particular instant, and resolve1 the forces so that the conditions for zero
+acceleration are satisfied. We should state a few definitions more formally.
+
+• Torque or Moment. The magnitude of the torque (or moment) about
+a particular point (or pivot) due to a force is the product of the force
+and the perpendicular distance between the line of action of the force
+and the point of interest. We refer to this distance as the lever arm of
+the force. Torque has units of N m.
+
+• Equilibrium Requirement for Zero Linear Acceleration. For an
+object of finite mass, for the linear acceleration in a particular direc-
+t∑ion to be∑zero, the forces in that direction must sum to zero. For the
+simplest two-dimensional Cartesian system, with axes x and y, we write
+Fx = Fy = 0. This condition must hold in every direction.
+
+• Equilibrium Requirement for Zero Angular Acceleration. Tak-
+ing an object of finite moment of inertia2 about a particular pivot, A,
+for the angular acceleration to be zero, the s∑um of torques, TAi, about
+that pivot must be equal to zero. We write i TAi = 0. By the same
+logic, given that every real body has a finite moment of inertia, the sum
+of torques about any point in a system must be equal to zero, whether
+or not that point lies on the body.
+
+1To resolve, take the sum of vector components in a particular direction.
+2In the same way as mass is a measure of the resistance of a body to linear acceleration, the
+
+moment of inertia is a measure of the resistance of a body to angular acceleration. The moment
+of inertia I of a body is defined about a particular point. For a body composed of mass∑elements
+mi at distances ri from a point of interest A, the moment of inertia is defined by IA = m 2
+
+iri .
+i
+
+82
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+3.1. SEWAGE WORKER’S CONUNDRUM F 83
+
+• Centre ofMass (Gravity). The centre of mass (or gravity) of an object
+is defined as the point through which any plane drawn would split the
+object into two parts of equal mass. It can be thought of as the point
+from which the weight of the body acts. It does not necessarily need to
+lie on the object (consider a doughnut shape, for example).
+
+Now we are ready to try a few problems in statics. Most of these questions are
+my own invention, but a couple are modifications of well-known problems.
+
+3.1 Sewage worker’s conundrum F
+
+A sewage worker is inside a large underground aqueduct (diameter a man’s
+height) of circular cross section, and so smooth that friction is negligibly small.
+He has a ladder which is the same length as the diameter of the aqueduct. He
+wishes to inspect something in the roof. He mounts the ladder and continues
+to climb until he reaches the other end. What happens?
+
+Answer
+It hardly matters as far as solving the problem is concerned, but we might
+start with the realization that the sewage worker must be at the lowest point
+of the aqueduct. Were he anywhere else he would slide to the bottom because
+the aqueduct is perfectly smooth. The ladder, interestingly, is equally happy
+in any rotational position despite there being no friction. We could argue the
+case by drawing forces on the ladder. Or we could simply note that it has the
+same potential energy in all rotational positions. This must be so because the
+centre of mass of the ladder is always at the centre of the tunnel: the length
+of the ladder is equal to the diameter of the tunnel. Energy arguments can be
+powerful, and we will use them in this question.
+
+But what does happen next?
+Well, as the man takes hold of the ladder and mounts it, the very first thing
+
+that happens is that the ladder tips back slightly. Because the system is free to
+move, it moves to the position with the lowest potential energy. Here we are
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+84 CHAPTER 3. STATICS
+
+using the principle of minimum total potential energy.3 When we talk about the
+system, we mean the ladder and the man. The potential energy of the ladder is
+the same in every rotational position. The man’s potential energy varies with
+the angle he makes with the vertical, and is minimised when his centre of mass
+is below the centre of the ladder, which can be thought of as a virtual pivot.4
+The man’s centre of mass hangs slightly away from the plane of the ladder,
+and his centre of mass must be under the centre of rotation of the system for
+it to be in equilibrium.
+
+As he climbs and gets closer to the halfway point of the ladder, which is the
+centre of rotation of the system, the ladder has to tip back more. When the
+man approaches the middle of the ladder, the ladder must be almost hori-
+zontal, until his weight is directly under the centre of the cylinder and the
+ladder is horizontal.
+
+3This rather impressive sounding principle simply tells us that systems that are free to move do
+so until they are at the point of minimum potential energy. The lost energy is dissipated, as heat,
+for example. A ball placed on the top of a hill will roll to the bottom of the hill. Water will move
+until the free surface is perpendicular to the direction of gravity. The most stable configuration is
+the one with minimum potential energy. This is the equilibrium position for the system.
+
+4If this is not perfectly obvious, consider that when the man is a given distance, say r, from
+the midpoint of the ladder, his possible positions (for every angle θ his centre of mass makes with
+respect to the vertical) are defined by a circle of radius r centred on the midpoint of the ladder.
+The lowest point on that circle, or the point with the minimum potential energy, is below the
+midpoint of the ladder.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+3.2. SEWAGE WORKER’S ESCAPE FF 85
+
+As the man continues to climb along the ladder from the midpoint, the ladder
+rotates past the horizontal position. The man climbs down to the bottom of
+the cylinder, this time upside-down.
+
+Eventually he is back to where he started but the wrong way up. It seems his
+inspection of the roof will have to wait.
+
+3.2 Sewage worker’s escape FF
+A sewage worker is inside a large and smooth underground aqueduct of cir-
+cular cross section and diameter d. To escape a tide of effluent, he balances on
+the end of a ladder of length d/2 and mass m. If the sewage worker also has
+mass m, at what angle does the ladder settle? Assume that the length of the
+ladder is very much greater than the height of the man, so he acts as a point
+mass on the end of the ladder.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+86 CHAPTER 3. STATICS
+
+Answer
+We first need to consider the geometry of the problem. Triangle ABC is
+equilateral, with side d/2. We might spot at this point, however, that the
+answer is unlikely to depend on d/2, as it is determined by the angles of the
+system. The angle at which the ladder settles we mark as θ in the diagram.
+There are four external forces acting on the ladder-man system.
+
+• The weight due to the ladder,mg, which acts vertically downwards from
+the centre of the ladder.
+
+• The weight due to the man, mg, which acts vertically downwards from
+point B (we treat the man as we would a point mass at B ).
+
+• The normal reaction force F1, which acts perpendicular to the smooth
+wall at point B.
+
+• The normal reaction force F2, which acts perpendicular to the smooth
+wall at point C.
+
+Now we have the four forces we can mark them on the diagram, paying atten-
+tion to the directions in which they act. We note that forces F1 and F2 both
+act through the centre of the cylinder, along lines BA and CA respectively.
+
+For the man-ladder system to be in static equilibrium, the forces in all direc-
+tions have to balance. If we had a net force in a particular direction we would
+have a non-zero acceleration in that direction according to Newton’s Second
+Law. By similar reasoning we require zero net torque (moment) on the man-
+ladder system, so that it is in rotational equilibrium.5 We are interested in the
+
+5Netwon’s Second Law tells us that the force in a particular direction F (where we note this
+is a vector) is equal to the time rate of change of momentum in that direction, F = dp/dt. For
+constant m we have F = m (dv/dt) = ma. To be in static equilibrium we must have zero
+acceleration, dv/dt = a = 0. For this we require the sum of forces in every direction to be zero.
+To be in static equilibrium we also require the angular acceleration to be zero: α = dω/dt = 0,
+whereω is the angular velocity vector. For this we require the net torque on the object to be zero,
+giving τ = Iα = 0.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+3.2. SEWAGE WORKER’S ESCAPE FF 87
+
+vector forces, and the points of action of the forces, on the man-ladder system.
+As long as we preserve the relative magnitudes, angles, and distances we can
+consider the diagram in any rotated position. A slightly simpler representa-
+tion of the man-ladder system is shown below. Note that the weight vectors
+make an angle θ to the ladder, as they did in the original representation.
+
+The standard procedure from here, which should be the mantra of any student
+of statics, is to resolve, resolve, take moments. Let us do just that.
+
+• Resolve in the horizontal direction: 2mg sin θ = F1 cos 60◦−F2 cos 60◦
+
+• Resolve in the vertical direction: F1 sin 60◦ + F2 sin 60◦ = 2mg cos 60◦
+
+• Take moments about point B: 2F2 sin 60◦ = mg cos θ
+
+Now we just need to solve these equations for θ, the angle of the ladder to
+the horizontal. We should check that we have enough equations: we need as
+many independent equations as we have unknowns. The unknowns are F1,
+F2 and θ—only three. We have three independent equations, so a solution
+should be possible. I’ve left the algebra as an exercise, as it should be fairly
+straightforward from here. If you do it correctly you should get
+
+θ ≈ 16.10◦
+
+The answer feels about right: the ladder is at a shallow angle to the horizontal.
+Of course, if we wish, we can then also solve explicitly for F1 and F2, giving
+
+√
+F1 = 3mg cos θ ≈ 1.66 (mg)
+
+√
+3
+
+F2 = mg cos θ ≈ 0.555 (mg)
+3
+
+Again, the answers feel about right. F1 is approximately three times larger
+than F2, giving greater reaction force at the end where the man is balancing,
+as we’d expect.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+88 CHAPTER 3. STATICS
+
+Further discussion
+We did well to solve the last problem. We took a completely new situation,
+reduced it to the underlying equations, then solved the equations quite simply
+to get an exact result. The resolve, resolve, take moments method worked well.
+But there are many other ways to tackle problems of this sort, and here we
+demonstrate one that avoids the need to explicitly deal with forces and mo-
+ments. It is a very common method in statics problems, and a very common
+technique in studying systems in general. It is to consider the energy of the
+system—specifically, the point of minimum potential energy for the system
+comprising the ladder and the man. Many systems that are free to move to a
+lower potential energy point do move to that point. This is one such system.
+
+The lowest potential energy state for this system is the one in which the
+centre of mass is as low as possible. The centre of mass of the system is mid-
+way between point B and point E, or 1/4 of the way along the ladder from
+point B. The lowest potential energy state is when point D is directly below
+point A. If this is not obvious, consider varying θ between 0◦ and 360◦ in the
+diagram. Point D describes a circle about point A. It should now be obvious
+that the lowest point of the circle is directly below A.
+
+It is now a simple exercise in geometry to define the angle θ that line AE
+makes to the vertical. This is the same angle that BC makes to the horizontal.
+Consider the geometry of the situation.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+3.3. SEWAGE WORKER’S RESOLUTION FFF 89
+
+We have
+
+(d/8) 1
+θ = arctan = arctan √ ≈ 16.10◦
+
+|AE| 2 3
+
+This is the same answer as before. By using the principle of minimization of
+potential energy we have considerably simplified the problem.
+
+Assumptions
+We started by saying that the aqueduct was smooth, and we implicitly sug-
+gested that the man could get onto the ladder in a position that was not the
+point at which the ladder ultimately settles. If we wanted to be pedantic, we
+could argue that if there was no friction at all the ladder would simply oscil-
+late indefinitely, and never settle. Likewise, getting onto the ladder could be
+problematic. If the expected answer to “at what angle does the ladder settle?”
+was either of these I think we would feel we had been somewhat misled. We
+therefore assume that the walls are smooth enough that the reaction forces are
+always normal to the wall, but not quite so smooth that the ladder cannot
+eventually settle.
+
+An important skill in addressing physics problems is identifying the funda-
+mental subject of interest, the nub of the question, and filtering out everything
+that is unimportant. In that latter category are an almost infinite number
+of things which we should know we need to discount: the material of the
+ladder—we know it is smooth; air resistance—we are considering an equilib-
+rium/stationary solution; the name of the man; the day of the week; etc... If
+we feel the need to introduce these latter things, we are probably more inter-
+ested in riddles than physics problems.
+
+3.3 Sewage worker’s resolution FFF
+A sewage worker needs to use a ladder inside a large and perfectly smooth
+underground aqueduct of circular cross section. The ladder is of the same
+length as the diameter of the aqueduct. Draw the forces on the ladder when
+the ladder is placed: i) vertically; ii) horizontally. Discuss the diagrams.
+
+Answer
+We consider the answer in two sections. First the vertical ladder, then the
+horizontal ladder.
+
+i) Vertical Ladder
+
+This should seem, and is, very simple. There are only two external forces
+acting on the ladder:
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+90 CHAPTER 3. STATICS
+
+• The weight of the ladder,mg, which acts vertically downwards from the
+centre of mass of the ladder.
+
+• The reaction force, F , which acts normal to the smooth wall of the
+cylinder at the point of contact.
+
+If the ladder is in static equilibrium the two forces must be in balance. That
+is, F = mg.
+ii) Horizontal Ladder
+
+Our first reaction might be that this is equally simple. We can have three
+external forces acting on the ladder, one due to the weight of the ladder, and
+one at each end of the ladder. The ladder is symmetrically disposed about
+the y-axis, so we expect the two forces at the ends of the ladder to be equal
+in magnitude and opposite in sign. We know that the wall of the cylinder is
+smooth, so the forces at the ends must be normal to the wall of the cylinder.
+The arrangement of forces is shown in the diagram below.
+
+A problem is immediately apparent. We can balance forces in the horizontal
+direction, but what about the vertical direction? We seem to have a net down-
+ward force due to the weight, mg. The ladder cannot be in static equilibrium
+with this arrangement of forces. We require upward forces at the walls to bal-
+ance the weight of the ladder. As the boundary conditions are stated, and,
+making assumptions about the ladder having negligible width in the vertical
+direction, it is impossible to achieve a balance of forces.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+3.4. AZTEC STONE MOVERS FF 91
+
+There are a number of ways we can modify the boundary conditions, or
+relax the assumptions, that would allow us to have a more realistic arrange-
+ment of forces.
+
+• We could relax the smooth wall condition, and have a coefficient of
+friction slightly greater than zero.
+
+• We could allow the ladder to have finite width in the vertical direction,
+so that the points of contact are just above and just below the centre of
+the cylinder. This would allow an upward component of reaction force
+at the lower points of contact.
+
+• We could relax the condition that the ladder is exactly the same length
+as the diameter of the cylinder, and allow it to be infinitesimally shorter.
+This would allow it to drop a small distance below the centre of the cyl-
+inder, allowing an upward component of force at the points of contact.
+In practice this would happen due to both bending and compression.
+
+Let us consider the option of the ladder being infinitesimally shorter. This
+could be on account of a tiny amount of compression, or due to very slight
+bending, or both. Whatever the mechanism, the points of contact with the
+cylinder move just below the line through the centre of the cylinder. If we
+still make the assumption that the cylinder is perfectly smooth, the symmet-
+rical reaction forces, F , are still normal to the wall, and are therefore directed
+through the centre of the cylinder. This arrangement of forces allows us to
+have zero net horizontal and vertical force on the ladder. The conundrum is
+resolved. It is interesting to note that for a small amount of compression we
+require F  mg, so the mechanism for providing measurable compression of
+even a fairly rigid ladder is also apparent.
+
+3.4 Aztec stone movers FF
+There is some uncertainty about how the Aztecs and Egyptians moved huge
+stones great distances to their temples and pyramids, even if we assume that a
+practically unlimited supply of slaves must have been available. There is even
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+92 CHAPTER 3. STATICS
+
+more uncertainty about how our Neolithic ancestors behind such structures
+as Stonehenge could have accomplished what even today would have been
+quite a feat of engineering. The sarsen stones that form the outer circle of the
+monument weigh 50 tonnes each. To lift such a stone would take the strength
+of about 1,000 men—unfortunately only about 20 men fit round the perimeter
+of each stone. The nearest known source of sarsen stone is 25 miles from the
+monument. And the stones were transported in about 2000 BC.
+
+We have almost no direct evidence of how such a feat was accomplished,
+but most theorists have it that the stones were moved using sleds and ropes.
+The sleds were made of tree trunks, and the ropes of leather. The sleds were
+loaded onto rollers, also made from tree trunks. It has been estimated that
+using this relatively sophisticated system would have required 500 men to pull
+the load and a further 100 men to place the rollers.
+
+If a block of stone 2 m long is to be pulled 1 km, how many times do rollers
+have to be placed in the path of the stone?
+
+Answer
+The obvious answer to this goes as follows. The block of stone is 2 m long and
+can only balance on a single roller when that roller is exactly in the middle
+of the block. At this point the trailing roller could be removed and a leading
+roller could be added. The separation of the rollers is therefore 1 m, and
+approximately 1,000 rollers would have to be placed along the 1 km path. As
+you have already guessed, this answer is wrong. That would be too easy to be
+interesting.
+
+The correct solution is only a little more complicated, however. The key
+observation lies in the fact that a circle rolling along the ground is instantan-
+eously stationary at the point of contact. If it were not, slipping would occur.
+Consider points A, B and C in the diagram below. Point A is the point of
+contact with the ground. It is the point about which—instantaneously—the
+body appears to be rotating. We conclude that vA = 0. Neither is the ground
+moving, so vE = 0. Points B (the centre) and C (the top) lie vertically above
+point A. Thus, B and C can have only horizontal components of velocity if
+we consider that the body is rotating instantaneously about A. This is an im-
+portant point, which is worth thinking about. If the wheel is in solid-body
+rotation about point A, the velocity of C must be twice the velocity at B, so
+vC = 2vB . This is easy to see because B and C are, respectively, one radius
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+3.4. AZTEC STONE MOVERS FF 93
+
+and two radii from A. The velocity distribution for points on a line between
+A and C is linear; that is, a triangle of velocities is formed.6
+
+We can apply a similar argument to the block of stone. If the roller rolls against
+the block of stone, rather than slipping, the roller and the stone must have the
+same velocity at the point of contact, so vD = vC . The important result is that
+the speed of advance of the stone is twice the speed of advance of the roller.
+We will return to this in a moment.
+
+For interest’s sake, let’s consider the problem in the frame of reference of
+the block, that is, the frame of reference in which the block appears to be
+stationary, v′D = 0. This is the frame we would be observing from if we were
+sitting on top of the block as it was being slid along by the workers. In our
+block frame we will mark all velocities v′, to distinguish them from velocities
+measured in the ground frame, v. In our block frame it looks like the ground
+is being slid along on rollers underneath the block. The ground has to go in
+the opposite direction to the block when observed from this frame. Because
+there is no slipping at the point of contact with the block, v′C = v′D = 0.
+
+6A popular, related puzzle is how to derive the equation of a cycloid, or the path traced by
+a point on the rim of a wheel as it rolls without slipping along a plane. For a wheel of radius
+r, which has rolled about its centre through an angle θ, it is possible to show using relatively
+simple geometry that the parametric equations (that is, the equations for x and y as a function of
+θ) are x = r (θ − sin θ) and y = r (1− cos θ). By eliminating θ it is possible to show that the
+Cartesian equation (x = f (y)) is given(by
+
+y) ( )
+x = r cos 1− − /2
+
+2ry − y2 1
+
+r
+This is valid for y = 0 to y = 2r, and gives the first half of the first hump (from the origin to P
+in the diagram).
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+94 CHAPTER 3. STATICS
+
+Once again, the velocity distribution along a vertical line of points through
+the centre of a roller is linear in form, giving v′A = 2v′B . In this frame of
+reference, the ground is moving twice as fast as the centre of the roller. Because
+there is no slipping at the ground, v′E = v′A. There are no great surprises here,
+but it can sometimes be helpful to look at problems like this from another
+perspective to confirm that they still make sense.
+
+The key result of this analysis is that for every 1 m the block is pulled forward,
+the roller advances 1/2 m. We decided at the outset that we needed the rollers
+to be spaced exactly 1 m apart under the block. But this would be achieved
+by having them spaced every 2 m apart on the ground, because as the roller
+is pulled forward 2 m, the rollers already underneath the block go back only
+1 m relative to the block. The process is illustrated below.
+
+Further discussion
+It is interesting to note that the answer is independent of the diameter of the
+rollers. Note that we did not specify the diameter in the analysis. In fact,
+as we will see in questions relating to imperfect wheels, the force required to
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+3.4. AZTEC STONE MOVERS FF 95
+
+rotate an imperfect wheel on a smooth surface also depends only on shape,7
+and does not depend on diameter. When rolling on a rough surface, however,
+the diameter of the wheel is important, and on rough surfaces larger wheels,
+or larger rollers, are clearly better.
+
+There is a convincing case that the development of wheels was inspired by
+observations about the relative speed of rollers and load. In this version of
+history, men started with the observation that pushing or pulling great loads
+was made easier by using rollers made from tree trunks.
+
+Around the same period in man’s technological development, people started
+to use primitive sleds to haul loads, because the smooth runners had lower
+friction on most surfaces than the uneven loads did. One day, a particularly
+clever person realized that combining the sled and the roller was more efficient
+than using either in isolation.
+
+Many many years passed in which the roller-sled system was adopted more
+routinely for heavy loads. When objects were hauled very long distances the
+sleds cut into the rollers, creating deep grooves in them. This served to guide
+the sled, which was helpful, but there was an even more important effect. As
+the grooves got deeper, the rollers needed to be placed less frequently. With
+very deep grooves you might need to place the rollers, say, ten times less fre-
+quently than with un-grooved rollers.8 This made moving loads over long
+distances much more efficient.
+
+7By shape we mean how circular the wheel is. In a question that follows, we model imperfec-
+tions in the wheel, or facets, by representing the wheel as an n-sided polygon.
+
+8We require a diagram to explain this interesting effect fully, but I’ve left that as an exercise for
+the reader. Consider, however, that when the grooves get very deep, the radius r of the remaining
+axle of wood (at the very bottom of the groove, that is) is very much less than the radius of the
+roller, R. We write r  R. We should be able to show that the forward progression of the load
+in the lab frame is proportional to R+ r, and the backward progression of the roller with respect
+to the load (in the load frame) is proportional to r. The distance we can travel before having to
+replace a log is therefore proportional to (R+ r) /r, and goes up quickly as r becomes smaller.
+Prove it for FFF!
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+96 CHAPTER 3. STATICS
+
+Neolithic man then started pre-grooving the rollers, creating what we would
+now recognize as axles with fixed wheels, which were placed periodically un-
+der the load. Later a single axle with fixed wheels was attached through fixed
+holes in the sled. Now there was relative motion of the bearing and axle, so
+the holes had to be lubricated with animal fat. From here it was only a small
+step to design a fixed (non-rotating) axle with removable wheels.
+
+And the rest, as they say, is history.
+
+3.5 The Wheel Wars I FFF
+About five thousand years ago, tens of thousands of years of somewhat uncer-
+tain prehistory were ending rather abruptly in almost all corners of the world,
+with the almost simultaneous beginnings of Copper Ages, Bronze Ages and
+Iron Ages. The historical evidence suggests that smelting techniques were first
+used about 5,500 years ago in Pločnik, modern day Serbia. And by 2000 BC, a
+mere 3,500 years later, metallurgy had spread to South America, where it was
+used in Pre-Inca cultures to extract gold and silver. This comparative rush of
+technological development marked the end of the Neolithic Era, which was
+itself the end of countless millennia we call the Stone Age. It is strange to
+think that our human ancestors had developed such a high degree of latent
+sophistication, which would go on to suddenly manifest itself in all the great
+inventions during the few thousand years between then and now.
+
+One of the most important inventions in human history, along with the
+tools to make fire (fire itself had been around for a bit longer), and much later
+the printing press and penicillin, was the wheel.
+
+The first wheels seem to have been invented at similar times in several
+places: Mesopotamia (a region between the Tigris and Euphrates rivers which
+includes a large part of modern-day Iraq), the Indus Valley (modern day Afgh-
+anistan and Pakistan), the North Caucasus (home to the Maykop culture) and
+Central Europe. The very oldest intact wheel is thought to be the Ljubljana
+Marshes Wheel, which is believed to be 5,150 years old. Some people believe
+that the oldest known representation of a wheeled vehicle is on the Bronocice
+pot, dug up in the 1970s in Poland, and which dates back to 3500 BC.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+3.5. THE WHEEL WARS I FFF 97
+
+As with all interesting topics in history, there are naysayers, those who be-
+lieve the repeated motif is not a cart at all. You can decide for yourself. From
+around 3500 BC onwards, however, there is increasing evidence that people
+were using the wheel for pottery-making, transportation, and many other ap-
+plications besides. The fanciful cartoon images of cavemen with stone wheels
+are just that. Strangely, however, huge stone wheels were, and to some extent
+still are, used on the island of Yap (in Micronesia) as a form of currency. The
+wheel truly has wide application.
+
+The wheel’s ability to roll is a strong function of how smooth it is—how
+far it deviates from a perfect circular form. Of course, it also depends on how
+flat the road is—a problem in ancient times.
+
+During the Wheel Wars, a very brief period of Paleolithic history between
+1,000,000 years ago and 1,000,001 years ago—the exact dates are disputed by
+some scientists—there was a sudden surge in wheel research, and wheel makers
+were selling wheels with three, four, and five sides, or even special made-to-
+order n-sided wheels. Wheel sellers claimed that it was worth spending more
+caveman currency (probably mammoth tusk or some such) on wheels with
+more sides, and it certainly seemed to be the case that large-n wheels rolled
+very smoothly indeed. But it would be another million years until mathemat-
+ics was advanced enough to prove or disprove these marketing claims.
+
+How much horizontal force, F , applied at the frictionless axle of a regular
+n-sided polygon of mass m, is required to cause it to roll without slipping?9 If
+we wish, we can take r to be the distance from the axle to the vertices of the
+polygon, defined so that in the limit n→∞, r defines the radius of a circular
+wheel.
+
+Answer
+It may have been beyond the average Neolithic man, but this is actually rel-
+atively easy to answer. Let’s start with a polygon with an arbitrary number
+of sides: n = 4, say (a square). In a moment we will see that it is a trivial
+extension to generalize the answer.
+
+First we consider the point about which the square rotates. If we apply a
+force towards the left, and if the square rolls without slipping, the point about
+which the square rotates is the bottom left corner. When the object is on the
+point of overbalancing—that is, when it is about to rotate—all the force from
+
+9This implies that we must assume that the coefficient of friction is high enough that this
+motion can occur.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+98 CHAPTER 3. STATICS
+
+the ground is transmitted through the point of rotation. If this is not obvious,
+consider the object a moment later.
+
+If we apply a horizontal force F at the centre of the square (the axle), it
+must be balanced by a force equal in magnitude and opposite in sign which
+acts at the point about which the square rotates. Similarily, the downward
+force due to weight, mg, must be balanced by an upward force, mg, acting at
+the point of rotation. These two conditions are required for the object to be
+in static equilibrium—in other words, not accelerating in either the horizontal
+or vertical direction. We can now take moments about the point of rotation.
+When the applied force, F , is just large enough to cause rotation to occur, the
+moments about the pivot due to this force, and the weight mg, must be equal
+and opposite.
+
+We have
+
+Fr cos θ = mgr sin θ
+
+where r is the distance from the axle to the vertices of the polygon. We can
+rearrange this to give
+
+F = mg tan θ
+
+where, for a square, θ = 2π/8. In general for an n-sided polygon, we have
+θ = 2π/2n = π/n. So the required force becomes
+
+(π)
+F = mg tan
+
+n
+
+Because the side of a polygon subtends a smaller angle at the axle as n increases,
+the required force reduces rapidly as n increases. As n → ∞, θ → 0, so
+the required force also approaches zero. A perfectly circular wheel (with no
+friction at the axle) requires no force to rotate on flat ground. A million years
+later we have proved the cavemen right—it was worth spending a bit more
+mammoth tusk on a wheel with lots of sides.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+3.5. THE WHEEL WARS I FFF 99
+
+If we plot the solution we see that for n = 4 the force required to rotate the
+object is equal to mg. For a twenty-sided polygon F = 0.16mg. The solution
+asymptotes to zero for n→∞, which represents a perfect circle.
+
+Further discussion
+You will probably have noticed that in the analysis we have just performed the
+solution for the force required to rotate a wheel does not depend on diameter.
+Yet we know from practical experience that larger wheels give a smoother
+ride than smaller wheels. Bikes are less shaky than push scooters. There are a
+number of things at play here.
+
+• Imperfections in the flatness of the ground act in the same way as fa-
+cets on the wheel, and lead to large starting forces, and, by the same
+argument, a bumpy ride.
+
+• Manufacturing tolerances become proportionally more important as
+wheels become smaller.
+
+• Larger wheels often have additional mechanisms to reduce the peak
+force. These could include pneumatic tyres, or some form of suspen-
+sion, or just the compliance10 of the overall structure of the wheel.
+
+10Compliance is the inverse of stiffness, or the deformation of a structure under a given load.
+The compliance of a structure is often responsible for the redistribution of stress, so that peak
+stress within the structure is reduced.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+Chapter 4
+
+Dynamics and collisions
+
+In this chapter we look at dynamics and collisions. We consider collisions
+in terms of the velocities of the interacting bodies, the forces on the bodies
+during a collision, and the energy of the bodies before and after a collision.
+In the simplest case, we deal with head-on collisions—that is, one-dimensional
+collisions. The mathematics for two- and three-dimensional collisions is not
+much more complicated, but we need to consider the vector components (in
+the x, y and z directions, or in polar co-ordinates) when solving the equations.
+The basic principles remain the same.
+
+To solve problems in dynamics and collisions we need a number of con-
+cepts to hand. We won’t elaborate on all the equations here, because you
+should be able to derive them as you solve these problems. If we have the basic
+principles correct, however, the rest should follow naturally. Let us consider
+some of the concepts that come up in dynamics problems, and the notation
+that is used. If any of these are unfamiliar to you, it may be worth consulting
+a textbook before trying the problems.
+
+• Velocity. When we consider interacting bodies, we are generally in-
+terested in their initial and final velocities—that is, the velocities before
+and after the collision. We need a notation to distinguish these velocites.
+For example, we can use v1 and v2 for the initial velocities, and v′1 and
+v′2 for the final velocities. The corresponding scalar speeds are v1, v2, v′1
+and v′2. In general we will use the prime symbol ( ′) to indicate the state
+following a collision.
+
+• Energy. The kinetic energy of a body is given by KE = 1
+2mv
+
+2 (see
+proof1 ).
+
+1This proof of the formula for kinetic energy is a popular problem that encourages students
+to think more deeply about an equation we normally take for granted. The incremental work
+dW performed on a particle is defined as the force F acting on the particle m´ultiplied by the
+displacement in the direction of the force ds. In vector notation we writeW = s2
+
+s1 F .ds, where
+we take the dot product of vectors F and s. If we consider motion in a single direction—the
+
+119
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+120 CHAPTER 4. DYNAMICS AND COLLISIONS
+
+• Linear Momentum. The momentum of a body is given by p = mv.
+Because velocity is a vector quantity, momentum must also be a vec-
+tor quantity. According to the law of conservation of momentum, in
+all collisions, whether elastic or inelastic, the linear momentum of the
+system is conserved. For two bodies we write
+
+m1v1 +m2v2 = m′1v
+′
+1 +m′2v
+
+′
+2
+
+p1 + p2 = p′1 + p′2
+
+• Elastic and Inelastic Collisions. In an elastic collision the total en-
+ergy of the bodies is conserved: the sum is the same before and after a
+collision. In an inelastic collision energy can be lost. By lost we mean
+that it is converted from kinetic energy, which is the useful form that
+interests us, to less useful forms of energy like heat.2 For two bodies we
+write
+
+2
+m1v
+
+2
+1 +m2v
+
+2
+2 ≥ m1 (v′
+
+2
+1) +m2 (v′2)
+
+where the equality applies for elastic collisions.
+• Coefficient of Restitution. The coefficient of restitution e is defined
+
+as the ratio of relative velocities after and before a collision. We write
+speed of separation
+
+e = = −|v
+′
+1 − v′2|
+
+speed of approach |v1 − v2|
+
+where, in general,3 0 ≤ e ≤ 1. For an elastic collision e = 1, for an
+inelastic collision e < 1, and for a perfectly inelastic collision e = 0.
+Later in this chapter we prove that, for elastic collisions, saying there is
+zero kinetic energy loss is the same as saying that e = 1.
+
+• Impulse and Force. Newton’s Second Law tells us that force on a body
+is equal to the rate of change of momentum of the body. We write
+F = dp/dt, where the momentum p = mv. This reduces to
+
+´
+x-direction, say—this reduces to W = x2
+
+x1 Fxdx. The acceleration of a part´icle of mass m is
+related to the force Fx by Newton’s Second Law, Fx = max. We write W = x2
+
+x1 maxdx. The
+acceleration ax is defined in terms of the velocity vx as ax = dvx/dt. We write
+
+ˆ x2 ˆ
+dv x2 ˆ
+x dvx dx x2 dvx
+
+W = m dx = m dx = m vxdx
+x1 ´ dt x1 dx dt x1 dx
+
+Simplifying, we write W = v2
+v1 mvxdvx, where we change the limits to be in terms of velocity,
+
+the variable in which we are integrating. Integrating we get
+
+1
+W mv2
+
+1
+= v
+
+2 2 − m 2
+
+2 1
+
+which we define to be the kinetic energies of the initial and final states.
+2One measure of the usefulness of a particular form of energy is the ease with which it can be
+
+converted to another form. In this context kinetic energy can readily be converted to heat, but
+heat cannot as readily be converted to kinetic energy.
+
+3For superelastic collisions, or collisions in which stored energy is released, we can have e > 1.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+121
+
+dv dm dm
+F = m + v = ma for = 0
+
+dt dt dt
+
+We can integrate this relationship to get the impulse on a body due to a
+force, which is simply defined as the integral of the force over a period
+of time. So, impulse I is defined by
+
+ˆ t′ ˆ p′
+
+I = F dt = dp = p′ − p
+t p
+
+If the force is constant during the period of time over which we are
+integrating, we get
+
+I = F∆t = ∆p = p′ − p
+
+So to achieve a particular change of momentum of a body—to bring it
+to rest, for example—we require a fixed impulse. The magnitude of the
+force required to achieve that impulse depends on the period of time
+over which the force acts. If we fall over on a concrete floor, in the
+resulting collision we are brought to rest very quickly indeed and the
+force is high. It hurts. If we fall over and hit a springy surface we are
+brought to rest rather slower and the peak force is lower.4 In each case
+the total impulse is the same.
+
+• Reference frame. According to the principle of Galilean invariance,
+Newton’s laws apply in all inertial frames of reference. An inertial frame
+of reference is one for which the acceleration is zero. This means that the
+laws of conservation of momentum and energy (for elastic collisions)
+apply equally in any non-accelerating frame. In 1632 Galileo used the
+example of an observer in the belly of a ship sailing over a smooth sea.
+According to the invariance principle, when performing experiments
+the observer would be unable to detect whether the ship was in constant
+motion or stationary. For all practical purposes this statement is true,
+but we should note that the Earth’s surface is not quite an inertial frame.
+This is because it rotates about its own axis, and about the Sun, which
+itself rotates around the centre of the galaxy, and so on. We will ignore
+the secondary non-inertial effects, which are small.
+In addition to the laboratory frame of reference, which we take as be-
+ing the frame in which the observer is stationary, there are two special
+frames of reference we might choose for convenience during our calcu-
+lations. Whichever frame we choose we should get the same result. The
+frames are:
+
+4In collisions between springy/deformable objects, the peak pressure is also lower, because the
+force tends to be distributed over a larger surface area.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+122 CHAPTER 4. DYNAMICS AND COLLISIONS
+
+– A frame in which one body is stationary, allowing us to simplify
+the equations.
+
+– The centre-of-momentum frame, in which momentum is zero both
+before and after the collision (by the law of conservation of mo-
+mentum). This frame has the special property that in an elastic
+collision the bodies rebound with the same speeds as before the
+collision (but with the signs of the velocities reversed).
+
+4.1 Pulleys F
+Many students find this straightforward question (in the sense that there are
+no tricks) harder than they expect.
+
+A light, inextensible rope connecting 5 kg and 10 kg masses is suspended
+over a light frictionless pulley. The system is stationary, and has just been
+released from rest at the instant shown. Answer the following questions:
+
+1. Are the tensions T1 and T2 the same?
+
+2. What is the magnitude and direction of the force on the pulley?
+
+Answer
+Let us consider the two parts of the problem in turn.
+
+1) Are the Tensions T1 and T2 the Same?
+
+The simple answer is yes, they are the same. They have to be the same because
+both the rope and the pulley are light, so have no inertia.5 Likewise, the rope
+is inextensible so has no ability to store energy. If we pull on one end, the force
+must be transmitted to the other end.
+
+5Here we can think o∑f mass as being the translational inertia. The rotational inertia of the
+pulley is defined by I = mr2, the sum of the mass elements multiplied by their distance from
+the centre of rotation.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+4.1. PULLEYS F 123
+
+1) What is the Magnitude and Direction of the Force on the Pulley?
+
+For this part we need to solve the forces on all the objects. To do this we need
+to draw free-body diagrams of all three components. To simplify the diagram
+we let the smaller weight have mass m, and the larger weight have mass M .
+We have established that the tensions in the ropes are equal. We represent the
+tensions by T .
+
+Let’s deal first with the pulley. It should be immediately apparent that to
+achieve zero acceleration of the pulley, we require an upward force equal to
+2T acting from the axle of the pulley. We now need to establish the value of
+T .
+
+Consider the smaller mass m. Resolving forces upwards positive, and allowing
+the mass to have a positive upward acceleration a, we have
+
+T −mg = ma
+
+Consider the larger mass M . Resolving forces downwards positive, and allow-
+ing the mass to have a positive downward acceleration a, we have
+
+Mg − T = Ma
+
+Adding these equations we have
+
+(M −m) g = (M +m) a
+
+Rearranging for a we have
+
+(M −m)
+a = g
+
+(M +m)
+
+Putting in values (m = 5 kg, M = 10 kg) we have a = (1/3) g. We can
+now solve either of the equations for the masses to find T . Doing this gives
+T = (20/3) g. The upward force on the pulley is equal to 2T , so is therefore
+(40/3) g. Taking g ≈ 10 m s−2 gives a force of approximately 133 N.
+
+We can compare this value to the upward force on the pulley that would
+be required if the system were prevented from rotating (and the rope were
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+124 CHAPTER 4. DYNAMICS AND COLLISIONS
+
+prevented from slipping over the pulley). In this case we would need to sup-
+port the entire weight of the masses, and the upward force would be 15g, or
+approximately 150 N. By allowing the centre of mass of the system (which
+comprises both masses and the pulley6 ) to accelerate downwards, we reduce
+the force requirement on the pulley axle.
+
+4.2 Dr Lightspeed’s elastotennis match FF
+
+Dr Lightspeed and Professor Bumble are lining up for another elastotennis
+match. Viewed from a distance it looks an awful lot like ordinary tennis with
+very good players. The secret to their apparent prowess is that the elastoball
+and elastoracket are both perfectly elastic. It is a futile ceremony in which
+Dr Lightspeed wins every point. Fortunately, the ritual usually only lasts a
+couple of sets before the cucumber sandwiches arrive and the pair tackle some
+problem in mathematics.
+
+“It is fascinating,” says Professor Bumble, “how pre-eminently fast your
+returns are. I swear the ball comes off your racket faster than the sum of the
+ball speed and the swing speed. That should be impossible.” Dr Lightspeed
+looks confused for a moment then replies, “Why, dear professor, surely the
+reverse is true. In elastotennis it would be impossible for it not to come off
+my racket faster than the sum of those speeds.” They return to the match, in
+which Dr Lightspeed wins every point.
+
+Later, over more sandwiches, the professor is rather subdued. They sit
+nibbling in silence. Eventually the professor speaks. “I still don’t understand,
+Dr Lightspeed, how you can return so fast. You really must explain.”
+
+In elastotennis (tennis in which both the ball and the racket are entirely
+elastic), what is the maximum return speed of the ball in terms of the original
+ball speed and swing (racket) speed?
+
+6Though note that, in this case, the pulley has no moment of inertia.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+4.2. DR LIGHTSPEED’S ELASTOTENNIS MATCH FF 125
+
+Answer
+First we will take a brute-force approach to the problem, the standard method.
+We’ll solve the momentum and energy equations in the global frame of refer-
+ence (the frame of reference of the tennis court). I’ve also given an alternative
+answer, which exploits the centre-of-momentum frame, and which is more
+elegant.
+
+In the global frame of reference we define the velocities of the elastoball
+and the elastoracket as v1 and v2 respectively.
+
+We arbitrarily define a positive value of velocity as corresponding to motion
+to the right, and a negative value of velocity as motion to the left. Letting
+the masses of the ball and racket be m1 and m2, we can write the momentum
+equation
+
+m1v1 +m2v2 = m1v
+′
+1 +m2v
+
+′
+2
+
+or
+
+v1 + rv2 = v′1 + rv′2
+
+where r = m2/m1. F(or a compl)etely elastic collision we have
+
+e = − |v′1 − v′2| = 1 or v
+| 1 − v2 = v′
+v1 − v2| 2 − v′1
+
+where v′1 and v′2 are the velocities after the collision. Eliminating v′2 we have
+
+v′
+v1 (1− r) + 2rv2
+
+1 =
+(1 + r)
+
+Taking v1 to be positive (the ball moving to the right) and v2 as negative
+(the racket moving to the left), we seek to make v′1 as negative as possible.
+We therefore look at both limits, lim (v′1) and lim (v′
+
+r→∞ 1), and investigate all
+r→0
+
+possible minima. Let’s consider each of the three in turn.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+126 CHAPTER 4. DYNAMICS AND COLLISIONS
+
+• Consider lim (v′1). We see that lim (v′1) = v1. This is because m1 is so
+r→0 r→0
+
+heavy (relative to m2 ) that it continues unimpeded after the collision.
+
+• Consider lim (v′1). We see that lim (v′1) = 2v
+r→∞ r→∞ 2 − v1 < 0. In this
+
+case m2 is so heavy (relative to m1 ) that it continues unimpeded after
+colliding.7 The smaller mass m1 (the ball) bounces off the unaffected
+larger mass m2 (the racket).
+
+• Consider all possible minima. To do this, we first differentiate to get
+dv′1/dr, giving
+
+dv′1 2 (v2 − v1)
+=
+
+dr 2
+(1 + r)
+
+However, v1 > 0 and v2 < 0, so v2 − v1 < 0. For finite m1 and m2,
+r =∞ is not allowed. For finite r, dv′1/dr 6= 0, so there is no minimum
+or maximum.
+
+Considering both limits, and having shown that there are no minima or max-
+ima, we see that lim (v′1) = 2v2 − v1 is the solution. Recalling that v1 > 0
+
+r→∞
+and v2 < 0 we see that the maximum speed of return |v′1| is equal to the ball
+speed plus twice the racket speed. We write
+
+|v′1| = 2 |v2|+ |v1|
+Dr Lightspeed is correct. In elastotennis it is impossible for the elastoball not
+to come off the racket faster than the sum of the ball speed and the racket
+speed.8 No wonder Professor Bumble is struggling to return his shots.
+
+An elegant approach
+We now consider an approach that invokes the centre-of-momentum frame of
+reference.
+
+We are interested in determining the maximum return speed. This will
+occur when the change in velocity of the ball is greatest, no matter what in-
+ertial frame of reference we consider the problem in. Consider the frame of
+reference in which the elastoracket is stationary. It should be obvious that in
+an elastic collision, the biggest change in velocity of the ball occurs when
+the change in velocity of the racket during the collision approaches zero.
+This condition occurs when the racket has a much greater mass than the ball
+(m2  m1 ). If this doesn’t feel right, even in the frame of reference of the
+
+7To show this, we consider the symmetry of the problem (that is, what would happen if we
+interchanged 1 for 2 throughout the analysis). Alternatively we can solve directly for v′2.
+
+8For an individual shot this is true even for realistic ball and racket weights (see further dis-
+cussion).
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+4.2. DR LIGHTSPEED’S ELASTOTENNIS MATCH FF 127
+
+racket, try and invent some examples to convince yourself.9 In the discus-
+sion we solve the more general problem (m1 and m2 having the same order of
+magnitude10 ).
+
+Because we can perform our calculations in any inertial frame of reference,
+and because form2  m1 the racket will experience no velocity change during
+the collision, we consider the problem in the frame of reference of the racket.
+This frame is travelling at v2. The velocities v1 and v2 in the global frame of
+reference become v1−v2 and 0, respectively, in the racket frame. We represent
+the velocities in both frames below, and show the velocities of the frames with
+respect to the global frame.
+
+Considering the collision in the racket frame, for e = 1, and for m2  m1,
+the velocity of the ball is reversed. A ball velocity before collision, v1 − v2,
+becomes a velocity after collision, v2 − v1. Because m2  m1, the velocity
+of the racket after the collision is still zero. We now step back into the global
+frame by adding the racket frame velocity, v2, to the velocities of the ball and
+racket within the racket frame. For m2  m1, the velocities of the ball and
+racket after collision are v′1 = 2v2 − v1 and v′2 = v2.
+
+9Imagine floating in a space station with a superball (a highly elastic toy ball) and a number of
+hard steel plates of various thicknesses. We throw the superball at a particular floating stationary
+plate. If the plate is very heavy, the ball rebounds with approximately the same speed as it had
+when it arrived. This is like bouncing the ball off a hard floor. As we make the plate lighter, the
+ball rebounds more slowly. When the plate is very much lighter than the ball, it can no longer
+impede the ball’s progress, and the ball does not return.
+
+10The order of magnitude of a number is its size to the nearest power of 10, and is used to make
+approximate comparisons of the sizes of two numbers. The order of maguitude of a number
+a is log10 (a) rounded to the nearest integer. If two numbers a and b have the same order of
+maguitude we write a ∼ b.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+128 CHAPTER 4. DYNAMICS AND COLLISIONS
+
+We see that by using this approach we achieve the same result with consider-
+ably less complexity. The centre-of-momentum frame can be a powerful tool.
+
+A realistic case FFF
+Believe it or not there are quite a number of academic papers on the physics
+of tennis. Specifically ball-racket interactions, and ball-surface interactions.11
+
+In both cases the coefficients of restitution are reasonably similar, and both
+are functions of the impact speed. The latter defines the deformation of the
+tennis ball, which is the main source of energy loss during the collision. The
+coefficients of restitution vary between about e = 0.7 at low speed (10 m s−1 ),
+and about e = 0.4 at high speed (45 m s−1 ).
+
+Let’s reconsider the problem above, but with realistic values everywhere.
+A fast approach speed for a ball after bouncing is v1 = 20 m s−1. A very fast
+forehand racket speed would be v2 = −40 m s−1. A typical ball weighs about
+m1 = 60 g, and a typical racket weighs about m2 = 300 g. Assume that the
+coefficient of restitution is e = 1/2.
+
+We step into the centre-of-momentum frame of reference, defined as mov-
+ing with velocity V relative to the court frame. The velocities of the ball
+and racket relative to the centre-of-momentum frame are u1 = v1 − V and
+u2 = v2 − V . In this frame, by definition, the momentum is zero. That is,
+m1u1 +m2u2 = 0. Expanding this we find that
+
+m1 (v1 − V ) +m2 (v2 − V ) = 0
+
+or
+m1v1 +m2v2
+
+V = = −30 m s−1
+m1 +m2
+
+This gives u1 = 50 m s−1 and u2 = −10 m s−1. In the centre-of-momentum
+frame the relative speeds of the ball and racket are u2−u1 = −60 m s−1. The
+coefficient of restitution is e = 1/2. We denote the speeds of the ball and the
+racket in the centre-of-momentum frame after collision as u′1 and u′2. The rel-
+ative speeds after collision are therefore given by u′2−u′1 = −0.5 (u2 − u1) =
+30 m s−1. In the centre-of-momentum frame we must have zero momentum
+after the collision. That is, m2u
+
+′
+2 + m1u
+
+′
+1 = 0. Satisfying both of these
+
+conditions yields u′1 = −25 m s−1 and u′2 = 5 m s−1. To step out of the
+centre-of-momentum frame and into the court or global frame, we need to
+add the frame velocity. The velocities of the ball and racket in the court frame
+are therefore v′1 = u′1 + V = −55 m s−1 and v′2 = u′2 + V = −25 m s−1.
+
+In this more realistic case we achieve a ball velocity of 55 m s−1 (123 mph),
+for racket and ball speeds of 40 m s−1 and 20 m s−1 respectively. For a per-
+
+11For further discussion see: Miller, S., 2006, “Modern tennis rackets, balls, and surfaces,” Brit-
+ish Journal of Sports Medicine, May 2006, 40(5), pp. 401–405, doi: 10.1136/bjsm.2005.023283;
+and Brody, H., 1997, “The physics of tennis—III—The ball–racket interaction,” American Journal
+of Physics, 65, pp. 981–987.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+Chapter 9
+
+Electricity
+
+In this chapter we look at problems involving electricity. Some of the prob-
+lems test the application of very simple concepts, such as Ohm’s Law, or the
+definition of electrical power. You may feel that some of the questions are
+too simple even for high-school students. They are not, however, and it is
+surprising how many students struggle to think their way clearly to a cogent
+answer. Problems like this can be used to determine whether students have a
+sound knowledge of GCSE-level material on these topics. We must not dismiss
+them.
+
+I have also included quite a few resistor puzzles, which involve groups of
+resistors either in two-dimensional or three-dimensional arrays. The goal of
+these is to calculate the overall resistance of the network. Resistor puzzles have
+been very popular over the years. The classic question is that of the resistor
+cube, where each edge of the cube has a given resistance (R, say) and the aim
+is to calculate the overall resistance between two vertices, most commonly the
+longest diagonal (this is also the simplest variant). The rules for solving these
+problems are simple, so they reduce almost to logic problems.
+
+I have not included any unsteady problems—those which involve the char-
+ging and discharging of capacitors, or the time constant of CR circuits, etc.—
+even though these are also quite popular pre-university puzzles. They are easy
+to find in most textbooks, and are rather formulaic, so (to me anyway) are
+therefore less interesting. Nonetheless, this is an important area that students
+should be familiar with if they’ve studied physics to pre-university level.
+
+Let’s review a few simple definitions that will help us with these problems.
+
+• Current. The current, I , is related to the charge, Q, according to the
+definition I = dQ/dt, where t is time. For steady currents this reduces
+to I = Q/t.
+
+• Ohm’s Law. The current, I , through a conductor is proportional to
+the potential difference, V , across it, and inversely proportional to the
+
+228
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+229
+
+resistance1 R. We write I = V/R.
+
+• Electrical Power. The electrical power, P , dissipated in a load of
+resistance R, is proportional to both the current through the load, I ,
+and the potential difference across it, V . We write P = IV . Combining
+this with Ohm’s Law we can write instead P = I2R or P = V 2/R.
+
+• Resistors in Series. Resistors in series add. In other words, the total
+resistance is given by RT = R1 +R2.
+
+We should prove this relation, because it is used in many of the prob-
+lems that follow. It is a consequence of Ohm’s Law: V = IR. The
+voltage drops across R1 and R2 happen in series, so the total voltage
+drop between A and C is given by VT = V1 + V2, where V1 and V2
+are the individual voltage drops. The current flowing from A to B is
+the same as the current flowing from B to C,2 so we can rewrite this
+equation as IRT = IR1 + IR2. Dividing the equation by I , we get
+RT = R1 +R2.
+
+• Resistors in Parallel. Resistors in parallel obey the following rule.
+
+1 1 1
+= +
+
+RT R1 R2
+
+To prove this we note that for a given voltage drop VAB the voltage drop
+between C and D must be equal3 to the voltage drop between E and F .
+That is, VCD = VEF = VAB , or V1 = V2 = V . The current, on the
+
+1This is only true when the resistance is not a function of the current—that is, R 6= f (I). For
+many real loads in practical situations this assumption may not be valid.
+
+2This is because charge is not leaving the circuit, and because there is no place for charge
+to accumulate. We can think of this as a one-dimensional continuity equation for a conserved
+quantity (charge).
+
+3Taking the wire to have zero resistance, and noting that voltages add in series, we have VCD =
+VCE + VEF + VFD . The resistances between C and E and between F and D are both zero,
+giving VCE = 0 and VFD = 0. So VCD = VEF .
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+230 CHAPTER 9. ELECTRICITY
+
+other hand, obeys an additive law: IT = I1 + I2. Combining this with
+Ohm’s Law we get
+
+V V V 1 1 1
+= + or = +
+
+RT R1 R2 RT R1 R2
+
+• Capacitors in Series. Capacitors in series obey 1/CT = 1/C1 + 1/C2.
+
+• Capacitors in Parallel. Capacitors in parallel obey CT = C1 + C2.
+
+• Energy Stored in a Capacitor. The energy stored in a capacitor is
+given by E = (1/2)CV 2.
+
+We are now ready to try a few puzzles. As I remarked, the resistor cube is a
+well-established puzzle that has been circulating for several decades—I’ve also
+seen it in at least one physics textbook. The other resistor questions are my
+own, the result of a productive hour spent at Detroit airport waiting for a
+connecting flight across the US. Every time the waitress topped up my coffee
+she asked if I had solved my problem yet. “Yes,” I said, “but I keep finding
+new problems.” To which she replied, “Oh dear, honey, you just keep at it
+then.” Good advice for anyone attempting these puzzles.
+
+9.1 Resistor pyramid FF
+
+A resistor pyramid is built in a branched structure as shown below. If there
+are N levels, constructed from individual resistances of value R, what is the
+total resistance RN across the pyramid? What is the resistance of an infinite
+pyramid of this type?
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+9.1. RESISTOR PYRAMID FF 231
+
+Answer
+We can think of the structure of the pyramid as a combination of both series
+and parallel connections of resistors. From the symmetry of the arrangement
+we see that all nodes at a given level n in the pyramid are equipotential points.
+We can add dummy wires (shown as dotted lines in the diagram) between these
+equipotential points without changing the current flows in the circuit. So we
+see that the equivalent circuit has n levels in series, with 2n−1 resistors in
+parallel at the n-th level.
+
+The resistance of the n-th level is therefore
+
+R
+Rn =
+
+2n−1
+
+The resistance of a pyramid of size N is the sum of the resistances Rn from
+n = 1 to N . That is,
+
+∑N ( )
+R 1 1 1
+
+RN =
+2n−
+
+= R 1 + + + ...+
+1 2 4 2N−1
+
+n=1
+
+The right-hand side of this expression[is a g(eom)etr]ic series4 with the sum5
+
+N
+1
+
+RN = 2R 1−
+2
+
+4A geometric series of n terms has the general form Sn = a(1 + r+ r2 + ...+ rn−1), where
+a is the value of the first term and the common ratio is r. The sum can be expressed simply as
+follows. We multiply by r to give rSn = a(r + r2 + r3... + rn), then subtract this from the
+previous expression to give rSn − Sn = arn − a. Rearranging, Sn = a(rn − 1)/ (r − 1).
+
+5Taking a = R and r = 1/2.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+232 CHAPTER 9. ELECTRICITY
+
+To calculate the resistance of an infinite pyramid we need the sum to infinity
+of the series. The common ratio is r = 1/2 < 1, so the sum to infinity
+converges to give
+
+R∞ = 2R
+
+It might have been easier to put two resistors in series.
+
+A current-symmetry argument
+Another way of thinking about this problem is in terms of current symmetry
+in each tier of the pyramid. At the n-th level of the pyramid there are 2n−1
+
+resistors, each with the same current flowing through them (due to the sym-
+metry of the structure). If the current through the entire pyramid is I , then
+the current through each resistor in the n-th level is In = I/2n−1. We need
+to add the potential (or voltage) drop across each tier in series to find the po-
+tential drop across the entire pyramid. The potential drop across a resistor in
+the n-th level is Vn = InR = IR/2n−1. So the total potential drop across a
+pyramid of N levels is
+
+∑ ]
+N ( ) [ ( )N
+
+IR 1 1 1 1
+VN = = IR 1 + + + ...+ = 2IR 1−
+
+2n−1 2 4 2N−1 2
+n=1
+
+The resistance of a pyramid o[f N levels is given by RN = VN/I . As before,
+we get ( ) ]
+
+N
+1
+
+RN = 2R 1− and R∞ = 2R
+2
+
+An elegant solution
+We now consider an elegant solution that will appeal to the more mathemat-
+ically minded. A friend came up with the idea, and my brother and I extended
+it.
+
+In the diagram we represent an infinite pyramid of resistors as a double
+triangle inscribed with R∞. If we extend the pyramid by one level, it’s the
+same as having two such pyramids in parallel, in series with a single resistor. If
+the series converges, the resistance of the extended pyramid must be the same
+as that of the original pyramid. We write
+
+R∞
+R∞ = R+ , so R∞ = 2R
+
+2
+
+A very elegant solution.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+9.1. RESISTOR PYRAMID FF 233
+
+Let’s consider how we might extend this to find the resistance of a pyramid
+withN levels. In the diagram we represent a pyramid withN levels as a double
+triangle inscribed withRN . We see that extending the pyramid by one resistor
+gives
+
+RN
+RN+1 = R+
+
+2
+
+Here we remind ourselves that RN and RN+1 are terms in a series that we
+seek the expression for. Noting that the sum to infinity of the series is given
+by R∞ = 2R, we define a new series QN ≡ RN − 2R. The series QN
+converges on zero—that is, Q∞ = 0. We substitute the definition of QN into
+the expression for RN+1, giving
+
+(QN + 2R)
+QN+1 + 2R = R+
+
+2
+So
+
+QN
+QN+1 =
+
+2
+
+Noting that R1 = R, and that therefore Q1 = −R, we see that
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+234 CHAPTER 9. ELECTRICITY
+
+−R 2
+QN = = − R
+
+2N−1 2N
+
+Using QN ≡ RN − 2R, we get the expression for R
+[ N .
+
+( ) ]
+N
+
+1
+RN = −2R
+
++ 2R = 2R 1−
+2N 2
+
+If the previous solution was elegant, this is elegance to the power N .
+
+9.2 Resistor tetrahedron F
+
+A resistor tetrahedron has individual resistance valuesR in each leg. What
+is the total resistance RT across any pair of nodes in the pyramid?
+
+Answer
+It is easiest to think about this by flattening the structure onto a plane. Doing
+this makes it easier to see the essential structure we’re dealing with. Let’s
+consider the total resistance between A and B. When it’s flattened—as shown
+in the diagram—we can see that the network reduces to a single resistor (at the
+top, A → B ) in parallel with a group of five resistors (at the bottom, A′ →
+B′ ). If all the individual resistances take the same value R, the resistance of
+the bottom group itself becomes R. We see this by noting from the symmetry
+of the arrangement that the potentials at C and D are the same, so no current
+flows between those two points. Thus the resistor between C and D can
+be removed without affecting the currents in the circuit. The circuit is then
+equivalent to having two resistors of value 2R in parallel, giving a resistance
+of R for this block. The resistance of the top resistor (between A and B ) is
+trivially R. The total resistance between A and B is therefore RT = R/2. By
+symmetry, this is the resistance between any two nodes.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+Chapter 11
+
+Optics
+
+In this section on optics we look at problems built on simple principles of
+reflection and refraction. The underlying material is no more than GCSE
+level in difficulty, but the questions are designed to be challenging and unusual.
+Some are well-known questions, and others are my own invention.
+
+• Law of Reflection. The angle between the incident ray and the normal
+is the same as the angle between the reflected ray and the normal.
+
+• Snell’s Law of Refraction. A ray of light passing through an interface
+between two different media of refractive indices n1 and n2 obeys Snell’s
+Law, n1 sin θ1 = n2 sin θ2, where θ1 and θ2 are the angles to the normal
+of the incident and refracted rays.
+
+11.1 Mote in a sphere F
+
+I have only ever heard the word mote used in two places. The first was the
+Bible,1 in which one appears in a person’s eye. The second was in my Oxford
+physics interview, during which I had to answer the following optics puzzle.
+Fortunately, at my school a passing knowledge of the Bible was inescapable, so
+I knew that a mote was simply a small speck of something—a dust particle, for
+example. However, I’d not seen any unusual optics questions before then—but
+I suppose that was the point. The question is as follows.
+
+A mote is at the very centre of a perfect sphere of glass. Where, if anywhere,
+do you see the mote?
+
+1It appears in the Sermon on the Mount, as a moral lesson against hypocrisy and self-
+righteousness. The word mote comes from Greek, and means a very small dry body. Today
+we use the word speck more commonly.
+
+285
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+286 CHAPTER 11. OPTICS
+
+Answer
+We are, of course, expected to draw a ray diagram to demonstrate the solution.
+Snell’s Law tells us that refraction occurs according to the rule n1 sin θ1 =
+n2 sin θ2. Because the mote is at the very centre of the sphere, all emitted rays
+have an angle of incidence of θ1 = 90◦ with the glass-air interface. So the rays
+are not diffracted by passing through the interface, and the mote appears to be
+exactly where it is. In the ray diagram we represent the eye with a converging
+lens, showing it focussing the mote down to a point on the retina.
+
+11.2 Diminishing rings of light FFF
+I first heard this question about 15 years ago, though I think it is much older
+than that. My PhD supervisor was also a great fan of physics puzzles, and this
+was one of his favourites. I used to think the question was too hard for high-
+school students, but tried it on a few recently and found that with enough
+hints students made surprisingly good progress, and most were able to com-
+plete the question with a bit of help. I have also tried it on a number of PhD
+students, who did no better. I attributed this to them forgetting most of their
+high-school physics: they were all engineers. It is a very enjoyable question
+to ask, and best done with an experiment. First I would ask students to de-
+scribe what they saw before deriving equations from first principles to explain
+it. Students really enjoy this, and find it very satisfying when they manage
+to derive equations for the interesting optical display. When you attempt the
+question, remember that it works best with an experiment and someone to
+give you hints.
+
+You are given a long, thin polished metal tube (a 1 m length of the copper
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+11.2. DIMINISHING RINGS OF LIGHT FFF 287
+
+pipe used in domestic plumbing, for example) and asked to put your eye at
+one end and to point the other end at a diffuse light source (a well-illuminated
+wall, for example). What you see is a pattern of rings. At the centre there is a
+bright circle, which is the diffuse light source seen directly through the hole in
+the end of the tube. Surrounding this is a ring of light that is less bright than
+the central circle. Around that there’s another ring that’s less bright still. And
+so on. The rings become successively less bright until the pipe appears dark.
+The rings appear to have approximately the same width as they get larger. You
+are asked to derive an equation for the angle subtended at the eye by the n-th
+ring.
+
+Answer
+When approaching this question, it may help to first sketch a diagram of the
+tube, with the centre marked as a dotted line, in preparation for drawing ray
+diagrams. Analyse first the light that is directly incident at the eye from the
+diffuse light source without reflection, then consider the first-order reflection,
+second-order reflection, and so on.
+
+We start by drawing the ray that subtends the highest angle at the eye
+(which is at the centre of the tube). We see that where the diameter of the
+tube is D, and where the length of the tube is L, the highest angle that can be
+subtended at the eye without reflection is given by tan θ1 = (D/2) /L. For a
+long tube, taking the small-angle approximation, we have θ ≈ D/2L.
+
+We then consider the first reflected ray. To do this, the only additional thing
+we need to know is the law of reflection, which is simply that the incident
+and reflected rays make the same angle with the wall. We see that the ray that
+subtends the highest angle at the eye, and which is reflected once, divides the
+tube into three. We have tan θ2 = (D/2) / (L/3). That is, θ2 ≈ 3D/2L.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+288 CHAPTER 11. OPTICS
+
+We then consider the second reflected ray. The ray that subtends the highest
+angle at the eye, and which is reflected twice, divides the tube into five. We
+have tan θ3 = (D/2) / (L/5). That is, θ3 ≈ 5D/2L.
+
+We quickly see that the general formula for the angle subtended at the eye by
+the n-th ring is
+
+(D/2)
+tan θn =
+
+(L/ (2n− 1))
+
+Taking the small-angle approximation, we see that
+
+θn ≈
+(2n− 1)D
+
+2L
+This is a rather satisfying question, and one that works very well with the
+accompanying demonstration. If you haven’t already done so, track down a
+length of copper pipe a meter or so long (from your local plumber’s shop if
+necessary) and try it. It is very neat indeed.
+
+11.3 Floating pigs FFF
+If you’ve read the introduction to this book, you’ll know that I was asked this
+in my university physics interview. It’s difficult to recreate here the manner in
+which the question was asked, because it was set up as a desktop experiment. I
+was asked to explain the strange optical effect that it created. That is certainly
+the most logical way to ask the question. I still vividly remember the demon-
+stration. The interviewer took two bowls from a drawer, dusted them off with
+a handkerchief, and placed them proudly—and with something of a flourish—
+on the table in front of me. They were about the size of cereal bowls, and
+their insides were perfect mirrors. The top bowl had a hole about two inches
+in diameter in its base, and was set upside-down on top of the lower bowl, cre-
+ating a mirrored cavity which could be viewed through the hole. Before that,
+though, the interviewer placed a small, bright pink plastic pig—about the size
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+Chapter 14
+
+Estimation
+
+I really enjoy questions on estimation, or back-of-the-envelope calculations.
+They are popular questions for a whole range of numerate disciplines, and are
+certainly very common elements in physics and engineering tests. Strangely,
+they are also very common in job interviews, particularly with companies that
+consider themselves to be “free thinking”.
+
+I remember several summer evenings when we were physics undergradu-
+ates, sitting in a friend’s room, staring out over the cricket lawn, drinking cof-
+fee, and estimating things simply for the fun of it. The game had two stages.
+First, we would guess the answer to the problem at hand, going on instinct
+alone, and then compare our guesses. At this stage, to raise the stakes, you
+had to pretend to be very confident about your own guess and very sceptical
+about everyone else’s. It didn’t matter that we all made the least accurate guess
+about the same number of times. Then we would independently estimate the
+answer, usually without recourse to pen and paper. It could take a while, be-
+cause we often had to devise strategies to do the calculation at hand. This was
+just before the internet changed everything. So if we needed some import-
+ant but esoteric value we couldn’t estimate easily, one of us would be sent to
+the library to consult a (printed) encyclopaedia, or to look at a set of data
+tables, and would reappear with the population of Bolivia, say, or the density
+of uranium, scribbled on a scrap of paper. Once we’d made our estimates we
+would compare them. It was often surprising how close the estimates were,
+even when we had taken diverging approaches to the solution.
+
+We worked out that there were fewer blades of grass on the Merton College
+cricket ground than there were people in the world,1 and that if we shared
+the books in our college library equally across the population of the United
+
+1Merton College cricket ground is about 200 yards on a side, and we estimated about 50 blades
+of grass per square inch. This gave 50 × 122 × 32 × 2002 = 2.6 × 109 blades. Back in the
+mid-1990s this was roughly half the population of the world, which was 5.7 bn (it is now over
+7 bn). I still remember gazing out over the brown field at the end of that summer and thinking
+what an awful lot of people that represented, and how insignificant we would each seem if we all
+stood there side by side.
+
+351
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+352 CHAPTER 14. ESTIMATION
+
+Kingdom (something which we felt like doing more than once) we could offer
+each citizen a paltry third of a page.2 We worked out how many college rooms
+it would take to store all the gold in the world—a question that appears in this
+book.
+
+Wherever you look there is something to estimate, and it’s useful to know
+how to set about it. Just recently someone told me that work had started on
+the Kingdom Tower in Saudi Arabia. If it’s completed it will be over a kilo-
+metre high. The energy cost of pumping water up the tower, she speculated,
+will be terrific. I thought for a moment, and with a little mental arithmetic
+worked out the annual cost per person. When I told her the number she
+looked at me in surprise. “How did you know that?” she asked. When I told
+her I had just estimated it, but fairly accurately, she looked at me in disbelief.
+I had to go through the steps of the calculation to convince her that I really
+had just calculated it in my head.
+
+Most everyday things can be estimated easily and relatively accurately.
+It’s an essential skill for anyone who is serious about being a scientist. I
+shouldn’t really admit to it here, but I’m always a little shocked when someone
+who has been through high-school science can’t estimate—roughly—how big,
+long, heavy etc. some object of interest is. Often people simply shrug their
+shoulders and say, “I have no idea.” But we should always have some idea.
+
+I hope you will enjoy this selection of problems. They are based on the
+more unusual questions I have heard over the years, or are favourites of my
+own. Some of them require the odd value which you might not be able to
+estimate accurately enough to satisfy yourself. In which case you might need
+to look it up in a data table, or ask your tutor for it. Not knowing values is
+fine. It’s the ability to come up with a method for solving a problem that’s
+important.
+
+14.1 Mile-high tower F
+Frank Lloyd Wright, the great American architect, was perhaps not the first
+to conceive of the notion of a mile-high building, but he was probably the
+first to work seriously on plans for one. His 1956 skyscraper “Illinois” would
+have been 528 stories high, making it four times taller than the Empire State
+Building. To get up and down it you’d have had to use one of 76 “atomic-
+powered” elevators (gulp!). The Illinois was never built, and it’s unlikely that
+the technology to do so even existed at that time.
+
+Almost sixty years later, the tallest structure ever constructed by man is
+the Burj Khalifa in Dubai, in the United Arab Emirates. Finished in 2010, it
+stands 829.8 m tall. Huge as it is, it is still only half the height of the magic
+mile.
+
+2The library walls totalled a good 300 m, and were stacked six shelves high. A ream of 500
+pages of paper is about 5 cm thick. This gives (300× 6× 500) /0.05 = 18 × 106 pages, or a
+third of a page for each of the then 58 million inhabitants of the UK (the population is now over
+63 million).
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+14.1. MILE-HIGH TOWER F 353
+
+The Kingdom Tower, which is currently being built in Jeddah, Saudi Ara-
+bia, was originally designed to be one mile high. Plans were drawn up by the
+architect who designed the Burj Khalifa. But the geology of the area proved
+unsuitable, and the tower had to be scaled down. The current intended height
+is still a closely guarded secret, but it has been announced that it will be over
+1 km, setting a new record for super-tall buildings.
+
+In the architectural world there now seems to be little debate over the
+technical feasibility of the mile-high building—the question is purely one of
+finance. Given the sudden explosion in super-tall buildings in the last ten
+years, the near future will be very interesting.
+
+I remarked in the introduction that someone I know recently speculated
+that the cost of pumping water to the top of a mile-high building would be
+fantastic. The purpose of this question is to calculate whether or not that is
+so.
+
+Estimate the annual financial cost of the energy required per person to sup-
+ply water to living accommodation at the very top of a mile-high building.
+
+Answer
+Of course, we have to assume that we’re talking about the current economic
+and energy climate. The current cost of electricity in the UK is roughly 15
+pence per kWh. It’s reasonable to expect students to be able to estimate this
+to within, say, a factor of two. Energy is a key household expense, and one
+of the most significant drivers of the economy. Now let’s calculate the annual
+energy required to pump water for a single person.
+
+First we need to calculate the amount of water used by a person in a day.
+We can create a rough table to show this, and each of us might fill the table
+slightly differently. But we should certainly agree to within a factor of two or
+three, say. My rough estimates are as follows.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+354 CHAPTER 14. ESTIMATION
+
+Number per day Litres Total litres
+Toilet flushes 5 10 50
+
+Showers 2 25 50
+Washing clothes 1/3 60 20
+Washing dishes 1 20 20
+
+Sundries 1 10 10
+Total 150
+
+We estimate the total amount of water used at 150 l (or 150 kg) per day.
+Now we can estimate the energy required to pump that water to the top of
+
+a mile-high tower. A mile is approximately 1.6 km, or 1, 600 m. The energy
+cost is simply the gravitational potential energy gained, mgh, divided by the
+total efficiency of the pump. Let’s take a very conservative electrical efficiency
+value of ηE = 0.5, and a very conservative mechanical efficiency value of
+ηM = 0.5. The total energy cost per day is
+
+mgh
+E =
+
+ηEηM
+Taking m = 150 kg, g ≈ 10 m s−2 and h = 1, 600 m gives E = 9.6 × 106 J.
+This looks like a big number, but let’s put it in context by calculating the
+number of kWh it represents. One kWh is equal to 3.6 × 106 J, so we need
+2.7 kWh to pump a day’s water to the top of a mile-high tower. That works
+out at a daily cost of approximately 40 pence. The annual cost of the energy
+is approximately £146. It’s not a trivial sum, but it is far from being a fantastic
+amount of money. In fact it’s only about one-third of the cost of a typical
+Oxford water bill. In the scheme of things we can say it is fairly insignificant.
+
+The Burj Khalifa in Dubai has set an unprecedented record for height, and
+it’s likely that it will soon be surpassed by the Kingdom Tower in Jeddah, at
+over 1 km high. The smart money says that in the next few years we will build
+even higher. Consider the predictions made in a recent paper in the Journal
+of Urban Technology:3
+
+Technologically, a one-mile-high (1.6 km) building is possible
+today—although not without the associated challenges of required
+high-strength materials, fire safety provisions, elevator systems,
+and, above all, constructability. As the building gets taller, the
+slenderness (height-to-width) ratio increases and the tower be-
+comes dynamically extra sensitive to wind so it cannot be inhab-
+ited comfortably. To overcome this, the slenderness effect of the
+tower is offset by making it wide at the base, or connecting sev-
+eral towers with bridges at different levels so they will enforce
+and stiffen each other. Will it be possible someday to build a sky-
+scraper even taller than a mile-high building? Probably yes. Since
+
+3Al-Kodmany, K., 2011, “Tall buildings, design, and technology: visions for the twenty-first
+century city,” Journal of Urban Technology, Vol. 18, No. 3, pp. 115–140.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+14.2. HOW LONG DO WE HAVE LEFT? FF 355
+
+1885 when the 10-storey Home Insurance Building was built in
+Chicago, we have come a long way to the 2,717ft (828m) tall Burj
+Khalifa in Dubai, 2010. Will building height increase at this rate
+in the future? We may never know and may not contemplate this
+at present but we cannot guarantee that this will not definitely
+happen. One thing we know is that an inborn human instinct
+is to overcome obstacles through creativity and dreaming. This
+raises fundamental philosophical and moral questions about the
+so-called cloud-piercing future visionary towers.
+
+So the megastructures of the future may yet dwarf the tallest buildings of
+today. People have different views about ultra-tall buildings, but I find them
+remarkable and fascinating. I look forward to the mile-high buildings of the
+future.
+
+14.2 How long do we have left? FF
+
+A good friend of mine used to test prospective chemistry students with this
+estimation question back in the 1970s and 1980s. In those days he was a pro-
+fessor of physical chemistry and was researching the respirative absorption of
+oxygen and other gases, as applied to anaesthetics and diving. He must have
+been doing something right because one of his students went on to win the
+Nobel Prize for chemistry.
+
+The question relies on a basic knowledge of physiology, chemistry and
+physics, at lower than pre-university standard. Anyone interested in the world
+around us should be able to make at least a good guesstimate4 of most of the
+quantities required. The question went as follows.
+
+There are three of us in this room (whatever room you happen to be in).
+Assuming it to be perfectly sealed, how long will we live for?
+
+4Better than a guess, but worse than an estimate.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+The Deadly Game of Puzzle
+Points
+
+“Rébuffat points” must have been responsible for the deaths of quite a number
+of young mountaineers. In his 1973 book The Mont Blanc Massif: The Hun-
+dred Finest Routes, Gaston Rébuffat—French Alpinist extraordinaire—made
+the fatal error of organising his climbs roughly in order of difficulty, from
+route one to one hundred. Mountaineers are no less competitive creatures
+than mathematicians, and the deadly game of collecting Rébuffat points was
+quickly established. You got one point for a gentle traverse of the Clocher
+Clochetons on the Aiguilles Rouges, the first route in his book, and 100 points
+for dicing with death on the unrelentingly vertical walls of the Central Pillar
+of Freney, the last route in the book. If you got back alive, you could casually
+drop into conversation that you had “had a good season”. If you were lucky,
+someone would ask how many Rébuffat points you had collected, and you
+could brag that you had collected x points in that particular year, giving you
+y points in total. It was difficult to know whether to go for broke on a few
+hard routes or tick off many easy ones.
+
+So it is with Puzzle Points.
+“The four-star puzzles are just so much harder than the one-star puzzles,”
+
+I said to my friend Tet. “It would seem unfair to give just four times as many
+points.”
+
+“Then square the number of stars before adding,” said Tet.1
+And so the Deadly Game of Puzzle Point collecting was born.
+The distribution of questions in this book (including optional questions
+
+for which solutions are given) is: 35 F, 40 FF, 28 FFF, and 10 FFFF.
+That makes 113 questions in total, and a potential 607 Puzzle Points if we sum
+the squares of the number of stars.2
+
+“What’s the point of points if you can’t brag about them?” said Tet.
+And so the Puzzle Hall of Fame was born. By keeping track of your
+
+1In fact, a similar method of scoring was used for many years in Oxford maths exams. The
+raw marks for each question were squared before being added. Like any other arbitrary method
+of marking exams, it favours a certain kind of approach to the exam. In this case, it favours deep
+knowledge of particular topics rather than superficial knowledge of many topics.
+
+2 ( ) ( ) ( ) ( )
+You calculate your points like this: 35× 12 + 40× 22 + 28× 32 + 10× 42 = 607.
+
+367
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+368 THE DEADLY GAME OF PUZZLE POINTS
+
+progress with the ticklists and scoresheet on the pages that follow, you can
+calculate your Puzzle Points and your honorary title.
+
+• < 35 Puzzle Points: Aspirant Puzzlist
+
+• 35 ≤ Puzzle Points < 195: Novice Puzzlist
+
+• 195 ≤ Puzzle Points < 447: Expert Puzzlist
+
+• 447 ≤ Puzzle Points < 607: Puzzle Master
+
+• 607 Puzzle Points: Puzzle Overlord
+
+You can enter and update your points in the Hall of Fame by going to the
+website created for this book:
+
+www.PerplexingProblems.com
+
+Here you can debate the questions, make the case for alternative or more
+elegant solutions, and propose questions of your own. You might think it
+strange, but I have avoided “clever” solutions in favour of more standard meth-
+ods throughout this book. Of course, I appreciate clever solutions as much as
+the next person, but I thought it would be more instructive to focus on the ba-
+sic techniques, especially as we’re dealing with such unusual questions. There
+is ample scope, therefore, to “improve” upon many of my solutions in terms of
+simplicity and compactness. I look forward to seeing these “clever” solutions
+on the website.
+
+Like all adventures, these puzzles are much more fun when they are shared.
+Hopefully you already have someone to share your puzzling with, but the
+Puzzle Forum on the website allows you to share your ideas with an even
+wider audience, and—more importantly—to learn from others. From time to
+time I will also post new questions on the website.
+
+Finally, good luck. And I hope you enjoy the adventure, wherever it takes
+you.
+
+messages.downloaded_by
+
+
+
+lOMoARcPSD|62437317
+
+THOMAS POVEY is Professor of In Professor Povey’s Perplexing Problems, Thomas 
+Engineering Science at the University of ‘Entry to selective universities will often require students to demonstrate that THOMAS POVEY Povey shares 109 of his favourite problems 
+Oxford, where he researches jet-engine and they have engaged in super-curricular activities which develop their awareness in physics and maths. A tour de force of 
+rocket technology. His science puzzles have and understanding of their subject. Tom Povey has provided in this book imagination and exposition, he takes us by the 
+
+enough super-curricular content to keep an aspiring mathematician, physicist, hand and guides us through uncompromisingly 
+appeared in the Guardian newspaper and been 
+
+challenging territory that expands our minds and 
+featured on BBC Radio 4. engineer or material scientist (and their teachers) happy for months. For a 
+
+encourages a playful and exploratory approach 
+parent or teacher who wants to pro-actively support a student in preparing for to study. The puzzles, he says, are like toys. We 
+entry to a competitive science or maths course this is a no-brainer purchase.’ should pick up the one we most enjoy, and play 
+Mike Nicholson, Director of Undergraduate Admissions and with it. 
+Outreach, University of Oxford (2006-14), Director of Student 
+Recruitment and Admissions, University of Bath Professor Whether you are an aspiring scientist or an old-
+
+hand, pitting yourself against these problems will 
+‘This book is about the excitement of mathematics and physics at the school/ test your ability to think, and inspire you with 
+university boundary. It contains a remarkable collection of intriguing intellectual curiosity and enthusiasm for physics. Presented 
+challenges, all with complete solutions. You can read it to increase your ability Povey’s with charm and wit, the questions span the 
+in maths and physics; you can read it to develop your problem-solving skills; but gap between high-school and university-
+most of all you can read it for fun.’ Professor Richard Prager, Head of the entrance standard material. Detailed answers are 
+School of Technology, University of Cambridge lightened with a fascinating and refreshing blend 
+
+of scientific history, application and personal 
+‘This instructive book will allow aspiring young anecdote.
+
+scientists to test and expand their knowledge of Perplexing On this delightful and idiosyncratic romp 
+physics and mathematics, and gain greater
+
+through pre-university maths and physics, the 
+confidence in their abilities.’ Professor Sir Chris Problems author shows us that behind every single one 
+Llewellyn Smith FRS, Director General of these questions lies a new way of thinking 
+of CERN (1994-98) about subjects we thought we had understood. 
+
+He argues that engaging with the unfamiliar is 
+key to forming deeper insights and developing 
+intellectual independence. Professor Povey’s 
+Perplexing Problems is a manifesto that science 
+should be playful, and a celebration of the 
+curious.
+
+O N E W O R L D Pre-University Physics and Maths 
+MATHEMATICS / SCIENCE Puzzles with Solutions
+
+www.oneworld-publications.com £25/$30
+jacket illustrations courtesy of the author
+
+messages.downloaded_by
+
+Professor Povey’s Perplexing Problems  THOMAS POVEY
