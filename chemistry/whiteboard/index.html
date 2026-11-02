@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chem Board · Mr. D’s Sims</title>
+<meta name="robots" content="noindex">
+<style>html,body,#root{margin:0;height:100%;overflow:hidden;background:#fff}
+.shelves{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:5;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:calc(100vw - 440px);padding:6px;background:#fff;border:1px solid #ced4da;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.15);font:600 14px Nunito,system-ui,sans-serif}
+.shelves button{border:1px solid #ced4da;background:#f8f9fa;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;color:#1e1e1e}
+.shelves button.on{background:#14b8a6;border-color:#0f9488;color:#fff}
+.shelves button.add{border-style:dashed;background:#fff;font-weight:500}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#14b8a6">
+<link rel="stylesheet" href="app/app.css">
+</head>
+<body>
+<div id="root"></div>
+<script>window.EXCALIDRAW_ASSET_PATH = new URL('app/', location.href).href;</script>
+<script src="app/app.js"></script>
+<script>if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function(){});</script>
+</body>
+</html>

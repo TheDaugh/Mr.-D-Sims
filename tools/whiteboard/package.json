@@ -1,0 +1,12 @@
+{
+  "name": "mrd-whiteboard-build",
+  "private": true,
+  "type": "module",
+  "description": "Builds chemistry/whiteboard/app (Excalidraw + the chemistry stencil library). Run: npm install && node build.mjs",
+  "dependencies": {
+    "@excalidraw/excalidraw": "0.18.1",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "esbuild": "0.25.0"
+  }
+}
