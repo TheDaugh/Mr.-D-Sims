@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photoelectron Spectroscopy · Mr. D</title>
+<meta name="description" content="Shine light on atoms, read the spectrum of the electrons that come out, and match each spectrum to an element.">
+<link rel="stylesheet" href="../shared/lab.css">
+<style>
+  .wrap{max-width:none;padding-inline:clamp(12px,3vw,40px)}
+  .sub{color:var(--muted);margin:0 0 12px;max-width:72ch}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+  .chip{padding:2px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:.85rem;color:var(--muted)}
+  .chip.on{border-color:var(--accent);color:var(--accent);font-weight:700}
+  .chip.done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+  .card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px;background:var(--panel)}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+  .col{flex:1 1 380px;min-width:0}
+  .btn{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .ghost{background:var(--panel);color:var(--ink);border-color:var(--line)}
+  .opt{display:block;width:100%;text-align:left;margin:4px 0;padding:8px 10px}
+  .opt.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+  .opt.no{border-color:var(--bad,#b3261e);color:var(--bad,#b3261e)}
+
+  .tag{display:inline-block;padding:0 6px;border-radius:4px;background:var(--panel);border:1px solid var(--line);font-size:.8rem;color:var(--muted)}
+  .hint{color:var(--muted);font-size:.9rem}
+  .axis{font:12px system-ui,sans-serif;fill:var(--muted)}
+  .peak{fill:var(--accent);cursor:pointer}
+  .peak:hover{opacity:.8}
+  .ghostbar{fill:none;stroke:var(--warn,#c47a00);stroke-dasharray:4 3;stroke-width:2}
+  .periodic{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;margin:8px 0}
+  .periodic button{padding:6px 2px;font-size:.85rem;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px}
+  .periodic button:disabled{color:#9aa3ab;background:#f1f3f5;cursor:not-allowed}
+  .periodic button.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+  .periodic .p2{background:#e6f1fb}
+  .periodic .p3{background:#f3ecfa}
+  .draw{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+  .draw .slot{border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center}
+  .bar{margin:0 auto;width:34px;background:var(--accent);border-radius:3px 3px 0 0}
+  .keyonly{display:none}
+  body.keymode .keyonly{display:block}
+  .keyonly{margin-top:10px;padding:10px;border:2px dashed var(--warn,#c47a00);border-radius:8px;background:#fffaf0;font-size:.9rem}
+  .keyonly .a{background:#fde68a;padding:0 3px;border-radius:3px;font-weight:700}
+  table.k{border-collapse:collapse;width:100%;font-size:.86rem;margin:6px 0}
+  table.k td,table.k th{border:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
+  .locked{opacity:.5;pointer-events:none}
+  input.num{width:9ch;font-size:1.1rem;padding:6px}
+  input.txt{width:100%;max-width:60ch;font-size:1rem;padding:6px}
+</style>
+<script src="../../shared/config.js"></script>
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
+<script src="../../shared/teacherbar.js"></script>
+<script src="../../shared/live.js"></script>
+<script src="../../shared/profile.js"></script>
+<script src="../../shared/notes.js"></script>
+<script src="../../shared/lock.js"></script>
+<script src="../shared/pes-data.js"></script>
+<script src="../shared/pes-practice.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <a href="../index.html" class="hint">&larr; Chemistry</a>
+  <h1>Photoelectron Spectroscopy</h1>
+  <p class="sub">Shine light on an atom. The electrons that come out tell you how hard each one was held. Each spectrum is one element's fingerprint.</p>
+  <nav id="chips" class="chips" aria-label="Lesson steps"></nav>
+  <main id="app" aria-live="polite"></main>
+  <section id="keypanel" class="keyonly" hidden></section>
+</div>
+
+<script>
+/* ============ setup ============ */
+const KEY = MrD.isKey();
+const LESSON_ID = "photoelectron-spectroscopy";
+const NOLOCK = (/nolock=(\d+)/.exec(location.hash) || [])[1] === LessonLock.offCode();
+const LOCK_ON = !KEY && !NOLOCK;
+if (KEY) document.body.classList.add("keymode");
+
+const D = PESData, PR = PESPractice;
+const SIM = D.simElements();                                 // [1,2,3,10,12,18]
+const SYM = ["H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca"];
+const NM = PR.NAME;
+const LOG = Math.log10, LO = 0.4, HI = 400;                  // MJ/mol range of the beam and the axis
+const EV = D.EV_TO_MJ;
+
+/* ID-SWAP: students type a student ID (never a name). Pending the shared ID system; stored in S.first. */
+const ST = { id: "", period: "", screen: "start", band: { warm: 1, p1: 1, p2: 1, p3: 1, p4: 1, practice: 1 },
+  streak: 0, miss: 0, b3done: 0, log: [], notes: {}, drawn: null, p2ok: 0, h1ok: false, h2ok: false, startAt: Date.now() };
+const QUICK = 6;                                             // quick band-1 items at the start of each part
+
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const k in (attrs || {})) {
+    const v = attrs[k];
+    if (v === null || v === undefined || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "html") el.innerHTML = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else if (k === "disabled") el.disabled = !!v;
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  kids.flat().forEach(c => { if (c === null || c === undefined || c === false) return; el.append(c.nodeType ? c : document.createTextNode(String(c))); });
+  return el;
+}
+const $app = () => document.getElementById("app");
+const save = () => { try { sessionStorage.setItem("pes.state", JSON.stringify({ band: ST.band, log: ST.log.slice(-200), notes: ST.notes })); } catch (e) {} };
+function logResp(kind, text, extra) {
+  const row = { kind, text, extra: extra || null, at: Date.now() };
+  ST.log.push(row); ST.notes[kind + ":" + ST.log.length] = row; save();
+  try {
+    const day = MrD.bell.dayKey(), all = JSON.parse(localStorage.getItem("pes.responses") || "[]").filter(x => !(x.id === ST.id && x.day === day));
+    all.push({ id: ST.id, period: ST.period, day, ...row }); localStorage.setItem("pes.responses", JSON.stringify(all));
+  } catch (e) {}
+}
+function fb(el, ok, text) { el.className = "fb show " + (ok ? "ok" : "no"); el.textContent = text; }
+
+/* ============ the spectrum (binding energy on a log axis, high on the left) ============ */
+const xOf = (MJ, L, W) => L + (LOG(HI) - LOG(MJ)) / (LOG(HI) - LOG(LO)) * W;
+function spectrumSVG(Z, o = {}) {
+  const W = 600, H = 262, L = 56, T = 14, PW = W - L - 16, PH = H - T - 56;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", (NM[Z] || SYM[Z - 1]) + " photoelectron spectrum");
+  svg.style.width = "100%"; svg.style.maxWidth = "640px";
+  const NS = "http://www.w3.org/2000/svg";
+  const mk = (t, a, txt) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (txt !== undefined) e.textContent = txt; svg.append(e); return e; };
+  const base = T + PH;
+  mk("line", { x1: L, x2: L + PW, y1: base, y2: base, stroke: "var(--line)" });
+  mk("line", { x1: L, x2: L, y1: T, y2: base, stroke: "var(--line)" });
+  [0.5, 1, 2, 5, 10, 20, 50, 100, 200, 400].forEach(v => {
+    const x = xOf(v, L, PW);
+    mk("line", { x1: x, x2: x, y1: base, y2: base + 4, stroke: "var(--line)" });
+    mk("text", { x: x, y: base + 16, "text-anchor": "middle", class: "axis" }, v);
+  });
+  for (let c = 0; c <= 6; c += 2) {
+    const y = T + PH - c / 6 * PH;
+    mk("text", { x: L - 8, y: y + 4, "text-anchor": "end", class: "axis" }, c);
+  }
+  mk("text", { x: L + PW / 2, y: H - 8, "text-anchor": "middle", class: "axis" }, "binding energy, MJ/mol (log scale; hardest to knock loose on the left)");
+  mk("text", { x: 14, y: T + PH / 2, "text-anchor": "middle", class: "axis", transform: `rotate(-90 14 ${T + PH / 2})` }, "electrons");
+  const spec = D.spectrum(Z) || [];
+  const beam = o.photon === undefined ? Infinity : o.photon;
+  if (o.overlay) o.overlay.forEach(g => {
+    const x = xOf(g.MJ, L, PW), hgt = g.count / 6 * PH;
+    mk("rect", { x: x - 6, y: base - hgt, width: 12, height: hgt, class: "ghostbar" });
+  });
+  spec.forEach(p => {
+    if (p.MJ > beam) return;
+    const x = xOf(p.MJ, L, PW), hgt = p.count / 6 * PH;
+    const r = mk("rect", { x: x - 5, y: base - hgt, width: 10, height: hgt, class: "peak", tabindex: 0, "data-sub": p.sub });
+    r.addEventListener("click", () => o.onPeak && o.onPeak(p, Z));
+    r.addEventListener("keydown", e => { if (e.key === "Enter" && o.onPeak) o.onPeak(p, Z); });
+    if (o.tags) mk("text", { x: x, y: base - hgt - 4, "text-anchor": "middle", class: "axis" }, p.sub + " · " + p.count);
+  });
+  return svg;
+}
+function peakInfo(p, Z) {
+  return `${NM[Z] || SYM[Z - 1]}: the ${p.sub} peak. ${p.count} electrons. Binding energy ${p.MJ.toFixed(2)} MJ/mol (${p.eV.toFixed(p.eV < 100 ? 2 : 0)} eV).`;
+}
+function visiblePeaks(Z, photon) { return (D.spectrum(Z) || []).filter(p => p.MJ <= photon).length; }
+
+/* the atom: nucleus and rings, drawn in code */
+function atomSVG(Z) {
+  const NS = "http://www.w3.org/2000/svg", W = 200, H = 200, cx = 100, cy = 100;
+  const svg = document.createElementNS(NS, "svg"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.style.width = "180px";
+  const add = (t, a, txt) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (txt !== undefined) e.textContent = txt; svg.append(e); };
+  const shells = {};
+  D.occupied(Z).forEach(o => { const n = +o.sub[0]; shells[n] = (shells[n] || 0) + o.count; });
+  Object.keys(shells).forEach(n => {
+    const r = 22 + (+n - 1) * 28;
+    add("circle", { cx, cy, r, fill: "none", stroke: "var(--line)" });
+    const k = shells[n];
+    for (let i = 0; i < k; i++) { const a = 2 * Math.PI * i / k - Math.PI / 2; add("circle", { cx: cx + r * Math.cos(a), cy: cy + r * Math.sin(a), r: 4, fill: "var(--accent)" }); }
+  });
+  add("circle", { cx, cy, r: 14, fill: "var(--warn,#c47a00)" });
+  add("text", { x: cx, y: cy + 5, "text-anchor": "middle", fill: "#fff", "font-size": 13, "font-weight": 700 }, SYM[Z - 1]);
+  return svg;
+}
+
+/* ============ items: one renderer for every practice and check question ============ */
+function itemView(item, after) {
+  const wrap = h("div", { class: "card" });
+  const tagLine = item.tags && item.tagList ? h("div", { class: "hint" }, "Subshells on this atom: ", h("span", { class: "tag" }, item.tagList)) : null;
+  wrap.append(h("p", { html: item.q }), tagLine);
+  const fbEl = h("div", { class: "fb", "aria-live": "polite" });
+  let hints = 0, locked = false;
+  const hintBtn = h("button", { class: "ghost", onclick: () => { hints++; fb(fbEl, false, "Hint: " + item.hint); } }, "Hint");
+  const finish = (ok, first) => {
+    locked = true;
+    const b = ST.band.practice;
+    if (ok && first && hints === 0) ST.streak++; else if (!ok) { ST.streak = 0; ST.miss++; } else ST.streak = 0;
+    if (ok) { ST.miss = 0; } if (item.band === 3 && ok) ST.b3done++;
+    logResp("item:" + item.skill, (ok ? "right" : "miss") + " band " + item.band, { q: item.q });
+    after && after(ok);
+  };
+  if (item.type === "num") {
+    let tries = 0;
+    const inp = h("input", { class: "num", inputmode: "decimal", "aria-label": "Your answer", type: "text" });
+    const go = h("button", { class: "btn", onclick: () => {
+      if (locked) return; tries++;
+      const v = Number(inp.value.trim());
+      if (inp.value.trim() !== "" && Number(v) === item.ans) { fb(fbEl, true, "✔ " + item.why); finish(true, tries === 1); }
+      else { fb(fbEl, false, "Not yet. " + (tries >= 2 ? "Hint: " + item.hint : "Try once more.")); if (tries === 1) hintBtn.disabled = false; if (tries >= 2) { finish(false, false); } }
+    } }, "Check");
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") go.click(); });
+    wrap.append(h("p", {}, inp, " ", item.unit ? h("span", { class: "hint" }, item.unit) : null), h("p", {}, go, " ", hintBtn), fbEl);
+  } else {
+    let tries = 0;
+    const row = h("div");
+    item.opts.forEach((t, i) => {
+      const b = h("button", { class: "opt ghost", onclick: () => {
+        if (locked) return; tries++;
+        if (i === item.ans) { b.classList.add("ok"); fb(fbEl, true, "✔ " + item.why); finish(true, tries === 1); }
+        else { b.classList.add("no"); b.disabled = true; fb(fbEl, false, "Not that one. " + (tries >= 2 ? "Hint: " + item.hint : "Pick again.")); if (tries >= 2) finish(false, false); }
+      } }, t);
+      row.append(b);
+    });
+    wrap.append(row, h("p", {}, hintBtn), fbEl);
+  }
+  return wrap;
+}
+
+/* the ladder: band moves with success. Two right in a row with no hint goes up; two misses goes down. */
+function ladder(part, ok) {
+  if (ok) { if (ST.streak >= 2 && ST.band[part] < 3) { ST.band[part]++; ST.streak = 0; } }
+  else if (ST.miss >= 2 && ST.band[part] > 1) { ST.band[part]--; ST.miss = 0; }
+  save();
+}
+function quickItems(part, label, done) {
+  let n = 0, seed = ST.id.length * 97 + ST.period.length + 13;
+  const box = h("section", { class: "card" }, h("h3", {}, label), h("p", { class: "hint" }, "Quick items. Answer each one, then the task below."));
+  const next = () => {
+    if (n >= QUICK) { box.append(h("p", {}, h("button", { class: "btn", onclick: done }, "On to the task"))); return; }
+    const it = PR.spec(n, 1, seed + part.length);            // band 1 at the start of every part
+    n++;
+    const cont = h("button", { class: "ghost", hidden: true, onclick: () => { cont.remove(); next(); } }, "Next");
+    box.append(itemView(it, ok => { ladder(part, ok); cont.hidden = false; }), cont);
+  };
+  next();
+  return box;
+}
+
+/* ============ screens ============ */
+const SCREENS = [
+  ["start", "Start"], ["warm", "Warm-up"], ["h1", "Huddle 1"], ["p1", "Part 1"], ["p2", "Part 2"],
+  ["h2", "Huddle 2"], ["p3", "Part 3"], ["p4", "Part 4"], ["exit", "Exit"], ["practice", "Practice"]
+];
+function chips() {
+  const nav = document.getElementById("chips"); nav.replaceChildren();
+  SCREENS.forEach(([id, label], i) => {
+    const on = ST.screen === id, done = SCREENS.findIndex(s => s[0] === ST.screen) > i;
+    nav.append(h("span", { class: "chip " + (on ? "on" : "") + (done ? " done" : "") }, (i + 1) + " " + label));
+  });
+}
+function go(screen) { ST.screen = screen; save(); chips(); window.scrollTo(0, 0); render(); }
+const next = (to) => () => go(to);
+
+function render() {
+  const app = $app(); app.replaceChildren();
+  ({ start, warm, h1, p1, p2, h2, p3, p4, exit: exitScreen, practice }[ST.screen] || start)(app);
+  if (KEY) keyPanel();
+}
+
+/* Start */
+function start(app) {
+  const id = h("input", { class: "txt", id: "sid", "aria-label": "Student ID", placeholder: "Your student ID", value: ST.id });
+  const period = h("input", { class: "num", id: "per", "aria-label": "Period", placeholder: "period", value: ST.period });
+  const go_ = h("button", { class: "btn", onclick: () => {
+    const v = id.value.trim();
+    if (!v) { fb(err, false, "Type your student ID first."); return; }
+    ST.id = v; ST.period = period.value.trim(); save();
+    if (LOCK_ON) { try { LessonLock.init({ id: LESSON_ID, root: document.querySelector(".wrap"), onChange: chips }); LessonLock.enter(ST.id); } catch (e) {} }
+    go("warm");
+  } }, "Start");
+  const err = h("div", { class: "fb" });
+  app.append(
+    h("section", { class: "card" },
+      h("h2", {}, "Today you will"),
+      h("p", {}, "I can read a photoelectron spectrum and match it to an element."),
+      h("p", {}, "I can say what the peaks' positions and heights tell me."),
+      h("p", {}, "I can sketch the spectrum for an atom's configuration."),
+      h("p", { class: "hint" }, "Up next: a short warm-up, then the first huddle with Mr. D."),
+      h("p", {}, id, " ", period, " ", go_), err),
+    h("section", { class: "card hint" }, "This lesson is locked to this window while you work. Leaving it is logged for your teacher.")
+  );
+  if (KEY) go_.textContent = "Open (teacher key)";
+  if (ST.id) { chips(); }
+}
+
+/* Warm-up: 3 easy items with pictures, band 1 */
+function warm(app) {
+  const items = [
+    { Z: 10, q: "Neon is 1s² 2s² 2p⁶. How many electrons are in its 2p subshell?", ans: 6, unit: "electrons", hint: "The 6 after the p is the count.", why: "2p⁶ means six electrons in the 2p subshell." },
+    { Z: 11, q: "Sodium is 1s² 2s² 2p⁶ 3s¹. How many valence electrons does it have (the ones in its outer shell)?", ans: 1, unit: "electron", hint: "Count only the electrons in the highest shell, 3s.", why: "Only the 3s¹ electron is in the outer shell: one valence electron." },
+    { Z: 3, q: "Lithium has two electrons: one in 1s, close to the nucleus, and one in 2s, farther out. Which one is held harder?", opts: ["The 2s electron, farther out", "The 1s electron, closer to the nucleus"], ans: 1, hint: "Closer to a positive nucleus means a stronger pull.", why: "The closer electron feels a stronger pull from the nucleus, so it is held harder." },
+  ];
+  const box = h("section", { class: "card" }, h("h2", {}, "Warm-up"),
+    h("p", { class: "hint" }, "Three easy items from earlier work. The picture shows the atom: rings are shells, dots are electrons."));
+  app.append(box);
+  let k = 0;
+  const showNext = () => {
+    if (k >= items.length) { box.append(h("p", {}, h("button", { class: "btn", onclick: next("h1") }, "Continue to Huddle 1"))); return; }
+    const it = items[k++];
+    box.append(h("div", { class: "row" }, h("div", { class: "col" }, atomSVG(it.Z))));
+    const cont = h("button", { class: "ghost", hidden: true, onclick: () => { cont.remove(); showNext(); } }, "Next");
+    const reveal = () => { cont.hidden = false; };
+    const view = it.opts
+      ? itemView({ type: "mcq", q: it.q, opts: it.opts, ans: it.ans, hint: it.hint, why: it.why, band: 1, skill: "chem.pes.warm" }, reveal)
+      : itemView({ type: "num", q: it.q, ans: it.ans, unit: it.unit, hint: it.hint, why: it.why, band: 1, skill: "chem.pes.warm" }, reveal);
+    box.append(view, cont);
+  };
+  showNext();
+}
+
+/* Huddle 1: Mr. D talks; typed definitions; mystery spectrum hook */
+function h1(app) {
+  const defs = [
+    { t: "A photoelectron is an [[electron]] that light knocks out of an atom.", ans: ["electron", "electrons"] },
+    { t: "Binding energy is how [[hard]] it is to knock an electron loose.", ans: ["hard", "difficult"] },
+    { t: "A peak is one [[subshell]] on the spectrum.", ans: ["subshell", "sub-shell", "subshells"] },
+  ];
+  const card = h("section", { class: "card" }, h("h2", {}, "Huddle 1 · Mr. D at the front"),
+    h("p", { class: "hint" }, "Mr. D is talking. Write the blanks as you hear them."));
+  const fbEl = h("div", { class: "fb" });
+  const inputs = defs.map(d => {
+    const parts = d.t.split(/\[\[|\]\]/);
+    const inp = h("input", { class: "txt", "aria-label": "Blank" });
+    card.append(h("p", {}, parts[0], inp, parts[2]));
+    return { inp, ans: d.ans };
+  });
+  const huddleCode = h("input", { class: "num", "aria-label": "Huddle 1 code", placeholder: "code" });
+  const codeFb = h("div", { class: "fb" });
+  const checkBtn = h("button", { class: "btn", onclick: () => {
+    const okAll = inputs.every(x => x.ans.includes(x.inp.value.trim().toLowerCase()));
+    if (!okAll) { fb(fbEl, false, "Check the blanks. One word each."); return; }
+    inputs.forEach(x => logResp("huddle1:blank", x.inp.value.trim()));
+    fb(fbEl, true, "✔ Saved.");
+    ST.h1ok = true; save();
+  } }, "Save my blanks");
+  card.append(h("p", {}, checkBtn), fbEl);
+  card.append(h("h3", {}, "Worked example (Mr. D does this live)"),
+    h("p", {}, "Light with energy 2.1 MJ/mol hits lithium. Lithium's 2s binding energy is 0.52 MJ/mol. The 2s electron is knocked out, because the light has more energy than the ", h("input", { class: "txt", "aria-label": "Blank", id: "wex" }), " of that electron."));
+  card.append(h("h3", {}, "Mystery spectrum (hold your guess)"),
+    h("p", { class: "hint" }, "No labels. Count the peaks first. You will name this element in Part 2."),
+    spectrumSVG(12, { tags: false }));
+  const codeOK = KEY || !MrD.bell.gatesOn();
+  const cont = h("button", { class: "btn", disabled: !codeOK, onclick: next("p1") }, "Continue to Part 1");
+  if (!codeOK) {
+    card.append(h("p", {}, "Teacher code: ", huddleCode, " ", h("button", { class: "ghost", onclick: () => {
+      if (huddleCode.value.trim() === MrD.codes.huddle()) { cont.disabled = false; fb(codeFb, true, "✔ Unlocked."); }
+      else fb(codeFb, false, "Not the code. Ask Mr. D.");
+    } }, "Enter")), codeFb);
+  }
+  card.append(h("p", {}, cont));
+  app.append(card);
+}
+
+/* Part 1: guided Li run, two free runs, post-questions */
+function p1(app) {
+  const box = h("section", { class: "card" }, h("h2", {}, "Part 1 · Shine the beam"));
+  let photon = 0.4;
+  const beam = h("input", { type: "range", min: 0, max: 1000, value: 0, "aria-label": "Beam energy" });
+  const beamOut = h("output", {}, "0.40 MJ/mol");
+  const specWrap = h("div");
+  let elem = 3, guidedDone = false;
+  const sync = () => {
+    photon = Math.pow(10, LOG(LO) + (+beam.value) / 1000 * (LOG(HI) - LOG(LO)));
+    beamOut.textContent = photon.toFixed(2) + " MJ/mol";
+    specWrap.replaceChildren(spectrumSVG(elem, { photon, tags: ST.band.p1 <= 1, onPeak: (p, Z) => fbInfo.textContent = peakInfo(p, Z) }));
+    fbInfo.textContent = "";
+  };
+  const fbInfo = h("div", { class: "hint", "aria-live": "polite" });
+  beam.addEventListener("input", sync);
+  const guidedQ = h("div");
+  const guidedCheck = (n, expect) => {
+    const inp = h("input", { class: "num", "aria-label": "Peaks visible" });
+    const out = h("div", { class: "fb" });
+    const b = h("button", { class: "btn", onclick: () => {
+      if (Number(inp.value) === visiblePeaks(elem, photon)) { fb(out, true, "✔ " + visiblePeaks(elem, photon) + " peak(s) show. A peak appears once the beam passes its binding energy."); logResp("p1:guided" + n, inp.value); }
+      else fb(out, false, "Look at the spectrum. A peak shows only when the beam energy is above its binding energy (left of the beam marker).");
+    } }, "Check");
+    return h("p", {}, "How many peaks show now? ", inp, " ", b, out);
+  };
+  guidedQ.append(h("p", {}, "Guided run: lithium. Move the beam to about 3 MJ/mol, then to about 8 MJ/mol."), guidedCheck(1), guidedCheck(2));
+  box.append(h("div", { class: "row" }, h("div", { class: "col" }, h("div", {}, atomSVG(3)), h("p", { class: "hint" }, "Lithium: 3 protons, 3 electrons.")), h("div", { class: "col" }, h("p", {}, "Beam: ", beamOut), beam, specWrap, fbInfo)));
+  box.append(guidedQ);
+  sync();
+  box.append(h("p", { class: "hint" }, "Reading guide: across is how hard each electron is held (hardest on the left). Up is how many electrons. One bar is one subshell."));
+
+  const freeRuns = [
+    { Z: 10, q: "Neon's 2s and 2p electrons: are they equally hard to knock loose?", opts: ["Yes, both are one peak", "No, 2s is held harder (further left)", "No, 2p is held harder (further left)", "Cannot tell from the spectrum"], ans: 1, why: "The 2s peak is further left, so its electrons are held harder. The 2p peak is at a lower binding energy." },
+    { Z: 10, q: "Lithium's 1s electrons versus neon's 1s electrons. Which is held harder, and why?", opts: ["Lithium's, because it is smaller", "Neon's, because it has more protons pulling harder", "The same, since both are 1s", "Cannot tell"], ans: 1, why: "Neon has 10 protons and lithium has 3. More positive charge pulls the 1s electrons harder." },
+    { Z: 12, q: "Magnesium's outer 3s electron is easy to knock loose. What does that say about how magnesium reacts?", opts: ["Mg holds its outer electrons tightly, so it does not react", "Mg gives up its outer electrons easily, so it reacts", "The 3s electron is held harder than the 1s electron", "Mg has no outer electrons"], ans: 1, why: "A low binding energy for the outer electron means it leaves easily, which is why Mg loses electrons in reactions." },
+    { Z: 18, q: "Argon's spectrum: which electrons were hardest to knock loose?", opts: ["The 3p electrons", "The 2s electrons", "The 1s electrons", "The 2p electrons"], ans: 2, why: "The 1s peak is furthest left, at the highest binding energy." },
+  ];
+  box.append(h("h3", {}, "Free runs"), h("p", { class: "hint" }, "Pick an element and run the beam. Then answer the question with your fingers: A, B, C or D. Mr. D tallies the room."));
+  const runs = h("div");
+  freeRuns.forEach((r, idx) => {
+    const sec = h("div", { class: "card" });
+    const specBox = h("div");
+    const runBtn = h("button", { class: "btn", onclick: () => {
+      let t = 0; const start = performance.now();
+      const step = (now) => {
+        const f = Math.min(1, (now - start) / 2600);
+        const ph = Math.pow(10, LOG(LO) + f * (LOG(HI) - LOG(LO)));
+        specBox.replaceChildren(spectrumSVG(r.Z, { photon: ph, tags: false, onPeak: (p, Z) => tip.textContent = peakInfo(p, Z) }));
+        if (f < 1) requestAnimationFrame(step); else post.hidden = false;
+      };
+      requestAnimationFrame(step);
+    } }, "Run the beam on " + (NM[r.Z] || SYM[r.Z - 1]));
+    const tip = h("div", { class: "hint" });
+    const post = h("div", { hidden: true });
+    post.append(h("p", {}, r.q));
+    const ps = h("div");
+    const tally = r.opts.map((t, i) => {
+      const b = h("button", { class: "opt ghost", onclick: () => {
+        if (i === r.ans) { b.classList.add("ok"); fb(out, true, "✔ " + r.why); }
+        else { b.classList.add("no"); fb(out, false, "Not that one. Look at the peak positions and try again."); }
+        logResp("p1:free" + idx, String.fromCharCode(65 + i));
+      } }, String.fromCharCode(65 + i) + ". " + t);
+      return b;
+    });
+    const out = h("div", { class: "fb" });
+    tally.forEach(b => ps.append(b));
+    post.append(ps, out);
+    sec.append(h("p", {}, runBtn), specBox, tip, post);
+    runs.append(sec);
+  });
+  box.append(runs);
+  box.append(h("p", {}, h("button", { class: "btn", onclick: next("p2") }, "Continue to Part 2")));
+  app.append(box);
+  app.prepend(quickItems("p1", "Part 1 · quick items", () => {}));
+  // the quick items show above the task; they are optional to scroll past only after finishing them
+}
+
+/* Part 2: match unlabeled spectra to elements */
+function p2(app) {
+  const unknowns = [
+    { Z: 3, tip: "Count the bars first." },
+    { Z: 10, tip: "Three bars. The tallest is the 2p bar." },
+    { Z: 18, tip: "Five bars. Two are tall and close together: 2p and 3p are not the same bar." },
+  ];
+  const box = h("section", { class: "card" }, h("h2", {}, "Part 2 · Match the spectrum"),
+    h("p", { class: "hint" }, "Each spectrum is unlabeled. Pick the element. You get feedback after each answer; a hint is one click away."));
+  const cands = SIM.map(Z => NM[Z] || SYM[Z - 1]);
+  let correct = 0;
+  unknowns.forEach((u, i) => {
+    const sec = h("div", { class: "card" });
+    sec.append(spectrumSVG(u.Z, { photon: HI, tags: false }));
+    const hint = h("div", { class: "hint" });
+    const out = h("div", { class: "fb" });
+    const row = h("div");
+    SIM.forEach(Z => {
+      const b = h("button", { class: "opt ghost", onclick: () => {
+        if (Z === u.Z) { b.classList.add("ok"); fb(out, true, "✔ " + (NM[Z] || SYM[Z - 1]) + " has " + D.occupied(Z).length + " peaks: one per occupied subshell."); if (!sec.dataset.done) { correct++; sec.dataset.done = "1"; } }
+        else { b.classList.add("no"); b.disabled = true; fb(out, false, "Not " + (NM[Z] || SYM[Z - 1]) + ". Count the peaks: this one has " + D.occupied(u.Z).length + ", " + (NM[Z] || SYM[Z - 1]) + " has " + D.occupied(Z).length + "."); }
+        logResp("p2:match" + i, (NM[Z] || SYM[Z - 1]));
+        ST.p2ok = correct;
+      } }, NM[Z] || SYM[Z - 1]);
+      row.append(b);
+    });
+    const hintBtn = h("button", { class: "ghost", onclick: () => { hint.textContent = "Hint: " + u.tip; } }, "Hint");
+    sec.append(h("p", {}, "Spectrum " + (i + 1) + ". Which element?"), row, h("p", {}, hintBtn), hint, out);
+    box.append(sec);
+  });
+  box.append(h("p", {}, h("button", { class: "btn", onclick: () => { ST.p2ok = correct; ST.h2ok = correct >= 2; save(); next("h2")(); } }, "Continue to Huddle 2")));
+  app.append(box);
+  app.prepend(quickItems("p2", "Part 2 · quick items", () => {}));
+}
+
+/* Huddle 2: three questions on the crux */
+function h2(app) {
+  const box = h("section", { class: "card" }, h("h2", {}, "Huddle 2 · Mr. D at the front"),
+    h("p", { class: "hint" }, "Write the three answers, then Mr. D draws. Each answer is one word or one number."));
+  const qs = [
+    { q: "In a spectrum, which peak is furthest left, and what does left mean?", opts: ["The 1s peak: the hardest electrons to knock loose", "The 2p peak: the easiest electrons", "The tallest peak: the most electrons"], ans: 0 },
+    { q: "A peak's height tells you what?", opts: ["How hard the electrons are held", "How many electrons are in that subshell", "How much energy the light had"], ans: 1 },
+    { q: "Magnesium: how many peaks? (Mg is 1s² 2s² 2p⁶ 3s²)", num: true, ans: D.occupied(12).length, unit: "peaks" },
+  ];
+  const gate = ST.p2ok >= 2 || KEY;
+  const codeBox = h("div");
+  qs.forEach((q, i) => {
+    if (q.num) box.append(itemView({ type: "num", q: q.q, ans: q.ans, unit: q.unit, hint: "One peak for each subshell that has electrons.", why: "Mg has 1s, 2s, 2p and 3s: four peaks.", band: 2, skill: "chem.pes.huddle2" }, () => {}));
+    else box.append(itemView({ type: "mcq", q: q.q, opts: q.opts, ans: q.ans, hint: "Left is hardest. Height is a count.", why: q.opts[q.ans] + ".", band: 2, skill: "chem.pes.huddle2" }, () => {}));
+  });
+  box.append(h("h3", {}, "Mr. D draws Mg's spectrum"), spectrumSVG(12, { photon: HI, tags: true }));
+  const code = h("input", { class: "num", placeholder: "code", "aria-label": "Huddle 2 code" });
+  const codeOut = h("div", { class: "fb" });
+  const cont = h("button", { class: "btn", onclick: next("p3") }, "Continue to Part 3");
+  if (!KEY && MrD.bell.gatesOn()) {
+    cont.disabled = true;
+    if (gate) {
+      box.append(h("p", {}, "Teacher code: ", code, " ", h("button", { class: "ghost", onclick: () => {
+        if (code.value.trim() === MrD.codes.huddle2()) { cont.disabled = false; fb(codeOut, true, "✔ Unlocked."); }
+        else fb(codeOut, false, "Not the code. Ask Mr. D.");
+      } }, "Enter"), codeOut));
+    } else {
+      box.append(h("p", { class: "fb no" }, "The second code is open once you have 2 of 3 right in Part 2. Ask Mr. D if you are stuck."));
+    }
+  }
+  box.append(h("p", {}, cont));
+  app.append(box);
+}
+
+/* Part 3: Model A, then the draw tool */
+function p3(app) {
+  const box = h("section", { class: "card" }, h("h2", {}, "Part 3 · Does this model fit?"));
+  box.append(h("p", {}, "Model A says: ", h("i", {}, "“All electrons in the same shell are held equally hard, so each shell gives one peak.”")));
+  // Model A on neon: the K shell (1s) is one peak; the L shell is one peak placed at its electron-weighted average.
+  const ne = D.spectrum(10);
+  const L = ne.filter(o => o.sub[0] === "2");
+  const Lmj = L.reduce((a, o) => a + o.MJ * o.count, 0) / L.reduce((a, o) => a + o.count, 0);
+  const overlay = [{ MJ: ne[0].MJ, count: 2 }, { MJ: Lmj, count: 8 }];
+  box.append(h("p", { class: "hint" }, "Dashed bars: what Model A predicts for neon (K shell 2 electrons, L shell 8 electrons). Solid bars: the real spectrum."));
+  box.append(spectrumSVG(10, { photon: HI, tags: true, overlay }));
+  const fitQ = [
+    { t: "Fits: the real spectrum has one peak per shell.", ok: false },
+    { t: "Does not fit: neon has three peaks, so the L shell is not one peak.", ok: true },
+  ];
+  const out = h("div", { class: "fb" });
+  fitQ.forEach((f, i) => box.append(h("button", { class: "opt ghost", onclick: () => {
+    logResp("p3:fit", String.fromCharCode(65 + i));
+    if (f.ok) fb(out, true, "✔ Right. The 2s and 2p bars are at different heights and different positions.");
+    else fb(out, false, "Look again: count the bars in the real spectrum (solid). How many does Model A give?");
+  } }, String.fromCharCode(65 + i) + ". " + f.t)));
+  box.append(out);
+  const rev = h("input", { class: "txt", "aria-label": "One-sentence revision", placeholder: "One sentence: how would you fix Model A?" });
+  box.append(h("p", {}, rev, " ", h("button", { class: "ghost", onclick: () => {
+    if (rev.value.trim().length < 15) return fb(out, false, "One full sentence, please.");
+    logResp("p3:revision", rev.value.trim()); fb(out, true, "✔ Saved to your notes.");
+  } }, "Save")));
+  box.append(h("h3", {}, "Draw tool: sketch neon's spectrum"),
+    h("p", { class: "hint" }, "Set the three bars in order of binding energy, left to right: 1s, 2s, 2p. Height is the number of electrons (0 to 8)."));
+  const slots = ["1s", "2s", "2p"].map(sub => {
+    const v = { n: 0 };
+    const out = h("output", {}, "0");
+    const bar = h("div", { class: "bar", style: "height:0px" });
+    const set = d => { v.n = Math.max(0, Math.min(8, v.n + d)); out.textContent = v.n; bar.style.height = (v.n * 8) + "px"; };
+    return { sub, v, el: h("div", { class: "slot" }, h("div", {}, sub), bar, h("div", {}, h("button", { class: "ghost", onclick: () => set(-1), "aria-label": "Fewer " + sub }, "−"), " ", out, " ", h("button", { class: "ghost", onclick: () => set(1), "aria-label": "More " + sub }, "+"))) };
+  });
+  box.append(h("div", { class: "draw" }, ...slots.map(s => s.el)));
+  const chk = h("div", { class: "fb" });
+  box.append(h("p", {}, h("button", { class: "btn", onclick: () => {
+    const want = D.occupied(10).map(o => o.count);
+    const got = slots.map(s => s.v.n);
+    const bad = slots.filter((s, i) => got[i] !== want[i]).map(s => s.sub);
+    if (!bad.length) fb(chk, true, "✔ Matches neon: 2, 2 and 6 electrons. The 2p bar is the tallest.");
+    else fb(chk, false, "Check " + bad.join(" and ") + ". Compare with the solid bars above.");
+    logResp("p3:draw", slots.map(s => s.v.n).join(","));
+  } }, "Compare with the real spectrum")), chk);
+  box.append(h("p", {}, h("button", { class: "btn", onclick: next("p4") }, "Continue to Part 4")));
+  app.append(box);
+  app.prepend(quickItems("p3", "Part 3 · quick items", () => {}));
+}
+
+/* Part 4: map the pattern onto the table */
+function p4(app) {
+  const box = h("section", { class: "card" }, h("h2", {}, "Part 4 · Map it to the table"),
+    h("p", { class: "hint" }, "Click an element that is in this lesson. Period 2 is blue; period 3 is purple. The number on each tile is its number of peaks."));
+  const rows = [["H", "He"], ["Li", "Be", "B", "C", "N", "O", "F", "Ne"], ["Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar"], ["K", "Ca"]];
+  const grid = h("div", { class: "periodic" });
+  const info = h("div", { class: "fb" });
+  rows.forEach((row, ri) => row.forEach(sym => {
+    const Z = SYM.indexOf(sym) + 1, ok = SIM.includes(Z);
+    const per = ri === 1 ? "p2" : ri === 2 ? "p3" : "";
+    const b = h("button", { class: per, disabled: !ok, title: ok ? "" : "not in this lesson" }, ok ? sym + "\n" + D.occupied(Z).length : sym);
+    b.addEventListener("click", () => {
+      grid.querySelectorAll("button.sel").forEach(x => x.classList.remove("sel")); b.classList.add("sel");
+      const occ = D.occupied(Z), lastS = occ.filter(o => o.sub.endsWith("s")).pop(), lastP = occ.filter(o => o.sub.endsWith("p")).pop();
+      const val = lastS.count + (lastP ? lastP.count : 0);
+      fb(info, true, sym + ": last s bar " + lastS.count + (lastP ? " + last p bar " + lastP.count : " (no p electrons)") + " = " + val + " valence electrons.");
+      logResp("p4:tile", sym);
+    });
+    grid.append(b);
+  }));
+  box.append(grid, info);
+  const q = { q: "Argon: last s bar + last p bar = ?", ans: 8 };
+  box.append(itemView({ type: "num", q: q.q, ans: q.ans, unit: "valence electrons", hint: "Argon's last s is 3s and last p is 3p.", why: "3s (2) + 3p (6) = 8 valence electrons, same as the group count of Ar.", band: 2, skill: "chem.pes.p4" }, () => {}));
+  box.append(h("p", { class: "hint" }, "Look ahead: slot 12 is practice with whiteboards, and in slots 15 to 17 we use the same bars to read ionization energy trends."));
+  box.append(h("p", {}, h("button", { class: "btn", onclick: next("exit") }, "Continue to Exit")));
+  app.append(box);
+  app.prepend(quickItems("p4", "Part 4 · quick items", () => {}));
+}
+
+/* Exit: a drawing, not a journal */
+function exitScreen(app) {
+  const P = 15;
+  const cfg = D.occupied(P).map(o => o.sub + "<sup>" + o.count + "</sup>").join(" ");
+  app.append(h("section", { class: "card" }, h("h2", {}, "Exit · draw it"),
+    h("p", {}, "Draw phosphorus's spectrum on paper. Configuration: ", h("span", { html: cfg }), "."),
+    h("p", { class: "hint" }, "Bars left to right in order of binding energy, height = number of electrons, one bar per subshell. Label each bar. Phosphorus is not in the sim (no gas-phase source for its 2p or 3s/3p values yet), so this drawing is checked by Mr. D by eye, not by the page."),
+    h("p", {}, h("button", { class: "btn", onclick: next("practice") }, "I have drawn it. Continue to practice"))));
+}
+
+/* Practice: endless, bands 1 to 3, with the three band-3 items required before finishing */
+function practice(app) {
+  const box = h("section", { class: "card" }, h("h2", {}, "Practice"), h("p", { class: "hint" }, "Keep going. Band 3 items are required: " + Math.max(0, 3 - ST.b3done) + " to go."));
+  let n = ST.log.length;
+  const seed = (ST.id.length * 31 + ST.period.length) | 0;
+  const showItem = () => {
+    box.querySelectorAll(".practice-item").forEach(x => x.remove());
+    const it = PR.spec(n++, ST.band.practice, seed);
+    const wrap = h("div", { class: "practice-item" });
+    const nxt = h("button", { class: "ghost", hidden: true, onclick: showItem }, "Next item");
+    wrap.append(itemView(it, ok => { ladder("practice", ok); refreshFinish(); nxt.hidden = false; box.querySelector("p.hint").textContent = "Keep going. Band 3 items are required: " + Math.max(0, 3 - ST.b3done) + " to go."; }));
+    wrap.append(nxt);
+    box.append(wrap);
+  };
+  showItem();
+  const fin = h("button", { class: "btn", disabled: ST.b3done < 3 && !KEY, onclick: finish }, "Finish");
+  ST.finBtn = fin;
+  box.append(h("p", {}, fin));
+  app.append(box);
+}
+/* Finish opens once three band-3 items are done (or always in #key). Called after every practice answer. */
+function refreshFinish() { if (ST.finBtn) ST.finBtn.disabled = ST.b3done < 3 && !KEY; }
+
+function finish() {
+  const total = ST.log.filter(x => x.kind.startsWith("item:")).length;
+  logResp("finish", "done");
+  try { MrD.profile.record({ course: "chem", lesson: LESSON_ID, title: "Photoelectron Spectroscopy", first: ST.id, period: ST.period, day: MrD.bell.dayKey(), reached: SCREENS.length, of: SCREENS.length, items: total }); } catch (e) {}
+  if (LOCK_ON) { try { LessonLock.finish(); } catch (e) {} }
+  $app().replaceChildren(h("section", { class: "card" }, h("h2", {}, "Done for today"), h("p", {}, "Your notes are saved on this device. Mr. D will give you the next step.")));
+}
+
+/* ============ key view: #key shows answers and the teacher script ============ */
+function keyPanel() {
+  const p = document.getElementById("keypanel"); p.hidden = false; p.replaceChildren();
+  const un = D.unverified();
+  p.append(h("h2", {}, "Teacher key · Photoelectron spectroscopy (slot 11)"));
+  p.append(h("p", {}, h("b", {}, "Timing (50-minute period): "), "start and warm-up 0 to 4 · huddle 1 at minute 3 (called) to 9 · Part 1 9 to 19 · Part 2 19 to 26 · huddle 2 at minute 25 (called; the 2 of 3 gate applies) · Part 3 to 36 · Part 4 to 40 · exit 40 to 43 · practice to 50."));
+  p.append(h("p", {}, h("b", {}, "Huddle 1 script, answers marked: "), "A photoelectron is an ", h("span", { class: "a" }, "electron"), " that light knocks out. Binding energy is how ", h("span", { class: "a" }, "hard"), " it is to knock an electron loose. A peak is one ", h("span", { class: "a" }, "subshell"), " on the spectrum. Worked example: 2.1 is more than 0.52, so the 2s electron is knocked out."));
+  p.append(h("p", {}, h("b", {}, "Huddle 2 script, answers marked: "), "Furthest left is the ", h("span", { class: "a" }, "1s peak, the hardest to knock loose"), ". Height is the ", h("span", { class: "a" }, "number of electrons"), " in that subshell. Mg: ", h("span", { class: "a" }, "4"), " peaks; the tallest is ", h("span", { class: "a" }, "2p"), ". (Al was asked in the plan; Al has no gas-phase source yet, so Mg is drawn.)"));
+  p.append(h("p", {}, h("b", {}, "Post-questions (answers marked): "), "Neon 2s vs 2p: ", h("span", { class: "a" }, "B"), ". Li 1s vs Ne 1s: ", h("span", { class: "a" }, "B, neon, more protons"), ". Mg outer electron: ", h("span", { class: "a" }, "B"), ". Argon hardest: ", h("span", { class: "a" }, "C, 1s"), ". (Sodium and sulfur were in the worksheet plan; neither has a gas-phase source, so Mg and argon replace them.)"));
+  p.append(h("p", {}, h("b", {}, "Common wrong pictures and where the hard items aim: "), "one peak per electron (aim: band 2 'how many peaks'); 2p drawn left of 2s (aim: the 'leftmost' items); taller means higher energy (aim: the claim item); reading the axis as increasing (aim: the axis guide, Part 1); the same 1s energy for every element (aim: the 'why' item, band 3)."));
+  p.append(h("p", {}, h("b", {}, "Simplifications used: "), "one peak per subshell (the 2p spin-orbit pair, about 0.3 eV for Mg and 2.2 eV for Ar, is drawn as one bar); bar height = electron count (real intensity also depends on the photoionization cross-section); Model A's L-shell peak is placed at the electron-weighted average of 2s and 2p (Model A gives no position); the beam is shown on a log scale; warm-up items are 2 of 3, the closer-electron item is multiple choice."));
+  p.append(h("p", {}, h("b", {}, "Unverified (left out of the sim; listed by PESData.unverified()): "), un.length + " subshells. Elements with any missing value are not in the periodic table of the sim: Be, B, C, N, O, F, Na, Al, Si, P, S, Cl, K, Ca. Li 1s has a second gas-phase value, 64.89 eV, that differs by 0.5 eV (the sim uses 64.39 eV, the same paper as Li's other values)."));
+  p.append(h("p", {}, h("b", {}, "Not built as written: "), "the worksheet's Na and S runs and phosphorus exit (see the data sources); the exit drawing for phosphorus is checked by eye; band 3 finishing count is 3 (required); the ID field is a stub (ID-SWAP pending); the huddle codes use MrD.codes.huddle() and huddle2()."));
+  p.append(h("h3", {}, "Misconceptions"));
+  p.append(h("table", { class: "k" }, h("tr", {}, h("th", {}, "Say"), h("th", {}, "Fix")),
+    ...[["One peak per electron", "One peak per subshell. The height counts the electrons in it."],
+        ["2p is left of 2s", "2s is held harder: its peak is further left (4.7 vs 2.1 MJ/mol for neon)."],
+        ["Taller means held harder", "Taller means more electrons. Held harder means further left."],
+        ["The axis increases to the right", "Binding energy decreases left to right on the log axis."],
+        ["Every element's 1s is the same", "The 1s peak moves left as the nuclear charge grows (Li 0.6 vs Ne 84 MJ/mol)."]
+    ].map(r => h("tr", {}, h("td", {}, r[0]), h("td", {}, r[1])))));
+  p.append(h("p", { class: "hint" }, "Band structure: 1 = Z 1, 2, 3, 10 with tags; 2 = Z 1 to 18 with tags removed; 3 = cross-element reasoning and a flawed claim. Promote after two right with no hint; demote after two misses."));
+}
+
+/* ============ boot ============ */
+(function boot() {
+  try { const s = JSON.parse(sessionStorage.getItem("pes.state") || "null"); if (s && s.band) { ST.band = Object.assign(ST.band, s.band); ST.log = s.log || []; ST.notes = s.notes || {}; } } catch (e) {}
+  if (KEY) { ST.id = ST.id || "teacher"; ST.screen = (location.hash.match(/screen=(\w+)/) || [])[1] || "start"; }
+  chips(); render();
+})();
+</script>
+</body>
+</html>

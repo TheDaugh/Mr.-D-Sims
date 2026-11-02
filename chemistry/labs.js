@@ -114,6 +114,16 @@ window.UNITS = [
         blurb: "Drag electrons into an energy ladder, watch the filling rules say no, then write full configurations and draw the boxes through Z = 36.",
         tags: ["electron configuration", "Aufbau", "Hund's rule", "orbital diagrams"],
         teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/electron-config-1.html#key" }, { label: "Board page", href: "unit-3-atoms-ions/electron-config-1-board.html" }, { label: "Teacher page", href: "teacher.html" }]
+      },
+      {
+        title: "Photoelectron Spectroscopy",
+        type: "lesson",
+        day: 11,
+        icon: "📊",
+        href: "unit-3-atoms-ions/photoelectron-spectroscopy.html",
+        blurb: "Shine light on an atom and read the electrons that come out. Peak position shows how hard each subshell is held; peak height shows how many electrons it has. Match spectra to elements for Z = 1 to 20 (six of them in this lesson).",
+        tags: ["photoelectron spectroscopy", "binding energy", "subshells", "electron count"],
+        teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/photoelectron-spectroscopy.html#key" }, { label: "Teacher page", href: "teacher.html" }]
       }
     ]
   }
