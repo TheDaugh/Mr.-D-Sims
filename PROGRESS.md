@@ -176,3 +176,9 @@ Built from `docs/slot-07/` (the sheet's three JSON files and the content test ar
 ## 2026-10-28: shared slides exemplar (chem Unit 3, slot 10), branch `shared-slides-exemplar`
 
 Added `shared-slides/` with `README.md`, `WORKFLOW.md` and the first exemplar `chem-unit3-lesson10/` (26-slide Claude Slides deck, 2-page notes sheet with key and `.tex`, formula font). Not part of the site and not linked anywhere; nothing here is live until Ian merges. Open for Ian: the three Stretch items and the "why does 4s leave first" question conflict with the no-extension rule and the regular-level standard; "isoelectronic" appears only in speaker notes.
+
+## 2026-11-02: slot 11 photoelectron spectroscopy, data layer only (branch `claude/relaxed-faraday-aclf1z`)
+
+Built: `chemistry/shared/pes-data.js` (Z = 1 to 20; electron counts from Aufbau in code; energies in eV, MJ/mol by 1 eV = 0.0964853), `chemistry/shared/pes-data-sources.md` (one citation id per value), `tests/unit/pes-data.test.js` (6 tests, all pass). Not built yet: the page, the practice generator, the walkthrough, the key, the outline, the hub and standards entries.
+
+Blocked on sources: gas-phase core-level values exist for H, He, Li, Mg, Ne, Ar only. The NIST handbook gives every first ionization energy; the Tartu gas-phase database (repo `UT-XPS/gas-phase-database`, read access) has atomic 1s/2s/2p only for Li, Na (1s, 2s), Mg, Ne, Ar; the X-ray Data Booklet's other rows are solid-state (Fermi level), not gas phase. So Na (no gas-phase 2p), S and P are not in the sim, and the worksheet's Na and S runs and phosphorus exit cannot be built as written. Decision needed from Ian (see the list in the session reply).
