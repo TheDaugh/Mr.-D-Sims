@@ -12,6 +12,8 @@
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
   .chip{padding:2px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:.85rem;color:var(--muted)}
   .chip.on{border-color:var(--accent);color:var(--accent);font-weight:700}
+  button.chip{cursor:pointer;font:inherit;font-size:.85rem}
+  .chip.locked{opacity:.5}
   .chip.done{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
   .card{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px;background:var(--panel)}
   .row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
@@ -39,7 +41,9 @@
   .bar{margin:0 auto;width:34px;background:var(--accent);border-radius:3px 3px 0 0}
   .keyonly{display:none}
   body.keymode .keyonly{display:block}
-  .keyonly{margin-top:10px;padding:10px;border:2px dashed var(--warn,#c47a00);border-radius:8px;background:#fffaf0;font-size:.9rem}
+  .keyonly{margin-top:10px;padding:10px;border:2px dashed var(--warn,#c47a00);border-radius:8px;background:#fffaf0;color:#1b1b1b;font-size:.9rem}
+  .keyonly h2,.keyonly h3,.keyonly b,.keyonly p,.keyonly td,.keyonly th{color:#1b1b1b}
+  .keyonly .a{color:#1b1b1b}
   .keyonly .a{background:#fde68a;padding:0 3px;border-radius:3px;font-weight:700}
   table.k{border-collapse:collapse;width:100%;font-size:.86rem;margin:6px 0}
   table.k td,table.k th{border:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
@@ -181,7 +185,7 @@ function atomSVG(Z) {
 function itemView(item, after) {
   const wrap = h("div", { class: "card" });
   const tagLine = item.tags && item.tagList ? h("div", { class: "hint" }, "Subshells on this atom: ", h("span", { class: "tag" }, item.tagList)) : null;
-  wrap.append(h("p", { html: item.q }), tagLine);
+  wrap.append(h("p", { html: item.q }), ...[tagLine].filter(Boolean));
   const fbEl = h("div", { class: "fb", "aria-live": "polite" });
   let hints = 0, locked = false;
   const hintBtn = h("button", { class: "ghost", onclick: () => { hints++; fb(fbEl, false, "Hint: " + item.hint); } }, "Hint");
@@ -245,11 +249,17 @@ const SCREENS = [
   ["start", "Start"], ["warm", "Warm-up"], ["h1", "Huddle 1"], ["p1", "Part 1"], ["p2", "Part 2"],
   ["h2", "Huddle 2"], ["p3", "Part 3"], ["p4", "Part 4"], ["exit", "Exit"], ["practice", "Practice"]
 ];
+/* Chips jump back to any section already reached. Going forward still happens through each section's own Continue. */
 function chips() {
   const nav = document.getElementById("chips"); nav.replaceChildren();
+  const cur = SCREENS.findIndex(s => s[0] === ST.screen);
+  ST.reached = Math.max(ST.reached || 0, cur);
   SCREENS.forEach(([id, label], i) => {
-    const on = ST.screen === id, done = SCREENS.findIndex(s => s[0] === ST.screen) > i;
-    nav.append(h("span", { class: "chip " + (on ? "on" : "") + (done ? " done" : "") }, (i + 1) + " " + label));
+    const on = i === cur, done = cur > i, open = i <= ST.reached;
+    const cls = "chip " + (on ? "on" : "") + (done ? " done" : "");
+    nav.append(open && !on
+      ? h("button", { class: cls, type: "button", onclick: () => go(id) }, (i + 1) + " " + label)
+      : h("span", { class: cls + (open ? "" : " locked") }, (i + 1) + " " + label));
   });
 }
 function go(screen) { ST.screen = screen; save(); chips(); window.scrollTo(0, 0); render(); }
@@ -642,7 +652,7 @@ function keyPanel() {
         ["2p is left of 2s", "2s is held harder: its peak is further left (4.7 vs 2.1 MJ/mol for neon)."],
         ["Taller means held harder", "Taller means more electrons. Held harder means further left."],
         ["The axis increases to the right", "Binding energy decreases left to right on the log axis."],
-        ["Every element's 1s is the same", "The 1s peak moves left as the nuclear charge grows (Li 0.6 vs Ne 84 MJ/mol)."]
+        ["Every element's 1s is the same", "The 1s peak moves left as the nuclear charge grows (Li 6.2 vs Ne 84 MJ/mol)."]
     ].map(r => h("tr", {}, h("td", {}, r[0]), h("td", {}, r[1])))));
   p.append(h("p", { class: "hint" }, "Band structure: 1 = Z 1, 2, 3, 10 with tags; 2 = Z 1 to 18 with tags removed; 3 = cross-element reasoning and a flawed claim. Promote after two right with no hint; demote after two misses."));
 }
