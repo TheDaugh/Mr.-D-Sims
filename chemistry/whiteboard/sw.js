@@ -1,6 +1,6 @@
 /* Offline copy of the chem board. Stale-while-revalidate: a visit shows what is cached and refreshes it in the background,
    so a rebuilt board appears on the second open. Only files inside chemistry/whiteboard/ are touched. */
-var CACHE = 'mrd-chem-board-v1';
+var CACHE = 'mrd-chem-board-v2';
 var CORE = ['./', 'index.html', 'app/app.js', 'app/app.css', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', function (e) {

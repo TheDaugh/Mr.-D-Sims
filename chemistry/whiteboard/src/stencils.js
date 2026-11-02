@@ -34,7 +34,7 @@ function item(convert, name, skeletons) {
   var els = convert(skeletons);
   var gid = uid('g');
   els.forEach(function (e) { e.groupIds = [gid].concat(e.groupIds || []); });
-  return { id: uid('chem'), status: 'unpublished', created: Date.now(), name: name, elements: els };
+  return { id: 'chem:' + name, status: 'unpublished', created: Date.now(), name: name, elements: els };
 }
 
 /* ---------- electron configuration boxes ---------- */
@@ -225,4 +225,13 @@ function buildLibrary(convert) {
   return items;
 }
 
-export { buildLibrary };
+/* Which shelf each built-in stencil sits on, by the word before the dot in its name.
+   Add a shelf here, or just use the "+ Shelf" button on the board for your own. */
+var SHELVES = [
+  { name: 'Electron configuration', prefixes: ['Config', 'Spin'] },
+  { name: 'Atom pictures', prefixes: ['Bohr'] },
+  { name: 'Periodic table', prefixes: ['Table'] },
+  { name: 'Energy levels', prefixes: ['Levels'] }
+];
+
+export { buildLibrary, SHELVES };

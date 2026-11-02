@@ -4,6 +4,8 @@ A whiteboard for direct-instruction notes, with pasteable chemistry organizers. 
 
 Open `chemistry/whiteboard/index.html` (linked from the chemistry teacher page). The Library panel on the right holds the stencils: click one, then move, resize (corner handles), rotate (top handle) or ungroup it (Ctrl+Shift+G). Pen, text, shapes and arrows are the toolbar at the top.
 
+Shelves: the Library panel is one flat list, so the board shows one shelf at a time. Tabs along the bottom switch shelves: Electron configuration, Atom pictures, Periodic table, Energy levels. Press + Shelf to make one for a unit or concept. Select drawings on the board and use Add to library, and they land on the shelf that is open. Your shelves and the stencils on them are saved in this browser (localStorage key `mrd-chem-library-v1`), so they do not move to another computer. Built-in stencils always come from the code.
+
 - **Autosave**: every change is saved in the browser you use (localStorage, key `mrd-chem-whiteboard-v1`). Another browser or computer starts empty.
 - **Backup**: menu (top left) > Save to disk gives a `.excalidraw` file; Open loads one. Export image gives a PNG or SVG.
 - **Offline**: a service worker (`sw.js`) caches the board after the first visit. In Chrome, menu > Cast, save and share > Install page as app gives a window of its own.
