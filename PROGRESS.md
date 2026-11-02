@@ -2,6 +2,17 @@
 
 Update this at the end of every session. Newest entry first.
 
+
+## 2026-11-02: Chem board (whiteboard with chemistry stencils)
+
+For direct-instruction chem days: Ian writes the board notes on a whiteboard and pastes premade organizers instead of drawing them. Built on Excalidraw 0.18.1 (MIT), vendored so it runs from the site: `chemistry/whiteboard/` (`index.html`, `src/app.jsx`, `src/stencils.js`, built `app/`, `sw.js`, README). Build: `node tools/whiteboard/build.mjs` (needs `npm install` in `tools/whiteboard`). Linked from `chemistry/teacher.html`.
+
+- 36 stencils, all drawn in code: electron config rows, s/p/d boxes and 1s-3p / 1s-4p ladders; spin arrows; Bohr shells and six atoms; three blank periodic tables; energy level ladders and emission, absorption and photon arrows.
+- Autosave in the browser (localStorage); Save/Open `.excalidraw` as backup; service worker caches it for offline.
+- Checked: every stencil rendered in a grid and looked at; drag from the Library onto the board; reload restores the board and the library; service worker active; no console errors. Not run: the repo's lesson checks apply to lessons, not this page.
+- Not on `main` yet: branch `chem-whiteboard`. Netlify deploys when it merges. `app/app.js` is 8.1 MB (Excalidraw is big); Netlify serves it compressed.
+- Next: a chem version of the `di-day-builder` skill (script, notes, sheet, key, exit slip), using these stencils as the figure vocabulary.
+
 ## 2026-10-28: calculus 3.2 Implicit Differentiation (v2)
 
 Built from the calc template: `calculus/unit-3-composite-implicit-inverse/3-2-implicit.{html,spec.js,content.js}`, keys in `keys/calc/3-2-implicit-{makeup,teacher}.pdf`. Listed in both places: `shared/lessons.js` (teacher hub, added by the scaffolder) and `calculus/sims.js` (the student page). `templates/README.md` now says so as step 5.
