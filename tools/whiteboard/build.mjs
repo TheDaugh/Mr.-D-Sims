@@ -1,4 +1,5 @@
-// Builds chemistry/whiteboard/app/ (app.js, app.css, fonts/) from chemistry/whiteboard/src.
+// Builds shared/whiteboard/app/ (app.js, app.css, fonts/) from tools/whiteboard/src. One bundle runs every board
+// (chem, stats); each board's index.html sets window.MRD_BOARD.
 // Setup once: cd tools/whiteboard && npm install. Then: node tools/whiteboard/build.mjs
 import { build } from 'esbuild';
 import { cpSync, mkdirSync, rmSync, existsSync, statSync, readdirSync } from 'node:fs';
@@ -6,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, '../../chemistry/whiteboard');
+const root = path.resolve(here, '../../shared/whiteboard');
 const out = path.join(root, 'app');
 
 if (!existsSync(path.join(here, 'node_modules'))) {
@@ -18,7 +19,7 @@ rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
 await build({
-  entryPoints: [path.join(root, 'src/app.jsx')],
+  entryPoints: [path.join(here, 'src/app.jsx')],
   outfile: path.join(out, 'app.js'),
   bundle: true,
   minify: true,

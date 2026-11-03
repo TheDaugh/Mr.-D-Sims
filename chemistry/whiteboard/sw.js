@@ -1,7 +1,7 @@
 /* Offline copy of the chem board. Stale-while-revalidate: a visit shows what is cached and refreshes it in the background,
-   so a rebuilt board appears on the second open. Only files inside chemistry/whiteboard/ are touched. */
-var CACHE = 'mrd-chem-board-v2';
-var CORE = ['./', 'index.html', 'app/app.js', 'app/app.css', 'manifest.webmanifest', 'icon.svg'];
+   so a rebuilt board appears on the second open. Only same-origin GETs are cached; the board's code lives in shared/whiteboard/app/. */
+var CACHE = 'mrd-chem-board-v3';
+var CORE = ['./', 'index.html', '../../shared/whiteboard/board.css', '../../shared/whiteboard/app/app.js', '../../shared/whiteboard/app/app.css', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(CORE); }).then(function () { return self.skipWaiting(); }));

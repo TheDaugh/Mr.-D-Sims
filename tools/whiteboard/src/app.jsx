@@ -1,11 +1,22 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Excalidraw, convertToExcalidrawElements, serializeAsJSON, restore } from '@excalidraw/excalidraw';
+import { Excalidraw, MainMenu, convertToExcalidrawElements, serializeAsJSON, restore } from '@excalidraw/excalidraw';
 import '@excalidraw/excalidraw/index.css';
-import { buildLibrary, SHELVES } from './stencils.js';
+import * as chem from './chem.js';
+import * as stats from './stats.js';
 
-var KEY = 'mrd-chem-whiteboard-v1';
-var LIB_KEY = 'mrd-chem-library-v1'; /* your own shelves and the stencils you add to them */
+/* One app, one bundle, several boards. The page says which one (window.MRD_BOARD). The chem keys keep their old
+   names so the boards and shelves already saved in a browser still load. */
+var BOARDS = {
+  chem: { title: 'Chem board', key: 'mrd-chem-whiteboard-v1', libKey: 'mrd-chem-library-v1', prefix: 'chem:', lib: chem },
+  stats: { title: 'Stats board', key: 'mrd-stats-whiteboard-v1', libKey: 'mrd-stats-library-v1', prefix: 'stats:', lib: stats }
+};
+var BOARD = BOARDS[window.MRD_BOARD] || BOARDS.chem;
+var buildLibrary = BOARD.lib.buildLibrary, SHELVES = BOARD.lib.SHELVES;
+var ALL = location.hash === '#all'; /* every stencil laid out in a grid, never saved; for checking and for printing a stencil sheet */
+
+var KEY = BOARD.key;
+var LIB_KEY = BOARD.libKey; /* your own shelves and the stencils you add to them */
 
 /* The Library panel is one flat list, so the board keeps shelves itself and shows one shelf at a time.
    Built-in stencils come from stencils.js every time. Anything you add to the library lands on the shelf
@@ -57,6 +68,7 @@ function App() {
   var onApi = useCallback(function (api) {
     apiRef.current = api;
     if (!api) return;
+    if (ALL) window.MRD_API = api; /* for the stencil check (tests and screenshots) */
     builtin.current = buildLibrary(convertToExcalidrawElements);
     var start = shelves.indexOf(lib.current.last) >= 0 ? lib.current.last : SHELVES[0].name;
     setShelf(start);
@@ -67,7 +79,7 @@ function App() {
   var onLibraryChange = useCallback(function (items) {
     if (!shown.current) return;
     var cur = lib.current, keep = cur.items.filter(function (it) { return it.shelf !== shelf; });
-    var mine = items.filter(function (it) { return String(it.id).indexOf('chem:') !== 0; })
+    var mine = items.filter(function (it) { return String(it.id).indexOf(BOARD.prefix) !== 0; })
       .map(function (it) { return { shelf: shelf, item: it }; });
     cur.items = keep.concat(mine);
     saveLib(cur);
@@ -89,16 +101,53 @@ function App() {
     setShelves(shelves.filter(function (x) { return x !== shelf; })); pick(SHELVES[0].name);
   };
 
-  var onChange = useCallback(function (elements, appState, files) {
+  /* Autosave. The save waits 800 ms after the last change, so a tab closed inside that window used to lose the last
+     edit; the page now saves at once when it is hidden or closed. A failed save (storage full or blocked) shows a
+     bar instead of failing silently. */
+  var latest = useRef(null);
+  var [saveErr, setSaveErr] = useState(false);
+  var persist = useCallback(function () {
+    var l = latest.current;
+    if (!l || ALL) return;
     clearTimeout(timer.current);
-    timer.current = setTimeout(function () {
-      try { localStorage.setItem(KEY, serializeAsJSON(elements, appState, files, 'local')); } catch (e) { /* storage full or blocked: the Save button still works */ }
-    }, 800);
+    try { localStorage.setItem(KEY, serializeAsJSON(l.elements, l.appState, l.files, 'local')); setSaveErr(false); latest.current = null; }
+    catch (e) { setSaveErr(true); }
   }, []);
+  var onChange = useCallback(function (elements, appState, files) {
+    if (ALL) return;
+    latest.current = { elements: elements, appState: appState, files: files };
+    clearTimeout(timer.current);
+    timer.current = setTimeout(persist, 800);
+  }, [persist]);
 
-  useEffect(function () { return function () { clearTimeout(timer.current); }; }, []);
+  useEffect(function () {
+    var hide = function () { persist(); };
+    var vis = function () { if (document.visibilityState === 'hidden') persist(); };
+    window.addEventListener('pagehide', hide);
+    document.addEventListener('visibilitychange', vis);
+    return function () { clearTimeout(timer.current); window.removeEventListener('pagehide', hide); document.removeEventListener('visibilitychange', vis); };
+  }, [persist]);
 
-  var init = saved.current
+  var allEls = null;
+  if (ALL && !allEls) {
+    var items = buildLibrary(convertToExcalidrawElements), x = 0, y = 0, rowH = 0, out = [];
+    items.forEach(function (it) {
+      var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      it.elements.forEach(function (e) {
+        var pts = e.points || [[0, 0], [e.width || 0, e.height || 0]];
+        pts.forEach(function (p) { minX = Math.min(minX, e.x + p[0]); maxX = Math.max(maxX, e.x + p[0]); minY = Math.min(minY, e.y + p[1]); maxY = Math.max(maxY, e.y + p[1]); });
+        if (!e.points) { minX = Math.min(minX, e.x); minY = Math.min(minY, e.y); maxX = Math.max(maxX, e.x + (e.width || 0)); maxY = Math.max(maxY, e.y + (e.height || 0)); }
+      });
+      var w = maxX - minX, h = maxY - minY;
+      if (x > 0 && x + w > 2600) { x = 0; y += rowH + 90; rowH = 0; }
+      out.push.apply(out, convertToExcalidrawElements([{ type: 'text', x: x, y: y - 28, text: it.name + '          ', fontSize: 18, fontFamily: 6, strokeColor: '#868e96' }]));
+      it.elements.forEach(function (e) { out.push(Object.assign({}, e, { x: e.x - minX + x, y: e.y - minY + y })); });
+      x += 0;
+      x += w + 70; rowH = Math.max(rowH, h);
+    });
+    allEls = out;
+  }
+  var init = ALL ? { elements: allEls, appState: { viewBackgroundColor: '#ffffff' }, scrollToContent: true } : saved.current
     ? { elements: saved.current.elements, appState: Object.assign({}, saved.current.appState, { openSidebar: { name: 'default', tab: 'library' } }), scrollToContent: true }
     : { elements: [], appState: { openSidebar: { name: 'default', tab: 'library' }, objectsSnapModeEnabled: true, currentItemStrokeWidth: 2, currentItemRoughness: 0, currentItemFontFamily: 6, currentItemFontSize: 20 } };
 
@@ -109,16 +158,30 @@ function App() {
         initialData={init}
         onChange={onChange}
         onLibraryChange={onLibraryChange}
-        name="Chem board"
+        name={BOARD.title}
         UIOptions={{ canvasActions: { loadScene: true, saveToActiveFile: false, export: { saveFileToDisk: true }, toggleTheme: true } }}
-      />
-      <div className="shelves" role="tablist" aria-label="Stencil shelves">
+      >
+        {/* The default menu also lists GitHub, Twitter and Discord links and Excalidraw+ ads; a classroom board does not need them. */}
+        <MainMenu>
+          <MainMenu.DefaultItems.LoadScene />
+          <MainMenu.DefaultItems.Export />
+          <MainMenu.DefaultItems.SaveAsImage />
+          <MainMenu.DefaultItems.SearchMenu />
+          <MainMenu.DefaultItems.Help />
+          <MainMenu.DefaultItems.ClearCanvas />
+          <MainMenu.Separator />
+          <MainMenu.DefaultItems.ToggleTheme />
+          <MainMenu.DefaultItems.ChangeCanvasBackground />
+        </MainMenu>
+      </Excalidraw>
+      {saveErr && <div className="saveerr" role="alert">Not saved: this browser's storage is full or blocked. Use the menu, Save to, so you keep this board.</div>}
+      {!ALL && <div className="shelves" role="tablist" aria-label="Stencil shelves">
         {shelves.map(function (n) {
           return <button key={n} role="tab" aria-selected={n === shelf} className={n === shelf ? 'on' : ''} onClick={function () { pick(n); }}>{n}</button>;
         })}
         <button className="add" onClick={addShelf} title="New shelf for a unit or concept">+ Shelf</button>
         {lib.current.shelves.indexOf(shelf) >= 0 && <button className="add" onClick={dropShelf} title="Delete this shelf">Delete shelf</button>}
-      </div>
+      </div>}
     </div>
   );
 }

@@ -17,7 +17,8 @@ function lessonList() {
   return win.MrD.lessons || [];
 }
 const extra = ['index.html', 'physics/index.html', 'chemistry/index.html', 'calculus/index.html', 'stats/index.html', 'stats/shared/kit-demo.html', 'teacher/index.html', 'portal/index.html',
-  'physics/lessons/teacher.html', 'chemistry/teacher.html'];
+  'physics/lessons/teacher.html', 'chemistry/teacher.html', 'calculus/teacher.html', 'stats/teacher.html',
+  'chemistry/whiteboard/index.html', 'stats/whiteboard/index.html'];
 
 (async () => {
   const pages = [];
