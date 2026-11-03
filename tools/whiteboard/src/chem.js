@@ -5,37 +5,9 @@
    buildLibrary(convert) -> Excalidraw library items. `convert` is Excalidraw's convertToExcalidrawElements.
    Each item is one group, so it moves and resizes as a single object. Ungroup (Ctrl+Shift+G) to edit parts. */
 
-var INK = '#1e1e1e';
-var BLUE = '#1971c2';
-var FONT = 6; /* Nunito */
-var seq = 0;
+import { INK, BLUE, rect, ellipse, text, line, arrow, labeled, makeItem } from './draw.js';
 
-function uid(p) { seq += 1; return p + '-' + seq; }
-
-/* ---------- skeleton helpers (each returns one skeleton element) ---------- */
-
-function style(o) {
-  var s = { strokeColor: INK, strokeWidth: 2, roughness: 0, backgroundColor: 'transparent', fillStyle: 'solid', opacity: 100 };
-  for (var k in o) s[k] = o[k];
-  return s;
-}
-function rect(x, y, w, h, o) { return style(Object.assign({ type: 'rectangle', x: x, y: y, width: w, height: h }, o)); }
-function ellipse(x, y, w, h, o) { return style(Object.assign({ type: 'ellipse', x: x, y: y, width: w, height: h }, o)); }
-function text(x, y, t, size, o) { return style(Object.assign({ type: 'text', x: x, y: y, text: t, fontSize: size || 20, fontFamily: FONT, strokeWidth: 1 }, o)); }
-function line(x, y, pts, o) { return style(Object.assign({ type: 'line', x: x, y: y, points: pts }, o)); }
-function arrow(x, y, pts, o) { return style(Object.assign({ type: 'arrow', x: x, y: y, points: pts, startArrowhead: null, endArrowhead: 'arrow' }, o)); }
-function labeled(x, y, w, h, t, size, o) {
-  return rect(x, y, w, h, Object.assign({ label: { text: t, fontSize: size || 14, fontFamily: FONT, strokeColor: INK } }, o));
-}
-
-/* ---------- one library item from skeletons ---------- */
-
-function item(convert, name, skeletons) {
-  var els = convert(skeletons);
-  var gid = uid('g');
-  els.forEach(function (e) { e.groupIds = [gid].concat(e.groupIds || []); });
-  return { id: 'chem:' + name, status: 'unpublished', created: Date.now(), name: name, elements: els };
-}
+function item(convert, name, skeletons) { return makeItem(convert, 'chem', name, skeletons); }
 
 /* ---------- electron configuration boxes ---------- */
 

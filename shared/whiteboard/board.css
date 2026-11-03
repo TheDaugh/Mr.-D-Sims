@@ -1,0 +1,10 @@
+/* Page chrome for every board (chem, stats): the shelf tabs along the bottom and the save warning.
+   The accent comes from --board-accent, set by each board's index.html. */
+html,body,#root{margin:0;height:100%;overflow:hidden;background:#fff}
+.shelves{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:5;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:calc(100vw - 440px);padding:6px;background:#fff;border:1px solid #ced4da;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.15);font:600 14px Nunito,system-ui,sans-serif}
+.shelves button{border:1px solid #ced4da;background:#f8f9fa;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;color:#1e1e1e}
+.shelves button.on{background:var(--board-accent,#14b8a6);border-color:var(--board-accent,#14b8a6);color:#fff}
+.shelves button.add{border-style:dashed;background:#fff;font-weight:500}
+.saveerr{position:fixed;top:0;left:0;right:0;z-index:20;background:#e03131;color:#fff;padding:8px 14px;font:600 15px Nunito,system-ui,sans-serif;text-align:center}
+/* The library panel's "Browse libraries" button goes to excalidraw.com; the board is meant to work without it. */
+.library-menu-browse-button{display:none!important}
