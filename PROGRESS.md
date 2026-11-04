@@ -3,6 +3,14 @@
 Update this at the end of every session. Newest entry first.
 
 
+## 2026-11-04: Stats lesson board for 3.4 (branch `stats-lesson-boards`)
+
+Added the lesson-board mode to the shared whiteboard: `stats/whiteboard/index.html#lesson=3.4` opens the whole 3.4 day pre-drawn in seven frames (warm-up and big question, percent out of 100, hops, predict, the rule and tails, examples, exit ticket and up next). Answers sit under orange covers (select, Delete). Saves under its own key; Start over redraws. Built from `tools/whiteboard/src/lessons/stats-3-4.js`; `app.jsx` has a `LESSONS` registry; `stats.js` now exports `graph`, `normal`, `ctext`. Linked from `stats/teacher.html`. Both boards' service-worker caches bumped to v4.
+
+Checks run: `node tests/lesson-board.e2e.js` (new) 8 of 8; `node tools/check-lessons.mjs --strict`; `node --test tests/unit/*.test.js`; `node tests/smoke.js`. Results are in the session reply.
+
+Context: Ian's feedback on 3.3 (students could not follow area = 1, the algebra, or copy-and-explain at once) led to the 3.4 pack built outside the repo: thinking notes, board script, R3.4, practice sheet, key and exit slips. Margin of error (T10) moved from slot 8 to slot 9; the slot 9 checker has not been changed. Not live until Ian merges.
+
 ## 2026-11-03: Stats board, and the chem board rebuilt as a shared board
 
 Ian asked for a whiteboard like the chem one for statistics, after the word-definition problem in 3.3: students do not get a definition from a sentence or from math, so the board has **word cards** (a term, one plain sentence, two examples with a check and one non-example with a cross) for the stats vocabulary, plus curve and routine stencils for direct-instruction days.
