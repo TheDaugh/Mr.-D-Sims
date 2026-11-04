@@ -90,6 +90,19 @@ window.UNITS = [
           { label: "Teacher key PDF", href: "../keys/calc/3-2-implicit-teacher.pdf" },
           { label: "Make-up notes PDF", href: "../keys/calc/3-2-implicit-makeup.pdf" }
         ]
+      },
+      {
+        type: "lesson",
+        icon: "🪞",
+        title: "3.3 Derivatives of Inverse Functions",
+        href: "unit-3-composite-implicit-inverse/3-3-inverse.html",
+        blurb: "Mirror a curve across y = x and watch its slope flip. Four hands-on stations, then problems. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["inverse functions", "self-paced", "interactive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-3-composite-implicit-inverse/3-3-inverse.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/3-3-inverse-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/3-3-inverse-makeup.pdf" }
+        ]
       }
     ]
   },

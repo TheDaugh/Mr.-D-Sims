@@ -6,7 +6,7 @@ const found = []; (function walk(d) { for (const e of fs.readdirSync(d, { withFi
 const specs = found.map(f => ({ d: path.relative(root, f), spec: require(f) }));
 function rng(seed) { let a = seed; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 for (const { d, spec } of specs) {
-  test(d + ': pacing is valid', () => assert.deepStrictEqual(pace.validate(spec.pacing), []));
+  test(d + ': pacing is valid', () => assert.deepStrictEqual(spec.selfPaced ? [] : pace.validate(spec.pacing), []))   // a self-paced lesson has no clock, so no pacing;
   test(d + ': targets are one sentence each and start with I can', () => spec.targets.forEach(t => { assert.match(t, /^I can /); assert.ok(t.length < 110, t); }));
   test(d + ': every generator gives a checkable item at every band, many seeds', () => {
     for (const sk of spec.skills || []) for (let b = 1; b <= 4; b++) for (let s = 0; s < 40; s++) {

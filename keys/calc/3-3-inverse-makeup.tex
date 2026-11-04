@@ -1,0 +1,66 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 3.3 Derivatives of Inverse Functions}\fancyhead[R]{\small Make-up key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{3.3 Derivatives of Inverse Functions}
+\textbf{You missed this lesson. Copy this into your notes. That is all you need to do.}\par\medskip
+\subsection*{Question of the day}
+If you mirror a curve across y = x, what happens to its slope?\par
+\subsection*{Targets}\begin{itemize}\item I can say how the points and slopes of f and its inverse are linked.
+\item I can find the slope of the inverse at a point using the derivative of f.
+\item I can write the tangent line to an inverse at a point.\end{itemize}
+\subsection*{Concepts}\begin{itemize}
+\item \textbf{Inverse points} ((a, b) on f  $\rightarrow$  (b, a) on f\textsuperscript{-1}): An inverse swaps inputs and outputs. If f(a) = b, then f\textsuperscript{-1}(b) = a.
+\item \textbf{The mirror} (rise ? run): The graph of f\textsuperscript{-1} is the graph of f mirrored across y = x. Mirroring swaps rise and run.
+\item \textbf{Reciprocal slopes} ((f\textsuperscript{-1})?(b) = 1 / f?(a)): Slopes at mirrored points are reciprocals. Flat becomes vertical.
+\item \textbf{Where to evaluate} (f(a) = b  $\rightarrow$  f?(a)): Find a first: solve f(a) = b. Put a into f?, not b.
+\item \textbf{Tangent to the inverse} (y -- a = (1 / f?(a))(x -- b)): The point is (b, a). The slope is 1 / f?(a).
+\end{itemize}
+\subsection*{What the class predicted, and what is true}\begin{itemize}
+\item The line $y=2x$ has slope 2. Mirror it across $y=x$. The new line has slope... \A{1/2.} The mirror swaps $x$ and $y$: $x=2y$, so $y=\tfrac12x$. Rise and run trade places.
+\item $f(x)=x^3$ has a flat tangent at the origin. After mirroring across $y=x$, that tangent becomes... \A{vertical.} Rise and run swap. A run with no rise (flat) becomes a rise with no run (vertical).
+\end{itemize}
+\section*{Huddle notes (answers filled in)}
+\subsection*{Definitions}\begin{itemize}
+\item \textbf{Inverse:} An inverse reverses \A{inputs} and outputs: if f(a) = b then f\textsuperscript{-1}(b) = \A{a}.
+\item \textbf{Mirror:} The graph of f\textsuperscript{-1} is the graph of f reflected across \A{y = x}.
+\item \textbf{Slopes:} A reflection swaps rise and run, so the two slopes are \A{reciprocals}.
+\end{itemize}
+\subsection*{Worked example}
+f(x) = x\textsuperscript{3} + x. Find (f\textsuperscript{-1})?(2).\\
+\begin{itemize}
+\item Solve f(a) = 2. By inspection a = \A{1}
+\item The derivative is 3x\textsuperscript{2} + 1, so at x = 1 it is \A{4}
+\item Flip it: (f\textsuperscript{-1})?(2) = \A{1/4}
+\end{itemize}
+\subsection*{Label the mirror}
+\begin{enumerate}
+\item The curve through (1, 2) is the graph of \A{f}.
+\item Its mirror through (2, 1) is the graph of \A{f\textsuperscript{-1}}.
+\item f has slope 4 at (1, 2), so f\textsuperscript{-1} has slope \A{1/4} at (2, 1).
+\end{enumerate}
+\section*{One worked sample of each skill}
+\subsection*{Flip the slope}
+\noindent\textbf{Level 1.} $f(3)=26$ and $f'(3)=4$. Find $(f^{-1})'(26)$.\\ \A{Answer: 0.25} \quad The inverse slope is the reciprocal: $\dfrac1{4}=0.25$.\par\medskip
+\noindent\textbf{Level 2.} $f(4)=-7$ and $f'(4)=-10$. Find $(f^{-1})'(-7)$.\\ \A{Answer: -0.1} \quad The reciprocal keeps the sign: $\dfrac1{-10}=-0.1$.\par\medskip
+\noindent\textbf{Level 3.} The table gives selected values of a one-to-one function $f$ and its derivative. Find $(f^{-1})'(18)$.\\ \A{Answer: 0.25} \quad $f(2)=18$, so use $f'(2)=4$. The answer is $\dfrac1{4}=0.25$.\par\medskip
+\noindent\textbf{Level 4.} The table gives selected values of a one-to-one function $f$ and its derivative. Find $(f^{-1})'(34)$.\\ \A{Answer: 0.1} \quad $f(3)=34$, so use $f'(3)=10$. The answer is $\dfrac1{10}=0.1$.\par\medskip
+\subsection*{Where does f? go}
+\noindent\textbf{Level 1.} $f(x)=x^{3}+2x$ and $f(1)=3$. To find $(f^{-1})'(3)$ you evaluate $f'$ at...\\ \A{(A) x = 1} \quad (B) x = 1/3 \quad (C) x = 2 \quad (D) x = 3\\ \A{Answer: A} \quad $f(1)=3$, so the input is 1. Evaluate $f'(1)$, then flip it.\par\medskip
+\noindent\textbf{Level 2.} $f(x)=x^{3}+x$ and $f(1)=2$. To find $(f^{-1})'(2)$ you evaluate $f'$ at...\\ (A) x = 2 \quad \A{(B) x = 1} \quad (C) x = 1/2 \quad (D) x = 10\\ \A{Answer: B} \quad $f(1)=2$, so the input is 1. Evaluate $f'(1)$, then flip it.\par\medskip
+\noindent\textbf{Level 3.} $f(x)=e^{x}+3x$ and $f(0)=1$. To find $(f^{-1})'(1)$ you evaluate $f'$ at...\\ (A) x = 1 \quad (B) x = 8 \quad (C) x = 1/1 \quad \A{(D) x = 0}\\ \A{Answer: D} \quad $f(0)=1$, so the input is 0. Evaluate $f'(0)$, then flip it.\par\medskip
+\noindent\textbf{Level 4.} $f(x)=e^{x}+3x$ and $f(0)=1$. To find $(f^{-1})'(1)$ you evaluate $f'$ at...\\ (A) x = 1/1 \quad (B) x = 1 \quad \A{(C) x = 0} \quad (D) x = 8\\ \A{Answer: C} \quad $f(0)=1$, so the input is 0. Evaluate $f'(0)$, then flip it.\par\medskip
+\subsection*{Slope of the inverse}
+\noindent\textbf{Level 1.} $f(x)=5x+4$. Find $(f^{-1})'(29)$.\\ \A{Answer: 0.2} \quad $f'(x)=5$ everywhere, so $(f^{-1})'=\dfrac1{5}=0.2$.\par\medskip
+\noindent\textbf{Level 2.} $f(x)=x^{3}+x$. Find $(f^{-1})'(2)$.\\ \A{Answer: 0.25} \quad $f(1)=2$. $f'(1)=4$. So $(f^{-1})'(2)=\dfrac1{4}=0.25$.\par\medskip
+\noindent\textbf{Level 3.} $f(x)=e^{3x}+x$. Find $(f^{-1})'(1)$.\\ \A{Answer: 0.25} \quad $f(0)=1$. $f'(0)=4$. So $(f^{-1})'(1)=\dfrac1{4}=0.25$.\par\medskip
+\noindent\textbf{Level 4.} $f(x)=e^{3x}+x$. Find $(f^{-1})'(1)$.\\ \A{Answer: 0.25} \quad $f(0)=1$. $f'(0)=4$. So $(f^{-1})'(1)=\dfrac1{4}=0.25$.\par\medskip
+\subsection*{Tangent to the inverse}
+\noindent\textbf{Level 1.} Write the tangent line to $f^{-1}$ at the point $(3,1)$.\\ \A{Answer: $\frac{1}{5} \left(x - 3\right) + 1$} \quad The point is $(3,1)$ and the slope is $\dfrac1{5}$. So $y=\dfrac1{5}(x-(3))+(1)$.\par\medskip
+\noindent\textbf{Level 2.} Write the tangent line to $f^{-1}$ at the point $(2,1)$.\\ \A{Answer: $\frac{1}{4} \left(x - 2\right) + 1$} \quad The point is $(2,1)$ and the slope is $\dfrac1{4}$. So $y=\dfrac1{4}(x-(2))+(1)$.\par\medskip
+\noindent\textbf{Level 3.} Write the tangent line to $f^{-1}$ at the point $(1,0)$.\\ \A{Answer: $\frac{1}{4} \left(x - 1\right) + 0$} \quad The point is $(1,0)$ and the slope is $\dfrac1{4}$. So $y=\dfrac1{4}(x-(1))+(0)$.\par\medskip
+\noindent\textbf{Level 4.} Write the tangent line to $f^{-1}$ at the point $(1,0)$.\\ \A{Answer: $\frac{1}{4} \left(x - 1\right) + 0$} \quad The point is $(1,0)$ and the slope is $\dfrac1{4}$. So $y=\dfrac1{4}(x-(1))+(0)$.\par\medskip
+\end{document}

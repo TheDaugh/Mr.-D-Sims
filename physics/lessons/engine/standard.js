@@ -21,6 +21,90 @@
   /* Start: ID card, targets, the day's tabs. */
   steps.push(K.startStep({ title: SPEC.title, question: SPEC.question, targets: SPEC.targets, tabs: SPEC.tabs }));
 
+  /* Self-paced lesson (SPEC.selfPaced): no clock, no trimming, no skipping, no end mark, no stamp or report code.
+     Every tab is required, in order. Progress saves per device, so a student can stop and finish the next day.
+     Warm-up is the spec's review items (3 at most). Explore is required and draws its own stations (opts.explore).
+     The Huddle tab keeps Mr. D's notes (no code, no clock) and adds the spec's mid-lesson check (SPEC.mid). */
+  if (SPEC.selfPaced) {
+    var mathQ = function (r, extra) { var q = { type: 'choice', math: MATH, head: r.title, prompt: r.prompt, options: r.options.map(opt), answer: r.answer, maxMiss: 2, worked: opt(r.why) }; q.id = r.id; for (var k in extra) q[k] = extra[k]; return q; };
+    var allDone = function (list) { return list.every(function (r) { return qdone(r.id); }); };
+    var review = (SPEC.review || []).slice(0, 3), mid = SPEC.mid || [], station = SPEC.exploreIds || [], obs = SPEC.observe || [];
+    steps.push({ id: 'warmup', label: T.warmup,
+      render: function (card, c) {
+        var S = c.S; K.head(card, T.warmup, 'I can show what I already know.', 'Up next: you make predictions.');
+        if (!S.band0) { S.band0 = 1; S.band = 1; S.bandLog.push('start:1'); LE.save(); }
+        review.forEach(function (r) { LE.ask(card, mathQ(r)); });
+      },
+      canLeave: function () { return allDone(review); },
+      teacher: function () { return '<p>Three easy review items, no placement. Everyone starts at band 1. Answers: ' + review.map(function (r) { return r.id + ' = ' + opt(r.options[r.answer]); }).join('; ') + '.</p>'; } });
+    steps.push({ id: 'predict', label: T.predict,
+      render: function (card, c) {
+        K.head(card, T.predict, 'I can predict before I test.', 'Up next: you explore three stations with your hands.');
+        SPEC.predicts.forEach(function (p) { LE.ask(card, mathQ(p, { maxMiss: 1 })); });
+      },
+      canLeave: function () { return allDone(SPEC.predicts); },
+      teacher: function () { return '<p>Correct: ' + SPEC.predicts.map(function (p) { return p.id + ' = ' + opt(p.options[p.answer]); }).join('; ') + '. One try each; the answer is explained after.</p>'; } });
+    steps.push({ id: 'explore', label: T.explore,
+      render: function (card, c) {
+        K.head(card, T.explore, SPEC.exploreTarget || SPEC.targets[0], 'Up next: notes with Mr. D, then problems.');
+        if (opts.explore) opts.explore(card, c, K);
+        obs.forEach(function (o) { LE.ask(card, mathQ({ id: o.id, title: 'What did you see?', prompt: o.prompt, options: o.options, answer: o.answer, why: o.why || '' }, { maxMiss: 1 })); });
+      },
+      canLeave: function () { return station.every(qdone) && allDone(obs); },
+      teacher: function () { return '<p>Required, in order, no clock. Each station is a hands-on item the student must solve. ' + (SPEC.exploreTeacher || '') + '</p>'; } });
+    steps.push({ id: 'huddle', label: T.huddle,
+      render: function (card, c) {
+        var S = c.S; K.head(card, 'Notes with Mr. D', SPEC.huddleTarget || SPEC.targets[0], 'Up next: problems at your level.');
+        S.d.hud = S.d.hud || {};
+        var host = el('div'); card.appendChild(host);
+        MrD.huddle.render(host, SPEC.huddle, S.d.hud, { key: c.key, onChange: function () { LE.save(); } });
+        if (mid.length) card.appendChild(el('h3', null, 'Check yourself'));
+        mid.forEach(function (r) { LE.ask(card, mathQ(r)); });
+      },
+      canLeave: function () { return allDone(mid); },
+      teacher: function () { return '<p>No clock and no code: the student reads the notes and fills the blanks at their own pace, then answers the mid-lesson check. Check answers: ' + mid.map(function (r) { return r.id + ' = ' + opt(r.options[r.answer]); }).join('; ') + '. Fill-in answers are in the make-up key PDF.</p>'; } });
+    steps.push({ id: 'build', label: T.build,
+      render: function (card, c) {
+        K.head(card, T.build, SPEC.buildTarget || SPEC.targets[0], 'Up next: endless practice at your level.');
+        var b = LE.band(); for (var i = 0; i < 4; i++) LE.ask(card, skillQ(SPEC.skills[i % SPEC.skills.length], b, 'b', i));
+      },
+      canLeave: function () { for (var i = 0; i < 4; i++) if (!qdone('b.' + i)) return false; return true; },
+      teacher: function () { return '<p>Four problems at the student’s band. Hints appear one at a time and point to a step; nothing is trimmed.</p>'; } });
+    steps.push({ id: 'practice', label: T.practice,
+      render: function (card, c) { K.head(card, T.practice, 'I can solve problems at my level.', 'Up next: a two-question check.'); K.morePractice(card, c); },
+      canLeave: function (c) { return (c.S.d.more && c.S.d.more.n || 0) >= 4; },
+      teacher: function () { return '<p>Practice never runs out. Everyone does at least four; the level moves with each answer.</p>'; } });
+    steps.push({ id: 'check', label: T.check,
+      render: function (card, c) {
+        K.head(card, T.check, 'I can do it without help.', 'Up next: your notes.');
+        var b = LE.band(); ['C1', 'C2'].forEach(function (id, i) { var q = skillQ(SPEC.skills[i], b, 'chk', i); q.id = id; q.maxMiss = 2; LE.ask(card, q); });
+      },
+      canLeave: function () { return qdone('C1') && qdone('C2'); },
+      teacher: function () { return '<p>Two questions at the student’s level, two tries each.</p>'; } });
+    steps.push({ id: 'notes', label: T.notes,
+      render: function (card, c) {
+        card.appendChild(el('h2', null, 'Wrap-up and notes'));
+        var ex = el('div', 'prose');
+        ex.innerHTML = '<p><b>My notes</b> is a study sheet the page writes from your own work: your predictions, your rule, your definitions and the problems you solved. Print it or save it as a PDF to study from.</p><p>Your work is saved in this browser. You can close the page at any time and open it again on this device to pick up where you stopped.</p>';
+        card.appendChild(ex);
+        var row = el('div', 'row'), v = el('button', 'btn primary', 'View my notes'); v.type = 'button'; v.onclick = function () { LE.setViewNotes(true); LE.render(); window.scrollTo(0, 0); };
+        var pr = el('button', 'btn', 'Print or save as PDF'); pr.type = 'button'; pr.onclick = function () { LE.print(); };
+        var tx = el('button', 'btn', 'Download LaTeX (.tex)'); tx.type = 'button'; tx.onclick = function () { LE.downloadTex(); };
+        row.appendChild(v); row.appendChild(pr); row.appendChild(tx); card.appendChild(row);
+        card.appendChild(el('h3', null, 'Keep practicing'));
+        card.appendChild(el('p', 'hint', 'The questions keep coming at your level, and each one goes into your notes. Stop whenever you are ready.'));
+        K.morePractice(card, c);
+        if (window.MrD && MrD.profile) MrD.profile.record(K.profileRecord(c.S));
+      },
+      canLeave: function () { return true; },
+      teacher: function (c) { return '<p>No stamp and no report code. Scores are saved on this device (<code>MrD.profile.record</code>). The lesson never ends by the clock: a student can stop and resume on the same device.</p>'; } });
+    var cfgSP = { id: ID, course: SPEC.course, version: 1, title: SPEC.title, subtitle: 'Online lesson · go at your own pace', identity: 'id', keypad: true, lock: true, selfPaced: true, maxBand: 3,
+      steps: steps, notes: null, concepts: SPEC.concepts, conceptTabs: null, gates: [] };
+    cfgSP.notes = function (c) { var d = notesDoc(c); return d; };
+    (window.LESSONS_REG = window.LESSONS_REG || {})[ID] = cfgSP;
+    return cfgSP;
+  }
+
   /* Warm-up doubles as placement: start at band 1, climb on first-try rights, stop at two misses (MrD.place). */
   steps.push({ id: 'warmup', label: T.warmup,
     render: function (card, c) {
