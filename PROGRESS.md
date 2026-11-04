@@ -25,6 +25,19 @@ For direct-instruction chem days: Ian writes the board notes on a whiteboard and
 - Not on `main` yet: branch `chem-whiteboard`. Netlify deploys when it merges. `app/app.js` is 8.1 MB (Excalidraw is big); Netlify serves it compressed.
 - Next: a chem version of the `di-day-builder` skill (script, notes, sheet, key, exit slip), using these stencils as the figure vocabulary.
 
+## 2026-11-04: calculus 3.3 Derivatives of Inverse Functions (self-paced, interactive)
+
+Ian asked for the next lesson to be more interactive than calculating, with the skipping removed so a student goes at his own pace and can finish the next day. Files: `calculus/unit-3-composite-implicit-inverse/3-3-inverse.{html,spec.js,content.js}`, keys `keys/calc/3-3-inverse-{makeup,teacher}.pdf`, hub card in `calculus/sims.js`, registry line in `shared/lessons.js`.
+
+- Engine: new opt-in `SPEC.selfPaced` in `standard.js`. No `pacing` at all: no clock, trim, skip, huddle code, end banner (`lesson.js` hides it when `cfg.selfPaced`), stamp or report code. Every tab is required, in order. Warm-up is the spec's 3 review items (`SPEC.review`), no placement; band starts at 1, three bands (`maxBand` 3). The Huddle tab keeps Mr. D's notes plus a required mid-lesson check (`SPEC.mid`). Wrap-up keeps endless practice and `MrD.profile.record`. Locked mode releases when the student reaches Wrap-up. Lessons without `selfPaced` are unchanged.
+- Resume: progress is the existing `le.<id>.v1` localStorage record, so the same device picks up where it stopped on any later day. The student ID reseeds the numbers on any device, but answers do not travel between devices.
+- Explore is four required stations built in `content.js` (custom items X1 to X4): mirror a point onto stars, swap rise and run in an orange triangle, a flat tangent turns vertical, and match slope partners. Each has a "How to read it" line. Two observe questions follow.
+- Skills: flip the slope (num, band 3 reads a table with decoy rows), where f′ goes (choice), slope of the inverse (num), tangent to the inverse (typed). Hints name a step card, do the first step, and show the same move on another example.
+- Tests: `tests/unit/inverse.test.js` checks each answer against f with a numeric derivative, never the inverse formula. `tests/lessons/3-3-inverse.e2e.js` replaces the five standard tests that assume placement, the clock huddle, trim and stamp, and adds stations, wrong-try messages, resume next evening and a #key tab sweep. `specs.test.js` skips pacing validation for self-paced specs; `build-keys.mjs` prints a self-paced outline.
+- Checks run: unit tests 220 of 220, `check-lessons --strict` 0 errors, lesson e2e 10 of 10, calc template e2e all passed, lock e2e (target added), smoke 41 pages. Screenshot of the Explore tab at 1366x768 looked at.
+- Not checked: the "term list" rule (DAY-RULES 13) has no coder test in this repo yet, so content words were not machine-checked. The three-band ramp is decided by the same bands code; whether the top band should equal the regular standard is Ian's call.
+- Not on `main` yet: branch `calc-3-3-inverse`. Netlify deploys when it merges.
+
 ## 2026-10-28: calculus 3.2 Implicit Differentiation (v2)
 
 Built from the calc template: `calculus/unit-3-composite-implicit-inverse/3-2-implicit.{html,spec.js,content.js}`, keys in `keys/calc/3-2-implicit-{makeup,teacher}.pdf`. Listed in both places: `shared/lessons.js` (teacher hub, added by the scaffolder) and `calculus/sims.js` (the student page). `templates/README.md` now says so as step 5.

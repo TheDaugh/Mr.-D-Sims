@@ -106,10 +106,18 @@ function v2Block(spec) {
 function teacher(spec) {
   const o = [head(spec, 'teacher')], P = spec.pacing || { steps: [], huddles: [], budgetMin: 0 };
   o.push('\\section*{' + tex(spec.title) + ' --- teacher key}', '\\textbf{Question:} ' + tex(spec.question) + '\\par');
+  if (spec.selfPaced) {
+    const list = (title, items) => { if (items && items.length) { o.push('\\subsection*{' + title + '}\\begin{itemize}'); items.forEach(p => o.push('\\item ' + tex(p.prompt) + ' \\A{' + tex(strip(p.options[p.answer])) + '.} ' + tex(p.why || ''))); o.push('\\end{itemize}'); } };
+    o.push('\\subsection*{Self-paced lesson}No clock, no trimming, no skipping, no end mark, no stamp. Every tab is required in order; progress saves on the device so a student can stop and finish the next day.\\par');
+    list('Warm-up review (3 easy items)', spec.review);
+    o.push('\\subsection*{Explore stations}Four hands-on stations (' + (spec.exploreIds || []).map(tex).join(', ') + '). Station answers are in the teacher view of the lesson page (add \\texttt{\\#key} to its address).\\par');
+    list('Explore: what did you see', spec.observe); list('Mid-lesson check (Huddle tab)', spec.mid);
+  } else {
   o.push('\\subsection*{Outline and pacing (' + P.budgetMin + ' min)}\\begin{tabular}{@{}llll@{}}\\toprule Tab & Priority & Minutes & If behind\\\\\\midrule');
   P.steps.forEach(s => o.push(tex(s.id) + ' & ' + s.prio + ' & ' + s.min + ' & ' + (s.prio === 1 ? 'never trimmed' : s.prio === 3 ? 'skipped first' : 'shrinks to ' + s.minItems + ' of ' + s.parts) + '\\\\'));
   (P.huddles || []).forEach(h => o.push('Huddle ' + tex(h.key) + ' & clock & minute ' + h.atMin + ' & pulled in by the clock\\\\'));
   o.push('\\bottomrule\\end{tabular}');
+  }
   o.push('\\subsection*{Targets}\\begin{itemize}' + spec.targets.map(t => '\\item ' + tex(t)).join('\n') + '\\end{itemize}');
   if (spec.predicts) { o.push('\\subsection*{Predictions}\\begin{itemize}'); spec.predicts.forEach(p => o.push('\\item ' + tex(p.prompt) + ' \\A{' + tex(strip(p.options[p.answer])) + '.} ' + tex(p.why))); o.push('\\end{itemize}'); }
   o.push('\\section*{Huddle script (answers in green)}', huddleBlock(spec, true));

@@ -67,5 +67,8 @@ window.MrD.lessons = [
     gates: [{ key: "h1", label: "Huddle" }], live: true },
   { course: "calc", id: "3-2-implicit", title: "3.2 Implicit Differentiation", unit: "unit-3-composite-implicit-inverse",
     href: "calculus/unit-3-composite-implicit-inverse/3-2-implicit.html", spec: "calculus/unit-3-composite-implicit-inverse/3-2-implicit.spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "calc", id: "3-3-inverse", title: "3.3 Derivatives of Inverse Functions", unit: "unit-3-composite-implicit-inverse",
+    href: "calculus/unit-3-composite-implicit-inverse/3-3-inverse.html", spec: "calculus/unit-3-composite-implicit-inverse/3-3-inverse.spec.js",
     gates: [{ key: "h1", label: "Huddle" }], live: true }
 ];

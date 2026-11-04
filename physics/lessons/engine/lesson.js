@@ -199,7 +199,7 @@
   function updateEndBar() {
     var b = $('endbar'); if (!b) return;
     var last = CFG.steps[CFG.steps.length - 1].id, c = LE.clock();
-    var show = !KEY && !!S.first && !S.ended && S.step !== last && c.needsEnd;
+    var show = !CFG.selfPaced && !KEY && !!S.first && !S.ended && S.step !== last && c.needsEnd;   // a self-paced lesson never forces an end
     if (show === !b.hidden) return;
     b.hidden = !show; b.textContent = '';
     if (!show) return;
@@ -554,7 +554,7 @@
     var i = stepIndex(S.step), st = CFG.steps[i]; S.max = Math.max(S.max || 0, i);
     var card = el('section', 'card'); card.dataset.step = st.id; stage.appendChild(card);
     if (KEY && st.teacher) { var kp = el('div', 'keypanel'); kp.appendChild(el('h4', null, 'Teacher key \u00b7 ' + st.label)); var inner = el('div'); html(inner, st.teacher(ctx())); kp.appendChild(inner); stage.insertBefore(kp, card); }
-    if (lockArmed) { if (i === CFG.steps.length - 1 && LE.canEnd()) lockFinish(); else LessonLock.save(i, false, null); }   // progress itself saves in S; the lock only needs to know where the student is
+    if (lockArmed) { if (i === CFG.steps.length - 1 && (LE.canEnd() || CFG.selfPaced)) lockFinish(); else LessonLock.save(i, false, null); }   // progress itself saves in S; the lock only needs to know where the student is
     st.render(card, ctx());
     if (i === 0 && lockWanted() && !lockArmed) card.appendChild(el('p', 'hint', '\ud83d\udd12 Locked mode. This lesson runs in fullscreen while class is on. Leaving it (Esc, a new tab, another window, closing the page) is recorded on your stamp. The second time, your screen locks until Mr. D gives you a code.'));
     if (i === CFG.steps.length - 1 && LE.canEnd() && S.lockExits != null) card.appendChild(el('p', 'hint', 'Times you left the lesson: ' + S.lockExits + ' \u00b7 time away ' + Math.floor(S.lockAway / 60) + ':' + ('0' + (S.lockAway % 60)).slice(-2)));
