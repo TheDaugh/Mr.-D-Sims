@@ -58,6 +58,7 @@
       <h2 style="margin:0 0 6px">Photoelectron lab: unlock PIN</h2>
       <p class="hint">When a student's screen locks, you type this PIN on it. Pick 4 to 8 digits here. The page shows one line (a hash, never the PIN). Paste it into <code>chemistry/virtual-lab/content/config.json</code>, next to <code>modeVerifiers</code>, and push. Or run <code>node tools/pes-pin.mjs &lt;pin&gt;</code>.</p>
       <div class="controls"><input id="pinIn" inputmode="numeric" maxlength="8" aria-label="PIN" style="width:8em"><button id="pinMake">Make the line</button></div>
+      <p id="pinNow" class="good"></p>
       <pre id="pinOut" class="fbtext" style="margin-top:8px"></pre>
     </section>
     <section class="card" id="foilCard" style="margin-top:16px" hidden>

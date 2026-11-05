@@ -247,4 +247,11 @@ $("#pinMake").addEventListener("click", async () => {
   const hex = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("pes-pin:" + pin)).then((b) => [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join(""));
   $("#pinOut").textContent = `"pesPinHash": "${hex}"`;
 });
+// Show the PIN in use. Only a hash is stored, so find it by trying every 4-digit PIN (about a second). shortcut: 5 to 8 digit PINs are not shown, use the box above to check one.
+(async () => {
+  const want = (await J("content/config.json").catch(() => ({}))).pesPinHash, out = $("#pinNow"), hex = async (s) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map((x) => x.toString(16).padStart(2, "0")).join("");
+  if (!want) { out.textContent = "No PIN is set yet. Make one above."; return; }
+  for (let i = 0; i < 10000; i++) { const p = String(i).padStart(4, "0"); if (await hex("pes-pin:" + p) === want) { out.textContent = "PIN in use: " + p; return; } }
+  out.textContent = "The PIN in use is longer than 4 digits, so it is not shown here.";
+})();
 window.__teacher = { load, rows: () => rows, heat: () => heat, foil: () => foil, pes: () => pes };
