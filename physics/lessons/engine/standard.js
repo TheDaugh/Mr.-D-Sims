@@ -46,15 +46,16 @@
       teacher: function () { return '<p>Correct: ' + SPEC.predicts.map(function (p) { return p.id + ' = ' + opt(p.options[p.answer]); }).join('; ') + '. One try each; the answer is explained after.</p>'; } });
     steps.push({ id: 'explore', label: T.explore,
       render: function (card, c) {
-        K.head(card, T.explore, SPEC.exploreTarget || SPEC.targets[0], 'Up next: notes with Mr. D, then problems.');
+        K.head(card, T.explore, SPEC.exploreTarget || SPEC.targets[0], 'Up next: notes, then problems.');
         if (opts.explore) opts.explore(card, c, K);
         obs.forEach(function (o) { LE.ask(card, mathQ({ id: o.id, title: 'What did you see?', prompt: o.prompt, options: o.options, answer: o.answer, why: o.why || '' }, { maxMiss: 1 })); });
       },
       canLeave: function () { return station.every(qdone) && allDone(obs); },
       teacher: function () { return '<p>Required, in order, no clock. Each station is a hands-on item the student must solve. ' + (SPEC.exploreTeacher || '') + '</p>'; } });
-    steps.push({ id: 'huddle', label: T.huddle,
+    steps.push({ id: 'huddle', label: 'Notes',   /* same step id as the class version, so saved work and tests line up; a solo student reads and fills in, no teacher talk */
       render: function (card, c) {
-        var S = c.S; K.head(card, 'Notes with Mr. D', SPEC.huddleTarget || SPEC.targets[0], 'Up next: problems at your level.');
+        var S = c.S; K.head(card, 'Notes', SPEC.huddleTarget || SPEC.targets[0], 'Up next: problems at your level.');
+        card.appendChild(el('p', 'hint', 'Read each definition and the example, and fill in the blanks. Take your time: nothing here is timed.'));
         S.d.hud = S.d.hud || {};
         var host = el('div'); card.appendChild(host);
         MrD.huddle.render(host, SPEC.huddle, S.d.hud, { key: c.key, onChange: function () { LE.save(); } });
@@ -62,7 +63,7 @@
         mid.forEach(function (r) { LE.ask(card, mathQ(r)); });
       },
       canLeave: function () { return allDone(mid); },
-      teacher: function () { return '<p>No clock and no code: the student reads the notes and fills the blanks at their own pace, then answers the mid-lesson check. Check answers: ' + mid.map(function (r) { return r.id + ' = ' + opt(r.options[r.answer]); }).join('; ') + '. Fill-in answers are in the make-up key PDF.</p>'; } });
+      teacher: function () { return '<p>The Notes tab (the huddle content, for a solo student): no clock, no code, no teacher talk. The student reads the notes and fills the blanks at their own pace, then answers the mid-lesson check. Check answers: ' + mid.map(function (r) { return r.id + ' = ' + opt(r.options[r.answer]); }).join('; ') + '. Fill-in answers are in the make-up key PDF.</p>'; } });
     steps.push({ id: 'build', label: T.build,
       render: function (card, c) {
         K.head(card, T.build, SPEC.buildTarget || SPEC.targets[0], 'Up next: endless practice at your level.');
@@ -199,7 +200,7 @@
     pl.defs.concat(pl.example, pl.tags).forEach(function (line) { hb.push({ type: 'p', text: line }); });
     var filled = Object.keys(hud).filter(function (k) { return hud[k]; }).map(function (k) { return hud[k]; });
     if (filled.length) hb.push({ type: 'box', label: 'My filled-in blanks:', text: filled.join(' · ') });
-    secs.push({ title: 'Huddle notes', blocks: hb });
+    secs.push({ title: SPEC.selfPaced ? 'Notes' : 'Huddle notes', blocks: hb });
     var log = ((S.d.more && S.d.more.log) || []).map(function (x) { return { type: 'box', label: x.title + ':', text: x.p + ' → ' + x.a + '. ' + x.w }; });
     secs.push({ title: 'Problems I solved', blocks: log.length ? log : [{ type: 'p', text: 'Your solved problems appear here.' }] });
     var sk = Object.keys(S.skip || {}); if (sk.length) secs.push({ title: 'Do at home', blocks: [{ type: 'list', items: sk.map(function (k) { return 'Finish the ' + k + ' tab.'; }) }] });
