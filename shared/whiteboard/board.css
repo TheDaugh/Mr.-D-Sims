@@ -2,6 +2,8 @@
    The accent comes from --board-accent, set by each board's index.html. */
 html,body,#root{margin:0;height:100%;overflow:hidden;background:#fff}
 .shelves{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:5;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:calc(100vw - 440px);padding:6px;background:#fff;border:1px solid #ced4da;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.15);font:600 14px Nunito,system-ui,sans-serif}
+.shelves.frames{bottom:58px;flex-wrap:nowrap;max-width:calc(100vw - 60px);font-size:13px}
+.shelves.frames button{white-space:nowrap;padding:5px 10px}
 .shelves button{border:1px solid #ced4da;background:#f8f9fa;border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit;color:#1e1e1e}
 .shelves button.on{background:var(--board-accent,#14b8a6);border-color:var(--board-accent,#14b8a6);color:#fff}
 .shelves button.add{border-style:dashed;background:#fff;font-weight:500}

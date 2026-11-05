@@ -319,4 +319,4 @@ var SHELVES = [
   { name: 'Routines', prefixes: ['Routines'] }
 ];
 
-export { buildLibrary, SHELVES };
+export { buildLibrary, SHELVES, graph, normal, ctext };

@@ -15,6 +15,7 @@ Run from the repo root with a static server (`python3 -m http.server 8123`). Pla
 | `TZ=America/New_York node tests/vlab-standard.e2e.js [lab]` | The virtual lab standard on all six labs: the demo plays to the end, `#key` skips the name screen and pre-lab, the hash restarts the page, and (labs with huddles) the bell calls huddle 1 at minute 3 and huddle 2 at minute 25. |
 | `node tests/stats-kit.e2e.js` | The shared stats widgets on `stats/shared/kit-demo.html`: curve (hidden readout, snap, keyboard), z-table (wrong row/column/side, inverse), tiles (mouse, touch, tap, keyboard), ruler, dot plot, histogram, and the Concepts tabs. `SHOTS=<dir>` writes 1366×768 screenshots. |
 | `node tools/build-toolkit.mjs` | Writes the one-page printable (`keys/stats/toolkit.pdf`) and fails if it spills past one page. |
+| `[LESSON=3.5\|3.6] PLAYWRIGHT_DIR=<path> node tests/lesson-board.e2e.js` | The stats lesson board (`stats/whiteboard/index.html#lesson=<id>`, default 3.4; 3.4 has seven frames, 3.5 and 3.6 five): answer covers, frame buttons scroll, a revealed answer survives a reload, the lesson saves under its own key, Start over redraws it, no console errors or outside requests. |
 | `node tests/smoke.js` | Every lesson, hub, teacher page and the portal load with no JavaScript errors (`KEY=1` also opens each lesson at `#key`). |
 
 ## New lesson checklist (spec-based, preferred)

@@ -18,6 +18,16 @@ Shelves: the Library panel is one flat list, so the board shows one shelf at a t
 - **Menu**: only Open, Save to, Export image, Find, Help, Reset the canvas, Dark mode. The Excalidraw defaults (GitHub, social links, ads) are removed, and the Library's "Browse libraries" button (which goes to excalidraw.com) is hidden.
 - **Offline**: each board has a service worker (`sw.js`) that caches it after the first visit. In Chrome, menu > Cast, save and share > Install page as app gives a window of its own.
 
+## Lesson boards
+
+A lesson board is the stats board with a whole lesson already drawn, in teaching order, so the teacher writes, scrolls and explains instead of drawing. Open it with `#lesson=<id>`, for example `stats/whiteboard/index.html#lesson=3.4` (linked from `stats/teacher.html`).
+
+- **Frames**: one screen each (Warm-up, Part 1, Part 2, Part 3 in three frames, Exit and up next). The buttons along the bottom jump to a frame.
+- **Answers**: every blank the students fill in has the answer under an orange cover. Select the cover and press Delete to reveal it.
+- **Saving**: each lesson board saves under its own key (`mrd-stats-lesson-3.4-v1`), so it never overwrites the plain board. Start over (last button) erases it and redraws the lesson.
+- **Shelves**: only the shelves the lesson uses (Normal curve, Routines, Graph tools) show.
+- **Source**: `tools/whiteboard/src/lessons/stats-3-4.js` (frames drawn with the same `graph` and `normal` helpers as the stencils; numbers match the 3.4 thinking notes and board script). Rebuild with `node tools/whiteboard/build.mjs`. A new lesson board is a new file in `lessons/` plus one line in `LESSONS` in `app.jsx`.
+
 ## Chem stencils (36)
 
 | Group | Items |

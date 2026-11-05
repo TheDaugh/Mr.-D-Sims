@@ -4,6 +4,9 @@ import { Excalidraw, MainMenu, convertToExcalidrawElements, serializeAsJSON, res
 import '@excalidraw/excalidraw/index.css';
 import * as chem from './chem.js';
 import * as stats from './stats.js';
+import * as lesson34 from './lessons/stats-3-4.js';
+import * as lesson35 from './lessons/stats-3-5.js';
+import * as lesson36 from './lessons/stats-3-6.js';
 
 /* One app, one bundle, several boards. The page says which one (window.MRD_BOARD). The chem keys keep their old
    names so the boards and shelves already saved in a browser still load. */
@@ -13,9 +16,15 @@ var BOARDS = {
 };
 var BOARD = BOARDS[window.MRD_BOARD] || BOARDS.chem;
 var buildLibrary = BOARD.lib.buildLibrary, SHELVES = BOARD.lib.SHELVES;
+/* A lesson board is a board with a whole lesson pre-drawn in frames (stats.html#lesson=3.4). It saves under its own key, so the
+   plain board and each lesson board never overwrite one another. */
+var LESSONS = { stats: { '3.4': lesson34, '3.5': lesson35, '3.6': lesson36 } };
+var LESSON_ID = (location.hash.match(/^#lesson=([\w.]+)/) || [])[1];
+var LESSON = ((LESSONS[window.MRD_BOARD] || {})[LESSON_ID]) || null;
+var ACTIVE = LESSON ? SHELVES.filter(function (s) { return LESSON.SHELVES.indexOf(s.name) >= 0; }) : SHELVES;
 var ALL = location.hash === '#all'; /* every stencil laid out in a grid, never saved; for checking and for printing a stencil sheet */
 
-var KEY = BOARD.key;
+var KEY = LESSON ? 'mrd-stats-lesson-' + LESSON_ID + '-v1' : BOARD.key;
 var LIB_KEY = BOARD.libKey; /* your own shelves and the stencils you add to them */
 
 /* The Library panel is one flat list, so the board keeps shelves itself and shows one shelf at a time.
@@ -26,7 +35,7 @@ function loadLib() {
     var d = JSON.parse(localStorage.getItem(LIB_KEY) || 'null');
     if (d && d.shelves && d.items) return d;
   } catch (e) { /* fall through to a fresh shelf list */ }
-  return { shelves: [], items: [], last: SHELVES[0].name };
+  return { shelves: [], items: [], last: ACTIVE[0].name };
 }
 function saveLib(lib) { try { localStorage.setItem(LIB_KEY, JSON.stringify(lib)); } catch (e) { /* storage full or blocked */ } }
 function shelfOf(item) {
@@ -52,7 +61,7 @@ function App() {
   var builtin = useRef(null);
   var shown = useRef(false); /* true once the current shelf has been pushed into the panel */
   var [shelf, setShelf] = useState(lib.current.last);
-  var [shelves, setShelves] = useState(SHELVES.map(function (s) { return s.name; }).concat(lib.current.shelves));
+  var [shelves, setShelves] = useState(ACTIVE.map(function (s) { return s.name; }).concat(lib.current.shelves));
 
   var show = useCallback(function (name) {
     var api = apiRef.current;
@@ -68,12 +77,25 @@ function App() {
   var onApi = useCallback(function (api) {
     apiRef.current = api;
     if (!api) return;
-    if (ALL) window.MRD_API = api; /* for the stencil check (tests and screenshots) */
+    if (ALL || LESSON) window.MRD_API = api; /* for the stencil and lesson checks (tests and screenshots) */
     builtin.current = buildLibrary(convertToExcalidrawElements);
-    var start = shelves.indexOf(lib.current.last) >= 0 ? lib.current.last : SHELVES[0].name;
+    var start = shelves.indexOf(lib.current.last) >= 0 ? lib.current.last : ACTIVE[0].name;
     setShelf(start);
     show(start);
+    if (LESSON && !saved.current) setTimeout(function () { goFrame(0); }, 250);
   }, [show]);
+
+  /* Lesson boards: jump to a frame (one screen of the lesson). */
+  function goFrame(i) {
+    var api = apiRef.current; if (!api) return;
+    var el = api.getSceneElements().filter(function (e) { return e.id === 'lesson-frame-' + i; })[0];
+    if (el) api.scrollToContent(el, { fitToViewport: true, viewportZoomFactor: 0.94, animate: true, duration: 300 });
+  }
+  function resetLesson() {
+    if (!window.confirm('Start this lesson board over? Everything you wrote on it will be erased.')) return;
+    try { localStorage.removeItem(KEY); } catch (e) { /* nothing to clear */ }
+    latest.current = null; location.reload();
+  }
 
   /* Items added to or deleted from the panel while a shelf is open belong to that shelf. */
   var onLibraryChange = useCallback(function (items) {
@@ -98,7 +120,7 @@ function App() {
     lib.current.shelves = lib.current.shelves.filter(function (x) { return x !== shelf; });
     lib.current.items = lib.current.items.filter(function (it) { return it.shelf !== shelf; });
     saveLib(lib.current);
-    setShelves(shelves.filter(function (x) { return x !== shelf; })); pick(SHELVES[0].name);
+    setShelves(shelves.filter(function (x) { return x !== shelf; })); pick(ACTIVE[0].name);
   };
 
   /* Autosave. The save waits 800 ms after the last change, so a tab closed inside that window used to lose the last
@@ -147,7 +169,9 @@ function App() {
     });
     allEls = out;
   }
-  var init = ALL ? { elements: allEls, appState: { viewBackgroundColor: '#ffffff' }, scrollToContent: true } : saved.current
+  var preset = null;
+  if (LESSON && !ALL && !saved.current) preset = { elements: LESSON.build(convertToExcalidrawElements), appState: { viewBackgroundColor: '#ffffff', objectsSnapModeEnabled: true, currentItemStrokeWidth: 2, currentItemRoughness: 0, currentItemFontFamily: 6, currentItemFontSize: 28 } };
+  var init = preset ? preset : ALL ? { elements: allEls, appState: { viewBackgroundColor: '#ffffff' }, scrollToContent: true } : saved.current
     ? { elements: saved.current.elements, appState: Object.assign({}, saved.current.appState, { openSidebar: { name: 'default', tab: 'library' } }), scrollToContent: true }
     : { elements: [], appState: { openSidebar: { name: 'default', tab: 'library' }, objectsSnapModeEnabled: true, currentItemStrokeWidth: 2, currentItemRoughness: 0, currentItemFontFamily: 6, currentItemFontSize: 20 } };
 
@@ -175,6 +199,10 @@ function App() {
         </MainMenu>
       </Excalidraw>
       {saveErr && <div className="saveerr" role="alert">Not saved: this browser's storage is full or blocked. Use the menu, Save to, so you keep this board.</div>}
+      {LESSON && !ALL && <div className="shelves frames" role="toolbar" aria-label="Lesson frames">
+        {LESSON.FRAMES.map(function (n, i) { return <button key={n} onClick={function () { goFrame(i); }}>{n}</button>; })}
+        <button className="add" onClick={resetLesson} title="Erase what you wrote and redraw the lesson">Start over</button>
+      </div>}
       {!ALL && <div className="shelves" role="tablist" aria-label="Stencil shelves">
         {shelves.map(function (n) {
           return <button key={n} role="tab" aria-selected={n === shelf} className={n === shelf ? 'on' : ''} onClick={function () { pick(n); }}>{n}</button>;

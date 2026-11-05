@@ -3,6 +3,22 @@
 Update this at the end of every session. Newest entry first.
 
 
+## 2026-11-05: Stats lesson boards for 3.5 and 3.6 (branch `stats-lesson-boards`)
+
+Added `stats/whiteboard/index.html#lesson=3.5` (percent below, above, between with normalcdf; hops and the standard normal) and `#lesson=3.6` (area or boundary, percentile, invNorm; hops and a lost mean or SD, the Could-tier segment). Five frames each: launcher and story, Parts 1-3, feedback key / exit slip / transfer. Answers under orange covers; numbers match the printed packs (generated and asserted with scipy). New `tools/whiteboard/src/lessons/stats-3-5.js`, `stats-3-6.js` and a small shared `stats-kit.js` (3.4 keeps its own copy). Registered in `app.jsx`, linked from `stats/teacher.html`, both boards' service-worker caches bumped to v5, bundle rebuilt (`shared/whiteboard/app/app.js`). `tests/lesson-board.e2e.js` now takes `LESSON=3.4|3.5|3.6`.
+
+Checks run: `LESSON=3.4/3.5/3.6 node tests/lesson-board.e2e.js` 8 of 8 each; `node tools/check-lessons.mjs --strict` (0 errors); `node --test tests/unit/*.test.js` 210 pass; `node tests/smoke.js` 40 pages load clean. Not run: template e2e and lock e2e (no guided lesson was added).
+
+Context: the 3.5 and 3.6 print packs (thinking notes, board script, R3.5/R3.6, practice, key, exit slips) were built outside the repo. Margin of error (T10) stays in slot 9. Not live until Ian merges.
+
+## 2026-11-04: Stats lesson board for 3.4 (branch `stats-lesson-boards`)
+
+Added the lesson-board mode to the shared whiteboard: `stats/whiteboard/index.html#lesson=3.4` opens the whole 3.4 day pre-drawn in seven frames (warm-up and big question, percent out of 100, hops, predict, the rule and tails, examples, exit ticket and up next). Answers sit under orange covers (select, Delete). Saves under its own key; Start over redraws. Built from `tools/whiteboard/src/lessons/stats-3-4.js`; `app.jsx` has a `LESSONS` registry; `stats.js` now exports `graph`, `normal`, `ctext`. Linked from `stats/teacher.html`. Both boards' service-worker caches bumped to v4.
+
+Checks run: `node tests/lesson-board.e2e.js` (new) 8 of 8; `node tools/check-lessons.mjs --strict`; `node --test tests/unit/*.test.js`; `node tests/smoke.js`. Results are in the session reply.
+
+Context: Ian's feedback on 3.3 (students could not follow area = 1, the algebra, or copy-and-explain at once) led to the 3.4 pack built outside the repo: thinking notes, board script, R3.4, practice sheet, key and exit slips. Margin of error (T10) moved from slot 8 to slot 9; the slot 9 checker has not been changed. Not live until Ian merges.
+
 ## 2026-11-03: Stats board, and the chem board rebuilt as a shared board
 
 Ian asked for a whiteboard like the chem one for statistics, after the word-definition problem in 3.3: students do not get a definition from a sentence or from math, so the board has **word cards** (a term, one plain sentence, two examples with a check and one non-example with a cross) for the stats vocabulary, plus curve and routine stencils for direct-instruction days.
