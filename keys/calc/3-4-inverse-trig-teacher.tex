@@ -1,0 +1,81 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 3.4 Derivatives of Inverse Trigonometric Functions}\fancyhead[R]{\small Teacher key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{3.4 Derivatives of Inverse Trigonometric Functions --- teacher key}
+\textbf{Question:} How fast does an angle change when its sine, or its tangent, changes?\par
+\subsection*{Self-paced lesson}No clock, no trimming, no skipping, no end mark, no stamp. Every tab is required in order; progress saves on the device so a student can stop and finish the next day.\par
+\subsection*{Warm-up review (3 easy items)}\begin{itemize}
+\item The derivative of $\sin(5x)$ is... \A{5cos(5x).} Chain rule: the outside gives $\cos(5x)$, and the inside $5x$ brings a factor 5.
+\item If $\sin y = x$, then differentiating both sides with respect to $x$ gives... \A{cos y $\cdot$ dy/dx = 1.} Every $y$ term gets a factor $\tfrac{dy}{dx}$. The derivative of $\sin y$ is $\cos y\cdot\tfrac{dy}{dx}$, and the derivative of $x$ is 1.
+\item A right triangle has hypotenuse 5 and one leg 3. The other leg is... \A{4.} Pythagorean theorem: $3^2+4^2=5^2$, so the other leg is 4.
+\end{itemize}
+\subsection*{Explore stations}Four hands-on stations (X1, X2, X3, X4). Station answers are in the teacher view of the lesson page (add \texttt{\#key} to its address).\par
+\subsection*{Explore: what did you see}\begin{itemize}
+\item In Station 3, the slope of arctan was largest at $x=$... \A{0.} The slope was 1 at $x=0$ and got smaller as $x$ moved away.
+\item In Station 4, at the same $x$, the slope of arccos compared with the slope of arcsin was... \A{the opposite sign and the same size.} The two slopes were $1.25$ and $-1.25$, then $1.67$ and $-1.67$: same size, opposite sign.
+\end{itemize}
+\subsection*{Mid-lesson check (Huddle tab)}\begin{itemize}
+\item For $y=\arctan(4x)$, the derivative $y'$ is... \A{4 / (1 + 16x\textsuperscript{2}).} Chain rule: $u=4x$, $u'=4$, and $u^2=16x^2$. So $y'=\dfrac{4}{1+16x^2}$.
+\item For $y=\arcsin(2x)$, the expression under the square root is... \A{1 -- 4x\textsuperscript{2}.} Square the whole inside: $(2x)^2=4x^2$, not $2x^2$.
+\end{itemize}
+\subsection*{Targets}\begin{itemize}\item I can say what arcsin, arccos and arctan mean.
+\item I can find the derivative of an inverse trig function, with the chain rule.
+\item I can find a slope or a tangent line for an inverse trig curve.\end{itemize}
+\subsection*{Predictions}\begin{itemize}
+\item Sine has a flat tangent at its peak. Mirror that piece across $y=x$. At $x=1$, the arcsin curve has a tangent that is... \A{vertical.} Rise and run swap in a mirror. A flat tangent becomes a vertical tangent, so the slope of arcsin grows without bound near $x=1$.
+\item The graph of arctan levels off for large $x$. As $x$ gets larger, its slope gets... \A{closer to 0.} A curve that levels off has a tangent that gets flatter and flatter, so the slope heads toward 0.
+\end{itemize}
+\section*{Huddle script (answers in green)}
+\subsection*{Definitions}\begin{itemize}
+\item \textbf{arcsin x:} The \A{angle} whose sine is x. It is not 1/sin x.
+\item \textbf{Inverse rule:} If y = arcsin x, then sin y = \A{x}. Differentiate both sides to find dy/dx.
+\item \textbf{The three rules:} arcsin: 1/$\surd$(1 -- x\textsuperscript{2}). arccos: \A{--1}/$\surd$(1 -- x\textsuperscript{2}). arctan: 1/(1 + \A{x\textsuperscript{2}}).
+\item \textbf{Chain rule:} Put u in for x, then multiply by \A{u?}. Square the \A{whole inside}.
+\end{itemize}
+\subsection*{Worked example}
+Differentiate y = arcsin(3x).\\
+\begin{itemize}
+\item The inside is u = \A{3x}
+\item Its derivative is u? = \A{3}
+\item Square the whole inside: u\textsuperscript{2} = \A{9x\textsuperscript{2}}
+\item So dy/dx = 3 / $\surd$(1 -- 9x\textsuperscript{2})
+\end{itemize}
+\subsection*{Label the triangle}
+\begin{enumerate}
+\item The longest side has length \A{1}.
+\item The side opposite y has length \A{x}.
+\item The third side has length \A{$\surd$(1 -- x\textsuperscript{2})}.
+\end{enumerate}
+\section*{Every level, with answers}
+\subsection*{Differentiate}
+\noindent\textbf{Level 1.} Differentiate.\\ \A{Answer: $\frac{-1}{\sqrt{1 - x^{2}}}$} \quad Use the arccos rule directly.\par\medskip
+\noindent\textbf{Level 2.} Differentiate.\\ \A{Answer: $\frac{5}{\sqrt{1 - \left(5 x\right)^{2}}}$} \quad The inside is $u=5x$ and $u'=5$. Put them in the arcsin rule.\par\medskip
+\noindent\textbf{Level 3.} Differentiate.\\ \A{Answer: $\frac{2 x}{1 + \left(x^{2}\right)^{2}}$} \quad The inside is $u=x^{2}$ and $u'=2x$. Put them in the arctan rule.\par\medskip
+\noindent\textbf{Level 4.} Differentiate.\\ \A{Answer: $\frac{\frac{-1}{x^{2}}}{1 + \left(\frac{1}{x}\right)^{2}}$} \quad The inside is $u=\dfrac1x$ and $u'=-\dfrac1{x^2}$. Put them in the arctan rule.\par\medskip
+\subsection*{Slope at a point}
+\noindent\textbf{Level 1.} $y=\arctan\,x$. Find $\dfrac{dy}{dx}$ at $x=3$.\\ \A{Answer: 0.1} \quad $u(3)=3$ and $u'(3)=1$. Put them in the arctan rule: the slope is $0.1$.\par\medskip
+\noindent\textbf{Level 2.} $y=\arcsin\left(5x\right)$. Find $\dfrac{dy}{dx}$ at $x=0.12$.\\ \A{Answer: 6.25} \quad $u(0.12)=0.6$ and $u'(0.12)=5$. Put them in the arcsin rule: the slope is $6.25$.\par\medskip
+\noindent\textbf{Level 3.} $y=\arcsin\left(0.6e^{x}\right)$. Find $\dfrac{dy}{dx}$ at $x=0$.\\ \A{Answer: 0.75} \quad $u(0)=0.6$ and $u'(0)=0.6$. Put them in the arcsin rule: the slope is $0.75$.\par\medskip
+\noindent\textbf{Level 4.} $y=\arcsin\left(0.6e^{x}\right)$. Find $\dfrac{dy}{dx}$ at $x=0$.\\ \A{Answer: 0.75} \quad $u(0)=0.6$ and $u'(0)=0.6$. Put them in the arcsin rule: the slope is $0.75$.\par\medskip
+\subsection*{Spot the right rule}
+\noindent\textbf{Level 1.} Which expression is $\dfrac{dy}{dx}$ for $y=\arccos\,x$?\\ (A) 1 / (1 + x\textsuperscript{2}) \quad (B) --1 / $\surd$(1 -- x) \quad (C) 1 / $\surd$(1 -- x\textsuperscript{2}) \quad \A{(D) --1 / $\surd$(1 -- x\textsuperscript{2})}\\ \A{Answer: D} \quad The inside is $u=x$, so $u'=1$ and $u^2=x^2$. The arccos rule gives --1 / $\surd$(1 -- x\textsuperscript{2}).\par\medskip
+\noindent\textbf{Level 2.} Which expression is $\dfrac{dy}{dx}$ for $y=\arcsin\left(5x\right)$?\\ \A{(A) 5 / $\surd$(1 -- 25x\textsuperscript{2})} \quad (B) 5 / (1 + 25x\textsuperscript{2}) \quad (C) 5 / $\surd$(1 -- 5x) \quad (D) 1 / $\surd$(1 -- 25x\textsuperscript{2})\\ \A{Answer: A} \quad The inside is $u=5x$, so $u'=5$ and $u^2=25x^2$. The arcsin rule gives 5 / $\surd$(1 -- 25x\textsuperscript{2}).\par\medskip
+\noindent\textbf{Level 3.} Which expression is $\dfrac{dy}{dx}$ for $y=\arctan\left(x^{2}\right)$?\\ (A) 1 / (1 + x?) \quad (B) 2x / (1 + x\textsuperscript{2}) \quad (C) 2x / $\surd$(1 -- x?) \quad \A{(D) 2x / (1 + x?)}\\ \A{Answer: D} \quad The inside is $u=x^{2}$, so $u'=2x$ and $u^2=x^4$. The arctan rule gives 2x / (1 + x?).\par\medskip
+\noindent\textbf{Level 4.} Which expression is $\dfrac{dy}{dx}$ for $y=\arctan\left(e^{x}\right)$?\\ (A) e? / (1 + e?) \quad (B) e? / $\surd$(1 -- e\textsuperscript{2}?) \quad \A{(C) e? / (1 + e\textsuperscript{2}?)} \quad (D) 1 / (1 + e\textsuperscript{2}?)\\ \A{Answer: C} \quad The inside is $u=e^{x}$, so $u'=e^{x}$ and $u^2=e^{2x}$. The arctan rule gives e? / (1 + e\textsuperscript{2}?).\par\medskip
+\subsection*{Tangent line}
+\noindent\textbf{Level 1.} Write the tangent line to $y=\arctan\,x$ at $x=0$.\\ \A{Answer: $1 \left(x - 0\right) + 0$} \quad The point is $(0,0)$ and the slope is $1$. So $y=1(x-0)+0$.\par\medskip
+\noindent\textbf{Level 2.} Write the tangent line to $y=\arctan\left(4x\right)$ at $x=0.25$.\\ \A{Answer: $2 \left(x - 0.25\right) + \frac{\pi}{4}$} \quad The point is $(0.25,\tfrac{\pi}{4})$ and the slope is $2$. So $y=2(x-0.25)+\tfrac{\pi}{4}$.\par\medskip
+\noindent\textbf{Level 3.} Write the tangent line to $y=\arctan\left(\dfrac1x\right)$ at $x=1$.\\ \A{Answer: $\left(-0.5\right) \left(x - 1\right) + \frac{\pi}{4}$} \quad The point is $(1,\tfrac{\pi}{4})$ and the slope is $-0.5$. So $y=-0.5(x-1)+\tfrac{\pi}{4}$.\par\medskip
+\noindent\textbf{Level 4.} Write the tangent line to $y=\arctan\left(\dfrac1x\right)$ at $x=1$.\\ \A{Answer: $\left(-0.5\right) \left(x - 1\right) + \frac{\pi}{4}$} \quad The point is $(1,\tfrac{\pi}{4})$ and the slope is $-0.5$. So $y=-0.5(x-1)+\tfrac{\pi}{4}$.\par\medskip
+\section*{Common misconceptions}\begin{tabularx}{\textwidth}{@{}X X@{}}\toprule Students say & Say instead\\\midrule
+sin\textsuperscript{-1} x means 1 / sin x. & It means the inverse function arcsin x. The notation looks like a power but is not one.\\
+arcsin and arccos have the same derivative. & They differ by a minus sign. arccos is the negative of arcsin.\\
+The derivative of arctan x has a square root. & Only arcsin and arccos do. arctan is 1 / (1 + x\textsuperscript{2}).\\
+Forgetting u?: d/dx arctan(4x) = 1/(1 + 16x\textsuperscript{2}). & Multiply by the derivative of the inside: 4 / (1 + 16x\textsuperscript{2}).\\
+Squaring only the x: (3x)\textsuperscript{2} = 3x\textsuperscript{2}. & Square the whole inside: (3x)\textsuperscript{2} = 9x\textsuperscript{2}.\\
+\bottomrule\end{tabularx}
+\end{document}

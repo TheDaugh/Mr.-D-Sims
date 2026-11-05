@@ -257,7 +257,7 @@
     if (!window.QKIT) { box.appendChild(el('p', 'msg bad', 'This question needs qkit.js on the page.')); return; }
     if (st.done) { var dn = el('div', 'msg worked ' + (st.ok ? 'ok' : '')); dn.innerHTML = (st.ok ? 'Correct. ' : 'Here is the reasoning. ') + 'Answer: ' + QKIT.tex(window.MC ? MC.toLatex(String(q.answer), q.vars || ['x']) : String(q.answer)) + (q.worked ? QKIT.rich(q.worked) : ''); box.appendChild(dn); return; }
     var slot = el('div'); box.appendChild(slot);
-    var field = { id: 'a', type: 'expr', label: q.label || '', answer: q.answer, vars: q.vars || ['x'], traps: q.traps };
+    var field = { id: 'a', type: 'expr', label: q.label || '', answer: q.answer, vars: q.vars || ['x'], traps: q.traps, domain: q.domain };   // q.domain: sample range for answers with a limited domain, e.g. {x:[0.1,0.9]} for a square root
     var spec = { id: q.id, fields: [field], hints: q.hints || [], worked: q.worked, why: q.why };
     var opt = { keypad: true, key: KEY, seed: q.id + '|' + S.first, noHints: !!q.noHints, maxTries: q.maxMiss ? q.maxMiss : 0,
       onDone: function (res) { st.misses = res.misses; st.hints = res.hints; st.traps = res.traps; st.assisted = res.assisted; finish(q, st, box, !res.assisted); } };

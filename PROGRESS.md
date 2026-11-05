@@ -25,6 +25,18 @@ For direct-instruction chem days: Ian writes the board notes on a whiteboard and
 - Not on `main` yet: branch `chem-whiteboard`. Netlify deploys when it merges. `app/app.js` is 8.1 MB (Excalidraw is big); Netlify serves it compressed.
 - Next: a chem version of the `di-day-builder` skill (script, notes, sheet, key, exit slip), using these stencils as the figure vocabulary.
 
+## 2026-11-05: calculus 3.4 Inverse Trig and 3.5 Higher-Order Derivatives (self-paced, interactive)
+
+Ian asked for 3.4 and 3.5 built as guided lessons from the Unit 3 files. (CLAUDE.md says one lesson per session; he asked for two, so both are here.) Both are made with `tools/new-lesson.mjs` and use the self-paced shape from 3.3. Files per lesson: `calculus/unit-3-composite-implicit-inverse/<id>.{html,spec.js,content.js}`, a 300-word outline `<id>-outline.md`, keys `keys/calc/<id>-{makeup,teacher}.pdf`, hub cards in `calculus/sims.js`, registry lines in `shared/lessons.js`, lock target in `tests/lock.e2e.js`.
+
+- 3.4 (`3-4-inverse-trig`): stations are the triangle behind arcsin, steepness of arcsin, steepness of arctan, arcsin vs arccos. Skills: deriv (typed), slope, inside (choice), tangent (typed).
+- 3.5 (`3-5-higher-order`): stations are slope of the slope (f and f′), match f/f′/f″, sine wheel, three machines. Skills: second (typed f″), nth, read, implicit (d²y/dx²).
+- Engine: `askExpr` in `lesson.js` now passes `q.domain` to the typed field, so answers with square roots are sampled where they are defined.
+- Tests: `tests/unit/inverse-trig.test.js` and `higher-order.test.js` check every answer against numeric derivatives of the function in the item, never the lesson's rules. `tests/lessons/<id>.e2e.js` replace the pacing tests and add stations, wrong-try messages, resume and a #key sweep.
+- Checks run: unit tests 240 of 240, `check-lessons --strict` 0 errors, calc template e2e all passed for both pages, lock e2e all passed, smoke 43 pages clean, Explore tabs looked at in screenshots at 1366 wide. Keys built with pdflatex.
+- Not checked: nobody has played the Build/Practice items by hand beyond the automated run; the term-list rule (DAY-RULES 13) has no coder test; the answer key PDFs were not opened to read.
+- Not on `main` yet: branch `calc-3-4-3-5`. Netlify deploys when it merges.
+
 ## 2026-11-04: calculus 3.3 Derivatives of Inverse Functions (self-paced, interactive)
 
 Ian asked for the next lesson to be more interactive than calculating, with the skipping removed so a student goes at his own pace and can finish the next day. Files: `calculus/unit-3-composite-implicit-inverse/3-3-inverse.{html,spec.js,content.js}`, keys `keys/calc/3-3-inverse-{makeup,teacher}.pdf`, hub card in `calculus/sims.js`, registry line in `shared/lessons.js`.

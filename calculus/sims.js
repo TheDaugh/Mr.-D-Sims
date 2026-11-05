@@ -103,6 +103,32 @@ window.UNITS = [
           { label: "Teacher key PDF", href: "../keys/calc/3-3-inverse-teacher.pdf" },
           { label: "Make-up notes PDF", href: "../keys/calc/3-3-inverse-makeup.pdf" }
         ]
+      },
+      {
+        type: "lesson",
+        icon: "📐",
+        title: "3.4 Derivatives of Inverse Trigonometric Functions",
+        href: "unit-3-composite-implicit-inverse/3-4-inverse-trig.html",
+        blurb: "Build the triangle behind arcsin, then see how steep arcsin and arctan really are. Four hands-on stations, then problems. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["inverse trig", "self-paced", "interactive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-3-composite-implicit-inverse/3-4-inverse-trig.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/3-4-inverse-trig-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/3-4-inverse-trig-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "🔁",
+        title: "3.5 Higher-Order Derivatives",
+        href: "unit-3-composite-implicit-inverse/3-5-higher-order.html",
+        blurb: "Take the derivative of a derivative and see how f, f′ and f″ connect. Four hands-on stations, then problems. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["second derivative", "self-paced", "interactive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-3-composite-implicit-inverse/3-5-higher-order.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/3-5-higher-order-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/3-5-higher-order-makeup.pdf" }
+        ]
       }
     ]
   },
