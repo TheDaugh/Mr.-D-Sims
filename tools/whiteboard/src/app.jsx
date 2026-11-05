@@ -5,6 +5,8 @@ import '@excalidraw/excalidraw/index.css';
 import * as chem from './chem.js';
 import * as stats from './stats.js';
 import * as lesson34 from './lessons/stats-3-4.js';
+import * as lesson35 from './lessons/stats-3-5.js';
+import * as lesson36 from './lessons/stats-3-6.js';
 
 /* One app, one bundle, several boards. The page says which one (window.MRD_BOARD). The chem keys keep their old
    names so the boards and shelves already saved in a browser still load. */
@@ -16,7 +18,7 @@ var BOARD = BOARDS[window.MRD_BOARD] || BOARDS.chem;
 var buildLibrary = BOARD.lib.buildLibrary, SHELVES = BOARD.lib.SHELVES;
 /* A lesson board is a board with a whole lesson pre-drawn in frames (stats.html#lesson=3.4). It saves under its own key, so the
    plain board and each lesson board never overwrite one another. */
-var LESSONS = { stats: { '3.4': lesson34 } };
+var LESSONS = { stats: { '3.4': lesson34, '3.5': lesson35, '3.6': lesson36 } };
 var LESSON_ID = (location.hash.match(/^#lesson=([\w.]+)/) || [])[1];
 var LESSON = ((LESSONS[window.MRD_BOARD] || {})[LESSON_ID]) || null;
 var ACTIVE = LESSON ? SHELVES.filter(function (s) { return LESSON.SHELVES.indexOf(s.name) >= 0; }) : SHELVES;
