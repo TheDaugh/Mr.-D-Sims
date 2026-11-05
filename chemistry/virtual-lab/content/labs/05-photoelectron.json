@@ -1,0 +1,327 @@
+{
+ "id": "photoelectron",
+ "kind": "pes",
+ "title": "Photoelectron Spectroscopy",
+ "badgeTitle": "Photoelectron Spectroscopy",
+ "roomFile": "spectroscopy",
+ "noPPE": true,
+ "lock": true,
+ "carry": 1,
+ "tutorial": {
+  "pes": true
+ },
+ "intro": "A spectrometer shines light on a gas of atoms and catches the electrons that fly out. Today you read what those electrons say about the atom.",
+ "introSteps": [
+  "Look at the unlabeled spectrum below. Then read three short cards: what a photoelectron is, what binding energy is, and what a peak is.",
+  "Walk to the spectrometer. Yellow arrows show each control the first time you need it.",
+  "Work the steps in order, Part A to Part E. Each step opens when the one before it is done.",
+  "At three checkpoints you answer a fresh question each time. Three right in a row passes. If you are stuck, press I need Mr. D.",
+  "Your written answers go on the paper worksheet. The lab keeps a record on this computer for Mr. D."
+ ],
+ "keyRows": [
+  [
+   "← ↑ → ↓ or W A S D",
+   "Walk. On screen you move along the floor diagonals."
+  ],
+  [
+   "E",
+   "Use what you are facing (the spectrometer)."
+  ],
+  [
+   "Esc",
+   "Close a window."
+  ],
+  [
+   "Hover",
+   "Point at anything to see its name."
+  ]
+ ],
+ "hook": {
+  "Z": 17,
+  "ask": "What element makes this spectrum?",
+  "note": "Each bar is a group of electrons. By the end of the lab you can read it."
+ },
+ "goal": "Goal: read each peak as a measure of how hard some electrons are held, and match a spectrum to an element.",
+ "cards": [
+  {
+   "id": "photoelectron",
+   "term": "Photoelectron",
+   "body": "Light carries energy. When a beam of light hits an atom with enough energy, it can knock an electron out of the atom. The electron that flies out is a photoelectron. It leaves with the energy that is left over after it breaks free."
+  },
+  {
+   "id": "binding",
+   "term": "Binding energy",
+   "body": "Binding energy is how hard an electron is to knock loose. A big number means the electron is held tightly. A small number means it comes loose easily. Light that is too weak for an electron frees nothing at all, however bright it is."
+  },
+  {
+   "id": "peak",
+   "term": "Peak",
+   "body": "The spectrometer counts the electrons it catches and sorts them by how hard they were held. Electrons held equally hard land together and make one tall bar, called a peak. The place of the peak shows how hard they were held. The height shows how many electrons there are."
+  }
+ ],
+ "reading": [
+  [
+   "Axes",
+   "Bottom: how hard the electrons are held, in MJ/mol. Big numbers are on the left and small numbers on the right. Each step is ten times the last, because the innermost electrons are held so hard they would fall off a normal page. Side: how many electrons."
+  ],
+  [
+   "One peak",
+   "One peak is one group of electrons held equally hard. Its place is how hard. Its height is how many."
+  ],
+  [
+   "Where to look first",
+   "Find the peak farthest left: the hardest to knock loose. Then count the peaks from left to right. Then read each height."
+  ]
+ ],
+ "ui": {
+  "welcome": "A spectroscopy room. Walk to the spectrometer (the long machine) and press E.",
+  "enter": "You step into the spectroscopy room.",
+  "full": "Your hands are full.",
+  "putBack": "Put back.",
+  "huddle1Done": "Go to the spectrometer.",
+  "huddle2Done": "",
+  "tutorialDone": "Tutorial done. The arrows are off. Parts A to E are yours; read the step card and keep the order.",
+  "coachKey": "Teacher key (creative mode): any sample is open and nothing locks. Open Key for the answers, the PIN setup and the simplifications.",
+  "doneInfo": "Your record is saved on this computer. Download it for Mr. D, then hand in your paper worksheet.",
+  "exitHead": "Next",
+  "spectrometer": "Spectrometer",
+  "carousel": "Samples",
+  "lightHead": "Light color",
+  "brightHead": "Brightness",
+  "fire": "Fire",
+  "stop": "Stop",
+  "clear": "Clear",
+  "help": "I need Mr. D",
+  "visibleWord": "visible",
+  "uvWord": "ultraviolet",
+  "xrayWord": "X-ray",
+  "noFree": "Nothing leaves. This light is too weak for every electron here.",
+  "lockHead": "🔒 Stop. Get Mr. D.",
+  "lockBody": "Raise your hand and wait. Mr. D will come to your screen. You cannot go on until then.",
+  "lockHelp": "You asked for Mr. D.",
+  "lockMiss": "Three misses in a row.",
+  "unlockWord": "Mr. D: enter the PIN",
+  "pinWrong": "That PIN is not right.",
+  "redoNote": "Mr. D unlocked this. Get {n} new questions right in a row to go on.",
+  "cpRight": "Right.",
+  "cpMiss": "Not yet.",
+  "cpPass": "Checkpoint passed.",
+  "handNote": "Download your record. It stays on this computer; Mr. D loads it on the teacher page. Then take out your paper worksheet.",
+  "claimHead": "A classmate says",
+  "modelAHead": "Model A",
+  "fitWord": "It fits",
+  "noFitWord": "It does not fit"
+ },
+ "steps": {
+  "li": "Part A, step 1. Lithium. Pick Li in the carousel, press Fire, then turn the light color from low to high. Watch where electrons first appear.",
+  "free": "Part A, step 2. Run Ne, then Na, then S, then one sample you choose. Raise the light until every peak shows. Click each peak to see what it is.",
+  "cp1": "Checkpoint 1. Read the spectrum, answer, and press Check.",
+  "bdraw": "Part B. Draw the spectrum for each atom, then compare with the real run.",
+  "cp2": "Checkpoint 2. Draw the spectrum for the configuration shown.",
+  "mystery": "Part C. Each mystery cell holds an element you have not been told. Run it, find it on the table, and read its period and valence electrons from the peaks.",
+  "cp3": "Checkpoint 3. Match the spectrum to an element on the table, then give its period and group.",
+  "modelA": "Part D. Test Model A against neon's real spectrum.",
+  "phos": "Part E. Draw phosphorus (P) last, then check it against the real run.",
+  "done": "All steps done. Hand in."
+ },
+ "model": {
+  "A": "Model A: all electrons in the same shell are held equally hard, so each shell gives one peak.",
+  "ask": "Neon's real spectrum is in dark bars. What Model A says is in the outlined bars. Do they match?",
+  "after": "Your choice is saved. Write your reason on the paper worksheet."
+ },
+ "flaw": {
+  "say": "A classmate says: \"The tallest peak is the electrons held hardest.\"",
+  "ask": "Click the peak that is really held hardest."
+ },
+ "mystery": {
+  "order": [
+   "A",
+   "B",
+   "C",
+   "D"
+  ],
+  "max": {
+   "A": 10,
+   "B": 10,
+   "C": 18,
+   "D": 20
+  },
+  "skip": [
+   3,
+   8,
+   10,
+   11,
+   12,
+   14,
+   15,
+   16
+  ]
+ },
+ "demo": [
+  "Welcome. This tour shows every control. None of it counts toward your lab.",
+  "Walk with the arrow keys or WASD. Press E at the spectrometer, the long machine in the middle of the room.",
+  "The carousel holds one gas for each element. Click a cell to load that gas.",
+  "The light color dial sets how much energy each photon carries. Most visible light is too weak to free any electron.",
+  "Fire sends light in. Brightness only sets how fast counts build. It never changes which peaks appear.",
+  "Electrons that fly out are counted and sorted by how hard they were held. A spectrum builds. Click a peak to see its subshell, its electrons and its energy.",
+  "The zoom view shows the atom, a photon hitting it, and an electron leaving. Its speed comes from the energy left over.",
+  "At a checkpoint you answer a fresh question each time. Three right in a row passes.",
+  "Three misses in a row, or I need Mr. D, locks the screen. Mr. D types a PIN to unlock it.",
+  "That is the tour. In the lab, yellow arrows will walk you through each step."
+ ],
+ "arrows": {
+  "door": "Walk to the door at the bottom of the room and go through.",
+  "spectro": "Walk to the spectrometer and press E.",
+  "pickLi": "Click Li (lithium) in the sample carousel.",
+  "fire": "Press Fire. Light goes in and the counting starts.",
+  "sweep": "Drag Light color slowly from low to high. Watch the spectrum.",
+  "peak": "Click a peak on the spectrum to see what it is.",
+  "liDone": "Turn the light color high enough that the left peak appears too, then press Stop.",
+  "zoom": "This is the zoom view: a photon hits, an electron leaves.",
+  "free": "Pick the next sample on the step card.",
+  "check": "Type your answer and press Check.",
+  "draw": "Set each bar's label and height. Leftmost is held hardest.",
+  "table": "Click the element on the table.",
+  "help": "Stuck? Press I need Mr. D. Your screen will lock until he comes."
+ },
+ "content": {
+  "exit": {
+   "prompt": "Do the paper worksheet next."
+  }
+ },
+ "clock": {},
+ "quests": [
+  {
+   "id": "door",
+   "text": "Walk through the lab door.",
+   "hint": "Walk to the door at the bottom of the room and keep going.",
+   "tutorial": true,
+   "state": "entered_lab"
+  },
+  {
+   "id": "spectro",
+   "text": "Step up to the spectrometer and press E.",
+   "hint": "The long machine in the middle of the room.",
+   "tutorial": true,
+   "event": "pes_open",
+   "count": 1
+  },
+  {
+   "id": "li_pick",
+   "text": "Part A: pick lithium (Li) in the carousel.",
+   "hint": "Click Li in the sample carousel.",
+   "tutorial": true,
+   "state": "flame",
+   "rule": "li_pick"
+  },
+  {
+   "id": "li_fire",
+   "text": "Press Fire.",
+   "hint": "Fire is under the dials.",
+   "tutorial": true,
+   "state": "flame",
+   "rule": "li_fire"
+  },
+  {
+   "id": "li_sweep",
+   "text": "Turn the light color from low to high.",
+   "hint": "Drag the Light color slider to the right, slowly.",
+   "tutorial": true,
+   "state": "flame",
+   "rule": "li_sweep"
+  },
+  {
+   "id": "li_peak",
+   "text": "Click a peak to see what it is.",
+   "hint": "Click a bar on the spectrum.",
+   "tutorial": true,
+   "state": "flame",
+   "rule": "li_peak"
+  },
+  {
+   "id": "li_done",
+   "text": "Show lithium's whole spectrum, then press Stop.",
+   "hint": "Light has to be stronger than the hardest-held electron.",
+   "tutorial": true,
+   "state": "flame",
+   "rule": "li_done"
+  },
+  {
+   "id": "t_help",
+   "text": "Find the I need Mr. D button (point at it).",
+   "hint": "It is at the bottom of the step card.",
+   "tutorial": true,
+   "state": "flame",
+   "rule": "t_help"
+  },
+  {
+   "id": "a_runs",
+   "text": "Part A: run Ne, Na and S, then one more of your choice.",
+   "hint": "Raise the light until every peak shows, then Stop.",
+   "state": "flame",
+   "rule": "a_runs",
+   "count": 4
+  },
+  {
+   "id": "cp1",
+   "text": "Checkpoint 1: read a spectrum.",
+   "hint": "Three right in a row.",
+   "state": "flame",
+   "rule": "cp1",
+   "tutorial": true
+  },
+  {
+   "id": "b_draw",
+   "text": "Part B: draw O, Mg and Si, and compare each with the real run.",
+   "hint": "Leftmost bar is held hardest.",
+   "state": "flame",
+   "rule": "b_draw",
+   "count": 3,
+   "tutorial": true
+  },
+  {
+   "id": "cp2",
+   "text": "Checkpoint 2: draw a spectrum.",
+   "hint": "Three right in a row.",
+   "state": "flame",
+   "rule": "cp2"
+  },
+  {
+   "id": "c_cells",
+   "text": "Part C: identify mystery cells A to D.",
+   "hint": "Run the cell, then use the table.",
+   "state": "flame",
+   "rule": "c_cells",
+   "count": 4,
+   "tutorial": true
+  },
+  {
+   "id": "cp3",
+   "text": "Checkpoint 3: match a spectrum to an element.",
+   "hint": "Three right in a row.",
+   "state": "flame",
+   "rule": "cp3"
+  },
+  {
+   "id": "d_model",
+   "text": "Part D: test Model A on neon.",
+   "hint": "Compare the outlined bars with the real ones.",
+   "state": "flame",
+   "rule": "d_model"
+  },
+  {
+   "id": "e_phos",
+   "text": "Part E: draw phosphorus, then check the real run.",
+   "hint": "Draw first, then compare.",
+   "state": "flame",
+   "rule": "e_phos"
+  },
+  {
+   "id": "handin",
+   "text": "Hand in: download your record.",
+   "hint": "Open Hand in and download.",
+   "state": "flame",
+   "rule": "handed"
+  }
+ ]
+}

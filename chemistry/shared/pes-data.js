@@ -36,6 +36,56 @@
     '18:3s': { eV: 29.3,      src: 'XDB-M1' }
   };
 
+  // CALCULATED fill-ins for the lab (slot 11 virtual lab). Hartree, magnitude of the NIST LDA orbital energy of the neutral atom
+  // (NIST SRD 141, "Atomic Reference Data for Electronic Structure Calculations", Kotochigova, Levine, Shirley, Chang; source id NISTDFT-LDA).
+  // These are free-atom calculations, not measurements. They fill the subshells with no gas-phase measured value, and only those.
+  // The older lesson page never reads them: complete(), spectrum() and simElements() ignore this table.
+  var HARTREE_EV = 27.211386245988;   // CODATA 2018
+  var CALC_EH = {
+    '4:1s': 3.856411,
+    '5:1s': 6.564347,
+    '5:2s': 0.344701,
+    '6:1s': 9.947718,
+    '6:2s': 0.500866,
+    '7:1s': 14.011501,
+    '7:2s': 0.676151,
+    '8:1s': 18.758245,
+    '8:2s': 0.871362,
+    '9:1s': 24.189391,
+    '9:2s': 1.086859,
+    '11:2p': 1.060636,
+    '13:1s': 55.156044,
+    '13:2s': 3.934827,
+    '13:2p': 2.564018,
+    '13:3s': 0.286883,
+    '14:1s': 65.184426,
+    '14:2s': 5.075056,
+    '14:2p': 3.514938,
+    '14:3s': 0.398139,
+    '15:1s': 76.061897,
+    '15:2s': 6.329346,
+    '15:2p': 4.576617,
+    '15:3s': 0.512364,
+    '16:1s': 87.789937,
+    '16:2s': 7.699940,
+    '16:2p': 5.751257,
+    '16:3s': 0.630912,
+    '17:1s': 100.369229,
+    '17:2s': 9.187993,
+    '17:2p': 7.039982,
+    '17:3s': 0.754458,
+    '19:1s': 128.414957,
+    '19:2s': 12.839001,
+    '19:2p': 10.283851,
+    '19:3s': 1.281897,
+    '19:3p': 0.693776,
+    '20:1s': 143.935181,
+    '20:2s': 15.046905,
+    '20:2p': 12.285376,
+    '20:3s': 1.706331,
+    '20:3p': 1.030572
+  };
+
   function occupied(Z) {          // Aufbau fill, Z = 1..20 (no d-block, no exceptions)
     var left = Z, out = [];
     for (var i = 0; i < SUBSHELLS.length && left > 0; i++) {
@@ -77,7 +127,36 @@
     return rows;
   }
 
+  // ---- the lab's view: every element, each value tagged measured or calculated ----
+  function labEV(Z, sub) {
+    var m = eVFor(Z, sub);
+    if (m) return { eV: m.eV, src: m.src, kind: 'measured' };
+    var c = CALC_EH[Z + ':' + sub];
+    return c === undefined ? null : { eV: c * HARTREE_EV, src: 'NISTDFT-LDA', kind: 'calculated' };
+  }
+  function labSpectrum(Z) {
+    var occ = occupied(Z), out = [];
+    for (var i = 0; i < occ.length; i++) {
+      var v = labEV(Z, occ[i].sub);
+      if (!v) return null;
+      out.push({ sub: occ[i].sub, count: occ[i].count, eV: v.eV, MJ: v.eV * EV_TO_MJ, src: v.src, kind: v.kind });
+    }
+    return out;
+  }
+  function labElements() { var o = []; for (var Z = 1; Z <= 20; Z++) if (labSpectrum(Z)) o.push(Z); return o; }
+  function labCalculated() {
+    var rows = [];
+    for (var Z = 1; Z <= 20; Z++) occupied(Z).forEach(function (o) { var v = labEV(Z, o.sub); if (v && v.kind === 'calculated') rows.push({ Z: Z, symbol: SYMBOLS[Z - 1], sub: o.sub, eV: v.eV }); });
+    return rows;
+  }
+  function labUnverified() {
+    var rows = [];
+    for (var Z = 1; Z <= 20; Z++) occupied(Z).forEach(function (o) { if (!labEV(Z, o.sub)) rows.push({ Z: Z, symbol: SYMBOLS[Z - 1], sub: o.sub }); });
+    return rows;
+  }
+
   var api = {
+    HARTREE_EV: HARTREE_EV, CALC_EH: CALC_EH, labEV: labEV, labSpectrum: labSpectrum, labElements: labElements, labCalculated: labCalculated, labUnverified: labUnverified,
     EV_TO_MJ: EV_TO_MJ, SUBSHELLS: SUBSHELLS, CAPACITY: CAPACITY, SYMBOLS: SYMBOLS,
     OUTER_IE_NIST: OUTER_IE_NIST, SOURCED: SOURCED,
     occupied: occupied, outerSub: outerSub, eVFor: eVFor,

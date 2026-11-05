@@ -3,7 +3,7 @@
 import { tileAt } from "./room.js";
 
 const OX = 156, OY = 22, TX = 12, TY = 6, ZS = 1.5;   // tile half-width, half-height, height scale
-const HEIGHT = { shelf: 14, locker: 18, rack: 15, first_aid: 13, sink: 8, hood: 18, eyewash: 14, waste: 9, extinguisher: 13, station: 10, door: 14, chalkboard: 16, radon: 12, pump: 14, valves: 10, gold_leaf: 8, marsden_desk: 9, notice: 14, tea: 8, foil_rig: 10 };
+const HEIGHT = { shelf: 14, locker: 18, rack: 15, first_aid: 13, sink: 8, hood: 18, eyewash: 14, waste: 9, extinguisher: 13, station: 10, door: 14, chalkboard: 16, radon: 12, pump: 14, valves: 10, gold_leaf: 8, marsden_desk: 9, notice: 14, tea: 8, foil_rig: 10, spectrometer: 12, carousel: 11, draw_bench: 9, pt_chart: 16, vac_pump: 12, gas_line: 16, pes_notice: 14 };
 
 function shade(c, f) {
   const n = c.replace("#", ""), v = [0, 2, 4].map((i) => Math.min(255, Math.round(parseInt(n.slice(i, i + 2), 16) * f)));
@@ -37,6 +37,10 @@ export function createRoomRenderer(canvas, room, extraArt) {   // extraArt(kit) 
     valves: (x, y) => { box(x + 0.1, y + 0.1, 0.8, 0.7, 7, "#7a5a3a"); box(x + 0.2, y + 0.25, 0.15, 0.15, 6, "#bfe6f2", 7); box(x + 0.55, y + 0.3, 0.15, 0.15, 4, "#c9ced6", 7); },
     gold_leaf: (x, y) => { box(x + 0.15, y + 0.15, 0.7, 0.7, 7, "#8a6a47"); box(x + 0.25, y + 0.25, 0.5, 0.5, 1, "#e8c24a", 7); },
     marsden_desk: (x, y) => { box(x, y, 1, 1, 8, "#7a5a3a"); box(x + 0.15, y + 0.2, 0.5, 0.4, 1, "#f4f4f0", 8); box(x + 0.7, y + 0.3, 0.1, 0.1, 3, "#2b2f36", 8); },
+    pt_chart: (x, y) => { box(x + 0.05, y, 0.9, 0.12, 13, "#e9edf1", 4); for (let r = 0; r < 4; r++) for (let c = 0; c < 8; c++) if (r > 0 || c < 1 || c > 6) fl(x + 0.05, y + 0.12, 0.06 + c * 0.1, 0.06 + c * 0.1 + 0.08, 6 + r * 2, 7.4 + r * 2, ["#e0472c", "#e8a33a", "#4f9bd9", "#7fb069"][(r + c) % 4]); },
+    vac_pump: (x, y) => { box(x + 0.15, y + 0.15, 0.7, 0.7, 10, "#3c4a58"); box(x + 0.3, y + 0.3, 0.4, 0.4, 3, "#c4a14a", 10); box(x + 0.4, y + 0.45, 0.2, 0.2, 2, "#d9dee4", 13); },
+    gas_line: (x, y) => { for (const u of [0.12, 0.52]) { box(x + u, y + 0.3, 0.3, 0.3, 14, "#2f9e5a"); box(x + u + 0.08, y + 0.38, 0.14, 0.14, 2, "#c9ced6", 14); } },
+    pes_notice: (x, y) => { box(x + 0.1, y, 0.8, 0.12, 10, "#a07c55", 3); fl(x + 0.1, y + 0.12, 0.25, 0.7, 5, 11, "#f4f4f0"); fl(x + 0.1, y + 0.12, 0.3, 0.6, 8, 8.8, "#2b6cb0"); },
     notice: (x, y) => { box(x + 0.1, y, 0.8, 0.12, 10, "#a07c55", 3); fl(x + 0.1, y + 0.12, 0.25, 0.7, 5, 11, "#f4f4f0"); },
     tea: (x, y) => { box(x + 0.1, y + 0.1, 0.8, 0.7, 6, "#6b4f33"); box(x + 0.3, y + 0.3, 0.2, 0.2, 3, "#f4f4f0", 6); box(x + 0.6, y + 0.35, 0.15, 0.15, 2, "#c0392b", 6); },
     door: (x, y, s) => { box(x, y, 0.12, 1, 14, "#a3804c"); box(x + 0.88, y, 0.12, 1, 14, "#a3804c"); box(x + 0.88, y + 0.4, 0.12, 0.2, 3, s.ready ? "#3ecf6a" : "#e0472c", 14); },
@@ -55,6 +59,15 @@ export function createRoomRenderer(canvas, room, extraArt) {   // extraArt(kit) 
     extinguisher: (x, y) => { box(x + 0.3, y + 0.3, 0.4, 0.4, 10, "#c0392b"); box(x + 0.4, y + 0.4, 0.2, 0.2, 3, "#2b2f36", 10); },
     station: (x, y, s, t) => {
       box(x, y, 1, 1, 8, "#b98b5e");
+      if (t && t.id === "spectrometer") {
+        let k = 0; while (tileAt(room, x - 1 - k, y)?.id === "spectrometer") k++;
+        if (k === 0) { box(x + 0.15, y + 0.2, 0.7, 0.6, 6, "#6b7078", 8); box(x + 0.7, y + 0.35, 0.3, 0.3, 4, "#7ec8ff", 11); }
+        if (k === 1) { box(x, y + 0.2, 1, 0.6, 7, "#9aa4ae", 8); poly([P(x + 0.1, y + 0.5, 15), P(x + 0.9, y + 0.5, 15), P(x + 0.9, y + 0.5, 9), P(x + 0.1, y + 0.5, 9)], "rgba(126,200,255,.35)"); const f = (Date.now() / 90) % 8; const [fx, fy] = P(x + 0.1 + f * 0.1, y + 0.5, 12); R(fx, fy, 2, 1, "#ffe08a"); }
+        if (k === 2) { box(x + 0.1, y + 0.15, 0.8, 0.7, 5, "#3c4a58", 8); box(x + 0.25, y + 0.3, 0.5, 0.4, 7, "#1e2630", 13); fl(x + 0.25, y + 0.7, 0.3, 0.7, 14, 17, "#2b3a2f"); fl(x + 0.25, y + 0.7, 0.35, 0.42, 14, 16, "#a9ff9a"); fl(x + 0.25, y + 0.7, 0.5, 0.57, 14, 15, "#a9ff9a"); }
+        return;
+      }
+      if (t && t.id === "carousel") { box(x + 0.1, y + 0.1, 0.8, 0.8, 4, "#58606b", 8); for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; box(x + 0.5 + Math.cos(a) * 0.28 - 0.08, y + 0.5 + Math.sin(a) * 0.28 - 0.08, 0.16, 0.16, 6, ["#cfe9ff", "#e8d9ff", "#d6ffd9", "#ffe7c2", "#ffd6dc", "#e0e0e0"][i], 12); } return; }
+      if (t && t.id === "draw_bench") { box(x, y, 1, 1, 2, "#7a5a3a", 6); fl(x + 0.1, y + 0.9, 0.1, 0.9, 8, 11, "#f4f4f0"); for (const [u, hh] of [[0.18, 1.4], [0.32, 1.4], [0.46, 3.4], [0.64, 1.8]]) fl(x + 0.1, y + 0.9, u, u + 0.07, 8, 8 + hh, "#2b6cb0"); return; }
       if (t && t.id === "foil_rig") {
         let k = 0; while (tileAt(room, x - 1 - k, y)?.id === "foil_rig") k++;
         if (k === 0) { box(x + 0.15, y + 0.25, 0.7, 0.5, 6, "#6b7078", 8); box(x + 0.7, y + 0.42, 0.3, 0.16, 2, "#1e2630", 11); }

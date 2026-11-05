@@ -56,7 +56,169 @@
     }
   }
 
+
+  /* ================= The virtual lab's generator: spec(n, type, seed), type = 'read' | 'draw' | 'match' =================
+     Item: { type, n, q, ans, tol, unit, why, hint, skill, title, p }.  p holds the parameters; labRecompute(p) returns the answer
+     again from pes-data.js (the lab view: all 20 elements). Answers are typed (read), drawn (draw) or clicked on the 20-element table (match).
+     read  ans: number (peak height, number of subshells) or a subshell label ('1s').  tol: absolute, 0 here.
+     draw  ans: [{sub,count}] left to right (highest binding energy first).
+     match ans: { Z, period, group }.
+     Seeded by the student's identity + attempt number n: a seeded shuffle of every variant, then n walks it, so no variant repeats
+     before the pool is used up (read 68 variants, draw 20, match 20).  hint here is general; diagnose(item, attempt) gives the specific
+     one, built from the student's own answer and never from the answer itself. */
+  var LAB_Z = [];
+  for (var zz = 1; zz <= 20; zz++) LAB_Z.push(zz);
+  var SYMBOL = D.SYMBOLS;
+  var SUP = { 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶' };
+  var TITLES = { read: 'Read a spectrum', draw: 'Draw the spectrum', match: 'Match a spectrum to an element' };
+
+  function labOcc(Z) { return D.occupied(Z); }
+  function configText(Z) { return labOcc(Z).map(function (o) { return o.sub + SUP[o.count]; }).join(' '); }
+  function periodOf(Z) { return Math.max.apply(null, labOcc(Z).map(function (o) { return +o.sub.charAt(0); })); }
+  function valenceOf(Z) {     // electrons in the last s and the last p subshell of the highest shell
+    var n = periodOf(Z);
+    return labOcc(Z).filter(function (o) { return +o.sub.charAt(0) === n; }).reduce(function (a, o) { return a + o.count; }, 0);
+  }
+  function groupOf(Z) { if (Z === 2) return 18; var v = valenceOf(Z); return v <= 2 ? v : 10 + v; }   // He is group 18 although it has 2 valence electrons
+  function uniqueTallest(Z) { var occ = labOcc(Z), m = Math.max.apply(null, occ.map(function (o) { return o.count; })); return occ.filter(function (o) { return o.count === m; }).length === 1 && occ.length > 1; }
+
+  function variants(type) {
+    var out = [], Z;
+    if (type === 'read') {
+      for (var i = 0; i < LAB_Z.length; i++) { Z = LAB_Z[i];
+        if (uniqueTallest(Z)) out.push({ kind: 'tall', Z: Z });
+        if (Z > 2) out.push({ kind: 'hardest', Z: Z }, { kind: 'easiest', Z: Z });
+        out.push({ kind: 'count', Z: Z }); }
+    } else if (type === 'draw' || type === 'match') {
+      for (var j = 0; j < LAB_Z.length; j++) out.push({ kind: type, Z: LAB_Z[j] });
+    } else throw new Error('unknown type ' + type);
+    return out;
+  }
+
+  function labRecompute(p) {
+    var occ = labOcc(p.Z);
+    switch (p.kind) {
+      case 'tall': return Math.max.apply(null, occ.map(function (o) { return o.count; }));
+      case 'count': return occ.length;
+      case 'hardest': return D.labSpectrum(p.Z)[0].sub;
+      case 'easiest': return D.labSpectrum(p.Z)[occ.length - 1].sub;
+      case 'draw': return D.labSpectrum(p.Z).map(function (o) { return { sub: o.sub, count: o.count }; });
+      case 'match': return { Z: p.Z, period: periodOf(p.Z), group: groupOf(p.Z) };
+      default: throw new Error('unknown kind ' + p.kind);
+    }
+  }
+
+  function shuffled(arr, seed, salt) {
+    var r = rnd(hashSeed(seed, salt)), a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) { var k = Math.floor(r() * (i + 1)), x = a[i]; a[i] = a[k]; a[k] = x; }
+    return a;
+  }
+  var TYPE_SALT = { read: 101, draw: 202, match: 303 };
+
+  function labSpec(n, type, seed) {
+    var pool = variants(type), perm = shuffled(pool, seed, TYPE_SALT[type]);
+    // never the same Z twice in a row inside a type (same element, different question is allowed)
+    var p = perm[((n % perm.length) + perm.length) % perm.length];
+    var Z = p.Z, item = { type: type, n: n, p: p, skill: 'chem.pes.' + type, title: TITLES[type], tol: 0 };
+    item.ans = labRecompute(p);
+    if (type === 'read') {
+      item.unit = p.kind === 'tall' ? 'electrons' : p.kind === 'count' ? 'subshells' : '';
+      item.q = p.kind === 'tall' ? 'How many electrons are in the tallest peak of this spectrum?'
+        : p.kind === 'count' ? 'How many different subshells give peaks in this spectrum?'
+        : p.kind === 'hardest' ? 'Which subshell is hardest to knock loose? Type its label, such as 1s.'
+        : 'Which subshell is easiest to knock loose? Type its label, such as 2p.';
+      item.hint = p.kind === 'tall' ? 'Peak height counts electrons. Find the tallest bar and read its height on the left axis.'
+        : p.kind === 'count' ? 'Each subshell that holds electrons gives one peak. Count the peaks, not the electrons.'
+        : 'Hardest to knock loose is the highest binding energy: the left end of the axis.';
+      item.why = p.kind === 'tall' ? 'The tallest peak holds ' + item.ans + ' electrons.' : p.kind === 'count' ? 'There are ' + item.ans + ' peaks.' : 'It is the ' + item.ans + ' subshell.';
+    } else if (type === 'draw') {
+      item.unit = '';
+      item.q = 'Draw the spectrum for ' + SYMBOL[Z - 1] + ' (Z = ' + Z + '), configuration ' + configText(Z) + '. Place one bar for each subshell: order, height and label.';
+      item.hint = 'One bar for each subshell, not for each electron. The bar height is how many electrons that subshell holds. Leftmost is held hardest.';
+      item.why = 'The bars, left to right: ' + labOcc(Z).map(function (o) { return o.sub + ' (' + o.count + ')'; }).join(', ') + '.';
+      item.config = configText(Z); item.symbol = SYMBOL[Z - 1];
+    } else {
+      item.unit = '';
+      item.q = 'Click the element on the table that gave this spectrum, then type its period and its group.';
+      item.hint = 'The heights add up to the number of electrons, which is the atomic number. The number of peaks and the last s and p heights give period and group.';
+      item.why = SYMBOL[Z - 1] + ': period ' + item.ans.period + ', group ' + item.ans.group + '.';
+    }
+    return item;
+  }
+
+  // ---- grading ----
+  function norm(s) { return String(s == null ? '' : s).trim().toLowerCase().replace(/\s+/g, ''); }
+  function gradeRead(item, typed) {
+    if (typeof item.ans === 'number') { var v = parseFloat(String(typed).replace(/[^0-9.\-]/g, '')); return isFinite(v) && Math.abs(v - item.ans) <= item.tol; }
+    return norm(typed) === norm(item.ans);
+  }
+  // bars: [{sub, count}] left to right as the student placed them (empty slots already removed)
+  function gradeDraw(item, bars) {
+    var exp = item.ans, rows = [], ok = bars.length === exp.length;
+    for (var i = 0; i < Math.max(bars.length, exp.length); i++) {
+      var b = bars[i] || null, e = exp[i] || null;
+      var r = { i: i, label: !!(b && e && b.sub === e.sub), height: !!(b && e && b.count === e.count) };
+      r.ok = r.label && r.height; rows.push(r); if (!r.ok) ok = false;
+    }
+    return { ok: ok, rows: rows };
+  }
+  function gradeMatch(item, a) { return !!a && +a.Z === item.ans.Z && +a.period === item.ans.period && +a.group === item.ans.group; }
+  function grade(item, attempt) {
+    return item.type === 'read' ? gradeRead(item, attempt) : item.type === 'draw' ? gradeDraw(item, attempt).ok : gradeMatch(item, attempt);
+  }
+
+  // ---- the hint after a miss: points at the student's own data, never the answer ----
+  var ORDER = ['1s', '2s', '2p', '3s', '3p', '4s'];
+  function diagnose(item, attempt) {
+    var exp = item.ans, Z = item.p.Z;
+    if (item.type === 'draw') {
+      var bars = attempt || [];
+      if (!bars.length) return { code: 'empty', hint: 'You have no bars yet. Look at your Ne run: each peak was one subshell.' };
+      var total = bars.reduce(function (a, b) { return a + b.count; }, 0);
+      if (bars.length > exp.length && bars.every(function (b) { return b.count === 1; })) return { code: 'perElectron', hint: 'You drew ' + bars.length + ' bars of height 1. Check your Ne run: it had 3 peaks for 10 electrons. A bar is a subshell, and its height is the electron count.' };
+      var subs = bars.map(function (b) { return b.sub; });
+      var want = exp.map(function (e) { return e.sub; });
+      var want = exp.map(function (e) { return e.sub; });
+      if (bars.length > 1 && subs.join() === want.slice().reverse().join()) return { code: 'axisUp', hint: 'Your bars run the other way. On the AP axis binding energy gets smaller to the right, as on your Li run. The 1s peak was at the left edge.' };
+      var ia = subs.indexOf('2p'), ib = subs.indexOf('2s');
+      if (ia >= 0 && ib >= 0 && ia < ib) return { code: 'p2Left', hint: 'Your 2p bar sits left of your 2s bar. Look at the real Ne run: which of 2s and 2p was held harder, and so sat further left?' };
+      var byHeight = bars.slice().sort(function (a, b) { return b.count - a.count; }).map(function (b) { return b.sub; });
+      if (bars.length > 1 && subs.join() === byHeight.join() && subs.join() !== exp.map(function (e) { return e.sub; }).join()) return { code: 'tallEnergy', hint: 'Your bars are in order of height. Height counts electrons; it does not say how hard they are held. Order them by binding energy instead: look at your Mg run.' };
+      if (total !== Z) return { code: 'total', hint: 'Your heights add up to ' + total + ' electrons. This atom has ' + Z + '. Check the configuration: each exponent is a bar height.' };
+      if (bars.length !== exp.length) return { code: 'count', hint: 'You placed ' + bars.length + ' bars. Count the subshells in the configuration: each one is a bar.' };
+      return { code: 'label', hint: 'The heights and the order can be right while a label is wrong. Read your bars against the configuration, left to right.' };
+    }
+    if (item.type === 'read') {
+      var s = String(attempt == null ? '' : attempt).trim();
+      if (item.p.kind === 'hardest' && /^(2s|2p|3s|3p|4s)$/i.test(s)) return { code: 'notLeft', hint: 'You typed ' + s + '. Binding energy runs high to low from left to right. Which peak is at the left end, and which subshell was at the left end in your Ne run?' };
+      if (item.p.kind === 'easiest' && s.toLowerCase() === '1s') return { code: 'notRight', hint: 'You typed 1s. That is the peak held hardest. Look at the other end of the axis, where the electrons are easiest to knock loose.' };
+      if (item.p.kind === 'hardest' && /^\d+$/.test(s)) return { code: 'tallEnergy', hint: 'You typed a number. Name a subshell. Height counts electrons; position on the axis shows how hard they are held.' };
+      if (item.p.kind === 'tall') return { code: 'height', hint: 'Read the height of the tallest bar on the left axis. One electron is one unit of height; check it against the Ne run, where 2p stood 6 tall.' };
+      if (item.p.kind === 'count') return { code: 'peaks', hint: 'You counted ' + s + '. Count the bars, not the electrons: Ne gave 3 bars for its 10 electrons.' };
+      return { code: 'generic', hint: item.hint };
+    }
+    var a = attempt || {};
+    if (!a.Z) return { code: 'noPick', hint: 'Click an element on the table first.' };
+    if (+a.Z !== item.ans.Z) {
+      var pickN = D.occupied(+a.Z).length, sumH = Z;
+      if (pickN !== labOcc(Z).length) return { code: 'peakCount', hint: 'The element you clicked gives ' + pickN + ' peaks. Count the peaks in this spectrum and compare.' };
+      return { code: 'heights', hint: 'The element you clicked has ' + (+a.Z) + ' electrons. Add up the peak heights in this spectrum and compare.' };
+    }
+    if (+a.period !== item.ans.period) return { code: 'period', hint: 'Your element is right. Period is the number of shells in use: the highest first number among the peaks.' };
+    return { code: 'group', hint: 'Your element is right. Group comes from the valence electrons: add the last s height and the last p height. Groups 13 to 18 add 10.' };
+  }
+
+  // the three misreads the lab teaches against, for the teacher key: code -> what the hint targets
+  var MISREADS = [
+    { code: 'perElectron', wrong: 'One bar per electron', targets: 'Counts the Ne run: three peaks for ten electrons; a bar is a subshell and its height is the count.' },
+    { code: 'p2Left', wrong: '2p drawn left of 2s', targets: 'Sends the student to the real Ne run to compare the positions of 2s and 2p.' },
+    { code: 'tallEnergy', wrong: 'Taller means higher energy', targets: 'Height counts electrons; order the bars by binding energy; points at the Mg run.' },
+    { code: 'axisUp', wrong: 'Axis read as increasing', targets: 'The AP axis falls to the right; points at the Li run where 1s sits at the left edge.' },
+    { code: 'sameOneS', wrong: 'Same 1s energy for every element', targets: 'Part C and the match type: 1s moves left as protons are added; compare the 1s positions in the runs.' }
+  ];
+
   function spec(n, band, seed) {
+    if (typeof band === 'string') return labSpec(n, band, seed);
     var b = band <= 1 ? 1 : (band >= 3 ? 3 : 2);
     var r = rnd(hashSeed(seed, n));
     var zs = BAND_Z[b];
@@ -146,7 +308,7 @@
     return item;
   }
 
-  var api = { spec: spec, recompute: recompute, NAME: NAME, BAND_Z: BAND_Z, CLAIMS: CLAIMS, CLAIM_OPTS: CLAIM_OPTS, rnd: rnd, hashSeed: hashSeed };
+  var api = { labSpec: labSpec, labRecompute: labRecompute, variants: variants, grade: grade, gradeRead: gradeRead, gradeDraw: gradeDraw, gradeMatch: gradeMatch, diagnose: diagnose, MISREADS: MISREADS, configText: configText, periodOf: periodOf, groupOf: groupOf, valenceOf: valenceOf, LAB_Z: LAB_Z, TYPES: ['read', 'draw', 'match'], spec: spec, recompute: recompute, NAME: NAME, BAND_Z: BAND_Z, CLAIMS: CLAIMS, CLAIM_OPTS: CLAIM_OPTS, rnd: rnd, hashSeed: hashSeed };
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.PESPractice = api;
 })(typeof window !== 'undefined' ? window : globalThis);

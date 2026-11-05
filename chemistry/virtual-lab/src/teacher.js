@@ -71,14 +71,15 @@ function summarize(e) {
     default: return e.type + (e.id ? " " + e.id : "") + (e.outcome ? " " + e.outcome : "");
   }
 }
-let heat = [], foil = [];
+let heat = [], foil = [], pes = [];
 // Loading the same student's record again (same lab, same start) replaces it instead of adding a second row.
 function addRecord(rec, file) {
   const k = GB.keyOf(rec), other = (x) => GB.keyOf(x.rec) !== k;
-  rows = rows.filter(other); heat = heat.filter(other); foil = foil.filter(other);
+  rows = rows.filter(other); heat = heat.filter(other); foil = foil.filter(other); pes = pes.filter(other);
   return addRecord0(rec, file);
 }
 function addRecord0(rec, file) {
+  if (rec.lab === "photoelectron" && rec.pes) { pes.push({ rec, file }); return null; }
   if (lab3&& rec.lab === lab3.id && rec.scat) { const x = { rec, file, scores: {} }; try { x.scores = JSON.parse(localStorage.getItem(`vlab-rubric:${lab3.id}:${rec.student}:${rec.started}`)) || {}; } catch (e) {} foil.push(x); return null; }
   if (lab2 && rec.lab === lab2.id && rec.samples) { const x = { rec, file, scores: {} }; try { x.scores = JSON.parse(localStorage.getItem(hkey(x))) || {}; } catch (e) {} heat.push(x); return null; }
   if (rec.cont) return `${file}: that is a save file, not a turned-in record.`;
@@ -174,7 +175,7 @@ async function load(files) {
     catch (e) { msgs.push(`${f.name}: could not be read.`); }
   }
   $("#msg").textContent = msgs.join(" ");
-  render(); renderHeat(); renderFoil(); savedNote();
+  render(); renderHeat(); renderFoil(); renderPes(); savedNote();
 }
 const savedNote = () => GB.all().then((a) => { $("#saved").textContent = a.length ? `${a.length} record${a.length === 1 ? "" : "s"} saved in this browser. They are here next time you open this page.` : "Nothing saved yet. Records you load are kept in this browser."; });
 const saveFile = (name, text, type) => { const a = h("a", { href: URL.createObjectURL(new Blob([text], { type })), download: name }); document.body.append(a); a.click(); a.remove(); };
@@ -183,7 +184,7 @@ const drop = $("#drop");
 drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
 drop.addEventListener("dragleave", () => drop.classList.remove("over"));
 drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("over"); load([...e.dataTransfer.files]); });
-const clearView = () => { rows = []; heat = []; foil = []; renderFoil(); $("#heatDetail").replaceChildren(); renderHeat(); $("#detail").replaceChildren(); $("#foilDetail").replaceChildren(); render(); };
+const clearView = () => { rows = []; heat = []; foil = []; pes = []; renderPes(); renderFoil(); $("#heatDetail").replaceChildren(); renderHeat(); $("#detail").replaceChildren(); $("#foilDetail").replaceChildren(); render(); };
 $("#clear").addEventListener("click", clearView);   // empties the screen only; the saved records come back on reload
 $("#wipe").addEventListener("click", async () => {
   if (!confirm("Delete every saved record from this browser? The scale scores and names you entered are kept.")) return;
@@ -199,7 +200,7 @@ $("#fbexport").addEventListener("click", async () => {
 (async () => {
   const saved = await GB.all(), msgs = [];
   for (const e of saved) { const m = addRecord(e.rec, e.file); if (m) msgs.push(m); }
-  render(); renderHeat(); renderFoil(); savedNote();
+  render(); renderHeat(); renderFoil(); renderPes(); savedNote();
 })();
 $("#csv").addEventListener("click", () => {
   const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
@@ -211,4 +212,39 @@ $("#portal").addEventListener("click", () => {
   const records = rows.map(({ r }) => window.PortalAdapters.vlabRecord(r, ""));
   const a = h("a", { href: URL.createObjectURL(new Blob([window.PortalAdapters.bundle(records)], { type: "application/json" })), download: "virtual-lab-scores.json" }); document.body.append(a); a.click(); a.remove();
 });
-window.__teacher = { load, rows: () => rows, heat: () => heat, foil: () => foil };
+// ---------- photoelectron lab (Lab 5): roster, detail, CSV, and the unlock PIN ----------
+const PQ = (rec) => { const p = rec.pes, cp = (t) => p.checkpoints[t], rightN = (t) => cp(t).attempts.filter((a) => a.ok).length, missN = (t) => cp(t).attempts.filter((a) => !a.ok).length; return { p, cp, rightN, missN }; };
+function renderPes() {
+  $("#pesCard").hidden = !pes.length; if (!pes.length) { $("#pesRoster").replaceChildren(); $("#pesDetail").replaceChildren(); return; }
+  pes.sort((a, b) => (a.rec.student || "").localeCompare(b.rec.student || ""));
+  const cell = (rec, t) => { const { cp, rightN, missN } = PQ(rec); return `${cp(t).passed ? "✔" : "·"} ${rightN(t)} right, ${missN(t)} missed`; };
+  $("#pesRoster").replaceChildren(h("thead", {}, h("tr", {}, ["Student", "Handed in", "Step", "Active", "Runs", "Read", "Draw", "Match", "Locks", "Unlocks", "Help", "Mystery A-D", "Draw O/Mg/Si/P tries", "Model A", ""].map((t) => h("th", {}, t)))),
+    h("tbody", {}, pes.map((x) => { const r = x.rec, { p } = PQ(r), mys = Object.values(p.mystery);
+      return h("tr", {}, idCell(r.student), h("td", {}, p.handed ? "yes" : "no"), h("td", {}, p.step), h("td", {}, `${Math.round((r.activeSec || 0) / 60)} min`), h("td", {}, String(p.runs.length)), h("td", {}, cell(r, "read")), h("td", {}, cell(r, "draw")), h("td", {}, cell(r, "match")),
+        h("td", {}, p.locks.length ? h("span", { class: "badc" }, String(p.locks.length) + (p.locked ? " (locked now)" : "")) : "0"), h("td", {}, String(p.locks.filter((l) => l.unlockedAt).length)), h("td", {}, String(p.helps.length)),
+        h("td", {}, mys.map((m) => (m.ok ? "✔" : "·") + m.tries).join(" ")), h("td", {}, ["O", "Mg", "Si", "P"].map((k) => p.draws[k].tries).join(" / ")), h("td", {}, p.modelA.first ? `${p.modelA.first} → ${p.modelA.choice || "—"}` : "—"), h("td", {}, h("button", { onclick: () => pesDetail(x) }, "Detail")));
+    })));
+}
+function pesDetail(x) {
+  const r = x.rec, p = r.pes, ev = (r.events || []).filter((e) => /^pes_(lock|unlock|help|attempt|run|mystery|draw|modelA|flaw|handin|compare|pass)/.test(e.type));
+  $("#pesDetail").replaceChildren(h("h3", {}, `${r.student}: photoelectron lab`), h("p", { class: "hint" }, "Checkpoint attempts, locks, unlocks and help requests are the record that deters getting past a lock on the Chromebook."),
+    h("h4", {}, "Locks"), p.locks.length ? h("ul", {}, p.locks.map((l) => h("li", {}, `${l.type}, ${l.reason === "help" ? "asked for help" : "three misses"}, at step ${l.step}, ${new Date(l.at).toLocaleTimeString()}; ${l.unlockedAt ? "unlocked " + new Date(l.unlockedAt).toLocaleTimeString() : "NOT unlocked"}${l.restored ? " (restored after a reload)" : ""}`))) : h("p", {}, "None."),
+    h("h4", {}, "Runs"), h("table", { class: "roster" }, h("thead", {}, h("tr", {}, ["Part", "Sample", "Light MJ/mol", "Band", "Brightness", "Photons", "Electrons", "Peaks seen", "Whole"].map((t) => h("th", {}, t)))),
+      h("tbody", {}, p.runs.map((q) => h("tr", {}, h("td", {}, q.phase), h("td", {}, q.mys ? "cell " + q.mys : "Z " + q.Z), h("td", {}, String(q.MJ)), h("td", {}, q.band), h("td", {}, String(q.bright)), h("td", {}, String(q.photons)), h("td", {}, String(q.hits)), h("td", {}, q.subs.join(" ")), h("td", {}, q.complete ? "yes" : "no"))))),
+    h("h4", {}, "Mystery cells"), h("ul", {}, Object.entries(p.mystery).map(([k, m]) => h("li", {}, `${k} = ${m.el}: ${m.ok ? "identified" : "not identified"} in ${m.tries} tries`))), h("p", {}, `Flawed claim: ${p.flaw.ok ? "corrected" : "not corrected"}, ${p.flaw.tries} tries. Model A: first choice ${p.modelA.first || "—"}, final ${p.modelA.choice || "—"}.`),
+    h("h4", {}, "Timeline"), h("div", { class: "tl" }, ev.map((e) => h("div", { class: /lock|help/.test(e.type) ? "inc" : "" }, `${mmss(Math.round(e.t))}  ${e.type.replace("pes_", "")} ${e.type === "pes_attempt" ? `${e.type === "pes_attempt" ? e.ok ? "right" : "miss" : ""} (${e.type && e.p ? e.p.kind : ""} ${e.p ? nameFromZ(e.p.Z) : ""})` : e.type === "pes_run" ? `${e.el} ${e.phase} ${e.hits} electrons` : e.type === "pes_lock" ? `${e.type} ${e.reason}` : e.el || ""}`))));
+  $("#pesDetail").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+const SYM = "H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca".split(" "), nameFromZ = (z) => SYM[z - 1] || "";
+$("#csvPes").addEventListener("click", () => {
+  const q = (v) => `"${String(v).replace(/"/g, '""')}"`, lines = [["student", "handed_in", "step", "active_min", "runs", "read_right", "read_missed", "draw_right", "draw_missed", "match_right", "match_missed", "locks", "unlocks", "help_requests", "mystery_ok", "model_a_first", "model_a_final"].join(",")];
+  for (const { rec } of pes) { const { p, rightN, missN } = PQ(rec); lines.push([rec.student, p.handed, p.step, Math.round((rec.activeSec || 0) / 60), p.runs.length, rightN("read"), missN("read"), rightN("draw"), missN("draw"), rightN("match"), missN("match"), p.locks.length, p.locks.filter((l) => l.unlockedAt).length, p.helps.length, Object.values(p.mystery).filter((m) => m.ok).length, p.modelA.first || "", p.modelA.choice || ""].map(q).join(",")); }
+  const a = h("a", { href: URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" })), download: "photoelectron-records.csv" }); document.body.append(a); a.click(); a.remove();
+});
+// The unlock PIN. The page keeps only a hash: type a PIN, copy the line into content/config.json, push. Nothing is stored here.
+$("#pinMake").addEventListener("click", async () => {
+  const pin = $("#pinIn").value.trim(); if (!/^\d{4,8}$/.test(pin)) { $("#pinOut").textContent = "Use 4 to 8 digits."; return; }
+  const hex = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("pes-pin:" + pin)).then((b) => [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join(""));
+  $("#pinOut").textContent = `"pesPinHash": "${hex}"`;
+});
+window.__teacher = { load, rows: () => rows, heat: () => heat, foil: () => foil, pes: () => pes };

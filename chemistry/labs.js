@@ -86,6 +86,16 @@ window.UNITS = [
         teacher: [{ label: "Paper version (print)", href: "virtual-lab/flame-explore.html" }]
       },
       {
+        title: "Virtual Lab: Photoelectron Spectroscopy (BETA)",
+        type: "lab",
+        day: 11,
+        icon: "⚛️",
+        href: "virtual-lab/index.html?lab=pes",
+        blurb: "Shine light on a gas of atoms and catch the electrons that fly out. Read each peak as how hard some electrons are held, match spectra to elements, and draw the spectrum for a configuration. Three checkpoints; written work goes on the paper worksheet.",
+        tags: ["beta", "photoelectron spectroscopy", "binding energy", "subshells"],
+        teacher: [{ label: "Teacher key (#key)", href: "virtual-lab/index.html?lab=pes#key" }, { label: "Teacher page (records, unlock PIN)", href: "virtual-lab/teacher.html" }]
+      },
+      {
         title: "Counting Particles: Atoms, Ions, Isotopes",
         type: "lesson",
         day: 4,

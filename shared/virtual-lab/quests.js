@@ -26,7 +26,7 @@ export function questProgress(q, events, state) {
   if (q.state === "notebook") return Math.min(state.notebookFilled || 0, q.count);
   if (q.state === "challenge") return Math.min(state.challengeFilled || 0, q.count);
   if (false) return Math.min(state.notebookFilled || 0, q.count);
-  if (q.state === "flame") return q.count ? Math.min(((state.flame || {})._knowns) || 0, q.count) : null;
+  if (q.state === "flame") return q.count ? Math.min(((state.flame || {})["_" + q.rule] ?? (state.flame || {})._knowns) || 0, q.count) : null;
   if (q.state && q.state.startsWith("heat_")) return Math.min((((state.heat || {})[{ heat_rows: "rows", heat_plot: "plot", heat_lines: "lines" }[q.state]] || {})[q.sample]) || 0, q.count);
   if (q.event) { const hits = events.filter((e) => e.type === q.event && Object.entries(q.where || {}).every(([k, v]) => test(v, e[k]))); return Math.min(q.distinct ? new Set(hits.map((e) => e[q.distinct])).size : hits.length, q.count || 1); }
   return null;

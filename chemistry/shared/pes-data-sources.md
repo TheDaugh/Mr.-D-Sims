@@ -57,6 +57,63 @@ Check: the outermost subshell of each neutral atom is the one the first ionizati
 | TARTU-6 | Ar | 2s | 326.37 | 10.1016/0368-2048(74)85066-8 |
 | TARTU-7 | Ar | 2p3/2 | 248.60 | 10.1016/0368-2048(74)85066-8 |
 
+
+## NISTDFT-LDA: calculated free-atom values for the lab (not measured)
+
+**Added for the virtual lab (slot 11), Ian's decision of 5 Nov 2026.** The values above leave 42 occupied subshells with no gas-phase measurement (listed under "Not in the sim" below). The lab fills exactly those, and only those, from a published free-atom calculation.
+
+**Source:** Kotochigova, S.; Levine, Z. H.; Shirley, E. L.; Stiles, M. D.; Clark, C. W. *Atomic Reference Data for Electronic Structure Calculations*, NIST Standard Reference Database 141 (DOI 10.18434/T4ZP4F, data content updated March 2009). Page per element, "Atomic Total Energies and Eigenvalues", neutral atom, **LDA column** (non-relativistic local density approximation). `https://www.nist.gov/pml/atomic-reference-data-electronic-structure-calculations` (pages `.../atomic-reference-data-electronic-7-<n>`, one per element). Accessed 5 Nov 2026.
+
+**Conversion:** the table gives the orbital energy in hartree (negative). The binding energy used is its magnitude, times 27.211386245988 eV per hartree (CODATA 2018), then times 0.0964853 MJ/mol per eV.
+
+**What these are:** orbital energies of a calculated neutral free atom. They are not measured gas-phase binding energies. Core levels come out about 3 to 20 percent below measurement, and calculated valence 2s and 3s values sit well below measured ones. The ordering 1s > 2s > 2p > 3s > 3p > 4s holds for every element, and the sim shows ordering and relative position, not the third digit. Every such value is marked "calculated" in the data, the sources file and the teacher key.
+
+| Id | Element | Subshell | Orbital energy (hartree) | Binding energy used (eV) |
+|---|---|---|---|---|
+| NISTDFT-LDA | 4 Be | 1s | 3.856411 | 104.94 |
+| NISTDFT-LDA | 5 B | 1s | 6.564347 | 178.62 |
+| NISTDFT-LDA | 5 B | 2s | 0.344701 | 9.38 |
+| NISTDFT-LDA | 6 C | 1s | 9.947718 | 270.69 |
+| NISTDFT-LDA | 6 C | 2s | 0.500866 | 13.63 |
+| NISTDFT-LDA | 7 N | 1s | 14.011501 | 381.27 |
+| NISTDFT-LDA | 7 N | 2s | 0.676151 | 18.40 |
+| NISTDFT-LDA | 8 O | 1s | 18.758245 | 510.44 |
+| NISTDFT-LDA | 8 O | 2s | 0.871362 | 23.71 |
+| NISTDFT-LDA | 9 F | 1s | 24.189391 | 658.23 |
+| NISTDFT-LDA | 9 F | 2s | 1.086859 | 29.57 |
+| NISTDFT-LDA | 11 Na | 2p | 1.060636 | 28.86 |
+| NISTDFT-LDA | 13 Al | 1s | 55.156044 | 1500.87 |
+| NISTDFT-LDA | 13 Al | 2s | 3.934827 | 107.07 |
+| NISTDFT-LDA | 13 Al | 2p | 2.564018 | 69.77 |
+| NISTDFT-LDA | 13 Al | 3s | 0.286883 | 7.81 |
+| NISTDFT-LDA | 14 Si | 1s | 65.184426 | 1773.76 |
+| NISTDFT-LDA | 14 Si | 2s | 5.075056 | 138.10 |
+| NISTDFT-LDA | 14 Si | 2p | 3.514938 | 95.65 |
+| NISTDFT-LDA | 14 Si | 3s | 0.398139 | 10.83 |
+| NISTDFT-LDA | 15 P | 1s | 76.061897 | 2069.75 |
+| NISTDFT-LDA | 15 P | 2s | 6.329346 | 172.23 |
+| NISTDFT-LDA | 15 P | 2p | 4.576617 | 124.54 |
+| NISTDFT-LDA | 15 P | 3s | 0.512364 | 13.94 |
+| NISTDFT-LDA | 16 S | 1s | 87.789937 | 2388.89 |
+| NISTDFT-LDA | 16 S | 2s | 7.699940 | 209.53 |
+| NISTDFT-LDA | 16 S | 2p | 5.751257 | 156.50 |
+| NISTDFT-LDA | 16 S | 3s | 0.630912 | 17.17 |
+| NISTDFT-LDA | 17 Cl | 1s | 100.369229 | 2731.19 |
+| NISTDFT-LDA | 17 Cl | 2s | 9.187993 | 250.02 |
+| NISTDFT-LDA | 17 Cl | 2p | 7.039982 | 191.57 |
+| NISTDFT-LDA | 17 Cl | 3s | 0.754458 | 20.53 |
+| NISTDFT-LDA | 19 K | 1s | 128.414957 | 3494.35 |
+| NISTDFT-LDA | 19 K | 2s | 12.839001 | 349.37 |
+| NISTDFT-LDA | 19 K | 2p | 10.283851 | 279.84 |
+| NISTDFT-LDA | 19 K | 3s | 1.281897 | 34.88 |
+| NISTDFT-LDA | 19 K | 3p | 0.693776 | 18.88 |
+| NISTDFT-LDA | 20 Ca | 1s | 143.935181 | 3916.68 |
+| NISTDFT-LDA | 20 Ca | 2s | 15.046905 | 409.45 |
+| NISTDFT-LDA | 20 Ca | 2p | 12.285376 | 334.30 |
+| NISTDFT-LDA | 20 Ca | 3s | 1.706331 | 46.43 |
+| NISTDFT-LDA | 20 Ca | 3p | 1.030572 | 28.04 |
+
+
 ## Choices made in the data (name them in the key)
 
 - **Li 1s:** a second gas-phase entry gives 64.89 eV (TARTU-1588, DOI 10.1016/0368-2048(82)85033-0). The two differ by 0.5 eV. The sim uses 64.39 so that all Li values come from one paper. Shown as an open question in the key.

@@ -239,3 +239,13 @@ Built: `chemistry/unit-3-atoms-ions/photoelectron-spectroscopy.html` (single pag
 Checks run: `node --test tests/unit/*.test.js` 210/210 pass (includes the 10 PES tests); `tests/lessons/photoelectron-spectroscopy.js` walkthrough passes at 1366×768 with no JavaScript errors; screenshot of Part 1 top saved to the session scratchpad.
 
 Not done or changed: `shared/lessons.js` not registered (that registry needs a spec file this page does not have, and the spec tests would fail on it); no `details.kt` block (the teacher key lives in the page's `#key` panel); sodium, sulfur and phosphorus are out of the sim, so the worksheet's Na and S runs and phosphorus exit are not built as written; Mg replaces Na, Mg replaces Al in the huddle; quick items show before the task without gating it; student ID is a stub pending the ID system; huddle 1 code is not gated by the gate question (huddle 2 is).
+
+## 2026-11-05: slot 11 photoelectron spectroscopy as a virtual lab (`?lab=pes`)
+
+Built: lab 5 in the room app. `chemistry/virtual-lab/content/labs/05-photoelectron.json` + `content/rooms/spectroscopy.json` (art in `shared/virtual-lab/roomview.js`), station module `src/ui/pes.js` + `pesview.js`, pure model `src/engine/pes.js`, endless generator `spec(n, type, seed)` in `chemistry/shared/pes-practice.js` (read, draw, match; the old `spec(n, band, seed)` still works), calculated fill-ins in `chemistry/shared/pes-data.js` (`labSpectrum`), teacher page roster, key, hub card, PLAN section, outline `chemistry/virtual-lab/photoelectron-lab-outline.md`. `node tools/pes-pin.mjs <pin>` sets the unlock PIN (hash in `content/config.json`).
+
+Decision (Ian, 5 Nov): the 42 subshell energies with no gas-phase measurement come from NIST SRD 141 (LDA free-atom calculation), marked `calculated` in the data, sources file and key. The earlier lesson page does not read them (`simElements()` is still the measured six).
+
+Checks run: `npm test` in chemistry/virtual-lab 98/98 and physics/virtual-lab 39/39; `node --test tests/unit/*.test.js` 232/232; `check-lessons --strict` 0 errors; `tests/smoke.js` 41 pages clean; `test/pes.e2e.js` (whole period, lock, PIN, help, teacher page, bundled key over file://) and `test/pes-guide.e2e.js` (10-caption demo, 53 s, state unchanged; tutorial arrows) pass; `tests/vlab-standard.e2e.js "chem 5"` and `tests/lock.e2e.js "virtual lab pes"` pass. Failing on a clean checkout too, not touched: `npm run gate` (unreviewed content), `flame.e2e.js` line 96, and `vlab-standard` physics huddle 2.
+
+Not done: no word-rule test (no term list for slot 11 in the repo); the lab is live only when `main` deploys.

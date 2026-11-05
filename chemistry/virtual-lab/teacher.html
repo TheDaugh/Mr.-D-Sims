@@ -48,6 +48,18 @@
       <div class="scrollx"><table class="roster" id="heatRoster"></table></div>
       <div id="heatDetail"></div>
     </section>
+    <section class="card" id="pesCard" style="margin-top:16px" hidden>
+      <div class="controls"><h2 style="margin:0">Photoelectron spectroscopy records</h2><button id="csvPes">Download CSV</button></div>
+      <p class="hint">Every attempt, lock, unlock and help request is listed. A lock that runs only on the Chromebook can be bypassed by a determined student; this log is the deterrent.</p>
+      <div class="scrollx"><table class="roster" id="pesRoster"></table></div>
+      <div id="pesDetail"></div>
+    </section>
+    <section class="card" id="pinCard" style="margin-top:16px">
+      <h2 style="margin:0 0 6px">Photoelectron lab: unlock PIN</h2>
+      <p class="hint">When a student's screen locks, you type this PIN on it. Pick 4 to 8 digits here. The page shows one line (a hash, never the PIN). Paste it into <code>chemistry/virtual-lab/content/config.json</code>, next to <code>modeVerifiers</code>, and push. Or run <code>node tools/pes-pin.mjs &lt;pin&gt;</code>.</p>
+      <div class="controls"><input id="pinIn" inputmode="numeric" maxlength="8" aria-label="PIN" style="width:8em"><button id="pinMake">Make the line</button></div>
+      <pre id="pinOut" class="fbtext" style="margin-top:8px"></pre>
+    </section>
     <section class="card" id="foilCard" style="margin-top:16px" hidden>
       <h2>Rutherford gold foil records</h2>
       <div class="scrollx"><table class="roster" id="foilRoster"></table></div>

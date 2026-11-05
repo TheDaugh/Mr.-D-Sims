@@ -19,6 +19,7 @@ html = html.replace(/<link rel="stylesheet" href="\.\.\/shared\/lab\.css">/, () 
   .replace(/<script type="module" src="src\/ui\/app\.js"><\/script>/, () => `<script>window.__TEACHER__=${!student};window.__CONTENT__=${safe(JSON.stringify(content))};</script><script>${safe(js)}</script>`);
 // locked mode needs the three shared scripts; inline them so the single-file build locks too
 for (const f of ["bell", "codes", "lock"]) html = html.replace(`<script src="../../shared/${f}.js"></script>`, () => `<script>${safe(readFileSync(join(root, "../../shared/" + f + ".js"), "utf8"))}</script>`);
+for (const f of ["pes-data", "pes-practice"]) html = html.replace(`<script src="../shared/${f}.js"></script>`, () => `<script>${safe(readFileSync(join(root, "../shared/" + f + ".js"), "utf8"))}</script>`);
 if (html.includes('src="../../')) throw new Error("unbundled shared script left in html");
 if (html.includes('src="src/') || html.includes('href="src/')) throw new Error("unbundled asset left in html");
 mkdirSync(join(root, "dist"), { recursive: true });

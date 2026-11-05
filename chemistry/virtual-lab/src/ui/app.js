@@ -15,6 +15,7 @@ import { profile, stateAt, reading, assign } from "../engine/heating.js";
 import { runDemo } from "./demo.js";
 import { createFlame, newFlame, fixFlame } from "./flame.js";
 import * as FE from "../engine/flame.js";
+import * as pesKind from "./pes.js";
 import { huddleDue, huddleTimes } from "../../../../shared/virtual-lab/clock.js";
 import { questDone, questProgress } from "../../../../shared/virtual-lab/quests.js";
 import { drawIcon } from "../../../../shared/virtual-lab/icons.js";
@@ -32,8 +33,8 @@ import { parseRoom, step, facingTile, hasPPE, tileAt } from "../../../../shared/
 const FIT = fitStage($("#stage"));
 let CAP = 10;
 // A page in another folder (physics/virtual-lab) sets window.VLAB_HOST before this file loads: its labs, its lab kinds, the shared content folder, its course, its room art and icons.
-const HOST = window.VLAB_HOST || {}, SHARED = HOST.base || "", COURSE = HOST.course || "chem", kindOf = (lab) => (HOST.kinds || {})[lab.kind] || null;
-const LABS = HOST.labs || { "unknown-solids": "01-unknown-solids.json", heating: "02-heating-curves.json", rutherford: "03-rutherford-gold-foil.json", flame: "04-flame-tests.json" };
+const HOST = window.VLAB_HOST || {}, SHARED = HOST.base || "", COURSE = HOST.course || "chem", kindOf = (lab) => (HOST.kinds || {})[lab.kind] || (lab.kind === "pes" ? pesKind : null);
+const LABS = HOST.labs || { "unknown-solids": "01-unknown-solids.json", heating: "02-heating-curves.json", rutherford: "03-rutherford-gold-foil.json", flame: "04-flame-tests.json", pes: "05-photoelectron.json" };
 const PRACTICE = { id: "practice", mass: 10, power: 100, T0: 20, mp: 50, bp: 150, Tend: 90, cs: 2, cl: 2.5, cg: 2, Lf: 200, Lv: 1000 };
 const SHORT = { NaCl: "Salt", sucrose: "Sugar", NaHCO3: "B.Soda", CaCO3: "Chalk", starch: "Starch", citric: "Citric", water: "Water", vinegar: "Vinegar", iodine: "Iodine" };
 
@@ -54,6 +55,7 @@ async function boot() {
     if (saved && (saved.lab !== lab.id || saved.version !== 1)) saved = null;
     const go = (resume) => start(species, reactions, lab, roomDef, hazardData, modeInfo, resume);
     if (!saved) return go(null);
+    { const K = kindOf(lab); if (K && K.noRestart && K.noRestart(saved.S && saved.S.flame)) return go(saved); }   // a locked screen is not an option to start over from
     if (params.get("resume") === "1") return go(saved);
     $("#boot").replaceChildren(h("p", {}, `You have a saved lab${saved.student ? " for " + saved.student : ""} from ${new Date(saved.savedAt).toLocaleString()}.`),
       h("div", { class: "controls" }, h("button", { class: "primary", onclick: () => go(saved) }, "Continue where I left off"),
@@ -1070,7 +1072,7 @@ function start(speciesData, reactionData, lab, roomDef, hazardData, modeInfo, re
   }
   $("#btnKey").addEventListener("click", () => { renderKey(); openDlg("dlgKey"); });
   const intro = () => {
-    renderIntro($("#introBody"), stageCtx);
+    (KIND && fl.renderIntro ? fl.renderIntro : renderIntro)($("#introBody"), stageCtx);
     if (lockClockOn()) { const note = h("p", { class: "hint" }, "🔒 Locked mode. This lab runs in fullscreen while class is on. Leaving it (a new tab, another window, closing the page) is recorded. The second time, your screen locks until Mr. D gives you a code."), f = $("#introBody .foot"); if (f) f.before(note); else $("#introBody").append(note); }
     openDlg("dlgIntro");
   };

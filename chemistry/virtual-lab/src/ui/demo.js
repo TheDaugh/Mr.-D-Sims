@@ -13,7 +13,7 @@ export async function runDemo(api) {
   const walk = async (route) => { for (const d of path(route)) { live(); api.walk(d); await wait(230); } };
   const total = 9;
   try {
-    if (api.scat) await scatScript({ say, walk, wait, live, api }); else if (api.kind) await api.kind.demo({ say, walk, wait, live, api }); else if (api.flame) await flameScript({ say, walk, wait, live, api }); else if (api.heat) await heatScript({ say, walk, wait, live, api }); else {
+    if (api.scat) await scatScript({ say, walk, wait, live, api }); else if (api.kind && api.kind.hooks) await pesScript({ say, walk, wait, live, api }); else if (api.kind) await api.kind.demo({ say, walk, wait, live, api }); else if (api.flame) await flameScript({ say, walk, wait, live, api }); else if (api.heat) await heatScript({ say, walk, wait, live, api }); else {
     await say(1, "Welcome. This tour shows every control. None of it counts toward your lab.", 2800);
     await say(2, "Walk with the arrow keys or WASD. The blue locker holds your goggles and apron.", 1400); await walk("ULLUL");
     await say(2, "Press E to use what you are facing. Put on goggles and an apron.", 1500); api.interact(); await wait(900); api.togglePPE("goggles"); await wait(700); api.togglePPE("apron"); await say(2, "Both are on. Now the door light is green.", 1800); api.closePanel();
@@ -81,4 +81,20 @@ async function flameScript({ say, walk, wait, live, api }) {
   await say(7, "Use a fresh splint every time. A reused splint flashes sodium yellow and the run is flagged.", 1200); A.dip("NaCl"); await wait(600); A.dip("NaCl"); A.hold(); await wait(1500); A.step(1); await wait(1800); A.step(9); await wait(1000);
   await say(8, "If two flames match, the spectroscope on the bench shows each color's lines. Open it from the bench or the Spectroscope button.", 1400); F.openNb("spec"); await wait(3200); F.closeNb(); await wait(400);
   await say(9, "That is the tour. Test all six salts and NaNO3, then bottles A and B. Yellow arrows will walk you through your first test.", 3600);
+}
+
+// The photoelectron tour: the room, the spectrometer, the dials, a spectrum building, the zoom view, a checkpoint and a lock screen.
+// It runs on a fresh copy of the lab's state; the app puts the student's own back afterwards. Nothing here is logged.
+async function pesScript({ say, walk, wait, live, api }) {
+  const K = api.kind.hooks, T = api.kind.demoLines;
+  await say(1, T[0], 9000); K.reset();
+  await say(2, T[1], 3500); await walk("UUUUUURRU"); api.interact(); await wait(2600);
+  await say(3, T[2], 3500); K.pick(10); await wait(2200);
+  await say(4, T[3], 3000); K.light(0.05); K.fast(true); K.fire(); await wait(2600); K.light(0.45); await wait(4200);
+  await say(5, T[4], 3000); K.bright(0.95); await wait(3200); K.light(0.97); await wait(3200);
+  await say(6, T[5], 3000); await wait(2800); const sp = K.det().spec; if (sp) K.peak(sp[sp.length - 1].sub); await wait(3600);
+  await say(7, T[6], 9000); K.stop();
+  await say(8, T[7], 2600); K.showCp("read"); await wait(7000);
+  await say(9, T[8], 2600); K.showLock(); await wait(7000); K.hideLock();
+  api.closeNotebook(); await say(10, T[9], 9000);
 }
