@@ -34,7 +34,7 @@
     selfPaced: true,
     question: 'If you mirror a curve across y = x, what happens to its slope?',
     targets: ['I can say how the points and slopes of f and its inverse are linked.', 'I can find the slope of the inverse at a point using the derivative of f.', 'I can write the tangent line to an inverse at a point.'],
-    tabs: ['Warm-up', 'Predict', 'Explore', 'Huddle', 'Build', 'Practice', 'Check'],
+    tabs: ['Warm-up', 'Predict', 'Explore', 'Notes', 'Build', 'Practice', 'Check'],
     exploreTarget: 'I can see what happens to a slope when a curve is mirrored.',
     huddleTarget: 'I can find the slope of the inverse at a point.',
     buildTarget: 'I can find the slope of an inverse function at a point.',

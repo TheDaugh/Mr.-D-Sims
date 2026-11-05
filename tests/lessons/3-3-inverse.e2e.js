@@ -58,6 +58,16 @@ module.exports = {
       for (const k of ['2', 'decimal point', '5']) await page.locator('.mrd-kp button[aria-label="' + k + '"]').first().click();
       assert.strictEqual(await inp.inputValue(), '2.5'); await ctx.close();
     },
+    '#key: every tab open, huddle needs no code, answers marked, Concepts button works': async H => {
+      const { ctx, page, errs } = await H.open(H.br, '#key'); await H.tick(page);
+      assert.ok(await page.locator('.mrd-tb').isVisible());
+      assert.strictEqual(await page.locator('#steps button:not([disabled])').count(), 9);
+      await page.locator('#steps button', { hasText: 'Notes' }).click(); await H.tick(page, 300);   // the huddle step is the Notes tab in this lesson
+      assert.ok(await page.locator('.hd-line input.keyed').count() >= 5);
+      await page.getByRole('button', { name: 'Concepts' }).click(); assert.ok(await page.locator('.cp-panel').isVisible());
+      await page.keyboard.press('Escape'); assert.ok(!(await page.locator('.cp-panel').isVisible()));
+      assert.deepStrictEqual(errs, []); await ctx.close();
+    },
     'Full run to the stamp after the end mark, no name anywhere': async H => {
       const { ctx, page, errs } = await H.open(H.br); await H.tick(page); await walkTo(H, page, 'practice');
       assert.strictEqual(await H.step(page), 'practice');
