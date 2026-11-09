@@ -76,5 +76,14 @@ window.MrD.lessons = [
     gates: [{ key: "h1", label: "Huddle" }], live: true },
   { course: "calc", id: "3-5-higher-order", title: "3.5 Higher-Order Derivatives", unit: "unit-3-composite-implicit-inverse",
     href: "calculus/unit-3-composite-implicit-inverse/3-5-higher-order.html", spec: "calculus/unit-3-composite-implicit-inverse/3-5-higher-order.spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "calc", id: "4-1-derivative-context", title: "4.1 Interpreting Derivatives in Context", unit: "unit-4-contextual-applications",
+    href: "calculus/unit-4-contextual-applications/4-1-derivative-context.html", spec: "calculus/unit-4-contextual-applications/4-1-derivative-context.spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "calc", id: "4-2-motion", title: "4.2 Position, Velocity and Acceleration", unit: "unit-4-contextual-applications",
+    href: "calculus/unit-4-contextual-applications/4-2-motion.html", spec: "calculus/unit-4-contextual-applications/4-2-motion.spec.js",
+    gates: [{ key: "h1", label: "Huddle" }], live: true },
+  { course: "calc", id: "4-3-rates-other", title: "4.3 Rates of Change in Other Contexts", unit: "unit-4-contextual-applications",
+    href: "calculus/unit-4-contextual-applications/4-3-rates-other.html", spec: "calculus/unit-4-contextual-applications/4-3-rates-other.spec.js",
     gates: [{ key: "h1", label: "Huddle" }], live: true }
 ];

@@ -3,6 +3,12 @@
 Update this at the end of every session. Newest entry first.
 
 
+## 2026-11-09: Calculus 4.1, 4.2, 4.3 as online self-paced guided lessons (branch `calc-4-1-to-4-3`)
+
+Ian asked for the first half of Unit 4 as online guided lessons students can do on their own. Read as 4.1 to 4.3 of 4.1 to 4.7 (4.4 Straight-line motion extras / related rates is the next one if "first half" meant four). Built from the calc template, not copied: `4-1-derivative-context` (Interpreting Derivatives in Context), `4-2-motion` (Position, Velocity and Acceleration), `4-3-rates-other` (Rates of Change in Other Contexts). Each is self-paced like 3.5: no clock, no huddle, no stamp; four Explore stations with named wrong-try messages; three hidden bands. New shared helper `calculus/shared/xkit.js` (plot, tangent, slider, shuffled choices). Registered in `shared/lessons.js`, hub group "Unit 4" in `calculus/sims.js` (teacher links), keys in `keys/calc/`, outlines beside each page.
+
+Checks run: `node tools/check-lessons.mjs --strict` 0 errors; `node --test tests/unit/*.test.js` 282 pass (new derivative-context, motion, rates-other tests recompute every answer from the item data; they caught duplicate options in a 4.1 band 3 item, fixed); `TEMPLATE=calc PAGE=... node tests/template.e2e.js` all passed for each of the three; `node tests/lock.e2e.js` all passed; `node tests/smoke.js` 46 pages load clean; Explore tabs viewed in screenshots; keys built with pdflatex. Not done: the earlier Unit 4 print PDFs were not available, so content was rebuilt from the lesson titles, so check it against Ian's own pack. CLAUDE.md's one-lesson-per-session rule was exceeded at Ian's request. Not live until Ian merges.
+
 ## 2026-11-05: Stats lesson boards for 3.5 and 3.6 (branch `stats-lesson-boards`)
 
 Added `stats/whiteboard/index.html#lesson=3.5` (percent below, above, between with normalcdf; hops and the standard normal) and `#lesson=3.6` (area or boundary, percentile, invNorm; hops and a lost mean or SD, the Could-tier segment). Five frames each: launcher and story, Parts 1-3, feedback key / exit slip / transfer. Answers under orange covers; numbers match the printed packs (generated and asserted with scipy). New `tools/whiteboard/src/lessons/stats-3-5.js`, `stats-3-6.js` and a small shared `stats-kit.js` (3.4 keeps its own copy). Registered in `app.jsx`, linked from `stats/teacher.html`, both boards' service-worker caches bumped to v5, bundle rebuilt (`shared/whiteboard/app/app.js`). `tests/lesson-board.e2e.js` now takes `LESSON=3.4|3.5|3.6`.

@@ -133,6 +133,52 @@ window.UNITS = [
     ]
   },
   {
+    id: "unit-4",
+    title: "Unit 4 · Contextual Applications of Differentiation",
+    blurb: "A derivative is a rate: say what it means with units, follow a moving particle, and compare rates in other settings.",
+    entries: [
+      {
+        type: "lesson",
+        icon: "📈",
+        title: "4.1 Interpreting Derivatives in Context",
+        href: "unit-4-contextual-applications/4-1-derivative-context.html",
+        blurb: "Read a derivative as a rate, say it in a sentence with units, and use it to estimate. Four hands-on stations, then problems. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["rate", "units", "self-paced", "interactive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-1-derivative-context.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-1-derivative-context-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-1-derivative-context-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "🏃",
+        title: "4.2 Position, Velocity and Acceleration",
+        href: "unit-4-contextual-applications/4-2-motion.html",
+        blurb: "Watch a particle and read velocity and acceleration off it: direction, speeding up and slowing down. Four hands-on stations, then problems. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["velocity", "acceleration", "self-paced", "interactive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-2-motion.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-2-motion-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-2-motion-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "🧫",
+        title: "4.3 Rates of Change in Other Contexts",
+        href: "unit-4-contextual-applications/4-3-rates-other.html",
+        blurb: "Compare an average rate with the rate right now, in growth, money and water stories. Four hands-on stations, then problems. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["average rate", "instantaneous rate", "self-paced", "interactive", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-3-rates-other.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-3-rates-other-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-3-rates-other-makeup.pdf" }
+        ]
+      }
+    ]
+  },
+  {
     id: "unit-6",
     title: "Unit 6 · Integration and Accumulation of Change",
     blurb: "Area as accumulated change, and how a Riemann sum closes in on the exact value.",
