@@ -1,0 +1,67 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 4.2 Position, Velocity and Acceleration}\fancyhead[R]{\small Make-up key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{4.2 Position, Velocity and Acceleration}
+\textbf{You missed this lesson. Copy this into your notes. That is all you need to do.}\par\medskip
+\subsection*{Question of the day}
+How do position, velocity and acceleration come from one another?\par
+\subsection*{Targets}\begin{itemize}\item I can find velocity and acceleration from a position function.
+\item I can say which way a particle moves from the sign of v.
+\item I can tell if a particle speeds up or slows down.\end{itemize}
+\subsection*{Concepts}\begin{itemize}
+\item \textbf{Position, velocity, acceleration} (v = s?,  a = v? = s?): Velocity is the derivative of position. Acceleration is the derivative of velocity.
+\item \textbf{Direction} (sign of v = direction): v > 0: moving in the positive direction (right). v < 0: moving in the negative direction (left). v = 0: at rest for an instant.
+\item \textbf{Speed} (speed = |v|): Speed is how fast, with no direction. It is the absolute value of velocity.
+\item \textbf{Speeding up or slowing down} (v$\cdot$a > 0 speeding up,  v$\cdot$a < 0 slowing down): Same sign for v and a: speeding up. Opposite signs: slowing down.
+\end{itemize}
+\subsection*{What the class predicted, and what is true}\begin{itemize}
+\item A particle has position $s(t)$ meters at $t$ seconds. Its velocity is... \A{the derivative $s'(t)$.} Velocity is how fast the position changes: the derivative of position.
+\item A particle moves on a horizontal line, with right as the positive direction. Its velocity is $-4$ meters per second. It is moving... \A{left.} Negative velocity means moving in the negative direction: left.
+\end{itemize}
+\section*{Huddle notes (answers filled in)}
+\subsection*{Definitions}\begin{itemize}
+\item \textbf{Velocity and acceleration:} v(t) = s?(t). a(t) = \A{v?(t)}, the derivative of velocity, so a(t) = s?(t).
+\item \textbf{Direction:} If v > 0 the particle moves \A{right}. If v < 0 it moves \A{left}. If v = 0 it is \A{at rest}.
+\item \textbf{Speed:} Speed is the \A{absolute value} of velocity: speed = |v|.
+\item \textbf{Speeding up or slowing down:} v and a with the \A{same} sign: speeding up. With \A{opposite} signs: slowing down.
+\end{itemize}
+\subsection*{Worked example}
+A particle has position s(t) = t\textsuperscript{3} -- 6t\textsuperscript{2} + 9t. Find v and a, then describe t = 2 and t = 4.\\
+\begin{itemize}
+\item Velocity: v(t) = 3t\textsuperscript{2} -- 12t + \A{9}
+\item Acceleration: a(t) = \A{6t -- 12}
+\item At t = 2: v = --3 and a = \A{0}, so it moves left at steady speed for an instant.
+\item At t = 4: v = 9 and a = 12, both \A{positive}, so it is speeding up.
+\end{itemize}
+\subsection*{Label the picture}
+\begin{enumerate}
+\item The dot: the particle at position \A{s}.
+\item The green arrow: the \A{velocity}.
+\item The orange arrow: the \A{acceleration}.
+\end{enumerate}
+\section*{One worked sample of each skill}
+\subsection*{Find the velocity}
+\noindent\textbf{Level 1.} A particle moves along a line with position $s$ in meters at time $t$ seconds. Find its velocity.\\ \A{Answer: $9 t^{2} + 8 t + 4$} \quad $v(t)=s'(t)=9t^{2}+8t+4$.\par\medskip
+\noindent\textbf{Level 2.} A particle moves along a line with position $s$ in meters at time $t$ seconds. Find its velocity.\\ \A{Answer: $8 \cos\left(4 t\right)$} \quad $v(t)=s'(t)=8\cos(4t)$.\par\medskip
+\noindent\textbf{Level 3.} A particle moves along a line with position $s$ in meters at time $t$ seconds. Find its velocity.\\ \A{Answer: $4 t \left(t^{2} + 1\right)$} \quad $v(t)=s'(t)=4t(t^{2}+1)$.\par\medskip
+\noindent\textbf{Level 4.} A particle moves along a line with position $s$ in meters at time $t$ seconds. Find its velocity.\\ \A{Answer: $\left(1 + 3 t\right) e^{3 t}$} \quad $v(t)=s'(t)=(1+3t)e^{3t}$.\par\medskip
+\subsection*{Find the acceleration}
+\noindent\textbf{Level 1.} A particle moves along a line with position $s$ in meters at time $t$ seconds. Find its acceleration.\\ \A{Answer: $12 t$} \quad $v(t)=6t^{2}+7$. Differentiating $v$ gives the acceleration, the answer above.\par\medskip
+\noindent\textbf{Level 2.} A particle moves along a line with position $s$ in meters at time $t$ seconds. Find its acceleration.\\ \A{Answer: $\left(-24\right) \cos\left(2 t\right)$} \quad $v(t)=-12\sin(2t)$. Differentiating $v$ gives the acceleration, the answer above.\par\medskip
+\noindent\textbf{Level 3.} A particle moves along a line with position $s$ in meters at time $t$ seconds. Find its acceleration.\\ \A{Answer: $\left(2 + 4 t^{2}\right) e^{t^{2}}$} \quad $v(t)=2t\,e^{t^{2}}$. Differentiating $v$ gives the acceleration, the answer above.\par\medskip
+\noindent\textbf{Level 4.} A particle moves along a line with position $s$ in meters at time $t$ seconds. Find its acceleration.\\ \A{Answer: $2 \cos\left(t\right) - t \sin\left(t\right)$} \quad $v(t)=\sin t+t\cos t$. Differentiating $v$ gives the acceleration, the answer above.\par\medskip
+\subsection*{Which way is it moving?}
+\noindent\textbf{Level 1.} A particle moves on a horizontal line, with right as the positive direction. At $t=3$ seconds its velocity is $-2$ meters per second. Which way is it moving?\\ \A{(A) to the left} \quad (B) to the right \quad (C) cannot tell \quad (D) at rest for an instant\\ \A{Answer: A} \quad The velocity is -2, so the particle is to the left.\par\medskip
+\noindent\textbf{Level 2.} A particle moves on a horizontal line, with right as the positive direction. Its velocity is $v(t)=3t^{2}+4t-1$ meters per second. At $t=2$ which way is it moving?\\ (A) to the left \quad (B) at rest for an instant \quad (C) cannot tell \quad \A{(D) to the right}\\ \A{Answer: D} \quad $v(2)=19$, so the particle is to the right.\par\medskip
+\noindent\textbf{Level 3.} A particle moves on a horizontal line, with right as the positive direction. Its position is $s(t)=t^{3}-4t^{2}-4t+5$ meters. At $t=4$ which way is it moving?\\ (A) at rest for an instant \quad (B) cannot tell \quad (C) to the left \quad \A{(D) to the right}\\ \A{Answer: D} \quad $v(t)=3t^{2}-8t-4$ and $v(4)=12$, so the particle is to the right.\par\medskip
+\noindent\textbf{Level 4.} A particle moves on a horizontal line, with right as the positive direction. Its position is $s(t)=3t^{3}-8t^{2}+11t+5$ meters. At $t=4$ which way is it moving?\\ (A) cannot tell \quad (B) to the left \quad (C) at rest for an instant \quad \A{(D) to the right}\\ \A{Answer: D} \quad $v(t)=9t^{2}-16t+11$ and $v(4)=91$, so the particle is to the right.\par\medskip
+\subsection*{Speeding up or slowing down?}
+\noindent\textbf{Level 1.} At one moment a particle has velocity $v=-3$ and acceleration $a=-4$ (meters per second, and meters per second squared). Is it speeding up or slowing down?\\ \A{(A) speeding up} \quad (B) slowing down \quad (C) neither: its speed is not changing at that moment\\ \A{Answer: A} \quad $v=-3$ and $a=-4$ have the same sign, so it is speeding up.\par\medskip
+\noindent\textbf{Level 2.} A particle has velocity $v(t)=3t^{2}+2t-1$ meters per second. At $t=0$ is it speeding up or slowing down?\\ (A) neither: its speed is not changing at that moment \quad \A{(B) slowing down} \quad (C) speeding up\\ \A{Answer: B} \quad $v(0)=-1$ and $a(0)=2$. Opposite signs: slowing down.\par\medskip
+\noindent\textbf{Level 3.} A particle has position $s(t)=t^{3}-4t^{2}-4t+5$ meters. At $t=5$ is it speeding up or slowing down?\\ (A) slowing down \quad \A{(B) speeding up} \quad (C) neither: its speed is not changing at that moment\\ \A{Answer: B} \quad $v(5)=31$ and $a(5)=22$. Same sign: speeding up.\par\medskip
+\noindent\textbf{Level 4.} A particle has position $s(t)=3t^{3}-8t^{2}+11t+5$ meters. At $t=4$ is it speeding up or slowing down?\\ (A) slowing down \quad \A{(B) speeding up} \quad (C) neither: its speed is not changing at that moment\\ \A{Answer: B} \quad $v(4)=91$ and $a(4)=56$. Same sign: speeding up.\par\medskip
+\end{document}

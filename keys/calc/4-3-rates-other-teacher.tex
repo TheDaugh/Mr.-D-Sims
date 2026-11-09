@@ -1,0 +1,81 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 4.3 Rates of Change in Other Contexts}\fancyhead[R]{\small Teacher key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{4.3 Rates of Change in Other Contexts --- teacher key}
+\textbf{Question:} How do average rates and instant rates work for things that are not moving objects?\par
+\subsection*{Self-paced lesson}No clock, no trimming, no skipping, no end mark, no stamp. Every tab is required in order; progress saves on the device so a student can stop and finish the next day.\par
+\subsection*{Warm-up review (3 easy items)}\begin{itemize}
+\item The slope of the line through $(2,5)$ and $(6,13)$ is... \A{2.} Rise over run: $\dfrac{13-5}{6-2}=2$.
+\item The derivative of $2x^2+5x$ is... \A{4x + 5.} Power rule: $2x^2$ gives $4x$, and $5x$ gives $5$.
+\item The second derivative of $x^3$ is... \A{6x.} First $3x^2$, then $6x$.
+\end{itemize}
+\subsection*{Explore stations}Four hands-on stations (X1, X2, X3, X4). Station answers are in the teacher view of the lesson page (add \texttt{\#key} to its address).\par
+\subsection*{Explore: what did you see}\begin{itemize}
+\item In Station 1, as the width of the interval got smaller, the average rate got... \A{closer to the rate at the start.} A tiny interval is almost one moment, so the secant almost matches the tangent.
+\item In Station 2, when the growth rate was at its biggest, the number of bacteria was about... \A{50 thousand.} The growth is fastest at the halfway point, near 50 thousand.
+\end{itemize}
+\subsection*{Mid-lesson check (Huddle tab)}\begin{itemize}
+\item A phone battery has $E'(3)=-12$ and $E''(3)=4$ at 3 hours. The charge is... \A{falling, but more and more slowly.} $E'0$ means $E'$ is getting bigger (closer to zero), so the fall slows.
+\item $N(2)=10$ and $N(6)=30$. The average rate of change from 2 to 6 is... \A{5.} $\dfrac{30-10}{6-2}=5$.
+\end{itemize}
+\subsection*{Targets}\begin{itemize}\item I can find an average rate of change from a table or a formula.
+\item I can tell an average rate from a rate at one moment.
+\item I can use f? and f? to say how a quantity is changing.\end{itemize}
+\subsection*{Predictions}\begin{itemize}
+\item A savings account holds $200 after 2 years and $260 after 5 years. On average, it grew by... \A{20 dollars per year.} Change over time: $\dfrac{260-200}{5-2}=20$ dollars per year.
+\item Is the average rate of change over an interval always the same as the rate at one moment inside it? \A{No: the rate can change inside the interval.} On a straight line they match. On a curve the rate changes, so an average can differ from the rate at one moment.
+\end{itemize}
+\section*{Huddle script (answers in green)}
+\subsection*{Definitions}\begin{itemize}
+\item \textbf{Average rate of change:} From x = a to x = b: \A{change in f} divided by \A{change in x}. It is the slope of the secant line.
+\item \textbf{Rate at one moment:} f?(a) is the rate at one \A{instant}. It is the slope of the \A{tangent} line.
+\item \textbf{Units:} Both rates have units of f \A{per} unit of x, like "thousand bacteria per hour".
+\item \textbf{The rate of the rate:} If f? > 0 the rate is getting \A{bigger}. If f? < 0 the rate is getting \A{smaller}.
+\end{itemize}
+\subsection*{Worked example}
+N(t) = --t\textsuperscript{2} + 12t + 20 thousand bacteria, t in hours. Find the average rate from t = 2 to t = 6, and the rate at t = 2.\\
+\begin{itemize}
+\item N(2) = 40 and N(6) = \A{56}
+\item Average rate = (56 -- 40) / 4 = \A{4} thousand per hour
+\item N?(t) = --2t + \A{12}
+\item Rate at t = 2: N?(2) = \A{8} thousand per hour
+\end{itemize}
+\subsection*{Label the picture}
+\begin{enumerate}
+\item The red tangent line: its slope is the \A{instantaneous} rate.
+\item The orange secant line: its slope is the \A{average} rate.
+\item The two points mark the \A{ends} of the interval.
+\end{enumerate}
+\section*{Every level, with answers}
+\subsection*{Average rate of change}
+\noindent\textbf{Level 1.} $P(t)$ is the population of a city, in thousands, $t$ years after 2000. You know $P(3)=260$ and $P(8)=280$. Find the average rate of change of $P$ from $t=3$ to $t=8$.\\ \A{Answer: 4 thousand people per year} \quad $\dfrac{280-260}{8-3}=\dfrac{20}{5}=4$ thousand people per year.\par\medskip
+\noindent\textbf{Level 2.} $N(t)$ is the number of bacteria, in thousands, in a dish $t$ hours after noon. The table gives some values. Find the average rate of change of $N$ from $t=3$ to $t=7$.\\ \A{Answer: 3 thousand bacteria per hour} \quad $\dfrac{37-25}{7-3}=\dfrac{12}{4}=3$.\par\medskip
+\noindent\textbf{Level 3.} $S(d)=d^{3}-2d^{2}+11d+10$ is the depth, in inches, of the snow on the ground $d$ days after a storm. Find the average rate of change of $S$ from $d=2$ to $d=4$.\\ \A{Answer: 27 inches per day} \quad $S(2)=32$ and $S(4)=86$. So $\dfrac{86-32}{2}=27$.\par\medskip
+\noindent\textbf{Level 4.} $S(d)=d^{2}+3d+56$ is the depth, in inches, of the snow on the ground $d$ days after a storm. Find the average rate of change of $S$ from $d=2$ to $d=4$.\\ \A{Answer: 9 inches per day} \quad $S(2)=66$ and $S(4)=84$. So $\dfrac{84-66}{2}=9$.\par\medskip
+\subsection*{Rate at one moment}
+\noindent\textbf{Level 1.} A cube has side $s$ inches. Its volume is $V(s)=s^3$ cubic inches. Find $V'(4)$: how fast does it change per inch of side when the side is 4 inches?\\ \A{Answer: 48 cubic inches per inch} \quad $V'(s)=3s^2$. Putting in 4 gives $48$ cubic inches per inch.\par\medskip
+\noindent\textbf{Level 2.} A circle has radius $r$ inches. Its area is $A(r)=\pi r^2$ square inches. Find $A'(6)$ and give your answer to 2 decimal places.\\ \A{Answer: 37.7 square inches per inch} \quad $A'(r)=2\pi r$. At 6 inches this is about $37.7$ square inches per inch.\par\medskip
+\noindent\textbf{Level 3.} The amount of a medicine in the blood is $C(t)=100e^{-0.1t}$ milligrams after $t$ hours. Find $C'(0)$ to 2 decimal places. The answer is negative: the quantity is falling.\\ \A{Answer: -10 milligrams per hour} \quad $C'(t)=-10e^{-0.1t}$. At that time it is about $-10$ milligrams per hour.\par\medskip
+\noindent\textbf{Level 4.} The amount of a medicine in the blood is $C(t)=40e^{-0.3t}$ milligrams after $t$ hours. Find $C'(10)$ to 2 decimal places. The answer is negative: the quantity is falling.\\ \A{Answer: -0.597 milligrams per hour} \quad $C'(t)=-12e^{-0.3t}$. At that time it is about $-0.597$ milligrams per hour.\par\medskip
+\subsection*{How is it changing?}
+\noindent\textbf{Level 1.} $P(t)$ is the population of a city, in thousands, $t$ years after 2000. At $t=7$ we know $P'(7)=-4$ and $P''(7)=2$. What is happening to the population?\\ (A) increasing, and the rate is getting bigger \quad (B) decreasing, and it is falling faster and faster \quad \A{(C) decreasing, but it is falling more and more slowly} \quad (D) increasing, but the rate is getting smaller\\ \A{Answer: C} \quad $P'$ is negative, so the population is decreasing. $P''$ is positive, so the rate is getting bigger.\par\medskip
+\noindent\textbf{Level 2.} $N(t)=-t^{3}-4t^{2}+9t+60$ is the number of bacteria, in thousands, in a dish $t$ hours after noon. At $t=1$, what is happening to the number of bacteria?\\ (A) decreasing, but it is falling more and more slowly \quad (B) increasing, but the rate is getting smaller \quad (C) increasing, and the rate is getting bigger \quad \A{(D) decreasing, and it is falling faster and faster}\\ \A{Answer: D} \quad $N'(1)=-2$ and $N''(1)=-14$. Decreasing, and it is falling faster and faster.\par\medskip
+\noindent\textbf{Level 3.} $S(d)$ is the depth, in inches, of the snow on the ground $d$ days after a storm. The rate $S'$ is -9 at $d=1$ and -5 at $d=5$ (inches per day), and it changes steadily in between. At $d=1$, what is happening to the snow depth?\\ (A) increasing, and the rate is getting bigger \quad (B) decreasing, and it is falling faster and faster \quad \A{(C) decreasing, but it is falling more and more slowly} \quad (D) increasing, but the rate is getting smaller\\ \A{Answer: C} \quad The sign of $S'$ is negative. The rate goes from -9 to -5, so it is getting bigger ($S''>0$). So decreasing, but it is falling more and more slowly.\par\medskip
+\noindent\textbf{Level 4.} $S(d)$ is the depth, in inches, of the snow on the ground $d$ days after a storm. The rate $S'$ is 10 at $d=4$ and 13 at $d=6$ (inches per day), and it changes steadily in between. At $d=4$, what is happening to the snow depth?\\ (A) decreasing, but it is falling more and more slowly \quad (B) increasing, but the rate is getting smaller \quad \A{(C) increasing, and the rate is getting bigger} \quad (D) decreasing, and it is falling faster and faster\\ \A{Answer: C} \quad The sign of $S'$ is positive. The rate goes from 10 to 13, so it is getting bigger ($S''>0$). So increasing, and the rate is getting bigger.\par\medskip
+\subsection*{Say what the average means}
+\noindent\textbf{Level 1.} $P(t)$ is the population of a city, in thousands, $t$ years after 2000. The average rate of change of $P$ from $t=2$ to $t=6$ is $8$ thousand people per year. What does this say?\\ (A) At exactly t = 2, the population is rising at 8 thousand people per year. \quad (B) At t = 6, the population is 8 thousand people. \quad \A{(C) On average, the population grew by 8 thousand people per year from t = 2 to t = 6.} \quad (D) The population grew by a total of 8 thousand people from t = 2 to t = 6.\\ \A{Answer: C} \quad The sentence must name the interval (2 to 6), say "on average", and give the rate per year: On average, the population grew by 8 thousand people per year from t = 2 to t = 6.\par\medskip
+\noindent\textbf{Level 2.} $N(t)$ is the number of bacteria, in thousands, in a dish $t$ hours after noon. The average rate of change of $N$ from $t=5$ to $t=9$ is $-2$ thousand bacteria per hour. What does this say?\\ (A) At exactly t = 5, the number of bacteria is falling at 2 thousand bacteria per hour. \quad (B) The number of bacteria fell by a total of 2 thousand bacteria from t = 5 to t = 9. \quad (C) At t = 9, the number of bacteria is 2 thousand bacteria. \quad \A{(D) On average, the number of bacteria fell by 2 thousand bacteria per hour from t = 5 to t = 9.}\\ \A{Answer: D} \quad The sentence must name the interval (5 to 9), say "on average", and give the rate per hour: On average, the number of bacteria fell by 2 thousand bacteria per hour from t = 5 to t = 9.\par\medskip
+\noindent\textbf{Level 3.} $S(d)$ is the depth, in inches, of the snow on the ground $d$ days after a storm. Which equation says: "the average rate of change of $S$ from $d=1$ to $d=5$ is 2 inches per day"?\\ (A) $S'(1)=2$ \quad (B) $\dfrac{S(5)-S(1)}{1}=2$ \quad \A{(C) $\dfrac{S(5)-S(1)}{5-1}=2$} \quad (D) $S(5)-S(1)=2$\\ \A{Answer: C} \quad Average rate = change in $S$ $\div$ change in $d$ = $\dfrac{S(5)-S(1)}{5-1}$.\par\medskip
+\noindent\textbf{Level 4.} $S(d)$ is the depth, in inches, of the snow on the ground $d$ days after a storm. Which equation says: "the average rate of change of $S$ from $d=5$ to $d=7$ is 8 inches per day"?\\ (A) $\dfrac{S(7)-S(5)}{5}=8$ \quad (B) $S'(5)=8$ \quad \A{(C) $\dfrac{S(7)-S(5)}{7-5}=8$} \quad (D) $S(7)-S(5)=8$\\ \A{Answer: C} \quad Average rate = change in $S$ $\div$ change in $d$ = $\dfrac{S(7)-S(5)}{7-5}$.\par\medskip
+\section*{Common misconceptions}\begin{tabularx}{\textwidth}{@{}X X@{}}\toprule Students say & Say instead\\\midrule
+The average rate from a to b is f?(a). & f?(a) is the rate at one moment. The average rate is (f(b) -- f(a)) / (b -- a).\\
+Average rate = f(b) -- f(a). & That is the total change. Divide by b -- a to get the rate per unit.\\
+Dividing by b instead of b -- a. & Divide by the width of the interval, b -- a.\\
+f? < 0 means the quantity is decreasing. & It means the rate f? is getting smaller. The quantity can still be increasing.\\
+Leaving the units off a rate. & Say "thousand bacteria per hour": output units per input unit.\\
+\bottomrule\end{tabularx}
+\end{document}
