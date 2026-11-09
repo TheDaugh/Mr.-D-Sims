@@ -283,3 +283,13 @@ Built from `node tools/new-lesson.mjs chem effective-nuclear-charge ... --unit u
 - Worksheet (30 points, scales printed) and key: `effective-nuclear-charge-worksheet{,-key}.{docx,pdf}`. Outline and key in `.md`. `keys/chem/effective-nuclear-charge-makeup.*` built; `build-keys.mjs` teacher key does not support a v3 pace plan (it expects `P.steps`), so it is not built.
 
 For Ian: pull = Z_eff ÷ n² is my classroom number. The 13 pairs where it contradicts measured first ionization energy are left out of every item (slot 17). No projector page. Not on the site until merged to `main`.
+
+## 2026-11-09: Unit 3 slot 14, The table as a map of configurations (DI day bundle)
+
+Built by `docs/slot-14/build_slot14.py` (one source; every number computed from an independent shell-filling model and asserted). Outputs in `docs/slot-14/out/`: typed notes (pdflatex), board script (xelatex, red margin remarks), problem sheet and key, exit slips (docx, one page of six), each with its `.tex` or `.docx` source.
+
+- Big question: if I tell you only where an element sits on the table, what can you say about its electrons? Two chunks (build the table from the ladder; valence configuration from position). Nine keepers, three live questions, a core of eight sheet items (14 of 15 minutes, asserted). Clock sums to 50.
+- Table figure through Z = 36 drawn in TikZ; exit slips carry a blank grid (matplotlib) for the drawing.
+- Not taught: Cr, Cu, transition-metal ions, the f block (named only). Slot 10 owns valence, shorthand and Lewis dots; today only uses them.
+- Not done: the Excalidraw stencils (blank table, energy ladder) are named in the script but not drawn; typed notes and script have no ladder figure (the row-by-row filling table stands in).
+- Nothing here is on the site; the files are for printing.
