@@ -20,7 +20,7 @@ Shelves: the Library panel is one flat list, so the board shows one shelf at a t
 
 ## Lesson boards
 
-A lesson board is the stats board with a whole lesson already drawn, in teaching order, so the teacher writes, scrolls and explains instead of drawing. Open it with `#lesson=<id>`, for example `stats/whiteboard/index.html#lesson=3.4` (linked from `stats/teacher.html`).
+A lesson board is a board with a whole lesson (or the notes huddle of a sim day) already drawn, in teaching order, so the teacher writes, scrolls and explains instead of drawing. Open it with `#lesson=<id>`, for example `stats/whiteboard/index.html#lesson=3.4` (linked from `stats/teacher.html`).
 
 - **Frames**: one screen each (Warm-up, Part 1, Part 2, Part 3 in three frames, Exit and up next). The buttons along the bottom jump to a frame.
 - **Answers**: every blank the students fill in has the answer under an orange cover. Select the cover and press Delete to reveal it.
@@ -28,7 +28,9 @@ A lesson board is the stats board with a whole lesson already drawn, in teaching
 - **Shelves**: only the shelves the lesson uses (Normal curve, Routines, Graph tools) show.
 - **Source**: `tools/whiteboard/src/lessons/stats-3-4.js` (frames drawn with the same `graph` and `normal` helpers as the stencils; numbers match the 3.4 thinking notes and board script). Rebuild with `node tools/whiteboard/build.mjs`. A new lesson board is a new file in `lessons/` plus one line in `LESSONS` in `app.jsx`.
 
-## Chem stencils (36)
+The chem board has one: `chemistry/whiteboard/index.html#lesson=zeff` (slot 15, Effective nuclear charge). It is the **notes huddle** of a sim day: three frames (core and shielding with the labeled sodium atom, sodium worked, what is tested), blanks in the same order as the Huddle tab on the page, answers under covers. Source: `tools/whiteboard/src/lessons/chem-zeff.js`; its numbers come from `chemistry/shared/zeff.js`, the page's own model. Script: `chemistry/unit-3-atoms-ions/day-cards/slot-15.board.md`. Test: `BOARD=chem LESSON=zeff node tests/lesson-board.e2e.js`.
+
+## Chem stencils (41)
 
 | Group | Items |
 |---|---|
@@ -36,6 +38,7 @@ A lesson board is the stats board with a whole lesson already drawn, in teaching
 | Bohr | empty 2, 3, 4 shells; H, Li, C, O, Na, Cl with electrons; electron dot; nucleus |
 | Table | blank; blank with group and period numbers; s, p, d, f blocks shaded (group 3 is drawn in the d block, the f block is 14 wide) |
 | Levels | n = 1 to 5 drawn to scale (levels bunch up); 3 and 4 evenly spaced; emission arrow, absorption arrow, photon |
+| Z_eff | Li, Na, K, Mg and Cl with the core rings amber and the outer ring blue; cards for Z_eff = Z − core, the five moves, and pull = Z_eff ÷ n² |
 
 ## Stats stencils (29)
 

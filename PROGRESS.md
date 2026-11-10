@@ -281,3 +281,29 @@ Decision (Ian, 5 Nov): the 42 subshell energies with no gas-phase measurement co
 Checks run: `npm test` in chemistry/virtual-lab 98/98 and physics/virtual-lab 39/39; `node --test tests/unit/*.test.js` 232/232; `check-lessons --strict` 0 errors; `tests/smoke.js` 41 pages clean; `test/pes.e2e.js` (whole period, lock, PIN, help, teacher page, bundled key over file://) and `test/pes-guide.e2e.js` (10-caption demo, 53 s, state unchanged; tutorial arrows) pass; `tests/vlab-standard.e2e.js "chem 5"` and `tests/lock.e2e.js "virtual lab pes"` pass. Failing on a clean checkout too, not touched: `npm run gate` (unreviewed content), `flame.e2e.js` line 96, and `vlab-standard` physics huddle 2.
 
 Not done: no word-rule test (no term list for slot 11 in the repo); the lab is live only when `main` deploys.
+
+## 2026-11-09: Unit 3 slot 15, Effective Nuclear Charge and Shielding (v3 sim day)
+
+Built from `node tools/new-lesson.mjs chem effective-nuclear-charge ... --unit unit-3-atoms-ions`. Data and generators in `day-cards/slot-15.content.js`; design in `day-cards/slot-15.card.md`.
+
+- Page, spec, Explore (Pull Meter) and wiring: `effective-nuclear-charge.{html,spec.js,content.js}`; Models tab `.models.js`; shared model and atom picture `chemistry/shared/zeff.js`.
+- v3: two huddles (hold at minute 3, writable at 25), 3-item warm-up with no placement, three hidden bands, no stamp and no report code (own Notes step; scores still saved via `MrD.profile.record`).
+- Registered: `shared/lessons.js`, hub card (`chemistry/labs.js`, day 15), `portal/standards.json` (CHEM-ATOM-7).
+- Tests: `tests/unit/slot-15-content.test.js` (model recomputed independently; dip pairs recomputed against `PESData`), `tests/lessons/effective-nuclear-charge.e2e.js` (overrides the v2 placement, minute-18 huddle, pace-trim and stamp tests with v3 versions; adds Pull Meter, Models, banned words), lock target.
+- Worksheet (30 points, scales printed) and key: `effective-nuclear-charge-worksheet{,-key}.{docx,pdf}`. Outline and key in `.md`. `keys/chem/effective-nuclear-charge-makeup.*` built; `build-keys.mjs` teacher key does not support a v3 pace plan (it expects `P.steps`), so it is not built.
+
+For Ian: pull = Z_eff ÷ n² is my classroom number. The 13 pairs where it contradicts measured first ionization energy are left out of every item (slot 17). No projector page. Not on the site until merged to `main`.
+
+## 2026-11-09: Unit 3 slot 14, The table as a map of configurations (DI day bundle)
+
+Built by `docs/slot-14/build_slot14.py` (one source; every number computed from an independent shell-filling model and asserted). Outputs in `docs/slot-14/out/`: typed notes (pdflatex), board script (xelatex, red margin remarks), problem sheet and key, exit slips (docx, one page of six), each with its `.tex` or `.docx` source.
+
+- Big question: if I tell you only where an element sits on the table, what can you say about its electrons? Two chunks (build the table from the ladder; valence configuration from position). Nine keepers, three live questions, a core of eight sheet items (14 of 15 minutes, asserted). Clock sums to 50.
+- Table figure through Z = 36 drawn in TikZ; exit slips carry a blank grid (matplotlib) for the drawing.
+- Not taught: Cr, Cu, transition-metal ions, the f block (named only). Slot 10 owns valence, shorthand and Lewis dots; today only uses them.
+- Not done: the Excalidraw stencils (blank table, energy ladder) are named in the script but not drawn; typed notes and script have no ladder figure (the row-by-row filling table stands in).
+- Nothing here is on the site; the files are for printing.
+
+## 2026-11-10 — Slot 15 as a notes huddle; chem lesson board
+- Sim days have ONE huddle at minute 21, mode `write` (DAY-RULES 8d; `pace.js` per-huddle `mode`). No minute-3 or minute-25 huddle on slot 15. Other v3 sim days (e.g. slot 9) still use two huddles until rebuilt.
+- New lesson board `chemistry/whiteboard/index.html#lesson=zeff` (4 frames, answers under covers) and Z_eff stencil shelf. Board script: `day-cards/slot-15.board.md`.

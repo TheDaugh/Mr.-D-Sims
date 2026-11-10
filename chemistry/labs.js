@@ -126,6 +126,16 @@ window.UNITS = [
         teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/electron-config-1.html#key" }, { label: "Board page", href: "unit-3-atoms-ions/electron-config-1-board.html" }, { label: "Teacher page", href: "teacher.html" }]
       },
       {
+        title: "Effective Nuclear Charge and Shielding",
+        type: "lesson",
+        day: 15,
+        icon: "🧲",
+        href: "unit-3-atoms-ions/effective-nuclear-charge.html",
+        blurb: "Mark the core rings, estimate Z_eff = Z minus core, and use the pull meter to see which atom holds its outer electron harder.",
+        tags: ["Z_eff", "shielding", "core electrons", "HS-PS1-1"],
+        teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/effective-nuclear-charge.html#key" }, { label: "Teacher page", href: "teacher.html" }]
+      },
+      {
         title: "Photoelectron Spectroscopy",
         type: "lesson",
         day: 11,
