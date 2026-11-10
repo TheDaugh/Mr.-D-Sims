@@ -3,6 +3,16 @@
 Update this at the end of every session. Newest entry first.
 
 
+## 2026-11-09: Calculus Unit 3 Review + Quiz and Review + Test (branch `calc-unit3-assessments`, stacked on `calc-4-1-to-4-3`)
+
+Two self-paced pages in `calculus/unit-3-composite-implicit-inverse/`: `unit-3-quiz.html` (Review + Quiz, 3.1 to 3.3, 15 problems, next link goes to 3.4) and `unit-3-test.html` (Review + Test, all of 3.1 to 3.5, 20 problems, next link goes to 4.1). Tabs: Start, Review (two problems per lesson with hints, plus each lesson's own concept lines), Quiz or Test (scored: one try each, no hints, band 3 = the regular standard, lessons mixed), Result. The pass mark is 85% of first-try rights (13 of 15, 17 of 20). The next-lesson link only shows on a pass. A miss lists the lessons where problems were missed (links to redo them) and a Retake button draws a new set (different skills and numbers); every try is kept and the score is recorded with `MrD.profile.record`.
+
+New engine file `physics/lessons/engine/assess.js` (`LK.assessment`), no new question bank: it reuses the five lessons' own skill generators (`window.SPECS`). `plan()`, `need()` and `reviewPlan()` are pure and tested. Registered in `shared/lessons.js` (no huddle gates), hub cards with teacher `#key` links in `calculus/sims.js`, lock e2e targets added.
+
+Checks run: `node tools/check-lessons.mjs --strict` 0 errors; `node --test tests/unit/*.test.js` 286 pass (new `assessment.test.js`); `TZ=America/New_York node tests/assessment.e2e.js` (new: review needs every item; a miss one over the line fails with a retake of different questions; exactly the pass mark passes and shows the next link; both tries kept; #key tabs; no hint button in the scored part) all passed; `node tests/lock.e2e.js` all passed; `node tests/smoke.js` 48 pages load clean; quiz, review and a failing result viewed in screenshots.
+
+Not done: the 85% is enforced on the result page only. The next lesson's own page (3.4 or 4.1) does not check for a pass, so a student can open it by its address or the hub. Locked mode releases when the student reaches Result. The test links to 4.1, which is on `calc-4-1-to-4-3` (PR #47), so merge that first. Not live until Ian merges.
+
 ## 2026-11-09: Calculus 4.1, 4.2, 4.3 as online self-paced guided lessons (branch `calc-4-1-to-4-3`)
 
 Ian asked for the first half of Unit 4 as online guided lessons students can do on their own. Read as 4.1 to 4.3 of 4.1 to 4.7 (4.4 Straight-line motion extras / related rates is the next one if "first half" meant four). Built from the calc template, not copied: `4-1-derivative-context` (Interpreting Derivatives in Context), `4-2-motion` (Position, Velocity and Acceleration), `4-3-rates-other` (Rates of Change in Other Contexts). Each is self-paced like 3.5: no clock, no huddle, no stamp; four Explore stations with named wrong-try messages; three hidden bands. New shared helper `calculus/shared/xkit.js` (plot, tangent, slider, shuffled choices). Registered in `shared/lessons.js`, hub group "Unit 4" in `calculus/sims.js` (teacher links), keys in `keys/calc/`, outlines beside each page.

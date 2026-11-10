@@ -129,6 +129,28 @@ window.UNITS = [
           { label: "Teacher key PDF", href: "../keys/calc/3-5-higher-order-teacher.pdf" },
           { label: "Make-up notes PDF", href: "../keys/calc/3-5-higher-order-makeup.pdf" }
         ]
+      },
+      {
+        type: "lesson",
+        icon: "✅",
+        title: "Review + Quiz: 3.1 to 3.3",
+        href: "unit-3-composite-implicit-inverse/unit-3-quiz.html",
+        blurb: "Review the chain rule, implicit differentiation and inverse functions with hints, then take a 15-question quiz: one try each, no hints. You need 85% to go on to 3.4. If you miss it, redo the lessons you missed and retake with new questions.",
+        tags: ["review", "quiz", "85% to move on", "self-paced"],
+        teacher: [
+          { label: "Teacher view (#key)", href: "unit-3-composite-implicit-inverse/unit-3-quiz.html#key" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "🏁",
+        title: "Review + Test: Unit 3",
+        href: "unit-3-composite-implicit-inverse/unit-3-test.html",
+        blurb: "Review all of Unit 3 with hints, then take a 20-question test: one try each, no hints. You need 85% to go on to Unit 4. If you miss it, redo the lessons you missed and retake with new questions.",
+        tags: ["review", "test", "85% to move on", "self-paced"],
+        teacher: [
+          { label: "Teacher view (#key)", href: "unit-3-composite-implicit-inverse/unit-3-test.html#key" }
+        ]
       }
     ]
   },
