@@ -6,6 +6,7 @@
    Each item is one group, so it moves and resizes as a single object. Ungroup (Ctrl+Shift+G) to edit parts. */
 
 import { INK, BLUE, rect, ellipse, text, line, arrow, labeled, makeItem } from './draw.js';
+import Zeff from '../../../chemistry/shared/zeff.js';   /* the same model the Z_eff lesson page uses, so the board and the page cannot disagree */
 
 function item(convert, name, skeletons) { return makeItem(convert, 'chem', name, skeletons); }
 
@@ -60,6 +61,31 @@ function bohr(rings, counts) {
       }
     }
   }
+  return out;
+}
+
+/* ---------- atoms for Z_eff: rings, electrons, a red nucleus. shade = core rings amber, outer ring blue (the picture on the lesson page). ---------- */
+
+var AMBER = '#e8a317';
+function zatom(Z, o) {
+  o = o || {};
+  var a = Zeff.atom(Z), out = [], R = RING[a.n - 1] + 10, cx = R, cy = R, i, j, r, k, ang, core, col;
+  for (i = 0; i < a.n; i++) {
+    r = RING[i]; core = i < a.n - 1; col = o.shade ? (core ? AMBER : BLUE) : INK;
+    out.push(ellipse(cx - r, cy - r, 2 * r, 2 * r, { strokeColor: col, strokeWidth: o.shade ? 3 : 2 }));
+    for (j = 0; j < a.rings[i]; j++) {
+      ang = (-90 + i * 25 + (360 * j) / a.rings[i]) * Math.PI / 180;
+      out.push(ellipse(cx + r * Math.cos(ang) - 6, cy + r * Math.sin(ang) - 6, 12, 12, { backgroundColor: o.shade && core ? AMBER : BLUE, strokeColor: o.shade && core ? AMBER : BLUE, strokeWidth: 1 }));
+    }
+  }
+  out.push(ellipse(cx - 22, cy - 22, 44, 44, { backgroundColor: '#ffc9c9', strokeColor: '#e03131' }));
+  out.push(text(cx - 16, cy - 11, '+' + Z, 20, { strokeColor: '#c92a2a', strokeWidth: 2 }));
+  return out;
+}
+/* a labeled card: a heading line and body lines, for the three rules the notes huddle writes */
+function zcard(head, lines) {
+  var out = [rect(0, 0, 520, 40 + lines.length * 34, { strokeWidth: 2, backgroundColor: '#fff9db' }), text(14, 8, head, 24, { strokeWidth: 2 })], i;
+  for (i = 0; i < lines.length; i++) out.push(text(14, 46 + i * 34, lines[i], 22));
   return out;
 }
 
@@ -186,6 +212,12 @@ function buildLibrary(convert) {
   add('Table · blank with group and period numbers', periodicTable({ numbers: true }));
   add('Table · s, p, d, f blocks shaded', periodicTable({ blocks: true }));
 
+  /* Z_eff (slot 15): core rings amber, outer ring blue. Zeff.atom does the counting. */
+  [3, 11, 19, 12, 17].forEach(function (z) { add('Z_eff · ' + Zeff.atom(z).name + ' (' + Zeff.atom(z).rings.join(',') + '), core shaded', zatom(z, { shade: true })); });
+  add('Z_eff · the rule', zcard('Z_eff = Z − core', ['core = every electron inside the outer ring', 'valence electrons do not shield each other']));
+  add('Z_eff · the five moves', zcard('Five moves', ['1  Count the electrons in each ring', '2  Mark the core rings', '3  Z_eff = Z − core', '4  Count the outer ring number, n', '5  Pull = Z_eff ÷ n²']));
+  add('Z_eff · pull = Z_eff ÷ n²', zcard('Pull on the outer electron', ['pull = Z_eff ÷ n²', 'n is the number of the outer ring', 'a classroom model number, not a measurement']));
+
   /* Energy level ladders */
   add('Levels · n = 1 to 5 (bunch up)', levels(5));
   add('Levels · 3 evenly spaced', simpleLevels(3));
@@ -203,7 +235,8 @@ var SHELVES = [
   { name: 'Electron configuration', prefixes: ['Config', 'Spin'] },
   { name: 'Atom pictures', prefixes: ['Bohr'] },
   { name: 'Periodic table', prefixes: ['Table'] },
-  { name: 'Energy levels', prefixes: ['Levels'] }
+  { name: 'Energy levels', prefixes: ['Levels'] },
+  { name: 'Z_eff', prefixes: ['Z_eff'] }
 ];
 
-export { buildLibrary, SHELVES };
+export { buildLibrary, SHELVES, zatom, zcard };

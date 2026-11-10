@@ -171,7 +171,7 @@
     { term: 'pull meter', words: ['meter'], who: 'tutorial', slot: 15 }
   ];
 
-  var pacing = { budgetMin: 42, clock: 'v3' };
+  var pacing = { budgetMin: 42, clock: 'v3', huddles: [{ key: 'h1', atMin: 21, mode: 'write' }] };   // sim day: one notes huddle in the middle, no talking at minute 3 or 25
 
   var CONTENT = { id: 'unit3-slot15', Z: Z, NAME: NAME, SYM: SYM, DIP_PAIRS: DIP_PAIRS, isDip: isDip, POOLS: POOLS, pairFor: pairFor, pairSpec: pairSpec, harder: harder, reasonFor: reasonFor,
     skills: skills, warmup: warmup, talk: talk, predicts: predicts, MOVES: MOVES, models: models, crux: crux, exit: exit, scoring: scoring, misconceptions: misconceptions,

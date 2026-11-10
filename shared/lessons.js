@@ -89,5 +89,5 @@ window.MrD.lessons = [
   { course: "chem", id: "effective-nuclear-charge", title: "Effective Nuclear Charge and Shielding", unit: "unit-3-atoms-ions",
     href: "chemistry/unit-3-atoms-ions/effective-nuclear-charge.html", teacher: "chemistry/teacher.html",
     spec: "chemistry/unit-3-atoms-ions/effective-nuclear-charge.spec.js",
-    gates: [{ key: "h1", label: "Huddle 1" }, { key: "h2", label: "Huddle 2" }], live: true }
+    gates: [{ key: "h1", label: "Huddle" }], live: true }
 ];

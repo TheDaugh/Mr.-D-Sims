@@ -6,7 +6,7 @@
    for the Pull Meter, the Models tab and the banned words. The chem bell for these tests is 10:41, so minute 3 is 10:44 and minute 25 is 11:06. */
 const C = require('../../chemistry/unit-3-atoms-ions/day-cards/slot-15.content.js');
 const Z = C.Z;
-const EARLY = '2026-10-21T10:41:30-04:00', H1 = '2026-10-21T10:44:10-04:00', H2 = '2026-10-21T11:06:10-04:00', LATE = '2026-10-21T11:30:00-04:00';
+const EARLY = '2026-10-21T10:41:30-04:00', M3 = '2026-10-21T10:44:10-04:00', H1 = '2026-10-21T11:02:10-04:00', H2 = '2026-10-21T11:06:10-04:00', LATE = '2026-10-21T11:30:00-04:00';
 
 async function solve(page, H, wrong) {
   for (let guard = 0; guard < 60; guard++) {
@@ -53,28 +53,27 @@ module.exports = {
       H.assert.strictEqual(await page.evaluate(() => LE.S().warm), 0);
       H.assert.deepStrictEqual(errs, []); await ctx.close();
     },
-    'Timed huddle: at minute 18 the clock pulls the class in, blanks can be written, Continue returns': async H => {   // v3: minute 3 hold, minute 25 writable
+    'Timed huddle: at minute 18 the clock pulls the class in, blanks can be written, Continue returns': async H => {   // sim day: one notes huddle at minute 21
       const { ctx, page, errs } = await H.open(H.br, '', EARLY); await H.tick(page); await H.start(page, H.myId, '3'); await H.next(page);
       await solve(page, H, false); await H.tick(page, 900); await H.next(page); H.assert.strictEqual(await H.step(page), 'predict');
+      await page.clock.setSystemTime(new Date(M3)); await H.tick(page, 2500);
+      H.assert.strictEqual(await H.step(page), 'predict', 'sim day: nothing pulls the class in at minute 3');
       await page.clock.setSystemTime(new Date(H1)); await H.tick(page, 2500);
-      H.assert.strictEqual(await H.step(page), 'huddle');
+      H.assert.strictEqual(await H.step(page), 'huddle', 'the one huddle fires at minute 21');
       let text = await page.locator('.card').innerText();
-      H.assert.ok(text.includes('Huddle 1: eyes up'), 'huddle 1 is the hold screen'); H.assert.strictEqual(await page.locator('.hd-line input').count(), 0, 'nothing to write at huddle 1');
+      H.assert.ok(!text.includes('eyes up'), 'the huddle is the notes tab, not a hold screen'); H.assert.ok(await page.locator('.hd-line input').count() >= 10, 'blanks to copy from the board');
+      H.assert.strictEqual(await page.locator('input[aria-label="Huddle code"]').count(), 1, 'one code box, labeled Huddle code');
       await page.locator('input[aria-label^="Huddle"]').fill('0000'); await page.getByRole('button', { name: 'Enter code' }).click(); H.assert.ok(await page.locator('.msg.bad').isVisible(), 'a wrong code is refused');
-      await enterCode(page, H, 'h1'); H.assert.ok(await page.locator('.msg.ok').count(), 'code accepted');
-      await H.next(page); H.assert.strictEqual(await H.step(page), 'predict', 'returns to where the student was');
-      await page.clock.setSystemTime(new Date(H1)); await H.tick(page, 2500); H.assert.strictEqual(await H.step(page), 'predict', 'huddle 1 fires once');
-      await page.clock.setSystemTime(new Date(H2)); await H.tick(page, 2500);
-      H.assert.strictEqual(await H.step(page), 'huddle'); text = await page.locator('.card').innerText();
-      H.assert.ok(!text.includes('eyes up'), 'huddle 2 is the writable tab');
       const blanks = await page.evaluate(() => { const sp = window.SPECS['effective-nuclear-charge'], out = []; (sp.huddle.defs || []).forEach(d => MrD.huddle.parse(d.text).forEach(p => p.b && out.push(p.b))); return out; });
       await page.locator('.hd-line input').first().fill(blanks[0]); await page.locator('.hd-line input').nth(1).fill(blanks[1]);
       await page.getByRole('button', { name: 'Check mine' }).click(); H.assert.ok(await page.locator('.hd-line input.ok').count() >= 2);
       H.assert.strictEqual(await page.evaluate(() => window.__q.length), 3, 'three crux questions follow the blanks');
       await solve(page, H, false); await H.tick(page, 600);
       H.assert.strictEqual(await page.evaluate(() => ['K1', 'K2', 'K3'].every(id => LE.qs(id).ok && LE.qs(id).misses === 0)), true);
-      await enterCode(page, H, 'h2'); H.assert.notStrictEqual(await huddleCode(page, 'h1'), await huddleCode(page, 'h2'), 'two different codes a day');
-      await H.next(page); H.assert.strictEqual(await H.step(page), 'predict');
+      await enterCode(page, H, 'h1'); H.assert.ok(await page.locator('.msg.ok').count(), 'code accepted');
+      await H.next(page); H.assert.strictEqual(await H.step(page), 'predict', 'returns to where the student was');
+      await page.clock.setSystemTime(new Date(H1)); await H.tick(page, 2500); H.assert.strictEqual(await H.step(page), 'predict', 'the huddle fires once');
+      await page.clock.setSystemTime(new Date(H2)); await H.tick(page, 2500); H.assert.strictEqual(await H.step(page), 'predict', 'and there is no second huddle at minute 25');
       H.assert.deepStrictEqual(errs, []); await ctx.close();
     },
     'Pace trim: far behind skips Explore and shrinks Build; core tabs stay': async H => {   // v3 never trims or skips

@@ -1,10 +1,12 @@
-/* Lesson board check (stats whiteboard, #lesson=<id>; default 3.4, set LESSON=3.5 or 3.6): opens, shows every frame, reveals an answer, keeps what you write across a reload,
+/* Lesson board check (stats whiteboard, #lesson=<id>; default 3.4, set LESSON=3.5 or 3.6; the chem board: BOARD=chem LESSON=zeff): opens, shows every frame, reveals an answer, keeps what you write across a reload,
    and starts over. Needs `python3 -m http.server 8123` from the repo root.
-   Run: [LESSON=3.5] PLAYWRIGHT_DIR=/opt/node-tools/node_modules/playwright node tests/lesson-board.e2e.js */
+   Run: [BOARD=chem] [LESSON=3.5] PLAYWRIGHT_DIR=/opt/node-tools/node_modules/playwright node tests/lesson-board.e2e.js */
 const { chromium } = require(process.env.PLAYWRIGHT_DIR || 'playwright');
-const LESSON = process.env.LESSON || '3.4';
-const NFRAMES = { '3.4': 7, '3.5': 5, '3.6': 5 }[LESSON];
-const URL = 'http://localhost:8123/stats/whiteboard/index.html#lesson=' + LESSON;
+const BOARD = process.env.BOARD || 'stats';
+const LESSON = process.env.LESSON || (BOARD === 'chem' ? 'zeff' : '3.4');
+const NFRAMES = { '3.4': 7, '3.5': 5, '3.6': 5, zeff: 4 }[LESSON];
+const MINCOVERS = BOARD === 'chem' ? 10 : 20;
+const URL = 'http://localhost:8123/' + (BOARD === 'chem' ? 'chemistry' : BOARD) + '/whiteboard/index.html#lesson=' + LESSON;
 let bad = 0;
 const ok = (c, m) => { if (!c) { bad++; console.log('FAIL ' + m); } else console.log('ok   ' + m); };
 (async () => {
@@ -20,7 +22,7 @@ const ok = (c, m) => { if (!c) { bad++; console.log('FAIL ' + m); } else console
   const frames = await p.evaluate(() => window.MRD_API.getSceneElements().filter(e => String(e.id).indexOf('lesson-frame-') === 0).length);
   ok(frames === NFRAMES, NFRAMES + ' lesson frames (' + frames + ')');
   const covers = await p.evaluate(() => window.MRD_API.getSceneElements().filter(e => e.backgroundColor === '#ffd8a8' && e.type === 'rectangle').length);
-  ok(covers > 20, 'answer covers present (' + covers + ')');
+  ok(covers > MINCOVERS, 'answer covers present (' + covers + ')');
   const x0 = await p.evaluate(() => window.MRD_API.getAppState().scrollX);
   await p.click('.frames button:nth-child(3)'); await p.waitForTimeout(900);
   const x1 = await p.evaluate(() => window.MRD_API.getAppState().scrollX);
@@ -31,8 +33,8 @@ const ok = (c, m) => { if (!c) { bad++; console.log('FAIL ' + m); } else console
   await p.reload(); await p.waitForSelector('.excalidraw'); await p.waitForTimeout(2500);
   const gone = await p.evaluate(id => { const e = window.MRD_API.getSceneElements().find(x => x.id === id); return !e || e.isDeleted; }, cid);
   ok(gone, 'a revealed answer stays revealed after reload');
-  const saved = await p.evaluate(k => localStorage.getItem(k) !== null && localStorage.getItem('mrd-stats-whiteboard-v1') === null, 'mrd-stats-lesson-' + LESSON + '-v1');
-  ok(saved, 'lesson saves under its own key and leaves the plain stats board alone');
+  const saved = await p.evaluate(([k, plain]) => localStorage.getItem(k) !== null && localStorage.getItem(plain) === null, ['mrd-' + BOARD + '-lesson-' + LESSON + '-v1', 'mrd-' + BOARD + '-whiteboard-v1']);
+  ok(saved, 'lesson saves under its own key and leaves the plain board alone');
   await p.click('.frames button:last-child'); await p.waitForTimeout(2500);
   const back = await p.evaluate(() => window.MRD_API.getSceneElements().filter(e => e.backgroundColor === '#ffd8a8' && e.type === 'rectangle' && !e.isDeleted).length);
   ok(back === covers, 'Start over redraws the lesson (' + back + ' covers, as at the start)');

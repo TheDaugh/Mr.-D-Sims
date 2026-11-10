@@ -11,6 +11,8 @@
    Huddle 1 is called at minute 3 and huddle 2 at minute 25 by default; a lab day overrides with
    huddles: [{ key:"h1", atMin:3 }, { key:"h2", atMin:33 }]. A v3 lesson never trims or skips: decide() returns no trim.
    Huddle 1 is a hold screen (Mr. D talks); huddle 2 is the writable Huddle tab. See huddleMode().
+   A sim day (a virtual lab, students on their computers) has ONE huddle in the middle, a notes huddle where students copy what Mr. D writes on the board:
+   huddles: [{ key:"h1", atMin:21, mode:"write" }]   (a huddle's own mode wins over the default).
 
    MrD.pace.validate(pacing)            [error strings], empty when fine
    MrD.pace.decide(pacing, {minutesIn, stepId, doneIds})
@@ -30,7 +32,10 @@
   /* The huddles that apply: the lesson's own list when it has one, else the v3 default, else none. */
   function huddlesOf(p) { return p && p.huddles ? p.huddles : (isV3(p) ? CLOCK_V3.map(function (h) { return { key: h.key, atMin: h.atMin }; }) : []); }
   /* "hold" = Mr. D is talking and students see only the code box (v3 huddle 1). "write" = the writable Huddle tab. */
-  function huddleMode(p, key) { return isV3(p) && key === "h1" ? "hold" : "write"; }
+  function huddleMode(p, key) {
+    var own = (p && p.huddles || []).filter(function (h) { return h.key === key && h.mode; })[0];   // a huddle can name its own mode
+    return own ? own.mode : (isV3(p) && key === "h1" ? "hold" : "write");
+  }
 
   function cost(s, shrunk) { return shrunk && s.minItems && s.parts ? s.min * s.minItems / s.parts : s.min; }
 

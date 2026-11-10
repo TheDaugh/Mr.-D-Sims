@@ -293,3 +293,7 @@ Built by `docs/slot-14/build_slot14.py` (one source; every number computed from 
 - Not taught: Cr, Cu, transition-metal ions, the f block (named only). Slot 10 owns valence, shorthand and Lewis dots; today only uses them.
 - Not done: the Excalidraw stencils (blank table, energy ladder) are named in the script but not drawn; typed notes and script have no ladder figure (the row-by-row filling table stands in).
 - Nothing here is on the site; the files are for printing.
+
+## 2026-11-10 — Slot 15 as a notes huddle; chem lesson board
+- Sim days have ONE huddle at minute 21, mode `write` (DAY-RULES 8d; `pace.js` per-huddle `mode`). No minute-3 or minute-25 huddle on slot 15. Other v3 sim days (e.g. slot 9) still use two huddles until rebuilt.
+- New lesson board `chemistry/whiteboard/index.html#lesson=zeff` (4 frames, answers under covers) and Z_eff stencil shelf. Board script: `day-cards/slot-15.board.md`.

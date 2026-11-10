@@ -157,7 +157,7 @@
           S.d.hud = S.d.hud || {};
           var host = el('div'); card.appendChild(host);
           MrD.huddle.render(host, opts.spec, S.d.hud, { key: c.key, onChange: function () { LE.save(); } });
-          K.codeBox(card, c, (P && P.clock === 'v3') ? key : (opts.gateKey || 'h1'), (P && P.clock === 'v3') ? 'Huddle 2 code' : 'Huddle code');
+          K.codeBox(card, c, (P && P.clock === 'v3') ? key : (opts.gateKey || 'h1'), (P && P.clock === 'v3' && MrD.pace.huddlesOf(P).length > 1) ? (key === 'h1' ? 'Huddle 1 code' : 'Huddle 2 code') : 'Huddle code');
         },
         canLeave: function (c) { return true; },
         teacher: opts.teacher };

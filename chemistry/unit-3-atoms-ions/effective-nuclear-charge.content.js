@@ -137,7 +137,7 @@
         SP.warmup.map(function (w) { return w.id + ' = ' + LK.plain(w.options ? w.options[w.answer] : w.answer) + ' (' + LK.plain(w.pattern) + ')'; }).join('; ') + '.</p>';
     } };
 
-  /* ---------- Huddle: v3. Huddle 1 (minute 3) is the hold screen the kit draws. Huddle 2 (minute 25) is the writable tab; the three crux questions follow the blanks. ---------- */
+  /* ---------- Huddle: a sim day has ONE huddle, in the middle (minute 21), and it is a notes huddle: students copy what Mr. D writes on the board. The crux questions follow the blanks. ---------- */
   var hs = cfg.steps[stepIdx('huddle')], hRender = hs.render;
   hs.render = function (card, c) {
     hRender(card, c);
@@ -152,8 +152,7 @@
   };
   hs.teacher = function () {
     var items = SP.crux.map(function (x) { return x.id + (LE.qs(x.id) && LE.qs(x.id).done ? (firstTry(x.id) ? ' (first try)' : ' (missed)') : ' (not reached)'); }).join(', ');
-    return '<p><b>Huddle 1 code: ' + LE.codeFor(ID, 'h1') + ' (minute 3, hold screen).</b> Review sodium and lithium from slot 14, the hook is “' + LK.plain(SP.talk[0]) + '”, then show Z_eff = Z − core on lithium (M1). Students see only the code box.</p>' +
-      '<p><b>Huddle 2 code: ' + LE.codeFor(ID, 'h2') + ' (minute 25, writable).</b> Define core electrons, shielding and Z_eff, work sodium on the board (students fill the blanks), label the atom. The three crux questions mirror the board and are the items that count: ' + items + '. They state what is tested.</p>';
+    return '<p><b>Huddle code: ' + LE.codeFor(ID, 'h1') + ' (minute 21, the only huddle; no talking at minute 3 or 25).</b> Students are on their computers, so nothing is taught before this. At minute 21 everyone looks up and copies the board: core electrons, shielding, Z_eff, sodium worked, the atom labeled (board: chem board, <code>#lesson=zeff</code>; script: <code>day-cards/slot-15.board.md</code>). Then the three crux questions, which mirror the board and say what is tested: ' + items + '.</p>';
   };
 
   /* ---------- Models tab (after the huddle) ---------- */

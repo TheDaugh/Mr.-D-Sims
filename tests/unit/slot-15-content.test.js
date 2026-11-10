@@ -111,10 +111,10 @@ test('models, crux, exit and warm-up: every stored answer is recomputed', () => 
   assert.ok(!C.isDip(3, 11) && !C.isDip(11, 19) && !C.isDip(11, 14));
 });
 
-test('v3 clock: no steps, huddles at minutes 3 and 25', () => {
+test('v3 clock, sim day: one writable huddle at minute 21', () => {
   const pace = require('../../shared/pace.js');
   assert.deepStrictEqual(pace.validate(C.pacing), []); assert.strictEqual(pace.isV3(C.pacing), true);
-  assert.deepStrictEqual(pace.huddlesOf(C.pacing).map(h => [h.key, h.atMin]), [['h1', 3], ['h2', 25]]);
+  assert.deepStrictEqual(pace.huddlesOf(C.pacing).map(h => [h.key, h.atMin]), [['h1', 21]]); assert.strictEqual(pace.huddleMode(C.pacing, 'h1'), 'write');
 });
 
 test('teachability: every content word a student sees is tagged to Mr. D, a tutorial or an earlier lesson, and nothing from slot 17 or later appears', () => {
