@@ -1,0 +1,101 @@
+{
+ "id": "pull-bench",
+ "theme": {
+  "wall": "#6d7f93",
+  "wallBack": "#5d6f83",
+  "floorA": "#d7dde4",
+  "floorB": "#cdd4dc",
+  "bg": "#171c22"
+ },
+ "start": {
+  "x": 4,
+  "y": 10,
+  "face": "u"
+ },
+ "rows": [
+  "############",
+  "#W.........#",
+  "#..........#",
+  "#....UUU...#",
+  "#..........#",
+  "#..........#",
+  "####D#######",
+  "#N.........#",
+  "#..........#",
+  "#..........#",
+  "#..........#",
+  "############"
+ ],
+ "legend": {
+  "#": {
+   "type": "wall",
+   "solid": true
+  },
+  ".": {
+   "type": "floor"
+  },
+  "D": {
+   "type": "door",
+   "id": "door",
+   "label": "PULL BENCH ROOM",
+   "name": "Door to the pull bench room",
+   "text": "The door to the bench room. It opens once you have read the picture card."
+  },
+  "U": {
+   "type": "station",
+   "solid": true,
+   "id": "spectrometer",
+   "label": "PULL BENCH",
+   "name": "Pull bench",
+   "text": "The pull bench: pick an atom, see its rings, and measure how hard its outer electron is held. Press E to use it."
+  },
+  "K": {
+   "type": "station",
+   "solid": true,
+   "id": "carousel",
+   "label": "SAMPLES",
+   "name": "Sample carousel",
+   "text": "A carousel of sealed vapor cells, one for each element from hydrogen to calcium, and four mystery cells. Press E to use it."
+  },
+  "B": {
+   "type": "station",
+   "solid": true,
+   "id": "draw_bench",
+   "label": "DRAW BENCH",
+   "name": "Draw bench",
+   "text": "The draw bench: graph paper for sketching a spectrum, then checking it against the real run. Press E to use it."
+  },
+  "W": {
+   "type": "info",
+   "solid": true,
+   "id": "pt_chart",
+   "label": "TABLE",
+   "name": "Periodic table chart",
+   "text": "A wall chart of the first twenty elements. Position on the chart tells you the period and the group."
+  },
+  "Y": {
+   "type": "info",
+   "solid": true,
+   "id": "vac_pump",
+   "label": "PUMP",
+   "name": "Vacuum pump",
+   "text": "The pump. Electrons would hit air and stop before reaching the detector, so the chamber is pumped nearly empty."
+  },
+  "G": {
+   "type": "info",
+   "solid": true,
+   "id": "gas_line",
+   "label": "GAS",
+   "name": "Gas cylinders",
+   "text": "Gas cylinders. Every sample is a vapor so that the atoms are far apart and do not bother each other."
+  },
+  "N": {
+   "type": "info",
+   "solid": true,
+   "id": "pes_notice",
+   "label": "NOTICE",
+   "name": "Notice board",
+   "text": "Notice: 'The pull is a classroom number. It ranks atoms; it is not a measurement.'"
+  }
+ }
+}

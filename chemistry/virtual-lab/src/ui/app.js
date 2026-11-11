@@ -16,6 +16,7 @@ import { runDemo } from "./demo.js";
 import { createFlame, newFlame, fixFlame } from "./flame.js";
 import * as FE from "../engine/flame.js";
 import * as pesKind from "./pes.js";
+import * as zeffKind from "./zeff.js";
 import { huddleDue, huddleTimes } from "../../../../shared/virtual-lab/clock.js";
 import { questDone, questProgress } from "../../../../shared/virtual-lab/quests.js";
 import { drawIcon } from "../../../../shared/virtual-lab/icons.js";
@@ -33,14 +34,17 @@ import { parseRoom, step, facingTile, hasPPE, tileAt } from "../../../../shared/
 const FIT = fitStage($("#stage"));
 let CAP = 10;
 // A page in another folder (physics/virtual-lab) sets window.VLAB_HOST before this file loads: its labs, its lab kinds, the shared content folder, its course, its room art and icons.
-const HOST = window.VLAB_HOST || {}, SHARED = HOST.base || "", COURSE = HOST.course || "chem", kindOf = (lab) => (HOST.kinds || {})[lab.kind] || (lab.kind === "pes" ? pesKind : null);
-const LABS = HOST.labs || { "unknown-solids": "01-unknown-solids.json", heating: "02-heating-curves.json", rutherford: "03-rutherford-gold-foil.json", flame: "04-flame-tests.json", pes: "05-photoelectron.json" };
+const HOST = window.VLAB_HOST || {}, SHARED = HOST.base || "", COURSE = HOST.course || "chem", kindOf = (lab) => (HOST.kinds || {})[lab.kind] || (lab.kind === "pes" ? pesKind : lab.kind === "zeff" ? zeffKind : null);
+const LABS = HOST.labs || { "unknown-solids": "01-unknown-solids.json", heating: "02-heating-curves.json", rutherford: "03-rutherford-gold-foil.json", flame: "04-flame-tests.json", pes: "05-photoelectron.json", zeff: "06-effective-nuclear-charge.json" };
 const PRACTICE = { id: "practice", mass: 10, power: 100, T0: 20, mp: 50, bp: 150, Tend: 90, cs: 2, cl: 2.5, cg: 2, Lf: 200, Lv: 1000 };
 const SHORT = { NaCl: "Salt", sucrose: "Sugar", NaHCO3: "B.Soda", CaCO3: "Chalk", starch: "Starch", citric: "Citric", water: "Water", vinegar: "Vinegar", iodine: "Iodine" };
 
 async function boot() {
   try {
-    const params = new URLSearchParams(location.search), labFile = LABS[params.get("lab")] || LABS[HOST.defaultLab || "unknown-solids"];
+    const params = new URLSearchParams(location.search);
+    // A lab address with a key this page does not know used to fall back to the default lab without a word: the link "worked" and the wrong lab (or none) showed. Say so instead.
+    if (params.has("lab") && !LABS[params.get("lab")]) throw new Error(`There is no lab called "${params.get("lab")}" on this page. Labs here: ${Object.keys(LABS).join(", ")}. If the lab is new, it is not on the site until it is merged to main.`);
+    const labFile = LABS[params.get("lab")] || LABS[HOST.defaultLab || "unknown-solids"];
     const getJSON = (u) => (window.__CONTENT__ && window.__CONTENT__[u] ? Promise.resolve(structuredClone(window.__CONTENT__[u])) : fetch(u).then((r) => { if (!r.ok) throw new Error(u); return r.json(); }));
     const lab = await getJSON("content/labs/" + labFile);
     if (kindOf(lab)) await kindOf(lab).load(lab, getJSON);
@@ -63,7 +67,8 @@ async function boot() {
   } catch (e) {
     console.error(e);
     $("#boot").hidden = false;
-    $("#boot").replaceChildren(h("p", {}, "This lab has to be opened from the web (GitHub Pages) or a local server. Double-clicking the file does not work because browsers block the files it loads."), h("p", { class: "hint" }, String(e.message || e)));
+    const msg = String(e.message || e);
+    $("#boot").replaceChildren(...(msg.startsWith("There is no lab") ? [h("p", {}, msg)] : [h("p", {}, "This lab has to be opened from the web (GitHub Pages) or a local server. Double-clicking the file does not work because browsers block the files it loads."), h("p", { class: "hint" }, msg)]));
   }
 }
 

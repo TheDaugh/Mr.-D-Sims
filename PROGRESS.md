@@ -307,3 +307,12 @@ Built by `docs/slot-14/build_slot14.py` (one source; every number computed from 
 ## 2026-11-10 — Slot 15 as a notes huddle; chem lesson board
 - Sim days have ONE huddle at minute 21, mode `write` (DAY-RULES 8d; `pace.js` per-huddle `mode`). No minute-3 or minute-25 huddle on slot 15. Other v3 sim days (e.g. slot 9) still use two huddles until rebuilt.
 - New lesson board `chemistry/whiteboard/index.html#lesson=zeff` (4 frames, answers under covers) and Z_eff stencil shelf. Board script: `day-cards/slot-15.board.md`.
+
+## 2026-11-11 — Slot 14 sheet rebuilt to the four modules
+- Sheet now follows problem-sheet-modules: Review L1-L4, Concept C1-C6 (C1-C3 are the live questions), Practice P1-P9 (core C4-C6 + P1-P5 = 14.0 of 15 min), Challenge H1-H4, spice meter, hint ladders in the key only. "Watch for" lines moved off the student sheet into the key. Board script updated to call items by number.
+
+## 2026-11-11 — Slot 15 rebuilt as a virtual lab (the guided lesson is retired)
+- Ian: a sim is a virtual lab, not a guided lesson; its length is his call; shorter and more exploratory. The slot-15 lesson page, its spec/models/content, key, outline, lesson e2e and unit test are deleted. New: `?lab=zeff` (the Pull Bench): `chemistry/virtual-lab/src/ui/zeff.js`, `src/engine/zeff-lab.js`, `content/labs/06-effective-nuclear-charge.json`, room `pull-bench.json`. 20 minutes by default (`lengthMin`), `&min=NN` overrides; one notes huddle at the middle (seven blanks, day's first code); predict Na vs Mg; mystery atom; demo (9 captions); tutorial arrows on the first two quests.
+- Display bug (the URL works, the lab does not show): (1) an unknown `?lab=` key used to fall back silently to the default lab; it now says so. (2) A kind module that read `window.Zeff` at import broke the physics lab page (the shared app imports every kind); caught by the new `tests/labs-display.e2e.js`, which opens every hub card's own address. (3) `.gitignore` ignores `out` and `dist`: `docs/slot-14/out` had never been committed (now force-added).
+- STANDARD.md: length is Ian's call, one huddle on a sim day, and a menu of interaction styles (drag and drop and others) to use only when they fit. DAY-RULES 8d rewritten. Hub card, portal map and lock/standard tests point at the lab. Worksheet (27 points) and key rebuilt for the lab: `docs/slot-15/build_worksheet.py`.
+- Not verified: the live site (Netlify), a real student session, the lab on a Chromebook. Mr. D's board still has four frames; the lab uses frames 1, 2 and 4.

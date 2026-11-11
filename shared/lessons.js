@@ -89,9 +89,5 @@ window.MrD.lessons = [
     gates: [{ key: "h1", label: "Huddle" }], live: true },
   { course: "calc", id: "4-3-rates-other", title: "4.3 Rates of Change in Other Contexts", unit: "unit-4-contextual-applications",
     href: "calculus/unit-4-contextual-applications/4-3-rates-other.html", spec: "calculus/unit-4-contextual-applications/4-3-rates-other.spec.js",
-    gates: [{ key: "h1", label: "Huddle" }], live: true },
-  { course: "chem", id: "effective-nuclear-charge", title: "Effective Nuclear Charge and Shielding", unit: "unit-3-atoms-ions",
-    href: "chemistry/unit-3-atoms-ions/effective-nuclear-charge.html", teacher: "chemistry/teacher.html",
-    spec: "chemistry/unit-3-atoms-ions/effective-nuclear-charge.spec.js",
     gates: [{ key: "h1", label: "Huddle" }], live: true }
 ];
