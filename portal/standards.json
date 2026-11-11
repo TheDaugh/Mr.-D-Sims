@@ -110,7 +110,7 @@
       "can": "I can estimate Z_eff as Z minus the core electrons and use it, with the ring number, to compare how hard two atoms hold an outer electron.",
       "codes": [{ "framework": "NGSS", "code": "HS-PS1-1", "note": "Supports the electron-pattern reasoning HS-PS1-1 rests on. Confirm." }, { "framework": "NGSS", "code": "HS-PS1-2", "note": "Foundation for predicting outcomes from how strongly electrons are held. Confirm." }],
       "needsReview": true,
-      "practice": { "gens": [], "lesson": { "label": "Effective Nuclear Charge lesson", "href": "../chemistry/unit-3-atoms-ions/effective-nuclear-charge.html" } }
+      "practice": { "gens": [], "lesson": { "label": "The Pull Bench (virtual lab)", "href": "../chemistry/virtual-lab/index.html?lab=zeff" } }
     },
     "CHEM-LAB-1": {
       "course": "chem", "title": "Working safely in the lab",

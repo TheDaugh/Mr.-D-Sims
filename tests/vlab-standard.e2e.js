@@ -10,6 +10,7 @@ const LABS = [
   { name: 'chem 1 unknown solids', url: '/chemistry/virtual-lab/index.html' }, { name: 'chem 2 heating curves', url: '/chemistry/virtual-lab/index.html?lab=heating' },
   { name: 'chem 3 gold foil', url: '/chemistry/virtual-lab/index.html?lab=rutherford' }, { name: 'chem 4 flame tests', url: '/chemistry/virtual-lab/index.html?lab=flame', huddles: true, course: 'chem' },
   { name: 'chem 5 photoelectron', url: '/chemistry/virtual-lab/index.html?lab=pes' },
+  { name: 'chem 6 pull bench', url: '/chemistry/virtual-lab/index.html?lab=zeff' },
   { name: 'physics 5 fan cart', url: '/physics/virtual-lab/index.html', huddles: true, course: 'physics' }];
 const want = process.argv[2], fails = [];
 const check = (c, m) => { if (!c) { fails.push(m); console.log('FAIL ' + m); } else console.log('ok   ' + m); };

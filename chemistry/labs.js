@@ -126,14 +126,14 @@ window.UNITS = [
         teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/electron-config-1.html#key" }, { label: "Board page", href: "unit-3-atoms-ions/electron-config-1-board.html" }, { label: "Teacher page", href: "teacher.html" }]
       },
       {
-        title: "Effective Nuclear Charge and Shielding",
-        type: "lesson",
+        title: "Virtual Lab: The Pull Bench (Effective Nuclear Charge)",
+        type: "lab",
         day: 15,
         icon: "🧲",
-        href: "unit-3-atoms-ions/effective-nuclear-charge.html",
-        blurb: "Mark the core rings, estimate Z_eff = Z minus core, and use the pull meter to see which atom holds its outer electron harder.",
-        tags: ["Z_eff", "shielding", "core electrons", "HS-PS1-1"],
-        teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/effective-nuclear-charge.html#key" }, { label: "Teacher page", href: "teacher.html" }]
+        href: "virtual-lab/index.html?lab=zeff",
+        blurb: "Measure how hard each atom holds its outer electron, from lithium to calcium. Explore any atoms in any order, predict sodium against magnesium, name a mystery atom, and copy the board at the one huddle. Short and open: Mr. D sets the length.",
+        tags: ["Z_eff", "shielding", "core electrons", "virtual lab"],
+        teacher: [{ label: "Teacher key (#key)", href: "virtual-lab/index.html?lab=zeff#key" }, { label: "Lesson board (huddle notes)", href: "whiteboard/index.html#lesson=zeff" }, { label: "Teacher page", href: "teacher.html" }]
       },
       {
         title: "Photoelectron Spectroscopy",

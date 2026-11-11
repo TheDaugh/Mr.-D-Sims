@@ -1,0 +1,177 @@
+{
+ "id": "zeff-pull",
+ "kind": "zeff",
+ "title": "The Pull Bench: How Hard Is the Outer Electron Held?",
+ "badgeTitle": "The Pull Bench",
+ "roomFile": "pull-bench",
+ "noPPE": true,
+ "lock": true,
+ "carry": 1,
+ "lengthMin": 20,
+ "minActiveMin": 10,
+ "tutorial": {
+  "zeff": true
+ },
+ "intro": "Every atom has a pull on its outermost electron. You will measure that pull on eighteen atoms and see what changes it.",
+ "introSteps": [
+  "Read the picture card: what the colors and the numbers mean. That is all the reading.",
+  "Walk to the pull bench. Pick atoms and measure them. Any atom, any order.",
+  "Halfway through, Mr. D calls a huddle. Eyes up, copy the board.",
+  "Then predict one atom, name one mystery atom, and hand in."
+ ],
+ "keyRows": [
+  [
+   "← ↑ → ↓ or W A S D",
+   "Walk. On screen you move along the floor diagonals."
+  ],
+  [
+   "E",
+   "Use what you are facing (the spectrometer)."
+  ],
+  [
+   "Esc",
+   "Close a window."
+  ],
+  [
+   "Hover",
+   "Point at anything to see its name."
+  ]
+ ],
+ "hook": {
+  "Z": 11,
+  "ask": "Sodium has 11 protons. How hard does its last electron feel them?",
+  "note": "Not as hard as you would think. That is what you are about to measure."
+ },
+ "goal": "Goal: find out what sets the pull on an atom's outer electron, using your own readings.",
+ "cards": [
+  {
+   "id": "picture",
+   "term": "Read the picture",
+   "body": "The red circle is the nucleus and the number on it is the protons. Each ring is a shell and each dot is an electron. The outermost ring is blue. The pull meter on the bench shows how hard that blue electron is held. That is all you need to start."
+  }
+ ],
+ "ui": {
+  "welcome": "A bench room. Walk to the pull bench (the long machine) and press E.",
+  "enter": "You step into the bench room.",
+  "full": "Your hands are full.",
+  "putBack": "Put back.",
+  "huddle1Done": "Go to the spectrometer.",
+  "huddle2Done": "",
+  "tutorialDone": "Tutorial done. The arrows are off. The rest is yours: try any atoms in any order.",
+  "coachKey": "Teacher key (creative mode): everything is open, no huddle stop. Open Key for the answers, the huddle blanks and the simplifications.",
+  "doneInfo": "Your record is saved on this computer. Download it for Mr. D, then take out your paper worksheet.",
+  "exitHead": "Next",
+  "huddleTitle": "Huddle: copy the board",
+  "huddleText": "Eyes up. Copy what Mr. D writes on the board into the blanks, in order. Then enter the huddle code.",
+  "codeLabel": "Huddle code",
+  "codeGo": "Go on",
+  "codeWrong": "That code is not right.",
+  "codeNote": "Outside class, the huddle is a note. Fill the blanks and go on.",
+  "keyShows": "Huddle code today: {code}",
+  "pickHead": "Atoms",
+  "measure": "Measure the pull",
+  "shield": "Show the shielding",
+  "hide": "Hide the shielding",
+  "predictHead": "Predict, then measure",
+  "mysteryHead": "Mystery atom",
+  "rowsHead": "Your readings",
+  "pullHead": "Pull on the outer electron",
+  "closeWord": "Close"
+ },
+ "arrows": {
+  "door": "Walk to the door at the bottom of the room and go through.",
+  "bench": "Walk to the pull bench and press E.",
+  "pick": "Click Na (sodium) in the atom grid.",
+  "measure": "Press Measure the pull. The meter fills.",
+  "shield": "Press Show the shielding. Amber rings are the electrons inside the outer ring.",
+  "free": "Pick any atom and measure it.",
+  "predict": "Pick a side in the Predict box.",
+  "mystery": "Click the atom you think it is."
+ },
+ "demo": [
+  "Welcome. This tour shows every control. None of it counts toward your lab.",
+  "Walk with the arrow keys or WASD. Press E at the pull bench, the long machine in the middle of the room.",
+  "The grid holds atoms from lithium to calcium. Click one to load it. Here is sodium.",
+  "Press Measure the pull. The meter shows how hard the outer electron is held, and your reading lands in the table.",
+  "Show the shielding paints the inner rings amber and shows the numbers behind the pull.",
+  "Try potassium. Same column, one more ring. Watch the meter.",
+  "The predict box asks sodium or magnesium before it lets you measure magnesium.",
+  "The mystery atom shows rings and a pull. Count the electrons and click the atom.",
+  "That is the whole bench. Press Esc to close it. Your lab starts when the tour ends."
+ ],
+ "content": {
+  "exit": {
+   "prompt": "Do the paper worksheet next."
+  }
+ },
+ "clock": {},
+ "quests": [
+  {
+   "id": "door",
+   "text": "Walk through the lab door.",
+   "hint": "Walk to the door at the bottom of the room and keep going.",
+   "tutorial": true,
+   "state": "entered_lab"
+  },
+  {
+   "id": "bench",
+   "text": "Step up to the pull bench and press E.",
+   "hint": "The long machine in the middle of the room.",
+   "tutorial": true,
+   "event": "zeff_open",
+   "count": 1
+  },
+  {
+   "id": "z_measure",
+   "text": "Pick sodium (Na) and press Measure the pull.",
+   "hint": "Click Na in the atom grid, then press Measure.",
+   "tutorial": true,
+   "state": "flame",
+   "rule": "z_measure"
+  },
+  {
+   "id": "z_shield",
+   "text": "Press Show the shielding and look at the amber rings.",
+   "hint": "The button is under the picture.",
+   "tutorial": true,
+   "state": "flame",
+   "rule": "z_shield"
+  },
+  {
+   "id": "z_five",
+   "text": "Measure five different atoms.",
+   "hint": "Any atoms, any order. Lithium to calcium are all open.",
+   "state": "flame",
+   "rule": "z_five",
+   "count": 5
+  },
+  {
+   "id": "z_col",
+   "text": "Measure lithium, sodium and potassium. Look at the pull as you go down.",
+   "hint": "They are the first atom of each row.",
+   "state": "flame",
+   "rule": "z_col"
+  },
+  {
+   "id": "z_pred",
+   "text": "Predict: sodium or magnesium? Then measure magnesium.",
+   "hint": "Pick a side in the Predict box first. Magnesium unlocks after you do.",
+   "state": "flame",
+   "rule": "z_pred"
+  },
+  {
+   "id": "z_mys",
+   "text": "Name the mystery atom from its rings and its pull.",
+   "hint": "Count the electrons in the rings, then click that atom in the grid.",
+   "state": "flame",
+   "rule": "z_mys"
+  },
+  {
+   "id": "handin",
+   "text": "Hand in: download your record.",
+   "hint": "Open Hand in and download.",
+   "state": "flame",
+   "rule": "handed"
+  }
+ ]
+}

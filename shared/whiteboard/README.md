@@ -28,7 +28,7 @@ A lesson board is a board with a whole lesson (or the notes huddle of a sim day)
 - **Shelves**: only the shelves the lesson uses (Normal curve, Routines, Graph tools) show.
 - **Source**: `tools/whiteboard/src/lessons/stats-3-4.js` (frames drawn with the same `graph` and `normal` helpers as the stencils; numbers match the 3.4 thinking notes and board script). Rebuild with `node tools/whiteboard/build.mjs`. A new lesson board is a new file in `lessons/` plus one line in `LESSONS` in `app.jsx`.
 
-The chem board has one: `chemistry/whiteboard/index.html#lesson=zeff` (slot 15, Effective nuclear charge). It is the **notes huddle** of a sim day: three frames (core and shielding with the labeled sodium atom, sodium worked, what is tested), blanks in the same order as the Huddle tab on the page, answers under covers. Source: `tools/whiteboard/src/lessons/chem-zeff.js`; its numbers come from `chemistry/shared/zeff.js`, the page's own model. Script: `chemistry/unit-3-atoms-ions/day-cards/slot-15.board.md`. Test: `BOARD=chem LESSON=zeff node tests/lesson-board.e2e.js`.
+The chem board has one: `chemistry/whiteboard/index.html#lesson=zeff` (slot 15, the Pull Bench virtual lab). It is the **notes huddle** of a sim day: four frames (core and shielding, sodium worked, label the atom, what is tested); the lab's seven blanks follow frames 1, 2 and 4 in order (frame 3 is skipped). Every blank has its answer under an orange cover. Script: `chemistry/unit-3-atoms-ions/day-cards/slot-15.board.md`.
 
 ## Chem stencils (41)
 
