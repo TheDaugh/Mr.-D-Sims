@@ -24,3 +24,7 @@ export const blankOk = (b, text) => b.ans.map(norm).includes(norm(text));
 // Length is Ian's call per day: the lab's `lengthMin`, or ?min=NN on the address. The one huddle sits at the middle.
 export const lengthOf = (lab, search) => { const q = Number(new URLSearchParams(search || "").get("min")); return q >= 8 && q <= 60 ? q : lab.lengthMin || 20; };
 export const huddleAt = (len) => Math.round(len / 2);
+// The marking step: the student clicks the inner rings (the electrons in the way). The outer ring is the electron being pulled, so it never counts.
+export const markedElectrons = (a, marks) => a.rings.reduce((s, c, i) => s + (i < a.n - 1 && marks && marks[i] ? c : 0), 0);
+export const estimateLeft = (a, marks) => a.Z - markedElectrons(a, marks);          // protons left over
+export const estimateMatches = (a, marks) => estimateLeft(a, marks) === a.zeff;     // equals the model's Z_eff, which is what the meter shows

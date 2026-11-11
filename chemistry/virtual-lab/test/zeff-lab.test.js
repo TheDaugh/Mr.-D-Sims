@@ -30,7 +30,28 @@ test("length is Ian's call: the lab's lengthMin, overridden by ?min, with the on
   assert.equal(huddleDue({ minutesIn: 10, stage: "lab", done: {}, forced: { 1: true }, at }), 2);
 });
 test("the lab JSON: quests are valid, rules exist, and the demo text matches the demo's caption count", () => {
-  assert.equal(lab.kind, "zeff"); assert.equal(lab.demo.length, 9); assert.ok(lab.lock); assert.ok(lab.lengthMin >= 8);
+  assert.equal(lab.kind, "zeff"); assert.equal(lab.demo.length, 10); assert.ok(lab.lock); assert.ok(lab.lengthMin >= 8);
   assert.deepEqual(validateQuests(lab.quests, ["flame", "entered_lab"]), []); const ids = lab.quests.map((q) => q.id); assert.equal(new Set(ids).size, ids.length);
   for (const w of ["extension", "challenge", "optional", "stars"]) assert.ok(!JSON.stringify(lab.quests).toLowerCase().includes(w), w);
+});
+
+test("marking step: only the full set of inner rings matches the meter, for every atom in the lab", () => {
+  for (const z of L.ZS) {
+    const a = Z.atom(z), inner = a.rings.slice(0, a.n - 1), N = inner.length;
+    for (let mask = 0; mask < 1 << N; mask++) {
+      const marks = inner.map((_, i) => !!(mask & (1 << i)));
+      assert.equal(L.estimateMatches(a, marks), mask === (1 << N) - 1, `${a.sym} mask ${mask}`);
+    }
+    assert.equal(L.markedElectrons(a, [...inner.map(() => true), true]), a.core, "the outer ring never counts");
+  }
+});
+test("the pull bench room: parses, has the windows and rug, and every object can be reached", async () => {
+  const { parseRoom, reachable, tileAt } = await import("../../../shared/virtual-lab/room.js");
+  const room = parseRoom(JSON.parse(readFileSync(new URL("../content/rooms/pull-bench.json", import.meta.url)))), geared = { goggles: true, apron: true };
+  assert.ok(room.windows && room.windows.back.length && room.windows.left.length);
+  assert.ok(!tileAt(room, room.start.x, room.start.y).solid && room.start.y > room.doorRow);
+  const objs = []; room.rows.forEach((r, y) => [...r].forEach((ch, x) => { const t = room.legend[ch]; if (t.id && t.type !== "door") objs.push({ t, x, y }); }));
+  assert.ok(objs.length >= 8 && objs.some((o) => o.t.id === "pull_rig"));
+  for (const o of objs) assert.ok(reachable(room, room.start, o, geared), o.t.id);
+  assert.ok(room.rows.join("").includes("r") && Object.values(room.legend).some((t) => t.rug));
 });

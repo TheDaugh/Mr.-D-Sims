@@ -131,7 +131,7 @@ window.UNITS = [
         day: 15,
         icon: "🧲",
         href: "virtual-lab/index.html?lab=zeff",
-        blurb: "Measure how hard each atom holds its outer electron, from lithium to calcium. Explore any atoms in any order, predict sodium against magnesium, name a mystery atom, and copy the board at the one huddle. Short and open: Mr. D sets the length.",
+        blurb: "Measure how hard each atom holds its outer electron, from lithium to calcium. Light up a pull map of the table, click the rings in the way and watch protons cancel, predict sodium against magnesium, name a mystery atom, and copy the board at the one huddle. Short and open: Mr. D sets the length.",
         tags: ["Z_eff", "shielding", "core electrons", "virtual lab"],
         teacher: [{ label: "Teacher key (#key)", href: "virtual-lab/index.html?lab=zeff#key" }, { label: "Lesson board (huddle notes)", href: "whiteboard/index.html#lesson=zeff" }, { label: "Teacher page", href: "teacher.html" }]
       },
