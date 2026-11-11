@@ -1,101 +1,130 @@
 {
- "id": "pull-bench",
- "theme": {
-  "wall": "#6d7f93",
-  "wallBack": "#5d6f83",
-  "floorA": "#d7dde4",
-  "floorB": "#cdd4dc",
-  "bg": "#171c22"
- },
- "start": {
-  "x": 4,
-  "y": 10,
-  "face": "u"
- },
- "rows": [
-  "############",
-  "#W.........#",
-  "#..........#",
-  "#....UUU...#",
-  "#..........#",
-  "#..........#",
-  "####D#######",
-  "#N.........#",
-  "#..........#",
-  "#..........#",
-  "#..........#",
-  "############"
- ],
- "legend": {
-  "#": {
-   "type": "wall",
-   "solid": true
+  "id": "pull-bench",
+  "theme": {
+    "wall": "#6f9bc7",
+    "wallBack": "#5f8bb7",
+    "darkFloorA": "#cfe8dc",
+    "darkFloorB": "#c2dfd2",
+    "floorA": "#eadcbc",
+    "floorB": "#e0cfa8",
+    "bg": "#18202a"
   },
-  ".": {
-   "type": "floor"
+  "windows": {
+    "back": [
+      7,
+      9
+    ],
+    "left": [
+      2,
+      3
+    ]
   },
-  "D": {
-   "type": "door",
-   "id": "door",
-   "label": "PULL BENCH ROOM",
-   "name": "Door to the pull bench room",
-   "text": "The door to the bench room. It opens once you have read the picture card."
+  "start": {
+    "x": 4,
+    "y": 10,
+    "face": "u"
   },
-  "U": {
-   "type": "station",
-   "solid": true,
-   "id": "spectrometer",
-   "label": "PULL BENCH",
-   "name": "Pull bench",
-   "text": "The pull bench: pick an atom, see its rings, and measure how hard its outer electron is held. Press E to use it."
-  },
-  "K": {
-   "type": "station",
-   "solid": true,
-   "id": "carousel",
-   "label": "SAMPLES",
-   "name": "Sample carousel",
-   "text": "A carousel of sealed vapor cells, one for each element from hydrogen to calcium, and four mystery cells. Press E to use it."
-  },
-  "B": {
-   "type": "station",
-   "solid": true,
-   "id": "draw_bench",
-   "label": "DRAW BENCH",
-   "name": "Draw bench",
-   "text": "The draw bench: graph paper for sketching a spectrum, then checking it against the real run. Press E to use it."
-  },
-  "W": {
-   "type": "info",
-   "solid": true,
-   "id": "pt_chart",
-   "label": "TABLE",
-   "name": "Periodic table chart",
-   "text": "A wall chart of the first twenty elements. Position on the chart tells you the period and the group."
-  },
-  "Y": {
-   "type": "info",
-   "solid": true,
-   "id": "vac_pump",
-   "label": "PUMP",
-   "name": "Vacuum pump",
-   "text": "The pump. Electrons would hit air and stop before reaching the detector, so the chamber is pumped nearly empty."
-  },
-  "G": {
-   "type": "info",
-   "solid": true,
-   "id": "gas_line",
-   "label": "GAS",
-   "name": "Gas cylinders",
-   "text": "Gas cylinders. Every sample is a vapor so that the atoms are far apart and do not bother each other."
-  },
-  "N": {
-   "type": "info",
-   "solid": true,
-   "id": "pes_notice",
-   "label": "NOTICE",
-   "name": "Notice board",
-   "text": "Notice: 'The pull is a classroom number. It ranks atoms; it is not a measurement.'"
+  "rows": [
+    "############",
+    "#P.K.V.....#",
+    "#..rrrrr...#",
+    "#..rUUUr...#",
+    "#..rrrrr...#",
+    "#M.H.......#",
+    "####D#######",
+    "#N........S#",
+    "#..........#",
+    "#..rrr.....#",
+    "#Y.rrr.....#",
+    "############"
+  ],
+  "legend": {
+    "#": {
+      "type": "wall",
+      "solid": true
+    },
+    ".": {
+      "type": "floor"
+    },
+    "r": {
+      "type": "floor",
+      "rug": "#d9694f"
+    },
+    "D": {
+      "type": "door",
+      "id": "door",
+      "label": "PULL BENCH ROOM",
+      "name": "Door to the pull bench room",
+      "text": "The door to the bench room. It opens once you have read the picture card."
+    },
+    "U": {
+      "type": "station",
+      "solid": true,
+      "id": "pull_rig",
+      "label": "PULL BENCH",
+      "name": "Pull bench",
+      "text": "The pull bench: a model atom, a dial and a screen. Pick an atom, measure how hard its outer electron is held, and find what changes it. Press E to use it."
+    },
+    "P": {
+      "type": "info",
+      "solid": true,
+      "id": "pt_chart",
+      "label": "TABLE",
+      "name": "Periodic table chart",
+      "text": "A wall chart of the first twenty elements. Position on the chart tells you the period and the group."
+    },
+    "K": {
+      "type": "info",
+      "solid": true,
+      "id": "chalkboard",
+      "label": "BOARD",
+      "name": "Chalkboard",
+      "text": "Chalkboard: 'Who holds on harder: the nucleus, or the crowd in between?'"
+    },
+    "V": {
+      "type": "info",
+      "solid": true,
+      "id": "vdg",
+      "label": "STATIC",
+      "name": "Van de Graaff generator",
+      "text": "A Van de Graaff generator. It piles charge onto the big sphere until the charge jumps to the small ball as a spark. Opposite charges pull on each other, and the pull gets weaker with distance."
+    },
+    "H": {
+      "type": "info",
+      "solid": true,
+      "id": "model_shelf",
+      "name": "Atom models",
+      "text": "Ball-and-ring models of atoms on a shelf. The red ball is the nucleus. Each ring is a shell of electrons."
+    },
+    "M": {
+      "type": "info",
+      "solid": true,
+      "id": "magnet_table",
+      "name": "Magnet table",
+      "text": "A horseshoe magnet and iron filings. Pull a magnet away and it fights you. Move it twice as far and the fight gets much weaker. Atoms hold their electrons by a pull like this one."
+    },
+    "Y": {
+      "type": "info",
+      "solid": true,
+      "id": "plant",
+      "name": "Plant",
+      "text": "A plant. It is not on the quiz."
+    },
+    "N": {
+      "type": "info",
+      "solid": true,
+      "id": "notice",
+      "label": "NOTICE",
+      "name": "Notice board",
+      "text": "Notice: 'The pull is a classroom number. It ranks atoms; it is not a measurement.'"
+    },
+    "S": {
+      "type": "info",
+      "solid": true,
+      "id": "model_shelf",
+      "label": "MODELS",
+      "name": "Atom models",
+      "text": "Ball-and-ring models of atoms on a shelf. The red ball is the nucleus. Each ring is a shell of electrons."
+    }
   }
- }
 }

@@ -12,10 +12,11 @@
  "tutorial": {
   "zeff": true
  },
- "intro": "Every atom has a pull on its outermost electron. You will measure that pull on eighteen atoms and see what changes it.",
+ "intro": "Every atom has a pull on its outermost electron. You will measure that pull on eighteen atoms, find what cancels part of it, and light up a map of the whole table.",
  "introSteps": [
-  "Read the picture card: what the colors and the numbers mean. That is all the reading.",
-  "Walk to the pull bench. Pick atoms and measure them. Any atom, any order.",
+  "Read the picture card: what the rings, the red nucleus and the numbers mean. That is all the reading.",
+  "Walk to the pull bench. Pick atoms from the table or drag the proton slider, then measure the pull.",
+  "Click the rings that are in the way of the outer electron and watch the protons cancel.",
   "Halfway through, Mr. D calls a huddle. Eyes up, copy the board.",
   "Then predict one atom, name one mystery atom, and hand in."
  ],
@@ -26,7 +27,7 @@
   ],
   [
    "E",
-   "Use what you are facing (the spectrometer)."
+   "Use what you are facing (the pull bench)."
   ],
   [
    "Esc",
@@ -47,17 +48,17 @@
   {
    "id": "picture",
    "term": "Read the picture",
-   "body": "The red circle is the nucleus and the number on it is the protons. Each ring is a shell and each dot is an electron. The outermost ring is blue. The pull meter on the bench shows how hard that blue electron is held. That is all you need to start."
+   "body": "The red circle is the nucleus and the number on it is the protons. Each ring is a shell and each dot is an electron. The outermost ring is the one that gets pulled. The pull meter on the bench shows how hard the nucleus holds that outer electron. That is all you need to start."
   }
  ],
  "ui": {
-  "welcome": "A bench room. Walk to the pull bench (the long machine) and press E.",
+  "welcome": "A bench room with a model atom on the bench. Walk to the pull bench (the long bench with the dial) and press E.",
   "enter": "You step into the bench room.",
   "full": "Your hands are full.",
   "putBack": "Put back.",
-  "huddle1Done": "Go to the spectrometer.",
+  "huddle1Done": "Go to the pull bench.",
   "huddle2Done": "",
-  "tutorialDone": "Tutorial done. The arrows are off. The rest is yours: try any atoms in any order.",
+  "tutorialDone": "Tutorial done. The arrows are off. Fill the map with any atoms in any order.",
   "coachKey": "Teacher key (creative mode): everything is open, no huddle stop. Open Key for the answers, the huddle blanks and the simplifications.",
   "doneInfo": "Your record is saved on this computer. Download it for Mr. D, then take out your paper worksheet.",
   "exitHead": "Next",
@@ -68,35 +69,71 @@
   "codeWrong": "That code is not right.",
   "codeNote": "Outside class, the huddle is a note. Fill the blanks and go on.",
   "keyShows": "Huddle code today: {code}",
-  "pickHead": "Atoms",
   "measure": "Measure the pull",
-  "shield": "Show the shielding",
-  "hide": "Hide the shielding",
   "predictHead": "Predict, then measure",
   "mysteryHead": "Mystery atom",
-  "rowsHead": "Your readings",
   "pullHead": "Pull on the outer electron",
-  "closeWord": "Close"
+  "closeWord": "Close",
+  "stepUp": "You step up to the pull bench.",
+  "mapHead": "Pull map",
+  "mapSub": "Click an atom. It lights up when you measure it.",
+  "weak": "weak pull",
+  "strong": "strong pull",
+  "slideHead": "Protons:",
+  "slideLabel": "{Z} ({name})",
+  "slideNone": "pick an atom",
+  "slideAria": "Number of protons",
+  "pickFirst": "Click an atom in the table, or drag the proton slider.",
+  "measureAgain": "Measure again",
+  "chipsHead": "Tug of war on the outer electron",
+  "inWay": "in the way",
+  "inWayNamed": "core electrons",
+  "tally": "{Z} protons pull. {m} electrons {inway} cancel {m} of them. {left} left over.",
+  "distLine": "The outer electron is on ring {n}. Distance counts twice: divide by {n} × {n} = {d}.",
+  "estLine": "Your estimate: {left} ÷ {d} = {f}",
+  "matchWait": "Press Measure, then compare it with your estimate.",
+  "matchYes": "Your estimate matches the meter.",
+  "matchBig": "Your estimate is bigger than the meter. Something else is in the way.",
+  "matchSmall": "Your estimate is smaller than the meter. You cancelled too much.",
+  "matchSay": "{name}: your estimate matches the meter.",
+  "ringBtn": "Ring {i} ({c})",
+  "ringNote": "Click the rings inside ring {n}. They get in its way.",
+  "lockNote": "Make your prediction first. Magnesium unlocks after it.",
+  "meterNote": "The meter is full at the strongest pull in the table.",
+  "predictAsk": "Which holds its outer electron harder?",
+  "sodium": "Sodium",
+  "magnesium": "Magnesium",
+  "predHeld": "Your prediction held.",
+  "predMissed": "Your prediction did not hold. Compare the two readings.",
+  "predLocked": "Locked in. Now pick magnesium and measure.",
+  "mysInfo": "Rings: {rings}. Pull on the outer electron: {pull}.",
+  "mysYes": "Yes. {name}.",
+  "mysNo": "Not yet. Add up the electrons in the rings: that is the number of protons.",
+  "mysGo": "Name it: click an atom",
+  "mysStop": "Stop naming",
+  "handBtn": "Hand in",
+  "handWait": "Hand in unlocks after the prediction and the mystery atom.",
+  "handReady": "Ready. Hand in to download your record."
  },
  "arrows": {
   "door": "Walk to the door at the bottom of the room and go through.",
   "bench": "Walk to the pull bench and press E.",
-  "pick": "Click Na (sodium) in the atom grid.",
-  "measure": "Press Measure the pull. The meter fills.",
-  "shield": "Press Show the shielding. Amber rings are the electrons inside the outer ring.",
-  "free": "Pick any atom and measure it.",
-  "predict": "Pick a side in the Predict box.",
-  "mystery": "Click the atom you think it is."
+  "open": "Open the pull bench.",
+  "pick": "Click Na (sodium).",
+  "measure": "Press Measure the pull.",
+  "mark1": "Click ring 1. It is in the way.",
+  "mark2": "Click ring 2 too."
  },
  "demo": [
   "Welcome. This tour shows every control. None of it counts toward your lab.",
-  "Walk with the arrow keys or WASD. Press E at the pull bench, the long machine in the middle of the room.",
-  "The grid holds atoms from lithium to calcium. Click one to load it. Here is sodium.",
-  "Press Measure the pull. The meter shows how hard the outer electron is held, and your reading lands in the table.",
-  "Show the shielding paints the inner rings amber and shows the numbers behind the pull.",
-  "Try potassium. Same column, one more ring. Watch the meter.",
-  "The predict box asks sodium or magnesium before it lets you measure magnesium.",
-  "The mystery atom shows rings and a pull. Count the electrons and click the atom.",
+  "Walk with the arrow keys or WASD. Press E at the pull bench, the long bench with the dial and the spinning atom.",
+  "The table is your pull map. Click an atom to load it. Here is sodium.",
+  "Or drag the proton slider. Watch the atom build: each proton you add brings an electron, and new rings appear.",
+  "Press Measure the pull. The meter fills, a blue arrow tugs the outer electron, and sodium lights up on the map.",
+  "Protons alone would say 11. The meter says much less. Click the inner rings, the electrons in the way, and watch them cancel protons until your estimate matches.",
+  "Go down the column to potassium. One more ring means a longer way out, so the pull drops. Mark its rings too.",
+  "Measure a whole row. The map fills with color: darker means a stronger pull. You can see the pattern across the table.",
+  "The predict box asks sodium or magnesium before it lets you measure magnesium. The mystery atom shows rings and a pull. Count the electrons and click the atom.",
   "That is the whole bench. Press Esc to close it. Your lab starts when the tour ends."
  ],
  "content": {
@@ -116,7 +153,7 @@
   {
    "id": "bench",
    "text": "Step up to the pull bench and press E.",
-   "hint": "The long machine in the middle of the room.",
+   "hint": "The long bench with the dial and the spinning atom.",
    "tutorial": true,
    "event": "zeff_open",
    "count": 1
@@ -124,31 +161,31 @@
   {
    "id": "z_measure",
    "text": "Pick sodium (Na) and press Measure the pull.",
-   "hint": "Click Na in the atom grid, then press Measure.",
+   "hint": "Click Na in the table, then press Measure.",
    "tutorial": true,
    "state": "flame",
    "rule": "z_measure"
   },
   {
-   "id": "z_shield",
-   "text": "Press Show the shielding and look at the amber rings.",
-   "hint": "The button is under the picture.",
+   "id": "z_mark",
+   "text": "Click sodium's inner rings until your estimate matches the meter.",
+   "hint": "The inner rings are the electrons in the way. Click them under the picture.",
    "tutorial": true,
    "state": "flame",
-   "rule": "z_shield"
+   "rule": "z_mark"
   },
   {
-   "id": "z_five",
-   "text": "Measure five different atoms.",
-   "hint": "Any atoms, any order. Lithium to calcium are all open.",
+   "id": "z_match3",
+   "text": "Match your estimate to the meter on three atoms.",
+   "hint": "Pick an atom, measure it, then click its inner rings.",
    "state": "flame",
-   "rule": "z_five",
-   "count": 5
+   "rule": "z_match3",
+   "count": 3
   },
   {
    "id": "z_col",
    "text": "Measure lithium, sodium and potassium. Look at the pull as you go down.",
-   "hint": "They are the first atom of each row.",
+   "hint": "They are the first atom of each row of the table.",
    "state": "flame",
    "rule": "z_col"
   },
@@ -162,7 +199,7 @@
   {
    "id": "z_mys",
    "text": "Name the mystery atom from its rings and its pull.",
-   "hint": "Count the electrons in the rings, then click that atom in the grid.",
+   "hint": "Count the electrons in the rings, then click that atom in the table.",
    "state": "flame",
    "rule": "z_mys"
   },

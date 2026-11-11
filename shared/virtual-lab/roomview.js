@@ -3,7 +3,7 @@
 import { tileAt } from "./room.js";
 
 const OX = 156, OY = 22, TX = 12, TY = 6, ZS = 1.5;   // tile half-width, half-height, height scale
-const HEIGHT = { shelf: 14, locker: 18, rack: 15, first_aid: 13, sink: 8, hood: 18, eyewash: 14, waste: 9, extinguisher: 13, station: 10, door: 14, chalkboard: 16, radon: 12, pump: 14, valves: 10, gold_leaf: 8, marsden_desk: 9, notice: 14, tea: 8, foil_rig: 10, spectrometer: 12, carousel: 11, draw_bench: 9, pt_chart: 16, vac_pump: 12, gas_line: 16, pes_notice: 14 };
+const HEIGHT = { shelf: 14, locker: 18, rack: 15, first_aid: 13, sink: 8, hood: 18, eyewash: 14, waste: 9, extinguisher: 13, station: 10, door: 14, chalkboard: 16, radon: 12, pump: 14, valves: 10, gold_leaf: 8, marsden_desk: 9, notice: 14, tea: 8, foil_rig: 10, spectrometer: 12, carousel: 11, draw_bench: 9, pt_chart: 16, vac_pump: 12, gas_line: 16, pes_notice: 14, vdg: 18, magnet_table: 8, model_shelf: 14, plant: 12 };
 
 function shade(c, f) {
   const n = c.replace("#", ""), v = [0, 2, 4].map((i) => Math.min(255, Math.round(parseInt(n.slice(i, i + 2), 16) * f)));
@@ -27,10 +27,15 @@ export function createRoomRenderer(canvas, room, extraArt) {   // extraArt(kit) 
     poly([P(x + w, y, z + h), P(x + w, y + d, z + h), P(x + w, y + d, z), P(x + w, y, z)], shade(c, 0.68));
   }
   const fl = (x0, yf, u0, u1, z0, z1, c) => poly([P(x0 + u0, yf, z1), P(x0 + u1, yf, z1), P(x0 + u1, yf, z0), P(x0 + u0, yf, z0)], c);   // patch on a +y face
+  const fx = (xf, y0, v0, v1, z0, z1, c) => poly([P(xf, y0 + v0, z1), P(xf, y0 + v1, z1), P(xf, y0 + v1, z0), P(xf, y0 + v0, z0)], c);   // patch on a +x face
+  const disc = (gx, gy, z, r, c) => { const [sx, sy] = P(gx, gy, z); ctx.fillStyle = c; ctx.beginPath(); ctx.arc(sx, sy, r, 0, 6.2832); ctx.fill(); };
+  const orbit = (gx, gy, z, r, c, w = 0.6) => { const [sx, sy] = P(gx, gy, z); ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.ellipse(sx, sy, r * 1.414 * TX, r * 1.414 * TY, 0, 0, 6.2832); ctx.stroke(); };   // a ring flat on the floor plane, as an iso ellipse
+  const winBack = (x) => { fl(x, 1, 0.1, 0.9, 6, 16.5, "#efe7d2"); fl(x, 1, 0.17, 0.83, 7.4, 15.2, "#8fcdf2"); fl(x, 1, 0.17, 0.83, 11.6, 15.2, "#b9e2fa"); fl(x, 1, 0.47, 0.53, 7.4, 15.2, "#efe7d2"); fl(x, 1, 0.17, 0.83, 11.1, 11.7, "#efe7d2"); poly([P(x + 0.1, 1, 0), P(x + 0.9, 1, 0), P(x + 2.6, 3.8, 0), P(x + 1.6, 3.8, 0)], "rgba(255,246,190,.2)"); };
+  const winLeft = (y) => { fx(1, y, 0.1, 0.9, 6, 16.5, "#efe7d2"); fx(1, y, 0.17, 0.83, 7.4, 15.2, "#8fcdf2"); fx(1, y, 0.17, 0.83, 11.6, 15.2, "#b9e2fa"); fx(1, y, 0.47, 0.53, 7.4, 15.2, "#efe7d2"); fx(1, y, 0.17, 0.83, 11.1, 11.7, "#efe7d2"); };
 
   const TH = room.theme || {};
   const ART = {
-    wall: (x, y) => box(x, y, 1, 1, y === room.doorRow && x !== 0 ? 6 : x === 0 || y === 0 ? 18 : 2, TH.wall || "#7d8b99"),
+    wall: (x, y) => { box(x, y, 1, 1, y === room.doorRow && x !== 0 ? 6 : x === 0 || y === 0 ? 18 : 2, TH.wall || "#7d8b99"); const W = room.windows; if (W) { if (y === 0 && x > 0 && (W.back || []).includes(x)) winBack(x); if (x === 0 && y > 0 && (W.left || []).includes(y)) winLeft(y); } },
     chalkboard: (x, y) => { box(x + 0.05, y, 0.9, 0.12, 13, "#2f3b33", 4); for (const [a, b, z] of [[0.15, 0.7, 13], [0.15, 0.55, 11], [0.2, 0.8, 9]]) fl(x + 0.05, y + 0.12, a, b, z, z + 0.7, "#eef2ea"); },
     radon: (x, y) => { box(x + 0.2, y + 0.2, 0.6, 0.6, 9, "#6b7078"); box(x + 0.4, y + 0.4, 0.2, 0.2, 5, "#bde5b0", 9); fl(x + 0.2, y + 0.8, 0.35, 0.65, 4, 5, "#1e2630"); },
     pump: (x, y) => { box(x + 0.15, y + 0.15, 0.7, 0.7, 12, "#3c4a58"); box(x + 0.3, y + 0.3, 0.4, 0.4, 3, "#c4a14a", 12); },
@@ -41,6 +46,19 @@ export function createRoomRenderer(canvas, room, extraArt) {   // extraArt(kit) 
     vac_pump: (x, y) => { box(x + 0.15, y + 0.15, 0.7, 0.7, 10, "#3c4a58"); box(x + 0.3, y + 0.3, 0.4, 0.4, 3, "#c4a14a", 10); box(x + 0.4, y + 0.45, 0.2, 0.2, 2, "#d9dee4", 13); },
     gas_line: (x, y) => { for (const u of [0.12, 0.52]) { box(x + u, y + 0.3, 0.3, 0.3, 14, "#2f9e5a"); box(x + u + 0.08, y + 0.38, 0.14, 0.14, 2, "#c9ced6", 14); } },
     pes_notice: (x, y) => { box(x + 0.1, y, 0.8, 0.12, 10, "#a07c55", 3); fl(x + 0.1, y + 0.12, 0.25, 0.7, 5, 11, "#f4f4f0"); fl(x + 0.1, y + 0.12, 0.3, 0.6, 8, 8.8, "#2b6cb0"); },
+    vdg: (x, y) => {
+      box(x + 0.2, y + 0.2, 0.6, 0.6, 7, "#58606b"); box(x + 0.38, y + 0.38, 0.24, 0.24, 18, "#c7d0da", 7); disc(x + 0.5, y + 0.5, 30, 7.5, "#d9dee4"); disc(x + 0.5, y + 0.5, 32, 3, "#f4f7fb");
+      if (Math.floor(Date.now() / 350) % 5 === 0) { const [ax, ay] = P(x + 0.5, y + 0.5, 30), [bx, by] = P(x + 0.95, y + 0.5, 20); ctx.strokeStyle = "#ffe36a"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(ax + 6, ay + 2); ctx.lineTo((ax + bx) / 2 + 2, (ay + by) / 2 - 3); ctx.lineTo((ax + bx) / 2 - 1, (ay + by) / 2 + 2); ctx.lineTo(bx, by); ctx.stroke(); }
+      disc(x + 0.95, y + 0.5, 20, 2.4, "#c4a14a");
+    },
+    magnet_table: (x, y) => {
+      box(x + 0.05, y + 0.1, 0.9, 0.8, 7, "#a07c55"); box(x + 0.2, y + 0.3, 0.14, 0.45, 5, "#c0392b", 7); box(x + 0.66, y + 0.3, 0.14, 0.45, 5, "#c0392b", 7); box(x + 0.2, y + 0.3, 0.6, 0.14, 5, "#c0392b", 7); box(x + 0.2, y + 0.62, 0.14, 0.13, 2, "#d9dee4", 12); box(x + 0.66, y + 0.62, 0.14, 0.13, 2, "#d9dee4", 12);
+      for (let i = 0; i < 7; i++) { const [sx, sy] = P(x + 0.4 + (i % 3) * 0.1, y + 0.5 + Math.floor(i / 3) * 0.1, 7); R(sx, sy, 1, 1, "#2b2f36"); }
+    },
+    model_shelf: (x, y) => {
+      box(x + 0.05, y, 0.9, 0.6, 12, "#8a6a47"); [["#e0472c", 0.25], ["#4f9bd9", 0.5], ["#e8a33a", 0.75]].forEach(([c, u], i) => { disc(x + u, y + 0.3, 17, 3 + i, c); orbit(x + u, y + 0.3, 17, 0.1 + i * 0.04, "rgba(255,255,255,.6)"); });
+    },
+    plant: (x, y) => { box(x + 0.3, y + 0.3, 0.4, 0.4, 6, "#c0652b"); for (const [dx, dy, z, r] of [[0.5, 0.5, 14, 4], [0.38, 0.45, 11, 3], [0.62, 0.55, 11, 3], [0.5, 0.4, 18, 3]]) disc(x + dx, y + dy, z, r, "#3f9a55"); },
     notice: (x, y) => { box(x + 0.1, y, 0.8, 0.12, 10, "#a07c55", 3); fl(x + 0.1, y + 0.12, 0.25, 0.7, 5, 11, "#f4f4f0"); },
     tea: (x, y) => { box(x + 0.1, y + 0.1, 0.8, 0.7, 6, "#6b4f33"); box(x + 0.3, y + 0.3, 0.2, 0.2, 3, "#f4f4f0", 6); box(x + 0.6, y + 0.35, 0.15, 0.15, 2, "#c0392b", 6); },
     door: (x, y, s) => { box(x, y, 0.12, 1, 14, "#a3804c"); box(x + 0.88, y, 0.12, 1, 14, "#a3804c"); box(x + 0.88, y + 0.4, 0.12, 0.2, 3, s.ready ? "#3ecf6a" : "#e0472c", 14); },
@@ -64,6 +82,18 @@ export function createRoomRenderer(canvas, room, extraArt) {   // extraArt(kit) 
         if (k === 0) { box(x + 0.15, y + 0.2, 0.7, 0.6, 6, "#6b7078", 8); box(x + 0.7, y + 0.35, 0.3, 0.3, 4, "#7ec8ff", 11); }
         if (k === 1) { box(x, y + 0.2, 1, 0.6, 7, "#9aa4ae", 8); poly([P(x + 0.1, y + 0.5, 15), P(x + 0.9, y + 0.5, 15), P(x + 0.9, y + 0.5, 9), P(x + 0.1, y + 0.5, 9)], "rgba(126,200,255,.35)"); const f = (Date.now() / 90) % 8; const [fx, fy] = P(x + 0.1 + f * 0.1, y + 0.5, 12); R(fx, fy, 2, 1, "#ffe08a"); }
         if (k === 2) { box(x + 0.1, y + 0.15, 0.8, 0.7, 5, "#3c4a58", 8); box(x + 0.25, y + 0.3, 0.5, 0.4, 7, "#1e2630", 13); fl(x + 0.25, y + 0.7, 0.3, 0.7, 14, 17, "#2b3a2f"); fl(x + 0.25, y + 0.7, 0.35, 0.42, 14, 16, "#a9ff9a"); fl(x + 0.25, y + 0.7, 0.5, 0.57, 14, 15, "#a9ff9a"); }
+        return;
+      }
+      if (t && t.id === "pull_rig") {
+        let k = 0; while (tileAt(room, x - 1 - k, y)?.id === "pull_rig") k++;
+        const now = Date.now();
+        if (k === 0) { box(x + 0.2, y + 0.25, 0.6, 0.5, 5, "#6b7078", 8); box(x + 0.44, y + 0.44, 0.12, 0.12, 9, "#9aa4ae", 13); disc(x + 0.5, y + 0.5, 25, 6, "#c4a14a"); disc(x + 0.5, y + 0.5, 25, 4.8, "#fdfdfb"); const [dx, dy] = P(x + 0.5, y + 0.5, 25), a = -1.57 + Math.sin(now / 650) * 0.85; ctx.strokeStyle = "#c0392b"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(dx, dy); ctx.lineTo(dx + Math.cos(a) * 4.6, dy + Math.sin(a) * 4.6); ctx.stroke(); R(dx - 1, dy - 1, 2, 2, "#1e2630"); }
+        if (k === 1) {
+          box(x + 0.3, y + 0.3, 0.4, 0.4, 5, "#58606b", 8); box(x + 0.46, y + 0.46, 0.08, 0.08, 4, "#9aa4ae", 13);
+          const cx = x + 0.5, cy = y + 0.5, z = 22, t = now / 1000; for (const r of [0.16, 0.3, 0.44]) orbit(cx, cy, z, r, "rgba(255,255,255,.55)");
+          disc(cx, cy, z, 3.4, "#e5533d"); [[0.16, 2.2, 1.9, "#e0a020"], [0.3, 1.4, 1.1, "#e0a020"], [0.44, 0.9, 0.6, "#4f9bd9"]].forEach(([r, w, ph, c]) => { disc(cx + Math.cos(t * w + ph) * r, cy + Math.sin(t * w + ph) * r, z, 1.7, c); });
+        }
+        if (k === 2) { box(x + 0.1, y + 0.2, 0.8, 0.6, 5, "#3c4a58", 8); box(x + 0.2, y + 0.3, 0.6, 0.4, 7, "#1e2630", 13); const lit = Math.floor(now / 450) % 6; [3, 5, 2.5, 4, 6, 3.5].forEach((h2, i) => fl(x + 0.2, y + 0.7, 0.08 + i * 0.09, 0.08 + i * 0.09 + 0.06, 14, 14 + h2, i === lit ? "#ffe36a" : "#a9ff9a")); }
         return;
       }
       if (t && t.id === "carousel") { box(x + 0.1, y + 0.1, 0.8, 0.8, 4, "#58606b", 8); for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; box(x + 0.5 + Math.cos(a) * 0.28 - 0.08, y + 0.5 + Math.sin(a) * 0.28 - 0.08, 0.16, 0.16, 6, ["#cfe9ff", "#e8d9ff", "#d6ffd9", "#ffe7c2", "#ffd6dc", "#e0e0e0"][i], 12); } return; }
@@ -107,8 +137,8 @@ export function createRoomRenderer(canvas, room, extraArt) {   // extraArt(kit) 
       const k = Math.min(1, dt * 16); ax += (p.x - ax) * k; ay += (p.y - ay) * k;
       R(0, 0, 320, 180, TH.bg || "#2b3440");
       for (let y = 0; y < room.h; y++) for (let x = 0; x < room.w; x++) {
-        const lab = y < room.doorRow, thresh = tileAt(room, x, y).type === "door";
-        poly([P(x, y), P(x + 1, y), P(x + 1, y + 1), P(x, y + 1)], thresh ? "#c9a066" : ((x + y) & 1) ? (lab ? TH.darkFloorA || "#dfe6ea" : TH.floorA || "#e6dfd0") : (lab ? TH.darkFloorB || "#d3dce2" : TH.floorB || "#ddd5c3"));
+        const lab = y < room.doorRow, tl = tileAt(room, x, y), thresh = tl.type === "door";
+        poly([P(x, y), P(x + 1, y), P(x + 1, y + 1), P(x, y + 1)], tl.rug ? (((x + y) & 1) ? tl.rug : shade(tl.rug, 0.94)) : thresh ? "#c9a066" : ((x + y) & 1) ? (lab ? TH.darkFloorA || "#dfe6ea" : TH.floorA || "#e6dfd0") : (lab ? TH.darkFloorB || "#d3dce2" : TH.floorB || "#ddd5c3"));
       }
       const s = { ready, tongs: ppe.tongs }, pd = Math.round(ax + ay);
       let drawn = false;
