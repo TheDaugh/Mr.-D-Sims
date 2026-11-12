@@ -28,7 +28,7 @@ The e2e tests need `python3 -m http.server 8123` running from the repo root. `te
 
 ## Virtual labs
 
-Every virtual lab follows `shared/virtual-lab/STANDARD.md` (read it before building or changing a lab): a demo, `#key` creative mode that skips the pre-lab, and the global huddle clock (minute 3 and 25, from the bell, in `shared/virtual-lab/clock.js`). Shared lab code lives in `shared/virtual-lab/`; the host is `chemistry/virtual-lab/src/ui/app.js`. A lab Ian cannot find is not done: it needs a hub card (`chemistry/labs.js`), the checks in the STANDARD, and it is live only when merged to `main` (never merge without Ian's say-so; end by saying it is not on the site until he merges, with the direct URL).
+Every virtual lab follows `shared/virtual-lab/STANDARD.md` (read it before building or changing a lab): a demo, `#key` creative mode that skips the pre-lab, the global huddle clock (minute 3 and 25, from the bell, in `shared/virtual-lab/clock.js`), and checkpoints with no click-through (3 right in a row, generated questions, 3 misses lock, unlocked by today's `MrD.codes.override()`; `shared/virtual-lab/checkpoint.js`, STANDARD item 8). Shared lab code lives in `shared/virtual-lab/`; the host is `chemistry/virtual-lab/src/ui/app.js`. A lab Ian cannot find is not done: it needs a hub card (`chemistry/labs.js`), the checks in the STANDARD, and it is live only when merged to `main` (never merge without Ian's say-so; end by saying it is not on the site until he merges, with the direct URL).
 
 ## Where things live
 
@@ -43,6 +43,7 @@ Every virtual lab follows `shared/virtual-lab/STANDARD.md` (read it before build
 
 - One huddle code per day for every class (`MrD.codes.huddle()`). Never a local hash, never a `PREVIEW` flag, never a separate key page. `#key` is the teacher switch.
 - No tiers on the student page: no *extension*, *challenge*, *stars*, *optional*, no star symbol. Difficulty is hidden and moves with the student.
+- The unlock code for a locked student is always today's `MrD.codes.override()`, shown on both teacher pages beside the huddle codes. Never a per-lab PIN.
 - Every guided lesson and virtual lab runs in locked mode (`lock: true` in the lesson config; `shared/lock.js`).
 - Lesson ends by the clock (42 minutes Mon-Thu, the whole period Friday), with endless practice before the mark.
 - Lab-report grading and feedback make no AI API calls: rubric and proficiency scales Ian clicks. Student records stay on Ian's device; students look up feedback by student ID.

@@ -241,17 +241,6 @@ $("#csvPes").addEventListener("click", () => {
   for (const { rec } of pes) { const { p, rightN, missN } = PQ(rec); lines.push([rec.student, p.handed, p.step, Math.round((rec.activeSec || 0) / 60), p.runs.length, rightN("read"), missN("read"), rightN("draw"), missN("draw"), rightN("match"), missN("match"), p.locks.length, p.locks.filter((l) => l.unlockedAt).length, p.helps.length, Object.values(p.mystery).filter((m) => m.ok).length, p.modelA.first || "", p.modelA.choice || ""].map(q).join(",")); }
   const a = h("a", { href: URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" })), download: "photoelectron-records.csv" }); document.body.append(a); a.click(); a.remove();
 });
-// The unlock PIN. The page keeps only a hash: type a PIN, copy the line into content/config.json, push. Nothing is stored here.
-$("#pinMake").addEventListener("click", async () => {
-  const pin = $("#pinIn").value.trim(); if (!/^\d{4,8}$/.test(pin)) { $("#pinOut").textContent = "Use 4 to 8 digits."; return; }
-  const hex = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("pes-pin:" + pin)).then((b) => [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join(""));
-  $("#pinOut").textContent = `"pesPinHash": "${hex}"`;
-});
-// Show the PIN in use. Only a hash is stored, so find it by trying every 4-digit PIN (about a second). shortcut: 5 to 8 digit PINs are not shown, use the box above to check one.
-(async () => {
-  const want = (await J("content/config.json").catch(() => ({}))).pesPinHash, out = $("#pinNow"), hex = async (s) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map((x) => x.toString(16).padStart(2, "0")).join("");
-  if (!want) { out.textContent = "No PIN is set yet. Make one above."; return; }
-  for (let i = 0; i < 10000; i++) { const p = String(i).padStart(4, "0"); if (await hex("pes-pin:" + p) === want) { out.textContent = "PIN in use: " + p; return; } }
-  out.textContent = "The PIN in use is longer than 4 digits, so it is not shown here.";
-})();
+// Today's codes (same functions the main teacher page uses, so they can never disagree).
+if (window.MrD && MrD.codes) { $("#codeUnlock").textContent = MrD.codes.override(); $("#codeH1").textContent = MrD.codes.huddle(); $("#codeH2").textContent = MrD.codes.huddle2(); }
 window.__teacher = { load, rows: () => rows, heat: () => heat, foil: () => foil, pes: () => pes };

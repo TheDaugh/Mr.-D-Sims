@@ -1,5 +1,6 @@
 {
   "id": "flame-tests",
+  "checkpoints": "legacy",
   "kind": "flame",
   "title": "Flame Tests",
   "roomFile": "flame-lab",

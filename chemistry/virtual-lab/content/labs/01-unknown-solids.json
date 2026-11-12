@@ -1,5 +1,6 @@
 {
   "id": "01-unknown-solids",
+  "checkpoints": "legacy",
   "title": "Lab 1: Identify the Unknown White Solids",
   "intro": "Four jars hold unidentified white solids; A, B and C are required and D is a challenge. Each is one of the six known samples on the shelf. You will run the same five tests on the unknowns and on the knowns, record what you observe, and decide which is which. Several of the solids look alike, so no single test is enough.",
   "standard": {

@@ -74,10 +74,36 @@ await page.click("#zePredNa"); await page.click("#zeMeasure"); await page.waitFo
 s = await st(); check(s.pred.choice === "na" && !s.pred.ok && s.measured.includes(12), "after a (wrong) prediction, magnesium measures and the miss is recorded");
 check(/did not hold/.test(await page.locator("#zePred").innerText()), "the miss says to compare the two readings");
 
-// ---------- mystery atom ----------
-const mz = await hk((k) => k.mysZ()); const wrong = mz === 3 ? 4 : 3;
-await page.click("#zeMysOn"); await page.click("#zeCell_" + wrong); check(/Not yet/.test(await page.locator("#zeMys").innerText()), "a wrong mystery guess gets a hint about the electrons, not the name");
-await page.click("#zeCell_" + mz); check((await st()).mys.ok, "the right atom solves the mystery");
+// ---------- the two checks: three right in a row, hints that never give the answer, three misses lock, today's code unlocks ----------
+const Q = (t) => hk((k, ty) => k.question(ty), t);
+const fillZ = async (v) => { await page.fill("#zeCkIn", String(v)); await page.click("#zeCkGo"); await page.waitForTimeout(120); };
+let q = await Q("zeff"); await fillZ(q.ans + 1);
+check(/Not yet/.test(await page.locator("#zeMys").innerText()) && !new RegExp("answer is|= " + q.ans + "$").test(await page.locator("#zeMys").innerText()), "a wrong answer gets a hint that does not give the number");
+let q2 = await Q("zeff"); check(q2.Z !== q.Z, "a miss serves a new question (nothing to click through)");
+await fillZ(q2.ans); await fillZ((await Q("zeff")).ans); s = await st(); check(s.cp.zeff.streak === 2 && !s.cp.zeff.passed, "two right after a miss is not yet a pass (a miss reset the streak) " + JSON.stringify(s.cp.zeff).slice(0, 160));
+await fillZ((await Q("zeff")).ans); s = await st(); check(s.cp.zeff.passed, "three right in a row passes the protons check");
+await page.click("#zeMysOn");
+const wrongZ = async () => { const m = await Q("name"); return m.Z === 3 ? 4 : 3; };
+await page.click("#zeCell_" + (await wrongZ())); await page.click("#zeCell_" + (await wrongZ()));
+check(!(await st()).lock, "two misses do not lock");
+await page.click("#zeCell_" + (await wrongZ())); await page.waitForSelector("#zeLockBox:not([hidden])");
+s = await st(); check(s.lock && s.lock.type === "name" && s.locks.length === 1, "three misses in a row lock the screen and the lock is in the state");
+check(!/answer|= \d/.test(await page.locator("#zeLockBox").innerText()), "the lock screen shows no answer");
+await page.keyboard.press("Escape"); await page.waitForTimeout(150); check((await page.locator("#dlgNotebook[open]").count()) === 1, "Escape does not close the locked screen");
+await page.goto(url + "&resume=1"); await page.waitForSelector("#zeLockBox:not([hidden])", { timeout: 8000 }).catch(() => {});
+check((await page.locator("#zeLockBox:not([hidden])").count()) === 1, "after a reload the lock is still there");
+await page.fill("#zePin", "0000"); await page.click("#zePinGo"); await page.waitForTimeout(200);
+check(/not right/.test(await page.locator("#zeLockBox").innerText()) && (await st()).lock, "a wrong code does not unlock");
+const today = await page.evaluate(() => MrD.codes.override());
+await page.fill("#zePin", today); await page.click("#zePinGo"); await page.waitForSelector("#zeLockBox", { state: "hidden" });
+s = await st(); check(!s.lock && s.cp.name.redo && s.cp.name.need === 2 && s.cp.zeff.passed && !s.cp.zeff.redo, "today's unlock code opens it and resets only the mystery check (2 fresh ones needed)");
+check(/Mr\. D unlocked/.test(await page.locator("#zeMys").innerText()), "the screen says how many new ones are needed");
+await page.click("#zeMysOn"); for (let i = 0; i < 2; i++) { const m = await Q("name"); await page.click("#zeCell_" + m.Z); await page.waitForTimeout(100); }
+s = await st(); check(s.cp.name.passed && !s.cp.name.redo, "two fresh right in a row finish the redo");
+await page.click("#zeHelp"); await page.waitForSelector("#zeLockBox:not([hidden])"); s = await st(); check(s.lock.reason === "help" && s.helps.length === 1, "I need Mr. D locks the screen and is logged");
+await page.fill("#zePin", today); await page.click("#zePinGo"); await page.waitForSelector("#zeLockBox", { state: "hidden" });
+await page.click("#zeMysOn").catch(() => {}); for (let i = 0; i < 2; i++) { const m = await Q("name"); if (!m) break; await page.click("#zeCell_" + m.Z); await page.waitForTimeout(100); }
+s = await st(); check(!s.lock && s.cp.name.passed && !s.cp.name.redo, "after a help unlock the type is passed again by two fresh ones");
 await shot("map");
 
 // ---------- the one huddle (a note outside class), hand in ----------
@@ -98,7 +124,7 @@ await page.click("#zeHand"); await page.waitForSelector("#dlgDone[open]");
 const [dl] = await Promise.all([page.waitForEvent("download"), page.click("#doneDl")]);
 const rec = JSON.parse(readFileSync(await dl.path(), "utf8"));
 check(rec.lab === "zeff-pull" && rec.zeff && rec.zeff.handed && rec.zeff.matched.length >= 3 && rec.zeff.huddle, "the record holds the matches, the huddle and the hand-in");
-check(rec.zeff.mystery.ok && rec.zeff.predict.choice === "na" && Object.keys(rec.zeff.marks).length >= 3, "the record holds the mystery, the prediction and the ring marks");
+check(rec.zeff.checks.name.passed && rec.zeff.checks.zeff.passed && rec.zeff.locks.length === 2 && rec.zeff.predict.choice === "na" && Object.keys(rec.zeff.marks).length >= 3, "the record holds the mystery, the prediction and the ring marks");
 check(rec.events.some((e) => e.type === "zeff_mark") && rec.events.some((e) => e.type === "zeff_match"), "the log holds every mark and match");
 await shot("done");
 

@@ -55,3 +55,15 @@ test("the pull bench room: parses, has the windows and rug, and every object can
   for (const o of objs) assert.ok(reachable(room, room.start, o, geared), o.t.id);
   assert.ok(room.rows.join("").includes("r") && Object.values(room.legend).some((t) => t.rug));
 });
+
+test("checkpoint questions: seeded, never the same atom twice in a row, graded from the model, and the hint points at the student's slip", () => {
+  for (const type of L.CK_TYPES) for (const seed of ["a", "b", "Test Student|zeff-pull"]) {
+    let prev = 0; for (let n = 0; n < 40; n++) { const q = L.question(type, n, seed, Z); assert.notEqual(q.Z, prev); prev = q.Z; assert.deepEqual(q, L.question(type, n, seed, Z)); assert.ok(L.ZS.includes(q.Z)); }
+  }
+  const q = L.question("zeff", 0, "x", Z), a = Z.atom(q.Z);
+  assert.equal(q.ans, a.zeff); assert.ok(L.gradeAnswer(q, String(a.zeff))); assert.ok(!L.gradeAnswer(q, "")); assert.ok(!L.gradeAnswer(q, String(a.zeff + 1)));
+  assert.equal(L.diagnose(q, String(a.Z), Z), "protons"); assert.equal(L.diagnose(q, String(a.core), Z), "core"); assert.equal(L.diagnose(q, "abc", Z), "num");
+  const m = L.question("name", 0, "x", Z); assert.ok(L.gradeAnswer(m, m.Z)); assert.ok(!L.gradeAnswer(m, m.Z + 1));
+  const other = Z.atom(m.Z).n === 2 ? 11 : 3; assert.equal(L.diagnose(m, other, Z), "rings");
+  for (const k of ["num", "protons", "core", "count", "rings", "pull"]) assert.ok(lab.ui["cpHint_" + k], "hint text for " + k);
+});

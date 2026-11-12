@@ -55,11 +55,10 @@
       <div id="pesDetail"></div>
     </section>
     <section class="card" id="pinCard" style="margin-top:16px">
-      <h2 style="margin:0 0 6px">Photoelectron lab: unlock PIN</h2>
-      <p class="hint">When a student's screen locks, you type this PIN on it. Pick 4 to 8 digits here. The page shows one line (a hash, never the PIN). Paste it into <code>chemistry/virtual-lab/content/config.json</code>, next to <code>modeVerifiers</code>, and push. Or run <code>node tools/pes-pin.mjs &lt;pin&gt;</code>.</p>
-      <div class="controls"><input id="pinIn" inputmode="numeric" maxlength="8" aria-label="PIN" style="width:8em"><button id="pinMake">Make the line</button></div>
-      <p id="pinNow" class="good"></p>
-      <pre id="pinOut" class="fbtext" style="margin-top:8px"></pre>
+      <h2 style="margin:0 0 6px">Today's codes</h2>
+      <p class="hint">Unlock (type it on a locked student's screen in any lab, and in locked lessons): <b id="codeUnlock" style="font:800 1.3rem ui-monospace,Menlo,monospace;letter-spacing:.12em"></b></p>
+      <p class="hint">Huddle 1: <b id="codeH1" style="font:800 1.3rem ui-monospace,Menlo,monospace;letter-spacing:.12em"></b> &nbsp; Huddle 2: <b id="codeH2" style="font:800 1.3rem ui-monospace,Menlo,monospace;letter-spacing:.12em"></b></p>
+      <p class="hint">All three change at 7:00 AM each school day and are also on the main teacher page.</p>
     </section>
     <section class="card" id="foilCard" style="margin-top:16px" hidden>
       <h2>Rutherford gold foil records</h2>
@@ -69,6 +68,8 @@
   </div>
 </div>
 <script src="../../shared/gradebook.js"></script>
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
 <script type="module" src="src/teacher.js"></script>
 </body>
 </html>

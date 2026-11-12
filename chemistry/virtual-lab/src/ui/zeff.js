@@ -4,6 +4,7 @@
 // Every word a student sees is in content/labs/06-effective-nuclear-charge.json. The model is chemistry/shared/zeff.js (window.Zeff).
 // Length is the lab's `lengthMin` or ?min=NN (engine/zeff-lab.js).
 import { h } from "../../../../shared/virtual-lab/dom.js";
+import * as CK from "../../../../shared/virtual-lab/checkpoint.js";
 import * as L from "../engine/zeff-lab.js";
 
 // Nothing here may run at import time: the shared app imports every lab kind, and a page that does not load ../shared/zeff.js (the physics lab) must still start.
@@ -28,13 +29,14 @@ const CSS = `.zeRoot{display:grid;grid-template-columns:352px 1fr 262px;gap:16px
 .zeTube i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(0deg,#d9480f,#f0a020);transition:height .8s cubic-bezier(.3,1.4,.5,1)}
 .zeTicks{position:absolute;right:-34px;top:0;height:300px;font-size:10.5px;color:#6a7787;pointer-events:none}.zeTicks span{position:absolute;right:0;transform:translateY(50%)}
 .zeMeterWrap{position:relative;width:46px;margin:0 auto}.zeBig{font:700 26px ui-monospace,Menlo,monospace;text-align:center;margin:8px 0 0}
+.zeLock{position:absolute;inset:0;background:#0f1620;color:#fff;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:30px}.zeLock[hidden]{display:none}.zeLock h2{font-size:26px;margin:0}.zeLock .pin{font-size:20px;width:7em;text-align:center}.zeLock .zeMsg.no,.zeLock .pesMsg{color:#ffb4a8}
 .zeRoot .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.zeBl{display:block;margin:6px 0}.zeBl input{width:7em;margin:0 6px}.zeHint{color:#6a7787;font-size:12px;margin:4px 0}`;
 const fmt = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => (o[k] === undefined ? "" : o[k]));
 const heat = (v) => { const t = Math.max(0, Math.min(1, v / 2)), a = [255, 243, 196], b = [217, 72, 15]; return `rgb(${a.map((c, i) => Math.round(c + (b[i] - c) * t)).join(",")})`; };
 
-const T0 = () => ({ Z: 0, mysMode: false, measured: [], rows: [], marks: {}, markN: 0, matched: [], pred: { choice: "", at: 0, ok: false }, mys: { Z: 0, tries: 0, ok: false, att: [] }, blanks: { b1: "", b2: "", b3: "", b4: "", b5: "", b6: "", b7: "" }, huddle: false, handed: false });
+const T0 = () => ({ Z: 0, mysMode: false, measured: [], rows: [], marks: {}, markN: 0, matched: [], pred: { choice: "", at: 0, ok: false }, mys: { Z: 0, tries: 0, ok: false, att: [] }, blanks: { b1: "", b2: "", b3: "", b4: "", b5: "", b6: "", b7: "" }, huddle: false, handed: false, cp: { zeff: CK.track(), name: CK.track() }, lock: null, locks: [], helps: [] });
 export const fresh = () => ({ ...T0(), huddle1: true, h1Forced: true, forced1: true, huddle2: false, h2Auto: false, forced2: false });   // huddle 1 never runs; the one huddle is the shared "huddle 2" slot, set at the middle by the clock below
-export function fix(g) { const d = fresh(); for (const k in d) if (g[k] === undefined) g[k] = d[k]; for (const k of ["pred", "mys", "blanks"]) for (const j in d[k]) if (g[k][j] === undefined) g[k][j] = d[k][j]; delete g.shield; delete g.shieldN; return g; }
+export function fix(g) { const d = fresh(); for (const k in d) if (g[k] === undefined) g[k] = d[k]; for (const k of ["pred", "mys", "blanks"]) for (const j in d[k]) if (g[k][j] === undefined) g[k][j] = d[k][j]; for (const t of L.CK_TYPES) for (const j in d.cp[t]) if (g.cp[t][j] === undefined) g.cp[t][j] = d.cp[t][j]; delete g.shield; delete g.shieldN; return g; }
 export async function load(lab) { lab.prelab = { questions: [] }; }
 
 export function create(ctx) {
@@ -45,7 +47,10 @@ export function create(ctx) {
   const ev = (t, d) => { if (!ctx.isDemo()) log.add(t, d); }, changed = () => { if (!ctx.isDemo()) onChange(); };
   const isOpen = () => { const d = $("dlgNotebook"); return !!(d && d.open); };
   const seed = () => String(ctx.studentKey() || "anon") + "|" + (lab.id || "");
-  const mysZ = () => (G().mys.Z || (G().mys.Z = L.mysteryZ(seed())));
+  const qOf = (type) => L.question(type, G().cp[type].n, seed(), Z);
+  const redoType = () => L.CK_TYPES.find((t) => G().cp[t].redo);
+  const curType = () => redoType() || L.CK_TYPES.find((t) => !G().cp[t].passed) || null;   // the check on screen
+  const checksDone = () => L.CK_TYPES.every((t) => G().cp[t].passed);
   const pullTxt = (a) => `${Z.frac(a)} = ${Z.pullValue(a).toFixed(2)}`;
   const canMeasure = (z) => god() || z !== 12 || !!G().pred.choice || G().measured.includes(12);   // magnesium waits for the prediction; you can still look at it and slide past it
   const marksOf = (z) => G().marks[z] || (G().marks[z] = []);
@@ -55,7 +60,7 @@ export function create(ctx) {
   // ---------- state the quests read ----------
   const col = () => [3, 11, 19].every((z) => G().measured.includes(z));
   const predDone = () => !!G().pred.choice && G().measured.includes(12);
-  function questState() { const g = G(); return { z_measure: g.measured.includes(11), z_mark: g.matched.includes(11), z_match3: g.matched.length >= 3, _z_match3: Math.min(3, g.matched.length), z_col: col(), z_pred: predDone(), z_mys: g.mys.ok, handed: g.handed }; }
+  function questState() { const g = G(); return { z_measure: g.measured.includes(11), z_mark: g.matched.includes(11), z_match3: g.matched.length >= 3, _z_match3: Math.min(3, g.matched.length), z_col: col(), z_pred: predDone(), z_check: g.cp.zeff.passed, z_mys: g.cp.name.passed, handed: g.handed }; }
 
   // ---------- actions ----------
   function pick(z) { const g = G(); if (!live() || z < 3 || z > 20) return false; g.Z = z; ev("zeff_pick", { Z: z }); render(); changed(); return true; }
@@ -72,12 +77,33 @@ export function create(ctx) {
     const g = G(); if (!live() || !g.Z) return; const a = Z.atom(g.Z); if (i < 0 || i >= a.n - 1) return;
     const m = marksOf(a.Z); m[i] = !m[i]; g.markN++; ev("zeff_mark", { Z: a.Z, ring: i + 1, on: m[i], marks: m.slice(0, a.n - 1).map(Boolean) }); checkMatch(a); render(); changed();
   }
-  const ready = () => god() || (predDone() && G().mys.ok);
+  const ready = () => god() || (predDone() && checksDone() && !G().lock);
   function handIn() { const g = G(); if (!live() || !ready()) return; g.handed = true; ev("zeff_handin", {}); changed(); ctx.closeNotebook(); ctx.finish(); }
   function predict(c) { const g = G(); if (g.pred.choice) return; g.pred = { choice: c, at: g.measured.length, ok: c === L.predictAnswer(Z) }; ev("zeff_predict", { choice: c, before: g.measured.slice() }); render(); changed(); }
-  function nameMystery(z) {
-    const g = G(), m = g.mys; if (m.ok) return; m.tries++; const ok = z === mysZ(); m.att.push({ Z: z, ok }); if (ok) m.ok = true; ev("zeff_mystery", { Z: z, ok }); render(); changed();
+  // ----- checkpoints: three right in a row, a hint after a miss that never gives the answer, three misses lock (shared/virtual-lab/checkpoint.js) -----
+  let cpNote = null;
+  function submit(type, attempt) {
+    const g = G(); if (!live() || g.lock || curType() !== type) return; const t = g.cp[type], item = qOf(type), ok = L.gradeAnswer(item, attempt), code = ok ? null : L.diagnose(item, attempt, Z);
+    t.att.push({ n: t.n, Z: item.Z, ok, hint: code, at: new Date().toISOString() }); ev("zeff_attempt", { type, n: t.n, Z: item.Z, answer: attempt, ok, code, redo: t.redo });
+    const r = CK.grade(t, ok);
+    if (r === "right") cpNote = { type, ok: true, text: `${U.cpRight} ${fmt(U.cpRow, { s: t.streak, n: t.need })}` };
+    else if (r === "pass") { cpNote = { type, ok: true, text: U.cpPass }; ev("zeff_pass", { type }); g.mysMode = false; }
+    else { cpNote = { type, ok: false, text: `${U.cpMiss} ${U["cpHint_" + code]} ${U.cpNew}` }; if (r === "lock") { lockNow(type, "misses"); return; } }
+    render(); changed();
   }
+  function lockNow(type, reason) {
+    const g = G(); if (g.lock) return; if (god() && !ctx.isDemo()) { say("Teacher key: a student's screen would lock here.", "warn"); return; }
+    g.lock = CK.lockInfo(type, reason, "check"); g.cp[type].atCp = type === curType(); if (reason === "help") g.cp[type].helps++;
+    g.locks.push({ type, reason, at: g.lock.at, unlockedAt: null }); ev("zeff_lock", { type, reason }); if (!ctx.isDemo()) CK.mirrorSet(lab.id, g.lock, S.student);
+    render(); changed();
+  }
+  function helpNow() { if (!live() || G().lock) return; const g = G(); g.helps.push({ at: new Date().toISOString() }); ev("zeff_help", {}); lockNow(curType() || "name", "help"); }
+  function tryUnlock(code) { const ok = CK.codeOk(code); ev("zeff_unlock_try", { ok }); if (ok) realUnlock(); return ok; }
+  function realUnlock() {
+    const g = G(), L0 = g.lock; if (!L0) return; CK.unlockTrack(g.cp[L0.type]); const last = [...g.locks].reverse().find((x) => !x.unlockedAt); if (last) last.unlockedAt = new Date().toISOString();
+    g.lock = null; cpNote = null; g.mysMode = false; ev("zeff_unlock", { type: L0.type }); if (!ctx.isDemo()) CK.mirrorClear(lab.id); render(); changed();
+  }
+  function ensureLockMirror() { if (ctx.isDemo() || G().lock || S.stage !== "lab") return; const m = CK.mirrorGet(lab.id); if (m) { G().lock = { type: m.type, reason: m.reason, step: "check", at: m.at }; G().locks.push({ type: m.type, reason: m.reason, at: m.at, unlockedAt: null, restored: true }); } }
 
   // ---------- drawing ----------
   const els = {};
@@ -89,14 +115,20 @@ export function create(ctx) {
     if (showPull) { const w = 2 + 5 * Z.pullValue(a), hw = w / 2 + 5; o += `<g transform="translate(${px.toFixed(1)},${py.toFixed(1)}) rotate(${deg.toFixed(1)})"><line x1="9" y1="0" x2="40" y2="0" stroke="#1d5fa8" stroke-width="${w.toFixed(1)}"/><polygon points="38,${-hw} ${40 + hw},0 38,${hw}" fill="#1d5fa8"/></g>`; }
     return Z.svg(a.Z, { marks: marksOf(a.Z), hit: true, tag: true }).replace(/<\/svg>\s*$/, o + "</svg>");
   }
-  function mysBody() {
-    const g = G(), m = g.mys, a = Z.atom(mysZ()), rings = a.rings.join(", ");
-    const msg = m.ok ? h("p", { class: "zeMsg ok" }, fmt(U.mysYes, { name: a.name })) : m.tries ? h("p", { class: "zeMsg no" }, U.mysNo) : null;
-    return [h("h3", {}, U.mysteryHead), h("p", {}, fmt(U.mysInfo, { rings, pull: pullTxt(a) })), msg]
-      .filter(Boolean).concat(m.ok ? [] : [h("button", { id: "zeMysOn", onclick: () => { G().mysMode = !G().mysMode; render(); } }, G().mysMode ? U.mysStop : U.mysGo)]);
+  function checkBody() {
+    const g = G(), type = curType(); if (!type) return [h("h3", {}, U.cpNameHead), h("p", { class: "zeMsg ok" }, U.cpDone)];
+    const t = g.cp[type], item = qOf(type), a = Z.atom(item.Z), out = [];
+    if (t.redo) out.push(h("p", { class: "zeMsg", role: "status" }, fmt(U.redoNote, { n: t.need })));
+    if (cpNote && cpNote.type === type) out.push(h("p", { class: "zeMsg " + (cpNote.ok ? "ok" : "no"), role: "status" }, cpNote.text));
+    out.push(h("h3", {}, type === "zeff" ? U.cpZeffHead : U.cpNameHead), h("p", { class: "zeHint" }, fmt(U.cpRow, { s: t.streak, n: t.need })));
+    if (type === "zeff") {
+      const inp = h("input", { id: "zeCkIn", type: "text", inputmode: "numeric", autocomplete: "off", style: "width:4em", "aria-label": U.cpCheck }); inp.addEventListener("keydown", (e) => { if (e.key === "Enter") submit("zeff", inp.value); });
+      out.push(h("p", {}, fmt(U.cpZeffQ, { name: a.name[0].toUpperCase() + a.name.slice(1), Z: a.Z, rings: a.rings.join(", ") })), h("div", { class: "row" }, inp, h("button", { id: "zeCkGo", class: "primary", onclick: () => submit("zeff", inp.value) }, U.cpCheck)));
+    } else out.push(h("p", {}, fmt(U.cpNameQ, { rings: a.rings.join(", "), pull: pullTxt(a) })), h("button", { id: "zeMysOn", onclick: () => { G().mysMode = !G().mysMode; render(); } }, g.mysMode ? U.cpPickOff : U.cpPickOn));
+    return out;
   }
   function render(animate) {
-    if (!els.root) return; const g = G(), a = g.Z ? Z.atom(g.Z) : null, mm = g.mysMode && !g.mys.ok;
+    if (!els.root) return; const g = G(), a = g.Z ? Z.atom(g.Z) : null, mm = g.mysMode && curType() === "name";
     for (const z of L.ZS) { const c = $("zeCell_" + z); if (c) { c.classList.toggle("on", g.Z === z); const was = g.measured.includes(z); c.style.background = was ? heat(Z.pullValue(Z.atom(z))) : ""; c.style.color = was && Z.pullValue(Z.atom(z)) > 1.2 ? "#fff" : ""; c.setAttribute("aria-label", `${Z.NAME[z]}${was ? ", pull " + Z.frac(Z.atom(z)) : ""}`); } }
     if (g.Z) els.slider.value = g.Z;
     els.slideLabel.textContent = a ? fmt(U.slideLabel, { Z: a.Z, name: a.name }) : U.slideNone; els.slider.disabled = !live();
@@ -121,7 +153,9 @@ export function create(ctx) {
     els.big.textContent = a && was ? pullTxt(a) : "—";
     els.pred.replaceChildren(h("h3", {}, U.predictHead), g.pred.choice ? h("p", { class: "zeMsg " + (g.measured.includes(12) ? (g.pred.ok ? "ok" : "no") : "") }, g.measured.includes(12) ? (g.pred.ok ? U.predHeld : U.predMissed) : U.predLocked)
       : h("div", { class: "row" }, h("span", {}, U.predictAsk), h("button", { id: "zePredNa", onclick: () => predict("na") }, U.sodium), h("button", { id: "zePredMg", onclick: () => predict("mg") }, U.magnesium)));
-    els.mys.replaceChildren(...mysBody());
+    els.mys.replaceChildren(...checkBody());
+    const lk = g.lock; els.lockBox.hidden = !lk; els.close.hidden = !!lk; els.help.disabled = !live() || !!lk; const dd = $("dlgNotebook"); if (dd && !ctx.isDemo()) { if (lk) dd.setAttribute("data-gate", ""); else dd.removeAttribute("data-gate"); }
+    if (!lk) els.lockBox.dataset.at = ""; else if (els.lockBox.dataset.at !== lk.at) { els.lockBox.dataset.at = lk.at; els.lockBox.replaceChildren(...CK.lockScreen(lk, { head: U.lockHead, miss: U.lockMiss, help: U.lockHelp, body: U.lockBody, word: U.unlockWord, wrong: U.pinWrong }, { pin: "zePin", go: "zePinGo", msg: "zePinMsg" }, () => tryUnlock(CK.todayCode()))); }
     for (const z of L.ZS) { const c = $("zeCell_" + z); if (c) c.disabled = false; }
     void mm;
   }
@@ -131,25 +165,25 @@ export function create(ctx) {
     els.chips = h("div", { class: "zeChips", id: "zeChips" }); els.tally = h("p", { class: "zeLine", id: "zeTally" }); els.dist = h("p", { class: "zeLine", id: "zeDist" }); els.est = h("p", { class: "zeLine", id: "zeEst" }); els.match = h("p", { class: "zeMsg", id: "zeMatch", role: "status" });
     els.measure = h("button", { id: "zeMeasure", class: "primary", onclick: measure }, U.measure); els.lock = h("p", { class: "zeHint", id: "zeLock" });
     els.hand = h("button", { id: "zeHand", class: "primary", onclick: handIn }, U.handBtn); els.handNote = h("p", { class: "zeHint", id: "zeHandNote" });
-    els.pred = h("div", { id: "zePred", class: "zeCard" }); els.mys = h("div", { id: "zeMys", class: "zeCard" });
+    els.pred = h("div", { id: "zePred", class: "zeCard" }); els.mys = h("div", { id: "zeMys", class: "zeCard" }); els.help = h("button", { id: "zeHelp", onclick: helpNow }, U.helpBtn); els.lockBox = h("div", { id: "zeLockBox", class: "zeLock", hidden: "" });
     els.slideLabel = h("span", { id: "zeSlideLabel" }); els.slider = h("input", { id: "zeSlider", type: "range", min: 3, max: 20, step: 1, value: 11, "aria-label": U.slideAria });
     els.slider.addEventListener("input", () => { pick(+els.slider.value); });
-    const cell = (z) => h("button", { id: "zeCell_" + z, onclick: () => { if (G().mysMode && !G().mys.ok) return nameMystery(z); pick(z); } }, h("b", {}, Z.SYM[z]), h("small", {}, z));
+    const cell = (z) => h("button", { id: "zeCell_" + z, onclick: () => { if (G().mysMode && curType() === "name") return submit("name", z); pick(z); } }, h("b", {}, Z.SYM[z]), h("small", {}, z));
     const rowOf = (label, zs) => [h("span", { class: "pl" }, label), ...[1, 2, 13, 14, 15, 16, 17, 18].map((gp) => { const z = zs.find((q) => Z.atom(q).group === gp); return z ? cell(z) : h("span", {}); })];
     const tab = h("div", { class: "zeTab", id: "zeGrid" }, h("span", {}), ...[1, 2, 13, 14, 15, 16, 17, 18].map((gp) => h("span", { class: "gl" }, gp)), ...rowOf(2, [3, 4, 5, 6, 7, 8, 9, 10]), ...rowOf(3, [11, 12, 13, 14, 15, 16, 17, 18]), ...rowOf(4, [19, 20]));
-    const close = h("button", { class: "x", "data-close": "", style: "position:absolute;right:0;top:-8px;z-index:4" }, U.closeWord);
+    const close = els.close = h("button", { class: "x", "data-close": "", style: "position:absolute;right:0;top:-8px;z-index:4" }, U.closeWord);
     els.root = h("div", { class: "zeRoot" }, close,
       h("div", { class: "zeCol" }, h("h3", {}, U.mapHead, " ", h("small", {}, U.mapSub)), tab, h("div", { class: "zeLegend" }, h("span", {}, U.weak), h("i", {}), h("span", {}, U.strong)),
         h("div", { class: "zeSlide" }, h("div", {}, U.slideHead, " ", h("b", {}, els.slideLabel)), els.slider), els.pred, els.mys),
       h("div", { class: "zeMid" }, els.name, els.pic, els.ringBtns, els.ringNote, h("h3", { id: "zeChipsHead", style: "margin-top:6px" }, U.chipsHead), els.chips, els.tally, els.dist, els.est, els.match),
       h("div", { class: "zeCol" }, h("h3", {}, U.pullHead), h("div", { class: "zeMeterWrap" }, h("div", { class: "zeTube", id: "zeMeter" }, els.fill), h("div", { class: "zeTicks" }, ...[0, 0.5, 1, 1.5, 2].map((v) => h("span", { style: `bottom:${(v / 2) * 100}%` }, v)))), els.big,
-        h("div", { style: "text-align:center;margin-top:10px" }, els.measure), els.lock, h("p", { class: "zeHint" }, U.meterNote), h("div", { style: "border-top:1px solid #c9d3de;margin-top:12px;padding-top:10px;text-align:center" }, els.hand, els.handNote)));
+        h("div", { style: "text-align:center;margin-top:10px" }, els.measure), els.lock, h("p", { class: "zeHint" }, U.meterNote), h("div", { style: "border-top:1px solid #c9d3de;margin-top:12px;padding-top:10px;text-align:center" }, els.hand, els.handNote, h("div", { style: "margin-top:8px" }, els.help))), els.lockBox);
     els.pic.addEventListener("click", (e) => { const r = e.target.closest && e.target.closest(".zr-hit"); if (r) toggleRing(+r.getAttribute("data-i")); });
     const st = document.createElement("style"); st.textContent = CSS; els.root.append(st); return els.root;
   }
   const sheet = build(); let lastG = null;
-  function step() { if (G() !== lastG) { lastG = G(); render(); } }
-  function refresh() { if (!live()) return; render(); const b = $("btnNotebook"); if (b && b.firstChild && b.firstChild.nodeType === 3) b.firstChild.textContent = "⚖ Pull bench"; const hb = $("btnHuddle"); if (hb && hb.firstChild) hb.firstChild.textContent = U.codeLabel; }
+  function step() { if (G() !== lastG) { lastG = G(); cpNote = null; ensureLockMirror(); render(); } }
+  function refresh() { if (!live()) return; ensureLockMirror(); render(); if (G().lock && !ctx.isDemo() && !god() && S.stage === "lab" && !isOpen()) ctx.openNotebook("zeff"); const b = $("btnNotebook"); if (b && b.firstChild && b.firstChild.nodeType === 3) b.firstChild.textContent = "⚖ Pull bench"; const hb = $("btnHuddle"); if (hb && hb.firstChild) hb.firstChild.textContent = U.codeLabel; }
   const station = (t) => { if (t.id !== "pull_rig") return false; ev("zeff_open", { at: t.id }); ctx.openNotebook("zeff"); say(U.stepUp); render(); return true; };
 
   // ---------- intro, card, guide ----------
@@ -200,12 +234,13 @@ export function create(ctx) {
     rows.push(tr("Huddle blanks", h("ol", {}, B.map((b) => h("li", {}, `${b.pre} ___ ${b.post}  →  ${b.ans[0]}`))), "Any non-empty copy lets a student on; the record keeps what they typed and whether it matched."));
     rows.push(tr("The marking step", "A student clicks the inner rings (the electrons in the way) and the strip cancels that many protons. The estimate is protons left over ÷ ring number squared. It matches the meter only when every inner ring is marked and the outer ring is not. A miss says only whether the estimate is bigger or smaller than the meter."));
     rows.push(tr("Predict", "Sodium or magnesium? Magnesium holds harder: Z_eff 2 vs 1 at the same outer ring, pull 2/9 vs 1/9. A miss is data, not a mistake: it opens the reason. Magnesium can be viewed and slid past, but not measured until the prediction is made."));
-    rows.push(tr("Mystery atom for this student", `${Z.atom(mysZ()).name} (Z = ${mysZ()})`, "Seeded by the student's name."));
+    rows.push(tr("The two checks", "Protons left over (type the number) and the mystery atom (rings and pull given; click the atom). Three right in a row passes each. A miss shows a hint that points at what the student did and then a new question, so there is nothing to click through. Three misses in a row, or I need Mr. D, locks the screen."));
+    rows.push(tr("Unlock code", `Type today's unlock code on the student's screen (the "Unlock any locked student" code on the teacher pages; today it is ${CK.todayCode()}). Only that check resets; the student then needs 2 fresh ones right in a row. Every attempt, lock, unlock and help request is in the record.`));
     rows.push(tr("Simplifications", h("ul", {}, ["Z_eff = Z − core electrons; valence electrons do not shield each other. Real values are larger; the ranking is the same.", "Pull = Z_eff ÷ n², with n the outer ring number standing in for distance. A classroom number, not a measurement.", "Lithium to calcium only: past calcium the 3d subshell fills and 'core' needs a rule this lab does not teach.", "Thirteen neighbor pairs (for example Be and B) rank differently in measured ionization energy. The lab never asks a student to compare them."])));
     for (const z of L.ZS) { const a = Z.atom(z); rows.push(tr(`${a.sym} (Z = ${z})`, `rings ${a.rings.join(", ")}`, `core ${a.core}, Z_eff ${a.zeff}, n ${a.n}, pull ${pullTxt(a)}`)); }
     return rows;
   }
-  function record(base) { const g = G(); return { ...base, prelab: { cards: lab.cards.map((c) => c.id) }, submitted: g.handed, zeff: { lengthMin: LEN, measured: g.measured, markToggles: g.markN, matched: g.matched, marks: g.marks, predict: g.pred, mystery: { Z: g.mys.Z, ok: g.mys.ok, tries: g.mys.tries, attempts: g.mys.att }, huddleBlanks: g.blanks, huddle: g.huddle, handed: g.handed } }; }
+  function record(base) { const g = G(); return { ...base, prelab: { cards: lab.cards.map((c) => c.id) }, submitted: g.handed, zeff: { lengthMin: LEN, measured: g.measured, markToggles: g.markN, matched: g.matched, marks: g.marks, predict: g.pred, checks: Object.fromEntries(L.CK_TYPES.map((t) => [t, { passed: g.cp[t].passed, attempts: g.cp[t].att, unlocks: g.cp[t].unlocks, helps: g.cp[t].helps, redo: g.cp[t].redo }])), locks: g.locks, helps: g.helps, huddleBlanks: g.blanks, huddle: g.huddle, handed: g.handed } }; }
 
   // The demo: walk in, open the bench, load an atom from the table, sweep the slider, measure, mark the rings until the estimate matches, go down a column, light up a row of the map.
   async function demo({ say: cap, walk, wait, api }) {
@@ -223,5 +258,5 @@ export function create(ctx) {
   }
   return { zeff: true, sheet, step, refresh, draw: () => {}, station, canOpen: () => live(), showTab: () => {}, hintPicture: () => null, guide, key, print: () => [], record, questState, visible: () => true, unlocked: () => true,
     syncSources: () => {}, answered: () => [], evidence: () => [], recordComplete: () => true, renderPrelab, renderIntro, text: (k) => U[k] || "", holding: () => false, clock: { huddle1AtMin: 999, huddle2AtMin: MID }, bottles: [], huddle, panel: () => ({ title: "", items: [] }),
-    controls: h("div", { id: "zeControls" }), demo, hooks: undefined, hk: { pick, measure, toggleRing, predict, nameMystery, state: G, mysZ, marked: (z) => markedN(Z.atom(z)), len: LEN, mid: MID } };
+    controls: h("div", { id: "zeControls" }), demo, hooks: undefined, hk: { pick, measure, toggleRing, predict, submit, tryUnlock, helpNow, question: qOf, state: G, marked: (z) => markedN(Z.atom(z)), len: LEN, mid: MID } };
 }

@@ -28,3 +28,26 @@ export const huddleAt = (len) => Math.round(len / 2);
 export const markedElectrons = (a, marks) => a.rings.reduce((s, c, i) => s + (i < a.n - 1 && marks && marks[i] ? c : 0), 0);
 export const estimateLeft = (a, marks) => a.Z - markedElectrons(a, marks);          // protons left over
 export const estimateMatches = (a, marks) => estimateLeft(a, marks) === a.zeff;     // equals the model's Z_eff, which is what the meter shows
+// ---------- checkpoints (shared rule: shared/virtual-lab/checkpoint.js; never the same question twice, so a student cannot click through) ----------
+// Two types. "zeff": type the protons left over for an atom. "name": the rings and the pull are given; click the atom. Both are generated from the model.
+export const CK_TYPES = ["zeff", "name"];
+const ZEFF_POOL = Array.from({ length: 18 }, (_, i) => i + 3);
+function pickPool(pool, key, n) {
+  let prev = -1, i = 0;
+  for (let k = 0; k <= n; k++) { i = hash(key + "|" + k) % pool.length; if (i === prev) i = (i + 1) % pool.length; prev = i; }   // never the same atom twice in a row
+  return pool[i];
+}
+export function question(type, n, seed, Zeff) {
+  if (type === "zeff") { const z = pickPool(ZEFF_POOL, seed + "|ck-zeff", n), a = Zeff.atom(z); return { type, n, Z: z, ans: a.zeff }; }
+  const z = pickPool(MYSTERY_POOL, seed + "|ck-name", n); return { type: "name", n, Z: z, ans: z };
+}
+export const gradeAnswer = (item, attempt) => item.type === "zeff" ? String(attempt).trim() !== "" && Number(String(attempt).trim()) === item.ans : Number(attempt) === item.Z;
+// The code of the hint. It points at what the student did, never gives the answer.
+export function diagnose(item, attempt, Zeff) {
+  const a = Zeff.atom(item.Z);
+  if (item.type === "zeff") {
+    const v = Number(String(attempt).trim()); if (!Number.isFinite(v)) return "num";
+    if (v === a.Z) return "protons"; if (v === a.core) return "core"; return "count";
+  }
+  const b = Zeff.atom(Number(attempt)); return b && b.n !== a.n ? "rings" : "pull";
+}
