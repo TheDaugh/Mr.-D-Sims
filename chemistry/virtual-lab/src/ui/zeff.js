@@ -18,7 +18,7 @@ const CSS = `.zeRoot{display:grid;grid-template-columns:352px 1fr 262px;gap:16px
 .zeTab button b{font-size:14px}.zeTab button small{font-size:9.5px;opacity:.7}.zeTab button.on{outline:3px solid #ffd23f;z-index:1}.zeTab button:disabled{opacity:.45}
 .zeLegend{display:flex;align-items:center;gap:6px;margin:6px 0 2px;font-size:11px;color:#6a7787}.zeLegend i{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#fff3c4,#d9480f)}
 .zeSlide{margin:10px 0 4px;padding:8px 10px;border:1px solid #c9d3de;border-radius:8px;background:#f7fafd}.zeSlide input{width:100%;margin:6px 0 0}
-.zeCard,.zeSlide,.zeTab button{color:#1e2630}.zeCard h3,.zeSlide h3,.zeCard label,.zeSlide label{color:#1e2630}.zeCard{margin:10px 0 0;padding:8px 10px;border:1px solid #c9d3de;border-radius:8px;background:#fff}
+.zeCard,.zeSlide,.zeTab button{color:#1e2630}.zeRoot input[type=text]{background:#fff;color:#1e2630;border:1px solid #8fa0b3;border-radius:6px;padding:6px 8px;font:600 16px system-ui,sans-serif}.zeCard h3,.zeSlide h3,.zeCard label,.zeSlide label{color:#1e2630}.zeCard{margin:10px 0 0;padding:8px 10px;border:1px solid #c9d3de;border-radius:8px;background:#fff}
 .zeName{font:700 17px Georgia,serif;margin:0 0 2px;text-align:center}.zeAtom{width:340px;height:340px;max-width:100%}.zeAtom svg{width:100%!important;max-width:none!important;height:100%}
 .zePulse{animation:zep 1.6s infinite}@keyframes zep{50%{opacity:.25}}@media (prefers-reduced-motion:reduce){.zePulse{animation:none}}
 .zeRingBtns{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:4px 0}.zeRingBtns button[aria-pressed=true]{background:#f6d88f;border-color:#c07a00;font-weight:700}
