@@ -56,6 +56,8 @@ Every virtual lab follows `shared/virtual-lab/STANDARD.md` (read it before build
 - No end-of-lesson stamp and no report code. The locally stored scores (`MrD.profile.record`) stay.
 - Three hidden bands, not four. They are a ramp to the regular-level standard, which every student completes. No AP content.
 - No lesson skipping or trimming. The 60% pacing rule and the fixed tab order do not apply to v3 lessons. Legacy lessons are untouched until rebuilt.
+- Sim days are virtual labs, never guided lesson pages (2026-11-11). One notes huddle in the middle, checkpoints with a lock unlocked by today's `MrD.codes.override()`, length set by Ian per day (`shared/virtual-lab/STANDARD.md`).
+- Physics Forces unit (UbD v3, 2026-11-12): sim days become sandbox sims (free play first, variables students change, linked views, a Record button, a prediction logged before each run), not replicas of a lab bench. Planned: a cart-and-hanging-mass sandbox (slots 8 to 10) and a ramp-and-pulley sandbox (slots 19, 25, 26, 29). Real labs stay only where the gear is cheap. The built cart and ramp rig are archived in the UbD schedule, not deleted. The fan-cart lab and the Newton's Second Law lesson are the stand-ins until then.
 - Where this block disagrees with the rest of this file or `docs/LESSON-STANDARD.md`, this block wins.
 
 ## Working rules
