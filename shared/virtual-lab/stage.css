@@ -61,7 +61,7 @@ body { display: flex; overflow: auto; }
 #veil { position: absolute; inset: 0; background: rgba(8, 12, 18, .62); z-index: 40; }
 dialog.dlg { position: absolute; z-index: 50; left: 70px; right: 70px; top: 24px; bottom: 24px; margin: 0; width: auto; height: auto; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); box-shadow: var(--shadow); }
 dialog.dlg.wide { left: 30px; right: 30px; }
-#stage:has(#demoBar:not([hidden])) dialog.dlg { top: 72px; }   /* the demo caption stays readable above an open bench */
+#stage:has(#demoBar:not([hidden])) dialog.dlg { top: 100px; max-height: 610px; }   /* the demo caption stays readable above an open bench */
 dialog.dlg.small { left: 330px; right: 330px; bottom: auto; top: 60px; }
 .dlg .body { height: 100%; box-sizing: border-box; padding: 16px 24px 18px; overflow: auto; }
 .dlg .x { position: sticky; top: 0; float: right; }
