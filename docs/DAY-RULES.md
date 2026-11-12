@@ -33,17 +33,21 @@ Start every slot chat by attaching this file, the slot-08 files (the worked exem
 1. `slot-NN.sheet.pdf` (Mr. D marks this up; it is the only file he opens)
 2. `slot-NN.sheet.tex`, 3. data JSON, 4. `items.json`, 5. content test, plus the 5-line coder prompt.
 
-## State of the build (as of 2026-10-27)
-- **Slot 8 (flame tests):** RECUT as a lab day in the existing virtual-lab room (pre-lab gate, tutorial quests, flame bench, notebook, CER, huddle 2 late). Sheet (5 pages), flame data, `lab-content.json` and the test (51/51) are written and await Mr. D's markup. The practice set is kept for home only. New lab module `04-flame-tests` is needed (repo has no flame/burner/spectroscope). Lab 01's JSON is the format to follow (prelab, quests with tutorial flags, tests, postlab CER).
-- **Already on main (built from the old cards, before these rules):** Chem Slot 9 "Electron Configurations I" and stats 3.6. Treat them as drafts until recut.
-- **Slot 9:** old card is obsolete. Recut after Slot 8: hook = the spectrum lines ("why only these lines?"), atom picture (rings) for Z up to 18, energy diagram after huddle 2 for Z up to 36 (4s before 3d), Cr and Cu out, no valence/ions/shorthand. Atom picture may reuse `atomscope.js`; check.
-- **Stats slot 11:** old card obsolete; redo in this format. Students were never taught invNorm: needs a calculator tutorial.
-- **Engine slots still to do:** 9, 10, 11, 14-18, 20-22. Build the shared electron-structure kit (periodic table, atom picture, energy diagram) once, against Slot 9 only, then map days 10-22 to the pictures they need before building more.
+## State of the build (as of 2026-11-12; `PROGRESS.md` has the detail)
+- **Chem Slot 8 (flame tests):** built as a lab day in the virtual-lab room (`?lab=flame`), with a teacher key, a demo and a hub card.
+- **Chem Slot 9 (Electron Configurations I):** built as the first v2 chemistry lesson (page, models, board page). It still uses two huddles; rebuild only when Ian asks.
+- **Chem Slot 11 (Photoelectron Spectroscopy):** built as a virtual lab (`?lab=pes`) and as a lesson page.
+- **Chem Slot 14 (the table as a map of configurations):** a direct-instruction day bundle in `docs/slot-14/out/` (typed notes, board script, problem sheet and key, exit slips). Print files, not on the site.
+- **Chem Slot 15 (effective nuclear charge):** built as the Pull Bench virtual lab (`?lab=zeff`, 20 minutes, one notes huddle in the middle). The guided-lesson version was deleted.
+- **Stats:** 3.6 Finding Boundary Values (first v2 stats lesson) and the 3.1 to 3.3 Review are built; lesson boards for 3.4 to 3.6 are on the stats board.
+- **Still to do as far as this repo shows:** chem slots 10 (a slides-and-notes exemplar is in `shared-slides/`, no engine page), 16 to 18 and 20 to 22. Confirm with Ian which become virtual labs.
+- **Labs still on the old checkpoint rules** (`"legacy"` in their lab JSON): unknown solids, heating, gold foil, flame, fan cart. Shrink that list, do not add to it.
+- **Physics:** the Forces unit plan (UbD v3, 2026-11-12) calls for two sandbox sims (cart and hanging mass; ramp and pulley). They are not built. They are virtual labs, so they follow `shared/virtual-lab/STANDARD.md`.
 
 ## Open decisions (Mr. D)
-- Lab-day shape: warm-up, huddle 1 (pre-lab), lab in the room, huddle 2 late (after data), exit drawing, with no practice bank unless wanted.
-- Where the "10 minute" huddle change lives (main has 18 and 32 in `shared/pace.js` and 18 in every template; it is not on main).
-- How the typed "explain" item is graded (self-compare with a model answer, or Mr. D reads it).
-- Cornell/MLA exemplar (never arrived).
-- Calculator model for stats; whether stats needs a z-table tab.
-- Whether the repo's four-band standard and `check-lessons --strict` change to three bands.
+- Settled in the built labs (flame, PES, Pull Bench) and `shared/virtual-lab/STANDARD.md`: the lab-day shape (pre-lab, lab in the room, notes huddle) and the checkpoint rule. Revisit only if Ian says.
+- Settled in code: huddle 1 at minute 3 and huddle 2 at minute 25 are the defaults in `shared/pace.js`.
+- Settled in `CLAUDE.md`: three hidden bands for v3 work. `tools/check-lessons.mjs --strict` has no band-count check, so nothing enforces it.
+- Still open: how the typed "explain" item is graded (self-compare with a model answer, or Mr. D reads it).
+- Still open: the Cornell/MLA exemplar (never arrived).
+- Still open: the calculator model for stats, and whether stats needs a z-table tab.

@@ -3,6 +3,18 @@
 Update this at the end of every session. Newest entry first.
 
 
+## 2026-11-12: Docs refresh (branch `docs/readme-refresh-2026-11-12`)
+
+Ian asked for the README and the other deprecated files to be brought up to date. Docs only; no code, test or content file changed.
+
+- `README.md` rewritten: it now covers stats, the whiteboards, the shared virtual-lab room, the FBD lesson and the physics virtual lab, the calculus and chemistry unit lists, templates, tools, keys and tests; the "which rules apply" order; Netlify deploys `main` only (it said GitHub Pages); templates ARE locked by default (it said they were not); statistics bell times are placeholders; v3 two-huddle day.
+- `CLAUDE.md`: added two Supersedes bullets: sim days are virtual labs (2026-11-11), and the Physics Forces unit direction (UbD v3: sandbox sims replace the fan-cart lab and the built apparatus days; planned, not built).
+- `docs/LESSON-STANDARD.md`: the "What each class changes in its next lesson" section (it says to copy older lessons) is marked legacy; v3 table gets a sim-day row.
+- `docs/DAY-RULES.md`: "State of the build" updated from 2026-10-27 to today; resolved open decisions marked (huddle times in `pace.js`, lab-day shape, three bands).
+- `templates/README.md`: status note (describes v2; v3 supersedes). `tests/README.md`: seven labs not six, rows for `labs-display.e2e.js`, `assessment.e2e.js` and the chem lab e2e files. `.claude/skills/guided-lessons/SKILL.md`: sim days are virtual labs.
+
+For Ian: not changed, because they are code or data, not docs: `physics/sims.js` still labels the fan cart "Virtual Lab 5, Slot 7" and `shared/lessons.js` still lists Newton's First and Second Law (the UbD v3 plan has no slot 7 lab). `chemistry/virtual-lab/PLAN.md` is the original build plan and has not been reviewed against the six labs now built. Nothing was deleted. Not on the site until merged to `main`.
+
 ## 2026-11-09: Calculus Unit 3 Review + Quiz and Review + Test (branch `calc-unit3-assessments`, stacked on `calc-4-1-to-4-3`)
 
 Two self-paced pages in `calculus/unit-3-composite-implicit-inverse/`: `unit-3-quiz.html` (Review + Quiz, 3.1 to 3.3, 15 problems, next link goes to 3.4) and `unit-3-test.html` (Review + Test, all of 3.1 to 3.5, 20 problems, next link goes to 4.1). Tabs: Start, Review (two problems per lesson with hints, plus each lesson's own concept lines), Quiz or Test (scored: one try each, no hints, band 3 = the regular standard, lessons mixed), Result. The pass mark is 85% of first-try rights (13 of 15, 17 of 20). The next-lesson link only shows on a pass. A miss lists the lessons where problems were missed (links to redo them) and a Retake button draws a new set (different skills and numbers); every try is kept and the score is recorded with `MrD.profile.record`.

@@ -33,6 +33,8 @@ Every guided lesson in physics, chemistry and calculus follows the same rules, s
 
 ## What each class changes in its next lesson
 
+> **Legacy (2026-11-12).** This section tells you how to maintain the older single-file lessons and pages. It is not how to build a new lesson: do not copy an older lesson. Run `node tools/new-lesson.mjs` and follow Standard v2 and v3 below and `templates/README.md`. Chemistry and physics **sim days are virtual labs**, not guided lesson pages (`shared/virtual-lab/STANDARD.md`). Where this section and `CLAUDE.md` disagree, `CLAUDE.md` wins.
+
 ### Physics (`physics/lessons/`)
 Already follows the standard. For the next lesson:
 - Copy `newtons-first-law.html` and `content/newtons-first-law.js`. Keep the script tags (config, bell, codes, teacherbar, live, profile) in front of `engine/lesson.js`.
@@ -108,6 +110,7 @@ New slots follow `docs/DAY-RULES.md`. Where a v3 rule below disagrees with a v1/
 | 16. Pace plan (60% rule, trimming) | No trimming and no skipped tabs. The two huddles are fixed by the clock. Lost time is lost; knowledge ramps during explore and after huddle 2. |
 | 17. Timed huddle at `atMin` | Huddle 1 at minute 3 (a hold screen while Mr. D talks), huddle 2 at minute 25 (the writable Huddle tab). A lab day sets huddle 2 later, after the data. |
 | Bands 1-4 | Three hidden bands, a ramp to the regular-level standard. The top band is the standard. No AP content. |
+| Sim day as a guided lesson page | A sim day is a virtual lab (`shared/virtual-lab/STANDARD.md`; DAY-RULES 8d; Ian, 2026-11-11). It has one notes huddle in the middle, checkpoints with a lock, and its length is Ian's call per day. The guided-lesson format is retired for physics and chemistry sim days. |
 
 Also v3: every student completes the regular-level standard; every term, picture and tool a student meets is introduced by Mr. D or by a tutorial of at most 60 seconds (at most two per day); every figure has a reading guide; Mr. D presents models and steps, the site carries the attempt and the hints. The sheet, data and test for each slot are produced under `docs/DAY-RULES.md`.
 

@@ -9,6 +9,8 @@ Four runnable template lessons, one per course. They are the starting point for 
 | Calculus | `templates/calc/lesson.html` | `templates/calc/spec.js` |
 | Statistics | `templates/stats/lesson.html` | `templates/stats/spec.js` |
 
+> **Status (2026-11-12).** These templates, and the notes below, describe the v2 standard (placement warm-up, four bands, pace trimming, a stamp and report code). New slots follow `docs/DAY-RULES.md` and Standard v3 in `docs/LESSON-STANDARD.md`, which supersede those parts: two huddles, three hidden bands, no placement, no trimming, no stamp. Sim days are virtual labs, not lessons (`shared/virtual-lab/STANDARD.md`).
+
 Add `#key` to see every tab with the answers marked. Add `#key&now=2026-10-21T09:30` to pretend it is a different time in class.
 
 ## Start a new lesson
