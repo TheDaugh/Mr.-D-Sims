@@ -153,7 +153,8 @@ export function create(ctx) {
     els.big.textContent = a && was ? pullTxt(a) : "—";
     els.pred.replaceChildren(h("h3", {}, U.predictHead), g.pred.choice ? h("p", { class: "zeMsg " + (g.measured.includes(12) ? (g.pred.ok ? "ok" : "no") : "") }, g.measured.includes(12) ? (g.pred.ok ? U.predHeld : U.predMissed) : U.predLocked)
       : h("div", { class: "row" }, h("span", {}, U.predictAsk), h("button", { id: "zePredNa", onclick: () => predict("na") }, U.sodium), h("button", { id: "zePredMg", onclick: () => predict("mg") }, U.magnesium)));
-    els.mys.replaceChildren(...checkBody());
+    const ty = curType(), tk = ty ? g.cp[ty] : null, sg = [ty, tk && tk.n, tk && tk.streak, tk && tk.redo, cpNote && cpNote.text, g.mysMode].join("|");
+    if (els.mys.dataset.sg !== sg) { els.mys.dataset.sg = sg; els.mys.replaceChildren(...checkBody()); }   // rebuild only when the question changes: the refresh loop must not destroy the answer box while a student types in it
     const lk = g.lock; els.lockBox.hidden = !lk; els.close.hidden = !!lk; els.help.disabled = !live() || !!lk; const dd = $("dlgNotebook"); if (dd && !ctx.isDemo()) { if (lk) dd.setAttribute("data-gate", ""); else dd.removeAttribute("data-gate"); }
     if (!lk) els.lockBox.dataset.at = ""; else if (els.lockBox.dataset.at !== lk.at) { els.lockBox.dataset.at = lk.at; els.lockBox.replaceChildren(...CK.lockScreen(lk, { head: U.lockHead, miss: U.lockMiss, help: U.lockHelp, body: U.lockBody, word: U.unlockWord, wrong: U.pinWrong }, { pin: "zePin", go: "zePinGo", msg: "zePinMsg" }, () => tryUnlock(CK.todayCode()))); }
     for (const z of L.ZS) { const c = $("zeCell_" + z); if (c) c.disabled = false; }
