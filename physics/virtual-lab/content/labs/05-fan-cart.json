@@ -1,5 +1,6 @@
 {
   "id": "fan-cart",
+  "checkpoints": "legacy",
   "kind": "fancart",
   "title": "Virtual Lab 5",
   "course": "physics",

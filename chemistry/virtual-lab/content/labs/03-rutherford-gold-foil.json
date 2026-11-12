@@ -1,5 +1,6 @@
 {
   "id": "rutherford-gold-foil",
+  "checkpoints": "legacy",
   "kind": "scatter",
   "title": "Rutherford's Gold Foil: Why the Plum-Pudding Atom Had to Go",
   "badgeTitle": "Gold Foil",

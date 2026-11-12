@@ -3,7 +3,7 @@
 // calls as the other "kind" labs (see physics/virtual-lab/src/ui/fancart.js), so the shared app hosts it. Every word a student sees is in
 // content/labs/05-photoelectron.json. Chemistry numbers: chemistry/shared/pes-data.js. Physics: engine/pes.js. Questions: pes-practice.js.
 import { h } from "../../../../shared/virtual-lab/dom.js";
-import { sha256Hex } from "../../../../shared/virtual-lab/mode.js";
+import * as CK from "../../../../shared/virtual-lab/checkpoint.js";
 import * as E from "../engine/pes.js";
 import * as V from "./pesview.js";
 
@@ -18,7 +18,7 @@ const Zof = (s) => D.SYMBOLS.indexOf(s) + 1;
 const hash = (s) => { let x = 2166136261; for (const c of String(s)) { x ^= c.charCodeAt(0); x = Math.imul(x, 16777619); } return x >>> 0; };
 
 // ---------- state the app saves (S.flame) ----------
-const T0 = () => ({ n: 0, streak: 0, miss: 0, passed: false, need: 3, redo: false, atCp: false, att: [], unlocks: 0, helps: 0 });
+const T0 = CK.track;   // the shared rule: 3 right in a row, 3 misses lock, today's unlock code opens it
 const D0 = () => ({ bars: V.newBars(), tries: 0, att: [], compared: false, ok: false, hint: "" });
 const M0 = () => ({ Z: 0, ran: false, pick: 0, period: "", val: "", ok: false, tries: 0, att: [], hint: "" });
 export const fresh = () => ({
@@ -39,7 +39,7 @@ export function fix(g) {
 }
 // The lock must survive a reload, and "Start over" on the saved-lab screen must not wipe it: the app asks before it offers that.
 export const noRestart = (g) => !!(g && g.lock);
-export async function load(lab, getJSON) { try { lab.pinHash = (await getJSON("content/config.json")).pesPinHash || ""; } catch (e) { lab.pinHash = ""; } lab.prelab = { questions: [] }; }
+export async function load(lab) { lab.prelab = { questions: [] }; }
 
 const CSS = `
 .pesRoot{display:grid;grid-template-columns:250px 1fr 330px;grid-template-rows:322px 1fr;gap:10px 12px;height:620px;position:relative;font-size:13px}
@@ -255,39 +255,33 @@ export function create(ctx) {
     const g = G(), t = g.cp[type], item = Pr.labSpec(t.n, type, seedNum()), ok = Pr.grade(item, attempt), diag = ok ? null : Pr.diagnose(item, attempt);
     t.att.push({ n: t.n, p: item.p, ok, hint: diag ? diag.code : null, at: new Date().toISOString() });
     ev("pes_attempt", { type, n: t.n, ok, p: item.p, answer: type === "match" ? { Z: attempt.Z, period: attempt.period, group: attempt.group } : attempt, code: diag ? diag.code : null, redo: t.redo });
-    t.n++; if (type === "draw") g.cpBars = V.newBars();
-    if (ok) { t.streak++; t.miss = 0; cpNote = { type, ok: true, text: `${U.cpRight} ${t.streak} of ${t.need} in a row.` };
-      if (t.streak >= t.need) { if (!t.redo || t.atCp || t.passed) t.passed = true; t.redo = false; t.need = 3; t.streak = 0; cpNote = { type, ok: true, text: U.cpPass }; ev("pes_pass", { type, redo: false }); } }
-    else { t.streak = 0; t.miss++; cpNote = { type, ok: false, text: `${U.cpMiss} ${diag.hint} Here is a new one.` }; if (t.miss >= 3) { lockNow(type, "misses"); return; } }
+    const r = CK.grade(t, ok); if (type === "draw") g.cpBars = V.newBars();
+    if (r === "right") cpNote = { type, ok: true, text: `${U.cpRight} ${t.streak} of ${t.need} in a row.` };
+    else if (r === "pass") { cpNote = { type, ok: true, text: U.cpPass }; ev("pes_pass", { type, redo: false }); }
+    else { cpNote = { type, ok: false, text: `${U.cpMiss} ${diag.hint} Here is a new one.` }; if (r === "lock") { lockNow(type, "misses"); return; } }
     renderStep(); changed();
   }
 
   // ----- lock, help and the PIN -----
   function lockNow(type, reason) {
     const g = G(); if (g.lock) return; if (god() && !ctx.isDemo()) { say("Teacher key: a student's screen would lock here.", "warn"); return; } det.firing = false; const step = stepId();
-    g.lock = { type, reason, step, at: new Date().toISOString() }; g.cp[type].atCp = CP_OF[step] === type; if (reason === "help") g.cp[type].helps++;
+    g.lock = CK.lockInfo(type, reason, step); g.cp[type].atCp = CP_OF[step] === type; if (reason === "help") g.cp[type].helps++;
     g.locks.push({ type, reason, step, at: g.lock.at, unlockedAt: null }); ev("pes_lock", { type, reason, step });
-    if (!ctx.isDemo()) { try { localStorage.setItem("vlab:" + lab.id + ":lock", JSON.stringify({ type, reason, at: g.lock.at, student: S.student })); } catch (e) { /* the saved lab keeps it too */ } }
+    if (!ctx.isDemo()) CK.mirrorSet(lab.id, g.lock, S.student);
     renderStep(); changed();
   }
   function helpNow() { if (!live() || G().lock) return; const g = G(); g.helps.push({ step: stepId(), at: new Date().toISOString() }); ev("pes_help", { step: stepId() }); lockNow(LOCK_TYPE[stepId()], "help"); }
-  async function tryUnlock(pin) {
-    const g = G(), ok = lab.pinHash ? (await sha256Hex("pes-pin:" + String(pin).trim())) === lab.pinHash : false;
-    ev("pes_unlock_try", { ok }); if (!ok) { const m = $("pesPinMsg"); if (m) m.textContent = U.pinWrong; return false; }
-    realUnlock(); return true;
-  }
+  function tryUnlock(code) { const ok = CK.codeOk(code); ev("pes_unlock_try", { ok }); if (ok) realUnlock(); return ok; }
   function realUnlock() {
-    const g = G(), L = g.lock; if (!L) return; const t = g.cp[L.type]; t.unlocks++; t.streak = 0; t.miss = 0; t.need = 2; t.redo = true;   // only this type is reset
+    const g = G(), L = g.lock; if (!L) return; CK.unlockTrack(g.cp[L.type]);
     const last = [...g.locks].reverse().find((x) => !x.unlockedAt); if (last) last.unlockedAt = new Date().toISOString(); g.lock = null; cpNote = null;
-    ev("pes_unlock", { type: L.type }); if (!ctx.isDemo()) { try { localStorage.removeItem("vlab:" + lab.id + ":lock"); } catch (e) { /* ignore */ } }
+    ev("pes_unlock", { type: L.type }); if (!ctx.isDemo()) CK.mirrorClear(lab.id);
     renderStep(); changed();
   }
   function renderLock() {
     const g = G(), L = g.lock, d = $("dlgNotebook"); if (!els.lock) return; els.lock.hidden = !L; els.close.hidden = !!L;
     if (d && !ctx.isDemo()) { if (L) d.setAttribute("data-gate", ""); else d.removeAttribute("data-gate"); }
-    if (!L) return; const pin = h("input", { id: "pesPin", class: "pin", type: "password", inputmode: "numeric", autocomplete: "off", "aria-label": U.unlockWord }); pin.addEventListener("keydown", (e) => { if (e.key === "Enter") go.click(); });
-    const go = h("button", { id: "pesPinGo", class: "primary", onclick: () => tryUnlock(pin.value) }, "Unlock");
-    els.lock.replaceChildren(h("h2", {}, U.lockHead), h("p", {}, L.reason === "help" ? U.lockHelp : U.lockMiss), h("p", {}, U.lockBody), h("div", { class: "row" }, h("b", {}, U.unlockWord), pin, go), h("p", { id: "pesPinMsg", class: "pesMsg no" }));
+    if (!L) return; els.lock.replaceChildren(...CK.lockScreen(L, { head: U.lockHead, miss: U.lockMiss, help: U.lockHelp, body: U.lockBody, word: U.unlockWord, wrong: U.pinWrong }, { pin: "pesPin", go: "pesPinGo", msg: "pesPinMsg" }, () => tryUnlock(CK.todayCode())));
   }
 
   // ----- draw bench (Parts B and E) -----
@@ -409,7 +403,7 @@ export function create(ctx) {
   function key() {
     const rows = [], calc = D.labCalculated(), mj = (x) => x.toFixed(x < 10 ? 3 : 1);
     rows.push(tr("Timing (50-minute period)", h("ol", {}, ["Minutes 0 to 4: intro hook, three cards, walk in.", "4 to 12: Part A lithium sweep, then Ne, Na, S and one free run; Checkpoint 1.", "12 to 22: Part B draw O, Mg and Si and compare; Checkpoint 2.", "22 to 33: Part C four mystery cells, flaw to correct; Checkpoint 3.", "33 to 38: Part D Model A against neon. 38 to 42: Part E phosphorus, then hand in.", "42 to 50: paper worksheet (the graded record). Target on screen: 30 to 35 minutes."].map((t) => h("li", {}, t))), "The lab ends when every step is done. A student who locks waits for Mr. D."));
-    rows.push(tr("Lock PIN", h("p", {}, "Students lock after 3 misses in a row on one checkpoint type, or when they press I need Mr. D. Unlock: type the PIN on their screen. Only that type resets; they then need 2 fresh questions right in a row."), h("p", {}, "Set the PIN on the teacher page (PIN card): it prints one line of JSON. Paste it into chemistry/virtual-lab/content/config.json as pesPinHash and push. The page stores a hash, never the PIN.")));
+    rows.push(tr("Unlock code", h("p", {}, "Students lock after 3 misses in a row on one checkpoint type, or when they press I need Mr. D. Unlock: type today's unlock code on their screen (the \"Unlock any locked student\" code on the teacher page; today it is " + CK.todayCode() + "). Only that type resets; they then need 2 fresh questions right in a row.")));
     rows.push(tr("Lock limits", "A lock that runs only on the Chromebook can be bypassed by a determined student (clear site data, a second profile). The log is the deterrent: every attempt, lock, unlock and help request is in the record and on the roster card."));
     rows.push(tr("Misreads and what each hint targets", h("ul", {}, Pr.MISREADS.map((m) => h("li", {}, h("b", {}, m.wrong + ". "), m.targets))), "The hint always points at the student's own run or drawing; it never gives the answer or the next bar."));
     rows.push(tr("Simplifications", h("ul", {}, ["A tunable light source. Real instruments use a fixed lamp (He or Mg Kα); the dial lets students see that light must beat the binding energy.", "Vaporized samples: every element is a gas of free atoms, so no solid-state or molecular effects.", "Peak heights are electron counts. There are no photoionization cross-sections, so real intensity ratios differ.", "Brightness changes only how fast counts build. It never changes which peaks appear.", "One 2p peak: spin-orbit splitting is not shown.", "No chemicals are handled, so the room has noPPE: true and the goggles gate is off.", "Z = 1 to 20 only: no Cr or Cu, because the Aufbau exceptions are not taught."].map((t) => h("li", {}, t))), ""));
@@ -432,7 +426,7 @@ export function create(ctx) {
     if (G() !== lastG) { lastG = G(); det = newDet(0); zoom = { hit: null, t: 99, none: false }; cpNote = null; rebuild = null; selPeak = null; ensureLockMirror(); if (G().el) { const e = G().el; det = newDet(typeof e === "string" ? G().mys[e].Z : e, typeof e === "string" ? e : ""); } renderStep(); }
     if (live()) detStep(dt); if (isOpen()) { drawAll(dt); if (G().lock && !ctx.isDemo()) { /* the overlay is already up */ } }
   }
-  function ensureLockMirror() { if (ctx.isDemo() || G().lock || S.stage !== "lab") return; try { const m = JSON.parse(localStorage.getItem("vlab:" + lab.id + ":lock") || "null"); if (m && m.type) { G().lock = { type: m.type, reason: m.reason, step: stepId(), at: m.at }; G().locks.push({ type: m.type, reason: m.reason, step: stepId(), at: m.at, unlockedAt: null, restored: true }); } } catch (e) { /* ignore */ } }
+  function ensureLockMirror() { if (ctx.isDemo() || G().lock || S.stage !== "lab") return; try { const m = CK.mirrorGet(lab.id); if (m) { G().lock = { type: m.type, reason: m.reason, step: stepId(), at: m.at }; G().locks.push({ type: m.type, reason: m.reason, step: stepId(), at: m.at, unlockedAt: null, restored: true }); } } catch (e) { /* ignore */ } }
   function refresh() {
     if (!els.root || !live()) return; ensureLockMirror();
     const s = [stepId(), !!G().lock, redoType(), G().cp.read.n, G().cp.draw.n, G().cp.match.n].join("|"); if (s !== sig) renderStep();

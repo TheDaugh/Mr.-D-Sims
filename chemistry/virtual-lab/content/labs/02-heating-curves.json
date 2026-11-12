@@ -1,5 +1,6 @@
 {
   "id": "02-heating-curves",
+  "checkpoints": "legacy",
   "title": "Virtual Lab: Heating Curves of Unknown Solids (BETA)",
   "intro": "Sealed tubes X and Y (required) and Z (challenge) each hold a different pure solid. You will weigh out 10 g of each, heat it on the hot plate at a steady rate, and record the temperature as time passes. Then you plot the data by hand and use the plateaus to identify each substance.",
   "substances": [

@@ -9,8 +9,7 @@ import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT_DIR || "/opt/node-tools/node_modules/playwright");
-const ORIGIN = process.env.BASE || "http://localhost:8123", SHOTS = process.env.SHOTS || "", PIN = "4242";
-const PINHASH = createHash("sha256").update("pes-pin:" + PIN).digest("hex");
+const ORIGIN = process.env.BASE || "http://localhost:8123", SHOTS = process.env.SHOTS || "", PIN = "";
 const ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 const fails = [], check = (c, m) => { if (!c) { fails.push(m); console.log("FAIL " + m); } else console.log("ok   " + m); };
 if (SHOTS && !existsSync(SHOTS)) mkdirSync(SHOTS, { recursive: true });
@@ -18,7 +17,7 @@ const browser = await chromium.launch(), ctx = await browser.newContext({ reduce
 page.setDefaultTimeout(9000);
 const errors = []; page.on("pageerror", (e) => errors.push(e.message)); page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
 await page.route(/fonts\./, (r) => r.abort());
-await page.route("**/content/config.json", (r) => r.fulfill({ contentType: "application/json", body: JSON.stringify({ modeVerifiers: {}, pesPinHash: PINHASH }) }));
+await page.route("**/content/config.json", (r) => r.fulfill({ contentType: "application/json", body: JSON.stringify({ modeVerifiers: {} }) }));
 await page.clock.setFixedTime(new Date("2026-10-21T07:30:00-04:00"));
 const shot = async (n) => { if (SHOTS) await page.screenshot({ path: `${SHOTS}/${n}.png` }); };
 const H = (f, a) => page.evaluate(`(() => { const k = window.__vl.fl.hooks; return (${f.toString()})(k, ${JSON.stringify(a ?? null)}); })()`);
@@ -135,7 +134,7 @@ await page.goto(url + "&resume=1"); await page.waitForSelector("#pesLock:not([hi
 check((await page.locator("#pesLock:not([hidden])").count()) === 1, "a resumed save keeps the lock");
 await page.fill("#pesPin", "0000"); await page.click("#pesPinGo"); await page.waitForTimeout(300);
 check(/not right/.test(await page.locator("#pesLock").innerText()) && (await st()).lock, "a wrong PIN does not unlock");
-await page.fill("#pesPin", PIN); await page.click("#pesPinGo"); await page.waitForSelector("#pesLock", { state: "hidden" });
+await page.fill("#pesPin", await page.evaluate(() => window.MrD.codes.override())); await page.click("#pesPinGo"); await page.waitForSelector("#pesLock", { state: "hidden" });
 let s1 = await st(); check(!s1.lock && s1.cp.draw.redo && s1.cp.draw.need === 2 && s1.cp.read.passed && !s1.cp.read.redo, "the right PIN unlocks and resets only the draw type (2 fresh variants needed)");
 check(/Mr\. D unlocked/.test(await page.locator("#pesStep").innerText()), "the screen says how many new questions are needed");
 async function drawCp(right) {
@@ -151,7 +150,7 @@ check((await step()) === "mystery", "Part C opens");
 // ---------- the help button ----------
 await page.click("#pesHelp"); await page.waitForSelector("#pesLock:not([hidden])");
 s1 = await st(); check(s1.lock.reason === "help" && s1.helps.length === 1 && s1.lock.type === "match", "I need Mr. D locks the screen and is logged as a help request");
-await page.fill("#pesPin", PIN); await page.click("#pesPinGo"); await page.waitForSelector("#pesLock", { state: "hidden" });
+await page.fill("#pesPin", await page.evaluate(() => window.MrD.codes.override())); await page.click("#pesPinGo"); await page.waitForSelector("#pesLock", { state: "hidden" });
 async function matchCp(right) { const it = await cpItem("match"); if (right) { await page.click(`#pesTable .pesEl[data-z="${it.ans.Z}"]`); await page.fill("#pesPeriod", String(it.ans.period)); await page.fill("#pesGroup", String(it.ans.group)); } await page.click("#pesCheck"); return it; }
 check((await st()).cp.match.redo === true, "a help unlock also asks for two fresh variants of that type");
 await matchCp(true); await matchCp(true);
@@ -210,8 +209,7 @@ check(/Test Student|seed11/.test(row) || /yes/.test(row), "the roster card shows
 check(/2/.test(row) && /yes/.test(row), "the roster card shows hand-in, locks and unlocks: " + row.replace(/\s+/g, " ").slice(0, 160));
 await tp.click("#pesRoster button:has-text('Detail')"); const dt = await tp.locator("#pesDetail").innerText();
 check(/Locks/.test(dt) && /asked for help/.test(dt) && /three misses/.test(dt) && /Runs/.test(dt) && /Mystery cells/.test(dt) && /Timeline/.test(dt), "the detail lists locks, help requests, runs, mystery cells and the timeline");
-await tp.fill("#pinIn", PIN); await tp.click("#pinMake"); check((await tp.locator("#pinOut").innerText()).includes(PINHASH), "the PIN card prints the hash line for the PIN you type (never the PIN)");
-check(!(await tp.locator("#pinOut").innerText()).includes(PIN), "the hash line does not contain the PIN");
+const codeNow = await tp.evaluate(() => window.MrD.codes.override()); check(/^\d{4}$/.test(codeNow) && (await tp.locator("#codeUnlock").innerText()) === codeNow && (await tp.locator("#codeH1").innerText()) === await tp.evaluate(() => window.MrD.codes.huddle()), "the lab teacher page shows today's unlock and huddle codes");
 check(terrs.length === 0, "no errors on the teacher page " + terrs.slice(0, 2).join("|"));
 
 // ---------- the bundled key over file:// ----------
@@ -222,7 +220,7 @@ if (built) {
   const kp = await ctx.newPage(); const kerrs = []; kp.on("pageerror", (e) => kerrs.push(e.message)); kp.on("console", (m) => { if (m.type() === "error") kerrs.push(m.text()); });
   await kp.goto("file://" + ROOT + "chemistry/virtual-lab/dist/teacher-key.html?lab=pes&seed=11"); await kp.waitForSelector("#btnKey:not([hidden])", { timeout: 10000 });
   await kp.click("#btnKey"); await kp.waitForSelector("#dlgKey[open]"); const key = await kp.locator("#keyBody").innerText();
-  check(/50-minute/.test(key) && /Lock PIN/.test(key) && /pesPinHash/.test(key) && /bypassed by a determined student/.test(key), "the key has the timing, the PIN setup and the lock caveat");
+  check(/50-minute/.test(key) && /Unlock code/.test(key) && /Unlock code/.test(key) && /bypassed by a determined student/.test(key), "the key has the timing, the PIN setup and the lock caveat");
   check(/One bar per electron/.test(key) && /2p drawn left of 2s/.test(key) && /Taller means higher energy/.test(key) && /Axis read as increasing/.test(key) && /Same 1s energy for every element/.test(key), "the key lists the five wrong pictures and what each hint targets");
   check(/tunable light source/.test(key) && /Vaporized samples/.test(key) && /no photoionization cross-sections/.test(key) && /noPPE/.test(key), "the key names every simplification, including noPPE");
   check(/42 of the \d+ subshell energies are calculated/.test(key) && /NISTDFT-LDA/.test(key), "the key lists the calculated values as unverified");

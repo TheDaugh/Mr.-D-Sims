@@ -22,11 +22,18 @@ The host page is still `chemistry/virtual-lab/src/ui/app.js`. Labs from another 
 6. **A paper fallback page** if the sheet asks for one.
 7. **A word rule test**: chemistry (or physics) words on a student screen must be in the sheet's term list.
 
+8. **Checkpoints: no click-through, a lock, and today's code** (Ian, 2026-11-12; `shared/virtual-lab/checkpoint.js`, first built in the photoelectron lab). Every lab that asks questions follows this:
+   - A checkpoint needs **3 right in a row**. A miss resets the streak, shows a hint that points at the student's own data or slip (never the answer), and serves a **freshly generated question** (seeded by student and question number, never the same twice in a row), so nothing can be clicked through or memorized. Guessable questions (yes/no, two choices) never stand alone: use a typed number, a drawing, a pick from the whole table, or a pick plus a reason.
+   - **3 misses in a row, or the "I need Mr. D" button, lock the screen.** The lock survives a reload and "Start over".
+   - **The unlock code is today's code**, `MrD.codes.override()`: the same "Unlock any locked student" code shown on `teacher/index.html` and, with the huddle codes, on `chemistry/virtual-lab/teacher.html`. No per-lab PIN, no hash in a config file. Only the question type that locked resets; the student then needs **2 fresh ones** right in a row.
+   - Every attempt (with the hint code), lock, unlock and help request goes in the record; the lab's Key has an "Unlock code" row. The lab JSON has `"checkpoints": [types]`. `tests/unit/lab-checkpoints.test.js` enforces that the lab imports the shared module and has the lock strings. `"legacy"` marks the labs not yet converted (unknown solids, heating, gold foil, flame, fan cart): do not add to that list, shrink it. A lab with no questions says `"none"` and `checkpointsWhy`.
+   - The lab supplies only a question generator, a grader and a hint diagnosis per type (see `zeff-lab.js` `question`/`gradeAnswer`/`diagnose`, or `pes-practice.js`), and its own question screen and lock overlay (`CK.lockScreen`). A lab's own e2e walks: a miss gives a hint and a new question, 3 right pass, 3 misses lock, reload keeps the lock, a wrong code fails, today's code opens it and resets only that type, "I need Mr. D" locks.
+
 ## Before you say a lab is done
 
 - `cd chemistry/virtual-lab && npm test`, `cd physics/virtual-lab && npm test`, `node --test tests/unit/*.test.js`.
 - `TZ=America/New_York node tests/vlab-standard.e2e.js` (demo, `#key`, the huddle clock, on every lab) and `TZ=America/New_York node tests/lock.e2e.js "virtual lab"`; add the new lab to the `LABS` list in the first and the `TARGETS` in the second.
-- The lab's own e2e, and `node tests/smoke.js`.
+- The lab's own e2e, and `node tests/smoke.js`. If the lab asks questions, its e2e covers the checkpoint rule (item 8).
 - A card in the hub list (`chemistry/labs.js` or `physics/sims.js`), a `PLAN.md` line, a `PROGRESS.md` entry.
 - It is live only when merged to `main` (Netlify deploys `main` only). Say so, and give the direct URL.
 

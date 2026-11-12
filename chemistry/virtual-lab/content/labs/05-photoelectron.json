@@ -1,5 +1,6 @@
 {
  "id": "photoelectron",
+ "checkpoints": ["read", "draw", "match"],
  "kind": "pes",
  "title": "Photoelectron Spectroscopy",
  "badgeTitle": "Photoelectron Spectroscopy",
@@ -81,7 +82,7 @@
   "huddle1Done": "Go to the spectrometer.",
   "huddle2Done": "",
   "tutorialDone": "Tutorial done. The arrows are off. Parts A to E are yours; read the step card and keep the order.",
-  "coachKey": "Teacher key (creative mode): any sample is open and nothing locks. Open Key for the answers, the PIN setup and the simplifications.",
+  "coachKey": "Teacher key (creative mode): any sample is open and nothing locks. Open Key for the answers, the unlock code and the simplifications.",
   "doneInfo": "Your record is saved on this computer. Download it for Mr. D, then hand in your paper worksheet.",
   "exitHead": "Next",
   "spectrometer": "Spectrometer",
@@ -100,8 +101,8 @@
   "lockBody": "Raise your hand and wait. Mr. D will come to your screen. You cannot go on until then.",
   "lockHelp": "You asked for Mr. D.",
   "lockMiss": "Three misses in a row.",
-  "unlockWord": "Mr. D: enter the PIN",
-  "pinWrong": "That PIN is not right.",
+  "unlockWord": "Mr. D: enter the unlock code",
+  "pinWrong": "That code is not right.",
   "redoNote": "Mr. D unlocked this. Get {n} new questions right in a row to go on.",
   "cpRight": "Right.",
   "cpMiss": "Not yet.",
@@ -166,7 +167,7 @@
   "Electrons that fly out are counted and sorted by how hard they were held. A spectrum builds. Click a peak to see its subshell, its electrons and its energy.",
   "The zoom view shows the atom, a photon hitting it, and an electron leaving. Its speed comes from the energy left over.",
   "At a checkpoint you answer a fresh question each time. Three right in a row passes.",
-  "Three misses in a row, or I need Mr. D, locks the screen. Mr. D types a PIN to unlock it.",
+  "Three misses in a row, or I need Mr. D, locks the screen. Mr. D types the unlock code to open it.",
   "That is the tour. In the lab, yellow arrows will walk you through each step."
  ],
  "arrows": {
