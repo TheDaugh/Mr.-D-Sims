@@ -2,6 +2,16 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-16: Ramp-and-pulley sandbox, UbD slot 19 (branch `physics-ramp-pulley-sandbox`)
+
+Ian asked for the slot 19 sim: "Ramp-and-pulley sandbox: play and predict" (also slots 25, 26, 29). Built as one standalone page, `physics/sandbox/ramp-pulley.html`, with its physics in `physics/sandbox/ramp-pulley-model.js` (no drawing, so tests and the page share it).
+
+What it does: a crate on a hinged ramp, a rope over an ideal pulley to a counterweight (0 kg means no rope). Sliders: angle, crate mass, counterweight, mu_s, mu_k (never above mu_s), planet. Conditions: rain (halves both mu, an `author_set` value) and an elevator speeding up or down (scales g, so the slip verdict does not change but the acceleration does). Toggles: force arrows, weight split along and across the ramp, instruments and graphs (numbers stay hidden until they are on). Buttons: Release (free play), Predict then release (a pick of stays put, slides up or slides down, logged before the run), Pause, Slow-mo, Reset, Record. A record table copies to a spreadsheet and downloads as CSV. A prediction tally is kept and saved on the student's device with `MrD.profile.record` (course physics, lesson `ramp-pulley-sandbox`, skill `ramp.predict`; not mapped in `portal/standards.json`). A miss points at the force arrows and gives the student's own settings, never the answer. Locked mode (`shared/lock.js`) from the Begin click, student ID and period, `#nolock=<code>` and resume-by-code as in the lessons. `#key` skips the start card and adds a Key button: the live verdict, forces, acceleration, tension, the range of angles where the crate stays put, and today's unlock code.
+
+Checks run: `node --test tests/unit/*.test.js` 303 pass (14 new, `ramp-pulley.test.js`: static criterion, kinetic slide, Atwood, ramp with counterweight, Moon, rain, elevator, stops, floor limit); `node tests/ramp-pulley.e2e.js` all pass; `TZ=America/New_York node tests/lock.e2e.js ramp-pulley` pass (new target); `node tests/smoke.js` 50 pages load clean (page and `#key` added with PAGES=); `node tests/labs-display.e2e.js` pass; `node tools/check-lessons.mjs --strict` 0 errors. Screenshots at 1280x720 viewed.
+
+Not done, on purpose: it is a standalone page, not a kind in the shared lab room, so it has none of the lab-standard items that need the room (the "Watch the demo" tour, the notes huddle in the middle, `lengthMin`, the checkpoint lock with 3 right in a row). Predictions are logged and tallied, not graded or locked. The friction sim (slot 22) could share `ramp-pulley-model.js`. Hub card is in `physics/sims.js` (type `sim`). Ian to decide: whether he wants it moved into the lab room, and whether rain and elevator should be hidden until he announces the late data point in slot 29 (today they are always visible). Not on the site until merged to `main`.
+
 
 ## 2026-11-12: Docs refresh (branch `docs/readme-refresh-2026-11-12`)
 

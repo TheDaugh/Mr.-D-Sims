@@ -42,7 +42,7 @@ Start every slot chat by attaching this file, the slot-08 files (the worked exem
 - **Stats:** 3.6 Finding Boundary Values (first v2 stats lesson) and the 3.1 to 3.3 Review are built; lesson boards for 3.4 to 3.6 are on the stats board.
 - **Still to do as far as this repo shows:** chem slots 10 (a slides-and-notes exemplar is in `shared-slides/`, no engine page), 16 to 18 and 20 to 22. Confirm with Ian which become virtual labs.
 - **Labs still on the old checkpoint rules** (`"legacy"` in their lab JSON): unknown solids, heating, gold foil, flame, fan cart. Shrink that list, do not add to it.
-- **Physics:** the Forces unit plan (UbD v3, 2026-11-12) calls for two sandbox sims (cart and hanging mass; ramp and pulley). They are not built. They are virtual labs, so they follow `shared/virtual-lab/STANDARD.md`.
+- **Physics:** the Forces unit plan (UbD v3, 2026-11-12) calls for two sandbox sims. The ramp-and-pulley sandbox (slots 19, 25, 26, 29) is built as a standalone page, `physics/sandbox/ramp-pulley.html` (2026-11-16). The cart-and-hanging-mass sandbox (slots 8 to 10) is not built. Neither runs in the shared lab room yet, so neither has the lab-standard demo, the notes huddle or the checkpoint lock; see the 2026-11-16 entry in `PROGRESS.md`.
 
 ## Open decisions (Mr. D)
 - Settled in the built labs (flame, PES, Pull Bench) and `shared/virtual-lab/STANDARD.md`: the lab-day shape (pre-lab, lab in the room, notes huddle) and the checkpoint rule. Revisit only if Ian says.
