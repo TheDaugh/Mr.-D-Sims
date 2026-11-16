@@ -83,7 +83,8 @@ const rp = (page, fn, arg) => page.evaluate(fn, arg);
   console.log('the rig keeps everything in bounds at every angle');
   { const { ctx, page, errors } = await open(browser, '#key');
     ok(!(await page.locator('#start').isVisible()), '#key skips the start card');
-    ok(await page.locator('#btnKey').isVisible(), '#key shows the Key button');
+    await page.click('#keyPageClose');
+    ok(await page.locator('#btnKey').isVisible(), '#key shows the live numbers button');
     await page.click('#btnKey'); const keyTxt = await page.locator('#keyPanel').innerText();
     ok(/slides down the ramp|slides up the ramp|stays put/.test(keyTxt) && /unlock code/i.test(keyTxt), 'the key states the verdict and the unlock code');
     for (const th of [0, 10, 25, 45, 70, 80]) for (const m2 of [0, 5, 50]) {
@@ -96,6 +97,7 @@ const rp = (page, fn, arg) => page.evaluate(fn, arg);
 
   console.log('checkpoints: 3 right in a row, a miss resets, 3 misses lock, today\'s code, a reload keeps the lock');
   { const { ctx, page, errors } = await open(browser, '#key');
+    await page.click('#keyPageClose');
     await page.click('#btnCp'); await page.waitForFunction(() => __rp.cp.ready());
     const tab = i => page.locator('.cptab').nth(i - 1);
     const ans = async (type, right) => {                       // answer the question on screen, rightly or wrongly
@@ -128,6 +130,7 @@ const rp = (page, fn, arg) => page.evaluate(fn, arg);
     ok(await page.locator('#cpLock').isVisible(), 'a reload keeps the lock');
     await page.fill('#cpPin', await rp(page, () => MrD.codes.override())); await page.click('#cpGo');
     ok(!(await page.locator('#cpLock').isVisible()), 'today\'s code unlocks');
+    await page.click('#keyPageClose');                      // a reload in #key opens the key page again
     ok(await rp(page, () => __rp.cp.state().cp1.passed) === true, 'unlocking one checkpoint does not reset another');
     await page.click('#btnCp'); await tab(2).click();       // the card is closed after a reload
     await ans('cp2', true); await next(); await ans('cp2', true);
@@ -138,6 +141,31 @@ const rp = (page, fn, arg) => page.evaluate(fn, arg);
     await ans('cp3', true); await next(); await ans('cp3', true);          // two right in a row after an unlock
     ok(await rp(page, () => __rp.cp.state().cp3.passed), 'checkpoint 3 passes');
     ok(errors.length === 0, 'JS errors: ' + errors.join(' | '));
+    await ctx.close(); }
+
+
+  console.log('the #key teacher page');
+  { const { ctx, page, errors } = await open(browser, '#key');
+    ok(await page.locator('#keyPage').isVisible(), '#key opens the teacher key page by default');
+    const txt = await page.locator('#kpBody').innerText();
+    const code = await rp(page, () => MrD.codes.override());
+    ok(code && (await page.locator('#kpCode').innerText()) === code, 'the key shows today\'s unlock code');
+    ok(/Checkpoint 1: Call it/.test(txt) && /Checkpoint 2: Find the slip angle/.test(txt) && /Checkpoint 3: Same ramp, new world/.test(txt), 'the key has a section for each checkpoint');
+    ok(/Wrong answers to expect/.test(txt) && /tan θ = μs/.test(txt), 'worked solution and wrong answers are there');
+    ok(/26\.6°/.test(txt) && /45\.0°/.test(txt), 'the slip-angle table is computed (μs 0.5 gives 26.6°, 1.0 gives 45.0°)');
+    ok(/Moon[^\n]*0\.17 × Earth/.test(txt) && /Jupiter[^\n]*2\.53 × Earth/.test(txt), 'the world table is computed from g');
+    ok(await page.locator('[data-demo]').count() >= 6, 'setups can be loaded');
+    ok(/slides in the rain|Holds dry/i.test(txt) && /no rope/.test(txt) && /\+5\.88|5\.88/.test(txt), 'demo rows come from the physics (Atwood a = 5.88)');
+    await page.click('[data-demo="2"]'); ok(!(await page.locator('#keyPage').isVisible()), 'Load closes the key page');
+    ok(await rp(page, () => __rp.P.theta === 0 && __rp.P.m1 === 2 && __rp.P.m2 === 3 && __rp.P.mus === 0 && __rp.mode() === 'held'), 'Load sets the sliders and holds the crate');
+    await page.click('#bGo'); await rp(page, () => __rp.step(60)); const a = await rp(page, () => __rp.st().a); ok(Math.abs(a - 5.88) < 0.01, 'the loaded Atwood setup accelerates at 5.88: ' + a);
+    await page.click('#btnKeyPage'); ok(await page.locator('#keyPage').isVisible(), 'the Teacher key button brings it back');
+    ok(errors.length === 0, 'JS errors: ' + errors.join(' | '));
+    await ctx.close(); }
+  { const { ctx, page } = await open(browser, '', '2026-10-24T11:00:00-04:00');
+    ok(!(await page.locator('#keyPage').isVisible()) && !(await page.locator('#btnKeyPage').isVisible()), 'a student never gets the teacher key');
+    await rp(page, () => { document.getElementById('start').hidden = true; });
+    ok(await page.locator('#kpBody').innerText() === '', 'the key page is not even built for a student');
     await ctx.close(); }
 
   console.log('checkpoint results reach the student record');

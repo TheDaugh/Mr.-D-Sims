@@ -82,6 +82,16 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
 .pin{width:6em;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin:0 6px}
 .pesMsg.no{color:var(--bad)}
 .card .row{display:flex;align-items:center;gap:6px;margin:10px 0}
+#keyPage{align-items:flex-start;overflow:auto;background:rgba(10,15,21,.97)}
+#keyPage .kp{max-width:880px;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 26px 28px;margin:0 auto}
+#keyPage h1{font-size:1.35rem;margin:0 0 2px} #keyPage h2{font-size:1.05rem;margin:22px 0 6px;color:var(--gold)} #keyPage h3{font-size:.95rem;margin:14px 0 4px}
+#keyPage p,#keyPage li{margin:5px 0;color:#d2dce6} #keyPage ul{padding-left:20px;margin:4px 0}
+#keyPage table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums;margin:6px 0}
+#keyPage th,#keyPage td{border-bottom:1px solid var(--line);padding:4px 7px;text-align:left} #keyPage th{color:var(--muted);font-weight:600}
+#keyPage .bar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+#keyPage .code{font-size:1.5rem;font-weight:700;color:var(--gold);letter-spacing:.12em}
+#keyPage .mini{padding:2px 10px;font-size:.82rem}
+@media print{body{overflow:visible;background:#fff;color:#000}#app,#start,#lockres,#cpLock,.float{display:none!important}#keyPage{position:static;background:#fff;display:block!important}#keyPage .kp{border:0;background:#fff;max-width:none;padding:0}#keyPage *{color:#000!important}#keyPage .bar,#keyPage .mini{display:none!important}#keyPage h2{color:#000!important}}
 #toast{left:50%;top:14px;transform:translateX(-50%);max-width:min(620px,92%);text-align:center;pointer-events:none;opacity:0;transition:opacity .25s}
 #toast.on{opacity:1}
 #toast.ok{border-color:var(--ok)} #toast.no{border-color:var(--bad)}
@@ -108,7 +118,8 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
   <span class="chip" id="chipWorld">Earth</span>
   <span class="chip" id="chipTally" hidden>Predictions <b id="tallyTxt">0 of 0</b></span>
   <span class="sp"></span>
-  <button class="hbtn" id="btnKey" aria-pressed="false" hidden title="Teacher key">🔑 Key</button>
+  <button class="hbtn" id="btnKeyPage" hidden title="Open the teacher key">🔑 Teacher key</button>
+  <button class="hbtn" id="btnKey" aria-pressed="false" hidden title="Live numbers for the settings on screen">📐 Live numbers</button>
   <button class="hbtn" id="btnCp" aria-pressed="false" title="Checkpoints (C)">✔ Checkpoints <b id="cpCount">0 of 3</b></button>
   <button class="hbtn" id="btnTable" aria-pressed="false" title="Record table (T)">📋 Table</button>
   <button class="hbtn" id="btnFs" title="Full screen">⛶</button>
@@ -193,6 +204,7 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
     <button class="big go" id="bBegin" disabled>Begin</button>
   </div>
 </div>
+<div class="overlay" id="keyPage" hidden role="dialog" aria-label="Teacher key"><div class="kp" id="kpBody"></div></div>
 <div class="overlay" id="cpLock" hidden><div class="card" id="cpLockBody"></div></div>
 <div class="overlay" id="lockres" hidden>
   <div class="card">
@@ -350,7 +362,7 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
     if (!KEY || $("keyPanel").hidden) return;
     var a = M.analyze(P), q = M.forces(P), side = a.verdict === "rest" ? "stays put" : a.verdict === "up" ? "slides up the ramp" : "slides down the ramp";
     var rr = a.restRanges.length ? a.restRanges.map(function (r) { return r[0] + "° to " + r[1] + "°"; }).join(" and ") : "no angle at all";
-    var h = "<button class=\"hbtn kx\" id=\"keyX\">Close ✕</button><h3>Teacher key: live from the settings</h3><table>" +
+    var h = "<button class=\"hbtn kx\" id=\"keyX\">Close ✕</button><h3>Live numbers for the settings on screen</h3><table>" +
       "<tr><td>Effective g (planet and elevator)</td><td>" + a.ge.toFixed(2) + " m/s²</td></tr>" +
       "<tr><td>μs and μk in use (rain halves both)</td><td>" + a.mus.toFixed(3) + ", " + a.muk.toFixed(3) + "</td></tr>" +
       "<tr><td>Normal force N = m g cos θ</td><td>" + f1(a.N) + " N</td></tr>" +
@@ -483,6 +495,79 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
   }
 
 
+
+  /* ---------- the teacher key page (#key): answers, worked solutions, wrong answers to expect, setups to load ---------- */
+  var DEMOS = [
+    ["Bare crate, gentle ramp", { theta: 20, m1: 10, m2: 0, mus: 0.5, muk: 0.3 }, "Holds. Raise the ramp past tan⁻¹ μs and it goes."],
+    ["Bare crate, steep ramp", { theta: 35, m1: 10, m2: 0, mus: 0.5, muk: 0.3 }, "Slides down. Mass cancels: change the crate to 40 kg and nothing changes except the arrows."],
+    ["Atwood machine on the flat", { theta: 0, m1: 2, m2: 3, mus: 0, muk: 0 }, "a = m₂g / (m₁ + m₂); the tension is less than m₂g. Slot 25."],
+    ["Counterweight balances the ramp", { theta: 30, m1: 10, m2: 5, mus: 0.3, muk: 0.2 }, "m₂ = m₁ sin θ, so no push along the ramp and friction has nothing to hold. Release it: it stays."],
+    ["Counterweight wins, friction fights it", { theta: 15, m1: 8, m2: 12, mus: 0.4, muk: 0.25 }, "Slides up; the friction arrow points down the ramp. Slot 26."],
+    ["Holds dry, slides in the rain", { theta: 22, m1: 10, m2: 0, mus: 0.5, muk: 0.3 }, "Press Release, then Reset, then tick Rain and Release again. The late data point for slot 29."],
+    ["Same ramp on the Moon", { theta: 35, m1: 10, m2: 2, mus: 0.25, muk: 0.15, planet: "moon" }, "Same verdict as Earth, much slower (a scales with g). Wrong idea to expect: lower g sticks better."]
+  ];
+  var WORLD_ROWS = [["Earth", 9.8, 0], ["Moon", 1.62, 0], ["Mars", 3.71, 0], ["Jupiter", 24.8, 0], ["Elevator speeding up, going up (Earth)", 9.8, 2.5], ["Elevator speeding up, going down (Earth)", 9.8, -2.5]];
+  function el2(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function tableOf(head, rowsArr) { var h = "<table><thead><tr>" + head.map(function (x) { return "<th>" + x + "</th>"; }).join("") + "</tr></thead><tbody>" + rowsArr.map(function (r) { return "<tr>" + r.map(function (x) { return "<td>" + x + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>"; return h; }
+  function loadSettings(o) {
+    reset();
+    var map = { theta: "rTheta", m1: "rM1", m2: "rM2", mus: "rMus", muk: "rMuk" }, k;
+    $("sPlanet").value = o.planet || "earth"; $("cRain").checked = !!o.rain; $("sElev").value = String(o.aE || 0);
+    $("rMus").value = o.mus; for (k in map) if (k !== "mus" && o[k] != null) $(map[k]).value = o[k];
+    readControls(); closeKeyPage();
+  }
+  function renderKeyPage() {
+    var b = $("kpBody"); b.textContent = "";
+    var code = MrD.codes && MrD.codes.override ? MrD.codes.override() : "see the teacher page";
+    var d = new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+    b.appendChild(el2("div", "bar", ""));
+    var top = b.firstChild; var close = el2("button", "big go", "Open the sandbox"); close.id = "keyPageClose"; close.onclick = closeKeyPage; var pr = el2("button", "big", "Print this key"); pr.onclick = function () { window.print(); };
+    top.appendChild(close); top.appendChild(pr);
+    b.appendChild(el2("h1", "", "Ramp and Pulley Sandbox: teacher key"));
+    b.appendChild(el2("p", "small", "UbD Forces slot 19 (play and predict). Also slots 25, 26 and 29. " + d + "."));
+
+    b.appendChild(el2("h2", "", "1. Today's unlock code"));
+    b.appendChild(el2("p", "", "A student whose checkpoint is locked (three misses in a row, or “I need Mr. D”) stays locked until you type today's code. It is the same code as “Unlock any locked student” on the teacher page: <span class=\"code\" id=\"kpCode\">" + code + "</span>"));
+    b.appendChild(el2("p", "", "After an unlock only that checkpoint resets, and the student needs two right in a row on fresh questions. The same code frees a student from the full-screen lock."));
+
+    b.appendChild(el2("h2", "", "2. How a period can run"));
+    b.appendChild(el2("ul", "", "<li><b>Free play first.</b> Release the crate and change anything. Say nothing about formulas.</li><li><b>Predict, then release.</b> Each prediction is logged with the settings and counted. A miss points the student at the force arrows, never at the answer.</li><li><b>Checkpoints (✔ button).</b> Three of them; each needs three right in a row. Questions are generated from the student's ID, so neighbours have different ones.</li><li><b>Record table.</b> Copy it to a spreadsheet or download the CSV. Predictions and passed checkpoints are also saved on the student's own device.</li><li><b>Slot 29 late data point.</b> Rain and the elevator are always on the page; tell them to use them in the last ten minutes.</li>"));
+
+    b.appendChild(el2("h2", "", "3. Setups worth showing (press Load)"));
+    var dr = DEMOS.map(function (x, i) {
+      var p = Object.assign({ g: M.PLANETS[x[1].planet || "earth"], aE: 0, rain: false }, x[1]), a = M.analyze(p), v = a.verdict === "rest" ? "stays put" : a.verdict === "up" ? "slides up" : "slides down";
+      return ["<button class=\"hbtn mini\" data-demo=\"" + i + "\">Load</button>", x[0], x[1].theta + "°, " + x[1].m1 + " kg, " + (x[1].m2 ? x[1].m2 + " kg" : "none") + ", μs " + x[1].mus + ", μk " + x[1].muk + (x[1].planet ? ", " + x[1].planet : ""), v, a.verdict === "rest" ? "0" : (a.a > 0 ? "+" : "") + a.a.toFixed(2), x[1].m2 ? f1(a.T) + " N" : "no rope", x[2]];
+    });
+    var tw = el2("div", "", tableOf(["", "Setup", "Settings", "Crate", "a (m/s², up +)", "Tension", "What to say"], dr)); b.appendChild(tw);
+    Array.prototype.forEach.call(tw.querySelectorAll("[data-demo]"), function (btn) { btn.onclick = function () { loadSettings(DEMOS[+btn.dataset.demo][1]); }; });
+
+    b.appendChild(el2("h2", "", "4. Checkpoint 1: Call it"));
+    b.appendChild(el2("p", "", "<b>Right answer.</b> Find the push along the ramp: counterweight pull m₂g (up the ramp) minus m₁g sin θ (down). Compare its size with the most static friction can give, μs·m₁g cos θ. If the push is no bigger, the crate <b>stays put</b>; otherwise it slides the way the push points (positive means up the ramp). The correct reason is the sentence that says which pull is bigger and whether friction can cover the difference. Every question is set at least 20% away from the edge, and the three calls come up in turn."));
+    b.appendChild(el2("p", "", "<b>Wrong answers to expect.</b>"));
+    b.appendChild(el2("ul", "", "<li>“The heavier mass wins” (the decoy sentence): ignores the ramp angle and friction.</li><li>Calls any unbalanced push a slide: forgets static friction can hold it.</li><li>Uses μk where μs belongs, or leaves out cos θ in the normal force.</li><li>Thinks a steeper ramp always slides, or that a bigger counterweight always wins.</li><li>Right call, wrong sentence: reads the picture, cannot say why.</li>"));
+
+    b.appendChild(el2("h2", "", "5. Checkpoint 2: Find the slip angle"));
+    b.appendChild(el2("p", "", "<b>Right answer.</b> No counterweight: m g sin θ = μs m g cos θ, so <b>tan θ = μs</b> and the mass cancels. The checker accepts ±" + CK.TOL_DEG + "°; students find a whole-degree answer in the sandbox by raising the ramp until the crate goes."));
+    var sl = [0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.7, 0.8, 0.9, 1.0].map(function (m) { return [m.toFixed(2), (Math.atan(m) * 180 / Math.PI).toFixed(1) + "°"]; });
+    b.appendChild(el2("div", "", tableOf(["μs", "slip angle tan⁻¹ μs"], sl)));
+    b.appendChild(el2("p", "", "<b>Wrong answers to expect.</b> Typing μs itself (“0.5”; the page says it is not an angle); using sin θ = μs or cos θ = μs, which gives 30° or 60° for 0.5; using μk; thinking a heavier crate slips sooner."));
+
+    b.appendChild(el2("h2", "", "6. Checkpoint 3: Same ramp, new world"));
+    var wr = WORLD_ROWS.map(function (w) { var ge = w[1] + w[2]; return [w[0], ge.toFixed(2) + " m/s²", (ge / 9.8).toFixed(2) + " × Earth", "unchanged"]; });
+    wr.push(["Rain (every surface wet)", "9.80 m/s²", "1.00 × Earth", "μs and μk halved, so the verdict can flip toward sliding"]);
+    b.appendChild(el2("p", "", "<b>Right answer.</b> Every force in the rig (both weights, the normal force, friction, tension) is proportional to the effective g, so the comparison that decides the verdict is the same on any planet and in any elevator; only the acceleration changes, by the ratio below. Rain is different: friction can hold half as much, so a crate that held may slide. Any three questions in a row include a rain question and a no-change question, so a student cannot pass on a pattern."));
+    b.appendChild(el2("div", "", tableOf(["World", "Effective g", "Accelerations scale by", "Slip verdict"], wr)));
+    b.appendChild(el2("p", "", "<b>Wrong answers to expect.</b> “A weaker g makes everything stick more” and “a bigger g always makes a crate slide” (the decoys); in the elevator, “it is heavier, so more friction, so it holds” (the pull grows by the same amount); rain students who say nothing changes."));
+
+    b.appendChild(el2("h2", "", "7. What the model assumes"));
+    b.appendChild(el2("ul", "", "<li>The rope pulls and never pushes; the pulley has no mass and no friction; the rope does not stretch. With no counterweight there is no rope.</li><li>Static friction holds the crate while the push along the ramp is no more than μs N. Once sliding, kinetic friction μk N opposes the motion. μk cannot be set above μs. If friction stops a crate it stays stopped unless the push beats μs N again.</li><li>The crate stops dead at the top and bottom bumpers, and the counterweight stops at the floor or the pulley.</li><li>Rain halves both coefficients. That factor is my choice, not a measured value (<code>author_set</code>); change <code>RAIN_FACTOR</code> in <code>ramp-pulley-model.js</code> if you want another.</li><li>g: Earth 9.8, Moon 1.62, Mars 3.71, Jupiter 24.8 m/s². The elevator adds ±2.5 m/s² to g for every force in the rig.</li>"));
+    b.appendChild(el2("h2", "", "8. Reading what students did"));
+    b.appendChild(el2("p", "", "Each student's table can be copied or downloaded from their own screen. Their saved record holds the prediction tally and which checkpoints they passed, and whether each was passed with no misses, on their own device under their ID (the review portal reads it). A student who locked three times on one checkpoint is the one to sit with."));
+  }
+  function openKeyPage() { if (!KEY) return; renderKeyPage(); $("keyPage").hidden = false; $("keyPage").scrollTop = 0; }
+  function closeKeyPage() { $("keyPage").hidden = true; }
+  toggle($("btnKeyPage"), openKeyPage);
+
   /* ---------- checkpoints: 3 right in a row, a lock after 3 misses, today's code (shared/virtual-lab/checkpoint.js) ---------- */
   var CPM = null, CK = window.RampCheckpoints, CPS = null, cpActive = "cp1", cpFb = null, cpItems = [];
   var CPLOCK_TEXT = { head: "🔒 Locked. Hand up, eyes forward.", miss: "You missed three in a row on a checkpoint.", help: "You asked for Mr. D.", body: "Mr. D will come to you and type a code. After that you need two right in a row.", word: "Unlock code", wrong: "Not the code. Hand up and wait for Mr. D.", go: "Unlock" };
@@ -597,7 +682,7 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
   var askH = null;
   function boot() {
     readControls(); reset();
-    if (KEY) { $("btnKey").hidden = false; $("start").hidden = true; started = true; cpStart(); return; }
+    if (KEY) { $("btnKey").hidden = false; $("btnKeyPage").hidden = false; $("start").hidden = true; started = true; cpStart(); openKeyPage(); return; }
     LessonLock.init({ id: LESSON_ID, root: $("app"), onChange: function () { } });
     var me = MrD.ids.me(); if (me) { S.id = me.id; S.period = me.period; }
     if (NOLOCK !== LessonLock.offCode() && clk().lockOn && LessonLock.pending()) { lockResumeCard(); return; }
