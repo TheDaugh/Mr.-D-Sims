@@ -93,6 +93,63 @@ const rp = (page, fn, arg) => page.evaluate(fn, arg);
     ok(errors.length === 0, 'JS errors: ' + errors.join(' | '));
     await ctx.close(); }
 
+
+  console.log('checkpoints: 3 right in a row, a miss resets, 3 misses lock, today\'s code, a reload keeps the lock');
+  { const { ctx, page, errors } = await open(browser, '#key');
+    await page.click('#btnCp'); await page.waitForFunction(() => __rp.cp.ready());
+    const tab = i => page.locator('.cptab').nth(i - 1);
+    const ans = async (type, right) => {                       // answer the question on screen, rightly or wrongly
+      const q = await rp(page, t => __rp.cp.q(t), type);
+      if (type === 'cp2') await page.fill('#cpAngle', String(right ? Math.round(q.answer) : Math.round(q.answer) + 12));
+      else {
+        const wrongV = ['rest', 'up', 'down'].find(v => v !== q.answer.verdict);
+        await page.check('input[name=cpV][value=' + (right ? q.answer.verdict : wrongV) + ']'); await page.check('input[name=cpR][value=' + (right ? q.answer.reason : 'decoy1') + ']');
+      }
+      await page.click('#cpCheck'); return q;
+    };
+    const next = async () => { await page.click('#cpBody button.primary'); };
+    ok(await page.locator('#cpBody').innerText().then(t => /Key:/.test(t)), '#key shows each question\'s answer');
+    // checkpoint 1: three right in a row
+    for (let i = 0; i < 3; i++) { await ans('cp1', true); if (i < 2) { ok(/Right/.test(await page.locator('#cpBody').innerText()), 'a right answer says so'); await next(); } }
+    ok(/passed/i.test(await tab(1).innerText()) && /1 of 3/.test(await page.locator('#cpCount').innerText()), 'three right in a row pass checkpoint 1');
+    // checkpoint 2: a miss resets the streak, the hint points at the student's own angle and does not give the answer, the next question is new
+    await tab(2).click(); await ans('cp2', true); await next();
+    const p1 = (await rp(page, () => __rp.cp.q('cp2'))).prompt; const bad = await ans('cp2', false);
+    const hint = await page.locator('#cpBody .fb').innerText();
+    ok(/Set the sandbox to your/.test(hint) && !new RegExp('\\b' + Math.round(bad.answer) + '\\b').test(hint.replace(/Set the sandbox to your \d+°/, '')), 'the hint uses the student\'s angle and does not give the answer: ' + hint);
+    ok(await rp(page, () => __rp.cp.state().cp2.streak) === 0, 'a miss resets the streak');
+    await next(); ok((await rp(page, () => __rp.cp.q('cp2'))).prompt !== p1, 'after a miss the next question is a new one');
+    ok(!/Key:.*undefined/.test(await page.locator('#cpBody').innerText()), 'key line is well formed');
+    // two more misses lock; a wrong code fails; today's code unlocks; then two right in a row pass
+    await ans('cp2', false); await next(); await ans('cp2', false);
+    ok(await page.locator('#cpLock').isVisible(), 'three misses in a row lock the screen');
+    await page.fill('#cpPin', '0000'); await page.click('#cpGo'); ok(await page.locator('#cpLock').isVisible() && /Not the code/.test(await page.locator('#cpMsg').innerText()), 'a wrong code does not unlock');
+    await page.reload(); await page.waitForFunction(() => __rp.cp.ready()); await page.waitForTimeout(200);
+    ok(await page.locator('#cpLock').isVisible(), 'a reload keeps the lock');
+    await page.fill('#cpPin', await rp(page, () => MrD.codes.override())); await page.click('#cpGo');
+    ok(!(await page.locator('#cpLock').isVisible()), 'today\'s code unlocks');
+    ok(await rp(page, () => __rp.cp.state().cp1.passed) === true, 'unlocking one checkpoint does not reset another');
+    await page.click('#btnCp'); await tab(2).click();       // the card is closed after a reload
+    await ans('cp2', true); await next(); await ans('cp2', true);
+    ok(/passed/i.test(await tab(2).innerText()), 'after an unlock, two right in a row pass');
+    // "I need Mr. D" locks at once
+    await tab(3).click(); await page.click('#cpHelp'); ok(await page.locator('#cpLock').isVisible(), '"I need Mr. D" locks the screen');
+    await page.fill('#cpPin', await rp(page, () => MrD.codes.override())); await page.click('#cpGo');
+    await ans('cp3', true); await next(); await ans('cp3', true);          // two right in a row after an unlock
+    ok(await rp(page, () => __rp.cp.state().cp3.passed), 'checkpoint 3 passes');
+    ok(errors.length === 0, 'JS errors: ' + errors.join(' | '));
+    await ctx.close(); }
+
+  console.log('checkpoint results reach the student record');
+  { const { ctx, page } = await open(browser, '', '2026-10-24T11:00:00-04:00');
+    await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(200); await page.click('#bBegin');
+    await page.click('#btnCp'); await page.waitForFunction(() => __rp.cp.ready()); await page.click('.cptab >> nth=1');
+    for (let i = 0; i < 3; i++) { const a = await rp(page, () => __rp.cp.key('cp2')); await page.fill('#cpAngle', String(Math.round(a))); await page.click('#cpCheck'); if (i < 2) await page.click('#cpBody button.primary'); }
+    const rec = await rp(page, () => MrD.profile.all().filter(r => r.lesson === 'ramp-pulley-sandbox')[0]);
+    ok(rec && rec.items.some(x => x.skill === 'ramp.cp2' && x.ok && x.firstTry === true) && rec.reached === 1, 'passing a checkpoint is saved with the student ID: ' + JSON.stringify(rec && rec.items));
+    ok(!/Key:/.test(await page.locator('#cpBody').innerText()), 'a student never sees the answer line');
+    await ctx.close(); }
+
   await browser.close();
   console.log(bad ? bad + ' problem(s)' : 'ramp-pulley sandbox: all checks pass'); process.exit(bad ? 1 : 0);
 })();

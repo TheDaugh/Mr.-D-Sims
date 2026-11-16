@@ -49,7 +49,7 @@ select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;p
 #inst dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:0 0 6px;font-variant-numeric:tabular-nums}
 #inst dt{color:var(--muted)} #inst dd{margin:0;text-align:right}
 #graphs{width:208px;height:150px;display:block;margin-top:4px;border-radius:6px;background:#101a24}
-#tablePanel{right:12px;bottom:12px;width:min(760px,calc(100% - 24px));max-height:46%;overflow:auto}
+#tablePanel{right:12px;bottom:12px;width:min(540px,calc(100% - 24px));max-height:46%;overflow:auto}
 #tablePanel table{border-collapse:collapse;width:100%;font-size:.86rem;font-variant-numeric:tabular-nums}
 #tablePanel th,#tablePanel td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;white-space:nowrap}
 #tablePanel th{color:var(--muted);font-weight:600}
@@ -60,6 +60,28 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
 #keyPanel h3{margin:0 0 6px;font-size:1rem} #keyPanel table{width:100%;border-collapse:collapse}
 #keyPanel td{padding:2px 4px;border-bottom:1px solid var(--line)} #keyPanel td:last-child{text-align:right;color:var(--gold);font-variant-numeric:tabular-nums}
 #keyPanel p{margin:6px 0 0;color:var(--muted)}
+#cpCard{left:12px;bottom:12px;width:min(410px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;z-index:4}
+#cpCard h3{margin:0 0 6px;font-size:1rem;display:flex;align-items:center;gap:8px}
+#cpCard h3 .sp{flex:1}
+.cptabs{display:flex;gap:6px;margin:0 0 8px;flex-wrap:wrap}
+.cptab{flex:1;min-width:110px;text-align:left;padding:5px 8px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-size:.85rem}
+.cptab[aria-pressed=true]{border-color:var(--accent)}
+.cptab .dots{display:block;letter-spacing:3px;color:var(--gold)}
+.cptab.done{border-color:var(--ok)} .cptab.done .dots{color:var(--ok)}
+#cpBody p{margin:6px 0}
+#cpBody fieldset{border:1px solid var(--line);border-radius:10px;margin:8px 0;padding:6px 10px}
+#cpBody legend{color:var(--muted);font-size:.82rem;padding:0 4px}
+#cpBody label.opt{display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer;font-size:.92rem}
+#cpBody label.opt input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex:none}
+#cpBody input[type=number]{width:7em;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+#cpBody .fb{padding:8px 10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
+#cpBody .fb.ok{border-color:var(--ok)} #cpBody .fb.no{border-color:var(--bad)}
+#cpBody .keyline{color:var(--gold);font-size:.82rem}
+.primary{background:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:6px 14px;cursor:pointer;font-weight:600}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:4px 0}
+.pin{width:6em;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin:0 6px}
+.pesMsg.no{color:var(--bad)}
+.card .row{display:flex;align-items:center;gap:6px;margin:10px 0}
 #toast{left:50%;top:14px;transform:translateX(-50%);max-width:min(620px,92%);text-align:center;pointer-events:none;opacity:0;transition:opacity .25s}
 #toast.on{opacity:1}
 #toast.ok{border-color:var(--ok)} #toast.no{border-color:var(--bad)}
@@ -87,6 +109,7 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
   <span class="chip" id="chipTally" hidden>Predictions <b id="tallyTxt">0 of 0</b></span>
   <span class="sp"></span>
   <button class="hbtn" id="btnKey" aria-pressed="false" hidden title="Teacher key">🔑 Key</button>
+  <button class="hbtn" id="btnCp" aria-pressed="false" title="Checkpoints (C)">✔ Checkpoints <b id="cpCount">0 of 3</b></button>
   <button class="hbtn" id="btnTable" aria-pressed="false" title="Record table (T)">📋 Table</button>
   <button class="hbtn" id="btnFs" title="Full screen">⛶</button>
 </header>
@@ -118,6 +141,11 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
       <table aria-label="Record table"><thead><tr><th>#</th><th>Angle °</th><th>Crate kg</th><th>Counter kg</th><th>μs</th><th>μk</th><th>World</th><th>You said</th><th>It did</th><th>a m/s²</th><th></th></tr></thead><tbody id="rows"></tbody></table>
       <p class="small" id="tableNote">a is positive up the ramp. A run you did not predict shows a dash in “You said”.</p>
       <div class="tools"><button class="hbtn" id="btnCopy">Copy for a spreadsheet</button><button class="hbtn" id="btnCsv">Download CSV</button><button class="hbtn" id="btnClear">Clear table</button></div>
+    </div>
+    <div class="float" id="cpCard" hidden role="region" aria-label="Checkpoints">
+      <h3>Checkpoints <span class="sp"></span><button class="linkbtn" id="cpHide">Hide</button></h3>
+      <div class="cptabs" id="cpTabs"></div>
+      <div id="cpBody"></div>
     </div>
     <div class="float" id="keyPanel" hidden></div>
   </div>
@@ -165,6 +193,7 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
     <button class="big go" id="bBegin" disabled>Begin</button>
   </div>
 </div>
+<div class="overlay" id="cpLock" hidden><div class="card" id="cpLockBody"></div></div>
 <div class="overlay" id="lockres" hidden>
   <div class="card">
     <h2>🔒 Locked. Hand up, eyes forward.</h2>
@@ -180,6 +209,7 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
 <script src="../../shared/profile.js"></script>
 <script src="../../shared/ids.js"></script>
 <script src="ramp-pulley-model.js"></script>
+<script src="ramp-pulley-checkpoints.js"></script>
 <script>
 (function () {
   "use strict";
@@ -287,7 +317,8 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
   }
   function saveProfile() {
     if (!S.id || !MrD.profile) return;
-    MrD.profile.record({ course: "physics", lesson: LESSON_ID, title: "Ramp and Pulley Sandbox", first: S.id, period: S.period, day: MrD.bell.dayKey(), reached: rights, of: items.length, items: items, source: "sandbox" });
+    var all = items.concat(cpItems);
+    MrD.profile.record({ course: "physics", lesson: LESSON_ID, title: "Ramp and Pulley Sandbox", first: S.id, period: S.period, day: MrD.bell.dayKey(), reached: all.filter(function (x) { return x.ok; }).length, of: all.length, items: all, source: "sandbox" });
   }
   var toastT = 0;
   function toast(msg, kind) { var t = $("toast"); clearTimeout(toastT); if (!msg) { t.className = "float"; return; } t.textContent = msg; t.className = "float on " + (kind || ""); toastT = setTimeout(function () { t.className = "float"; }, kind === "no" ? 11000 : 5000); }
@@ -309,6 +340,7 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
     else if (e.key === "r" || e.key === "R") reset();
     else if (e.key === "p" || e.key === "P") openPredict();
     else if (e.key === "t" || e.key === "T") $("btnTable").click();
+    else if (e.key === "c" || e.key === "C") $("btnCp").click();
     else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && $("side").dataset.locked !== "true") { var r = $("rTheta"); r.value = +r.value + (e.key === "ArrowRight" ? 1 : -1); readControls(); }
   });
 
@@ -332,6 +364,7 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
       "<tr><td>Crate stays put for angles</td><td>" + rr + "</td></tr>" +
       "<tr><td>With no counterweight it slips at tan⁻¹ μs</td><td>" + a.slipNoCounter + "°</td></tr></table>" +
       "<p>Teaching traps: moving to the Moon or Mars changes how fast it moves but never who slips, because every force is proportional to g. The elevator does the same thing: a speeding-up elevator multiplies every force by (g + a)/g, so the slip verdict is unchanged and the acceleration grows. Rain is the one that changes the verdict. A rope pulls and never pushes. The pulley is ideal.</p>" +
+      "<p>Checkpoints (✔ button, or C): 1 Call it, 2 Find the slip angle, 3 Same ramp, new world. Each needs 3 right in a row, every question is generated from the student's ID, 3 misses lock the screen, and today's code unlocks it (then 2 right in a row). In #key each question shows its answer.</p>" +
       "<p>The unlock code for a locked student is today's: " + (MrD.codes && MrD.codes.override ? MrD.codes.override() : "see the teacher page") + ".</p>";
     $("keyPanel").innerHTML = h; $("keyX").onclick = function () { $("btnKey").click(); };
   }
@@ -449,10 +482,103 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
     plot(4, 68, 1, "#59d596", "v"); plot(78, 68, 2, "#f2b84b", "a");
   }
 
+
+  /* ---------- checkpoints: 3 right in a row, a lock after 3 misses, today's code (shared/virtual-lab/checkpoint.js) ---------- */
+  var CPM = null, CK = window.RampCheckpoints, CPS = null, cpActive = "cp1", cpFb = null, cpItems = [];
+  var CPLOCK_TEXT = { head: "🔒 Locked. Hand up, eyes forward.", miss: "You missed three in a row on a checkpoint.", help: "You asked for Mr. D.", body: "Mr. D will come to you and type a code. After that you need two right in a row.", word: "Unlock code", wrong: "Not the code. Hand up and wait for Mr. D.", go: "Unlock" };
+  function cpWho() { return S.id || "key"; }
+  function cpStorage() { return "rp.cp.v1:" + cpWho() + ":" + MrD.bell.dayKey(); }
+  function cpLoad() {
+    var st = { cp1: CPM.track(), cp2: CPM.track(), cp3: CPM.track(), lock: null, items: [] }, saved = null;
+    try { saved = JSON.parse(localStorage.getItem(cpStorage())); } catch (e) { }
+    if (saved) { CK.TYPES.forEach(function (t) { if (saved[t]) st[t] = saved[t]; }); st.lock = saved.lock || null; st.items = saved.items || []; }
+    CK.TYPES.forEach(function (t) { st[t].atCp = true; });          // every checkpoint here is a stop, so a pass after an unlock still counts
+    return st;
+  }
+  function cpSave() { try { localStorage.setItem(cpStorage(), JSON.stringify(CPS)); } catch (e) { } }
+  function cpPassed() { return CK.TYPES.filter(function (t) { return CPS[t].passed; }).length; }
+  function cpStart() {
+    if (!CPM || !started || CPS) return;
+    CPS = cpLoad(); cpItems = CPS.items;
+    $("cpCount").textContent = cpPassed() + " of 3"; cpRender();
+    var m = CPM.mirrorGet(LESSON_ID);
+    if (!CPS.lock && m && m.student === cpWho()) CPS.lock = CPM.lockInfo(m.type, m.reason, "Checkpoints");
+    if (CPS.lock) cpShowLock();
+  }
+  function cpQ(type) { return CK.gen(type, cpWho(), CPS[type].n); }
+  function mk(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function cpRender() {
+    if (!CPS) return;
+    var tabs = $("cpTabs"), body = $("cpBody"); tabs.textContent = ""; body.textContent = "";
+    CK.TYPES.forEach(function (t, i) {
+      var tr = CPS[t], b = mk("button", "cptab" + (tr.passed ? " done" : ""));
+      b.type = "button"; b.setAttribute("aria-pressed", String(t === cpActive)); b.appendChild(document.createTextNode((i + 1) + " " + CK.NAMES[t]));
+      var d = mk("span", "dots", tr.passed ? "✓ passed" : "●".repeat(tr.streak) + "○".repeat(Math.max(0, tr.need - tr.streak))); b.appendChild(d);
+      b.onclick = function () { cpActive = t; cpFb = null; cpRender(); b.blur(); }; tabs.appendChild(b);
+    });
+    var t = cpActive, tr = CPS[t], q = cpQ(t);
+    if (tr.passed) { body.appendChild(mk("p", "fb ok", "✓ You passed “" + CK.NAMES[t] + "”. " + (cpPassed() === 3 ? "All three checkpoints are done." : "Pick another checkpoint above."))); return; }
+    if (cpFb) {
+      body.appendChild(mk("p", "fb " + (cpFb.ok ? "ok" : "no"), cpFb.text));
+      var nx = mk("button", "primary", cpFb.ok ? "Next question" : "Try a new question"); nx.type = "button"; nx.onclick = function () { cpFb = null; cpRender(); };
+      body.appendChild(nx); body.appendChild(mk("p", "small", "Question " + (tr.n + 1) + " will be a new one."));
+      return;
+    }
+    body.appendChild(mk("p", "", q.prompt));
+    var f = document.createElement("form"); f.setAttribute("novalidate", ""); f.onsubmit = function (e) { e.preventDefault(); cpSubmit(t, q, f); };
+    if (q.kind === "number") {
+      var row = mk("p"), inp = document.createElement("input"); inp.type = "number"; inp.id = "cpAngle"; inp.setAttribute("aria-label", "Angle in degrees"); inp.step = "1"; inp.min = "0"; inp.max = "90";
+      row.appendChild(inp); row.appendChild(document.createTextNode(" degrees")); f.appendChild(row);
+    } else {
+      var fs1 = mk("fieldset"); fs1.appendChild(mk("legend", "", "The crate…"));
+      ["rest", "up", "down"].forEach(function (k) { var l = mk("label", "opt"), r = document.createElement("input"); r.type = "radio"; r.name = "cpV"; r.value = k; l.appendChild(r); l.appendChild(mk("span", "", CK.WORD[k])); fs1.appendChild(l); });
+      var fs2 = mk("fieldset"); fs2.appendChild(mk("legend", "", "Because…"));
+      q.reasons.forEach(function (o) { var l = mk("label", "opt"), r = document.createElement("input"); r.type = "radio"; r.name = "cpR"; r.value = o.id; l.appendChild(r); l.appendChild(mk("span", "", o.text)); fs2.appendChild(l); });
+      f.appendChild(fs1); f.appendChild(fs2);
+    }
+    var msg = mk("p", "hint bad"); msg.id = "cpInline"; f.appendChild(msg);
+    var go = mk("button", "primary", "Check"); go.type = "submit"; go.id = "cpCheck"; f.appendChild(go);
+    var help = mk("button", "linkbtn", "I need Mr. D"); help.type = "button"; help.id = "cpHelp"; help.onclick = function () { tr.helps++; cpLockOn(t, "help"); }; f.appendChild(document.createTextNode(" ")); f.appendChild(help);
+    body.appendChild(f);
+    body.appendChild(mk("p", "small", "In a row: " + tr.streak + " of " + tr.need + ". Three misses in a row lock the screen."));
+    if (KEY) body.appendChild(mk("p", "keyline", "Key: " + cpKeyText(q)));
+  }
+  function cpKeyText(q) { return q.kind === "number" ? "about " + q.answer.toFixed(1) + "° (tan⁻¹ μs); accepts ±" + q.tol + "°" : CK.WORD[q.answer.verdict] + ". Reason: " + CK.REASON[q.answer.reason]; }
+  function cpSubmit(t, q, f) {
+    var tr = CPS[t], ans;
+    if (q.kind === "number") { var v = f.querySelector("#cpAngle").value; if (v === "") { $("cpInline").textContent = "Type an angle first."; return; } ans = Number(v); }
+    else {
+      var rv = f.querySelector("input[name=cpV]:checked"), rr = f.querySelector("input[name=cpR]:checked");
+      if (!rv || !rr) { $("cpInline").textContent = "Choose what the crate does and a reason."; return; }
+      ans = { verdict: rv.value, reason: rr.value };
+    }
+    var g = CK.grade(q, ans);
+    tr.att.push({ n: tr.n, ok: g.ok, code: g.code, hint: g.hint ? g.hint.slice(0, 60) : "", at: new Date().toISOString() });
+    var res = CPM.grade(tr, g.ok);
+    if (res === "pass") {
+      cpItems.push({ skill: "ramp." + t, title: CK.NAMES[t], band: null, firstTry: tr.att.every(function (a) { return a.ok; }), ok: true });
+      $("cpCount").textContent = cpPassed() + " of 3"; cpFb = { ok: true, text: "✓ Right. That is the checkpoint passed." }; toast("Checkpoint passed: " + CK.NAMES[t] + (cpPassed() === 3 ? ". All three are done." : "."), "ok"); saveProfile();
+    } else if (res === "right") cpFb = { ok: true, text: "✓ Right. " + tr.streak + " of " + tr.need + " in a row." };
+    else if (res === "miss") cpFb = { ok: false, text: g.hint + " (Misses in a row: " + tr.miss + " of 3.)" };
+    else { cpFb = null; cpSave(); cpLockOn(t, "miss"); return; }
+    cpSave(); cpRender();
+  }
+  function cpLockOn(type, reason) { var L = CPM.lockInfo(type, reason, "Checkpoints"); CPS.lock = L; CPM.mirrorSet(LESSON_ID, L, cpWho()); cpSave(); cpShowLock(); }
+  function cpShowLock() {
+    var L = CPS.lock, host = $("cpLockBody"); host.textContent = "";
+    CPM.lockScreen(L, CPLOCK_TEXT, { pin: "cpPin", go: "cpGo", msg: "cpMsg" }, function () {
+      CPM.unlockTrack(CPS[L.type]); CPS.lock = null; CPM.mirrorClear(LESSON_ID); cpFb = null; cpSave(); $("cpLock").hidden = true; cpActive = L.type; cpRender();
+    }).forEach(function (n) { host.appendChild(n); });
+    $("cpLock").hidden = false; var pin = $("cpPin"); if (pin) pin.focus();
+  }
+  toggle($("btnCp"), function () { var on = $("cpCard").hidden; $("cpCard").hidden = !on; $("btnCp").setAttribute("aria-pressed", String(on)); if (on) cpStart(); });
+  toggle($("cpHide"), function () { $("cpCard").hidden = true; $("btnCp").setAttribute("aria-pressed", "false"); });
+  import("../../shared/virtual-lab/checkpoint.js").then(function (m) { CPM = m; cpStart(); }, function () { $("btnCp").hidden = true; });
+
   /* ---------- starting, and locked mode (shared/lock.js) ---------- */
   function clk() { return MrD.bell.clock("physics"); }
   function lockWanted() { return !KEY && !!S.id && NOLOCK !== LessonLock.offCode() && !!clk().lockOn; }
-  function go() { started = true; $("start").hidden = true; $("lockres").hidden = true; }
+  function go() { started = true; $("start").hidden = true; $("lockres").hidden = true; cpStart(); }
   function begin() {
     var info = askH.get(); if (!info.valid) return; S.id = info.id; S.period = info.period; MrD.ids.setMe(S.id, S.period);
     if (!lockWanted()) { go(); return; }
@@ -465,13 +591,13 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
     $("start").hidden = true; $("lockres").hidden = false;
     $("lockresTxt").textContent = "You closed the sandbox. That is lock number " + LessonLock.lockNo() + ". Mr. D needs to see you and give you a code.";
     var inp = $("lockCode"); inp.focus();
-    var tryIt = function () { LessonLock.resume(inp.value).then(function (r) { if (r === "ok") { lockArmed = true; $("lockMsg").textContent = ""; started = true; $("lockres").hidden = true; } else $("lockMsg").textContent = r === "nofs" ? "Full screen did not start. Click again." : "Not the code. Hand up and wait for Mr. D."; }); };
+    var tryIt = function () { LessonLock.resume(inp.value).then(function (r) { if (r === "ok") { lockArmed = true; $("lockMsg").textContent = ""; $("lockres").hidden = true; go(); } else $("lockMsg").textContent = r === "nofs" ? "Full screen did not start. Click again." : "Not the code. Hand up and wait for Mr. D."; }); };
     $("bUnlock").onclick = tryIt; inp.onkeydown = function (e) { if (e.key === "Enter") tryIt(); };
   }
   var askH = null;
   function boot() {
     readControls(); reset();
-    if (KEY) { $("btnKey").hidden = false; $("start").hidden = true; started = true; return; }
+    if (KEY) { $("btnKey").hidden = false; $("start").hidden = true; started = true; cpStart(); return; }
     LessonLock.init({ id: LESSON_ID, root: $("app"), onChange: function () { } });
     var me = MrD.ids.me(); if (me) { S.id = me.id; S.period = me.period; }
     if (NOLOCK !== LessonLock.offCode() && clk().lockOn && LessonLock.pending()) { lockResumeCard(); return; }
@@ -483,7 +609,7 @@ td.ok{color:var(--ok)} td.no{color:var(--bad)}
   /* A hook for the tests; it only reads and drives the same functions the buttons use. */
   window.__rp = { P: P, st: function () { return st; }, mode: function () { return mode; }, rows: function () { return rows; }, items: function () { return items; }, rights: function () { return rights; },
     set: function (k, v) { var map = { theta: "rTheta", m1: "rM1", m2: "rM2", mus: "rMus", muk: "rMuk" }; if (map[k]) { $(map[k]).value = v; } else if (k === "planet") $("sPlanet").value = v; else if (k === "rain") $("cRain").checked = v; else if (k === "aE") $("sElev").value = String(v); readControls(); },
-    release: release, reset: reset, choose: choose, openPredict: openPredict, record: record, step: function (n) { for (var i = 0; i < n; i++) stepSim(); }, started: function () { return started; }, force: function () { started = true; $("start").hidden = true; } };
+    release: release, reset: reset, choose: choose, openPredict: openPredict, record: record, step: function (n) { for (var i = 0; i < n; i++) stepSim(); }, started: function () { return started; }, cp: { ready: function () { return !!CPS; }, state: function () { return CPS; }, key: function (t) { return CPS ? cpQ(t).answer : null; }, q: function (t) { return CPS ? cpQ(t) : null; } }, force: function () { started = true; $("start").hidden = true; } };
   boot();
   raf = requestAnimationFrame(frame);
 })();
