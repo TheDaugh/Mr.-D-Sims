@@ -1,5 +1,5 @@
 // Builds shared/whiteboard/app/ (app.js, app.css, fonts/) from tools/whiteboard/src. One bundle runs every board
-// (chem, stats); each board's index.html sets window.MRD_BOARD.
+// (chem, stats, physics); each board's index.html sets window.MRD_BOARD.
 // Setup once: cd tools/whiteboard && npm install. Then: node tools/whiteboard/build.mjs
 import { build } from 'esbuild';
 import { cpSync, mkdirSync, rmSync, existsSync, statSync, readdirSync } from 'node:fs';

@@ -4,6 +4,7 @@ import { Excalidraw, MainMenu, convertToExcalidrawElements, serializeAsJSON, res
 import '@excalidraw/excalidraw/index.css';
 import * as chem from './chem.js';
 import * as stats from './stats.js';
+import * as physics from './physics.js';
 import * as lesson34 from './lessons/stats-3-4.js';
 import * as lesson35 from './lessons/stats-3-5.js';
 import * as lesson36 from './lessons/stats-3-6.js';
@@ -13,7 +14,8 @@ import * as lessonZeff from './lessons/chem-zeff.js';
    names so the boards and shelves already saved in a browser still load. */
 var BOARDS = {
   chem: { title: 'Chem board', key: 'mrd-chem-whiteboard-v1', libKey: 'mrd-chem-library-v1', prefix: 'chem:', lib: chem },
-  stats: { title: 'Stats board', key: 'mrd-stats-whiteboard-v1', libKey: 'mrd-stats-library-v1', prefix: 'stats:', lib: stats }
+  stats: { title: 'Stats board', key: 'mrd-stats-whiteboard-v1', libKey: 'mrd-stats-library-v1', prefix: 'stats:', lib: stats },
+  physics: { title: 'Physics board', key: 'mrd-physics-whiteboard-v1', libKey: 'mrd-physics-library-v1', prefix: 'physics:', lib: physics }
 };
 var BOARD = BOARDS[window.MRD_BOARD] || BOARDS.chem;
 var buildLibrary = BOARD.lib.buildLibrary, SHELVES = BOARD.lib.SHELVES;
@@ -166,7 +168,7 @@ function App() {
       out.push.apply(out, convertToExcalidrawElements([{ type: 'text', x: x, y: y - 28, text: it.name + '          ', fontSize: 18, fontFamily: 6, strokeColor: '#868e96' }]));
       it.elements.forEach(function (e) { out.push(Object.assign({}, e, { x: e.x - minX + x, y: e.y - minY + y })); });
       x += 0;
-      x += w + 70; rowH = Math.max(rowH, h);
+      x += Math.max(w, 330) + 70; rowH = Math.max(rowH, h);
     });
     allEls = out;
   }

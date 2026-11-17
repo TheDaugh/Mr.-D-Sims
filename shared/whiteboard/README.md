@@ -1,4 +1,4 @@
-# Class boards (Chem board, Stats board)
+# Class boards (Chem board, Stats board, Physics board)
 
 A whiteboard for direct-instruction notes, with pasteable organizers. It is [Excalidraw](https://github.com/excalidraw/excalidraw) (MIT license, free), bundled into this repo so it runs from the site with no account and no calls to excalidraw.com. One bundle (`shared/whiteboard/app/`) runs every board; each board is a small page that says which stencils to load.
 
@@ -6,6 +6,7 @@ A whiteboard for direct-instruction notes, with pasteable organizers. It is [Exc
 |---|---|---|
 | Chem board | `chemistry/whiteboard/index.html` | `chemistry/teacher.html`, `teacher/index.html` |
 | Stats board | `stats/whiteboard/index.html` | `stats/teacher.html`, `teacher/index.html` |
+| Physics board | `physics/whiteboard/index.html` | `physics/lessons/teacher.html`, `teacher/index.html` |
 
 Add `#all` to a board's address to see every stencil laid out in a grid (never saved; good for checking a change or printing a stencil sheet).
 
@@ -13,7 +14,7 @@ Open the Library panel on the right: click a stencil, then move, resize (corner 
 
 Shelves: the Library panel is one flat list, so the board shows one shelf at a time. Tabs along the bottom switch shelves. Press + Shelf to make one for a unit or concept. Select drawings on the board and use Add to library, and they land on the shelf that is open. Your shelves and the stencils on them are saved in this browser, so they do not move to another computer. Built-in stencils always come from the code.
 
-- **Autosave**: every change is saved in the browser you use (localStorage; keys `mrd-chem-whiteboard-v1` and `mrd-stats-whiteboard-v1`). The save waits under a second after the last change, and runs at once when the tab is hidden or closed. If the browser cannot save (storage full or blocked), a red bar says so. Another browser or computer starts empty.
+- **Autosave**: every change is saved in the browser you use (localStorage; keys `mrd-chem-whiteboard-v1`, `mrd-stats-whiteboard-v1` and `mrd-physics-whiteboard-v1`). The save waits under a second after the last change, and runs at once when the tab is hidden or closed. If the browser cannot save (storage full or blocked), a red bar says so. Another browser or computer starts empty.
 - **Backup**: menu (top left) > Save to gives a `.excalidraw` file; Open loads one. Export image gives a PNG or SVG.
 - **Menu**: only Open, Save to, Export image, Find, Help, Reset the canvas, Dark mode. The Excalidraw defaults (GitHub, social links, ads) are removed, and the Library's "Browse libraries" button (which goes to excalidraw.com) is hidden.
 - **Offline**: each board has a service worker (`sw.js`) that caches it after the first visit. In Chrome, menu > Cast, save and share > Install page as app gives a window of its own.
@@ -52,9 +53,23 @@ The chem board has one: `chemistry/whiteboard/index.html#lesson=zeff` (slot 15, 
 
 Curves are computed from formulas, so the mean and median lines on the skewed stencils sit where they really are (the skew-right curve has mean 5.0 and median 4.35 on its axis).
 
+## Physics stencils (62)
+
+The Forces and Newton's Laws unit (UbD v3). Force arrows are colour-coded by kind (blue gravity, green normal, red friction, orange tension, black applied, purple drag, teal spring, magenta net force); the "Force colours" card is the key.
+
+| Shelf | Items |
+|---|---|
+| Free-body diagrams | dot, blank; at rest, steady slide, speeding up, slowing down, free fall, falling with drag, terminal velocity, hanging from a rope (each with its net force); eight single force arrows to paste and rotate; the force colours; FBD in five moves; FBD check; the force catalog |
+| Net force and motion | three cases (balanced, right, left); force strip (1 square = 1 N); two forces tip to tail; one force split into x and y; net force and motion card; motion maps (steady, speeding up, slowing down, blank) |
+| Graphs | blank v-t, a-t, x-t; v-t over a-t; a vs F (slope 1/m); a vs 1/m (slope F); a vs F bent by friction; v-t falling with drag (levels off); F vs x (Hooke slope k) |
+| Newton's laws | first, second and third law cards; ΣF = ma five moves; weight on other worlds; third-law pair template, they never cancel, book on a table (Fg and FN are not a pair), two spring scales, name the pair |
+| Inclines and systems | ramps at 15, 25 and 35 degrees; crate with tilted axes; incline FBDs with the weight split (no friction, and friction up the slope); cart and hanging mass (and both FBDs); Atwood machine (and object view); crate on a ramp with a counterweight; two blocks pushed (system and object view); spring with a hanging mass |
+
+Source: `tools/whiteboard/src/physics.js`. Ramps are drawn from their angle and the drag curve from its formula. There is no lesson board for physics yet.
+
 ## Adding or changing a stencil
 
-The stencils are code, in `tools/whiteboard/src/chem.js` and `tools/whiteboard/src/stats.js`: small helpers (in `draw.js`: `rect`, `ellipse`, `text`, `arrow`) and one `add('Name · item', [...])` line per item. The word before the dot picks the shelf (`SHELVES` at the foot of the file). After a change:
+The stencils are code, in `tools/whiteboard/src/chem.js`, `stats.js` and `physics.js`: small helpers (in `draw.js`: `rect`, `ellipse`, `text`, `arrow`) and one `add('Name · item', [...])` line per item. The word before the dot picks the shelf (`SHELVES` at the foot of the file). After a change:
 
 ```
 cd tools/whiteboard && npm install     # once

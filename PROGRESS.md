@@ -2,6 +2,16 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-17: Physics board for the Forces unit (branch `physics-whiteboard`)
+
+Ian asked for a physics board like the chem one, for the Forces unit. `physics/whiteboard/` (page, `sw.js`, manifest, icon) runs on the same shared Excalidraw bundle; the stencils are `tools/whiteboard/src/physics.js` and `app.jsx` has a `physics` entry in `BOARDS` (keys `mrd-physics-whiteboard-v1`, `mrd-physics-library-v1`). 62 stencils on five shelves: Free-body diagrams (9 FBDs with net force, 8 colour-coded force arrows and the colour key, FBD in five moves, FBD check, force catalog), Net force and motion (3 cases, force strip, tip to tail, components, motion maps), Graphs (blank v-t, a-t, x-t; a vs F; a vs 1/m; friction-bent; drag curve; Hooke), Newton's laws (three law cards, ΣF = ma moves, weight on other worlds, third-law pairs including book-on-table and two scales), Inclines and systems (ramps at 15, 25 and 35 degrees drawn from the angle, incline FBDs with components, cart and hanging mass, Atwood, ramp and pulley, two blocks, spring). Stencils were chosen from the slot plan: FBD days 4, 6, 7; second law 8 to 11; weight 13; drag 14; third law 17, 18, 24; inclines, friction, systems and springs 19 to 29.
+
+Linked from `physics/lessons/teacher.html` and `teacher/index.html`; documented in `shared/whiteboard/README.md`. `#all` now spaces stencils at least 330 wide so the names of narrow stencils do not overlap. Chem and stats board service-worker caches bumped (v7, v6) because the shared bundle changed. No physics lesson board yet (the chem and stats boards have them); a DI day such as slot 4 or 11 would be the first.
+
+Checks run: `node tests/physics-board.e2e.js` all pass (new; 62 stencils, shelves, place, autosave, no errors, no outside requests); `BOARD=chem LESSON=zeff` and `LESSON=3.4` lesson-board tests 0 failures (shared bundle rebuilt); `node tests/smoke.js` 49 pages load clean (physics board added); `node tools/check-lessons.mjs --strict` 0 errors. Every stencil viewed in a screenshot of `#all`. Not run: the unit tests and the lock/template e2e (no lesson was touched).
+
+Not on `main`: branch `physics-whiteboard`. Netlify deploys when it merges. Direct URL after merge: `/physics/whiteboard/index.html`.
+
 ## 2026-11-16: Ramp-and-pulley sandbox, UbD slot 19 (branch `physics-ramp-pulley-sandbox`)
 
 Ian asked for the slot 19 sim: "Ramp-and-pulley sandbox: play and predict" (also slots 25, 26, 29). Built as one standalone page, `physics/sandbox/ramp-pulley.html`, with its physics in `physics/sandbox/ramp-pulley-model.js` (no drawing, so tests and the page share it).
