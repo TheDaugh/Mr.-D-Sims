@@ -1,0 +1,75 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 4.5 Part 2 $\cdot$ Solving Related Rates: Volumes, Cones and Shadows}\fancyhead[R]{\small Make-up key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{4.5 Part 2 $\cdot$ Solving Related Rates: Volumes, Cones and Shadows}
+\textbf{You missed this lesson. Copy this into your notes. That is all you need to do.}\par\medskip
+\subsection*{Question of the day}
+What do I do when the link equation has two changing letters I need to reduce to one?\par
+\subsection*{Targets}\begin{itemize}\item I can use similar triangles to write one changing letter in terms of another.
+\item I can solve a cone or cylinder volume problem for the wanted rate.
+\item I can solve a shadow problem with similar triangles.\end{itemize}
+\subsection*{Concepts}\begin{itemize}
+\item \textbf{Similar triangles} (r/h = R/H): Matching sides of similar triangles have equal ratios. For a cone tank, $r/h$ never changes.
+\item \textbf{Reduce to one letter} (V(h)): Use the ratio to write $r$ in terms of $h$. Do this BEFORE you differentiate.
+\item \textbf{A relationship vs a moment} (always vs now): $r=h/2$ is true all the time, so use it early. $r=2$ is true for one moment, so wait.
+\end{itemize}
+\subsection*{What the class predicted, and what is true}\begin{itemize}
+\item Water is poured into a cone-shaped funnel (point down) at a steady rate. The water level rises... \A{fast at first, then slower and slower.} The cone gets wider at the top, so the same volume has to cover a wider circle and raises the level less each time.
+\item A person walks away from a street lamp at a steady speed. Her shadow gets longer at... \A{a steady speed that is slower than hers.} The shadow grows in proportion to how far she is, so its speed is steady. It is slower than hers because the lamp is taller than she is.
+\end{itemize}
+\section*{The tutorial, written out}
+\subsection*{Concept tutorial (8 pictures)}
+\textit{I can write one changing letter in terms of another with a similar triangle.}\par
+\begin{enumerate}
+\item \textbf{The cone keeps its shape.} As $h$ grows, $r$ grows with it. The ratio $r/h$ never changes: it is $4/8=\dfrac12$. \textit{(Picture: cone. A cone-shaped tank, point down. The blue-green $r$ is the radius of the water surface. The red $h$ is the water depth. Slide $h$.)}\\ \textit{Check:} The water is $h=6$ ft deep. What is the surface radius $r$? \A{3 ft.}
+\item \textbf{Two changing letters is too many.} Both $r$ and $h$ change, so $V=\tfrac13\pi r^2h$ would need a product rule. We can make it simpler. \textit{(Picture: cone. The readout also shows the volume $V=\tfrac13\pi r^2h$.)}\\ \textit{Check:} We know $r=\dfrac h2$. Write $V=\tfrac13\pi r^2h$ with only $h$. \A{$V=\dfrac{\pi}{12}h^3$.}
+\item \textbf{Now it is one letter.} From $V=\dfrac{\pi}{12}h^3$ we get $\dfrac{dV}{dt}=\dfrac{\pi}{4}h^2\dfrac{dh}{dt}$. \textit{(Picture: cone. With $V$ written in $h$ only, the rate of $V$ needs only the rate of $h$.)}\\ \textit{Check:} With $h=4$ and $\dfrac{dh}{dt}=1$, find $\dfrac{dV}{dt}=\dfrac{\pi}{4}h^2\dfrac{dh}{dt}$. Give it to 2 decimal places. \A{12.57 ft\textsuperscript{3}/min.}
+\item \textbf{A relationship vs a moment.} $r=\dfrac h2$ is true at all times. $h=4$ and $r=2$ are true only now. \textit{(Picture: cone. A frozen moment: $h=4$ and $r=2$.)}\\ \textit{Check:} Before differentiating, which may we put into $V=\tfrac13\pi r^2h$? \A{$r=\dfrac h2$.}
+\item \textbf{The cylinder needs no help.} In a cylinder the radius is fixed, so there is only one changing letter: $V=\pi R^2h$. \textit{(Picture: cylinder. A cylinder tank. The radius never changes.)}\\ \textit{Check:} For a cylinder tank, we need a similar-triangle step because... \A{we do not: only $h$ changes.}
+\item \textbf{A lamp and a shadow.} The big triangle (lamp to the tip of the shadow) and the small triangle (her to the tip) are similar. \textit{(Picture: shadow. A 15 ft lamp. A 6 ft person stands $x$ from it. The red line from the lamp to the ground touches the top of her head. $s$ is the shadow. Slide $x$.)}\\ \textit{Check:} Which proportion matches the two triangles? \A{$\dfrac{6}{s}=\dfrac{15}{x+s}$.}
+\item \textbf{Solve for the shadow.} Cross-multiply $\dfrac{6}{s}=\dfrac{15}{x+s}$: $15s=6x+6s$, so $9s=6x$ and $s=\dfrac23x$. \textit{(Picture: shadow. Slide $x$ to 9. Compare the shadow to $x$.)}\\ \textit{Check:} Using $s=\dfrac23x$, find $s$ when $x=9$. \A{6 ft.}
+\item \textbf{The rate of the shadow.} Since $s=\dfrac23x$, we get $\dfrac{ds}{dt}=\dfrac23\dfrac{dx}{dt}$. The shadow grows slower than she walks. \textit{(Picture: shadow. The shadow grows in proportion to $x$.)}\\ \textit{Check:} She walks at $\dfrac{dx}{dt}=6$ ft/s. Find $\dfrac{ds}{dt}$. \A{4 ft/s.}
+\end{enumerate}
+\subsection*{I do: the five moves}\begin{enumerate}\item Draw and name
+\item List what you know and want
+\item Link with one equation
+\item Differentiate in t
+\item Plug in last\end{enumerate}
+\subsection*{I do (8 steps)}
+\textit{I can watch a cone-tank problem and a shadow problem solved in five moves and spot the common slip.}\par
+\begin{enumerate}
+\item \textbf{Name and list.} \textit{Moves 1 and 2 $\cdot$ Name and list.} Water is going in, so $\dfrac{dV}{dt}$ is positive. We want the level's speed $\dfrac{dh}{dt}$. \textit{(Picture: cone. The tank is 8 ft tall with top radius 4 ft. The water has radius $r$ and depth $h$.)}\\ Given: $\dfrac{dV}{dt}=6$ ft\textsuperscript{3}/min\\ Want: $\dfrac{dh}{dt}$ when $h=4$ ft\\ \textit{Check:} Which rate do we WANT? \A{$\dfrac{dh}{dt}$.}
+\item \textbf{Link, then reduce to one letter.} \textit{Move 3 $\cdot$ Link with one equation.} Start with $V=\tfrac13\pi r^2h$. Use $r=\dfrac h2$ to write it with $h$ only. \textit{(Picture: cone. The ratio $r/h=4/8$ holds for the water at all times.)}\\ Link: $V=\tfrac13\pi r^2h$\\ Similar triangles: $r=\dfrac h2$\\ $V=\dfrac{\pi}{12}h^3$\\ \textit{Check:} Why can we use $r=\dfrac h2$ BEFORE differentiating? \A{It is true at all times, not just one moment..}
+\item \textbf{Differentiate.} \textit{Move 4 $\cdot$ Differentiate in t.} Differentiate $V=\dfrac{\pi}{12}h^3$ in $t$. The 3 comes down, and $\dfrac{dh}{dt}$ rides along. \textit{(Picture: chain. Time leads to $h$, and $h$ leads to $V$. The rates multiply.)}\\ $\dfrac{dV}{dt}=\dfrac{\pi}{12}\cdot3h^2\dfrac{dh}{dt}=\dfrac{\pi}{4}h^2\dfrac{dh}{dt}$\\ \textit{Check:} Which is $\dfrac{d}{dt}\left(\dfrac{\pi}{12}h^3\right)$? \A{$\dfrac{\pi}{4}h^2\dfrac{dh}{dt}$.}
+\item \textbf{Plug in last.} \textit{Move 5 $\cdot$ Plug in last.} Put in $\dfrac{dV}{dt}=6$ and $h=4$. Then solve for $\dfrac{dh}{dt}$. \textit{(Picture: cone. The cone at the moment we are asked about: the water is $h=4$ ft deep.)}\\ $6=\dfrac{\pi}{4}(16)\dfrac{dh}{dt}$\\ $6=4\pi\dfrac{dh}{dt}$\\ $\dfrac{dh}{dt}=\dfrac{6}{4\pi}\approx0.48$ ft/min\\ \textit{Check:} Solve $6=4\pi\dfrac{dh}{dt}$. Give it to 2 decimal places. \A{0.48 ft/min.}
+\item \textbf{The common slip.} Slip: putting $r=2$ into $V=\tfrac13\pi r^2h$ first. That makes $r$ a fixed number, so $\dfrac{dr}{dt}$ is lost and the answer is wrong. \textit{(Picture: cone. At this moment $r=2$ and $h=4$, but the tank is still filling.)}\\ Wrong: $V=\tfrac13\pi(2)^2h=\tfrac{4\pi}{3}h$, so $6=\tfrac{4\pi}{3}\dfrac{dh}{dt}$\\ That gives $\dfrac{dh}{dt}\approx1.43$. Too big.\\ \textit{Common slip.}\\ \textit{Check:} Why is 1.43 wrong? \A{The radius grows as the water rises, but this made it fixed at 2..}
+\item \textbf{Problem 2: a shadow.} \textit{Moves 1 to 3 $\cdot$ Name, list, link.} \textbf{Problem:} A 6 ft person walks away from a 15 ft lamp at 5 ft/s. How fast is her shadow growing? We are given $\dfrac{dx}{dt}=5$ and want $\dfrac{ds}{dt}$, and similar triangles link $x$ and $s$. \textit{(Picture: shadow. A 15 ft lamp. A 6 ft person is $x$ from it. $s$ is her shadow.)}\\ Given: $\dfrac{dx}{dt}=5$ ft/s\\ Want: $\dfrac{ds}{dt}$\\ Link: $\dfrac{6}{s}=\dfrac{15}{x+s}$\\ \textit{Check:} The two triangles are similar. Why? \A{They share the lamp's angle and each has a right angle..}
+\item \textbf{Solve for s, then differentiate.} \textit{Moves 3 and 4.} Cross-multiply: $15s=6x+6s$, so $s=\dfrac23x$. Then $\dfrac{ds}{dt}=\dfrac23\dfrac{dx}{dt}$. \textit{(Picture: shadow. The shadow is proportional to $x$.)}\\ $15s=6(x+s)$, so $9s=6x$\\ $s=\dfrac23x$\\ $\dfrac{ds}{dt}=\dfrac23\dfrac{dx}{dt}$\\ \textit{Check:} Why is the answer the same at every moment? \A{$\dfrac{ds}{dt}=\dfrac23\dfrac{dx}{dt}$ has no $x$ or $s$ in it..}
+\item \textbf{Plug in.} \textit{Move 5 $\cdot$ Plug in last.} Put in $\dfrac{dx}{dt}=5$. \textit{(Picture: shadow. Her speed is 5 ft/s.)}\\ $\dfrac{ds}{dt}=\dfrac23(5)=\dfrac{10}{3}\approx3.33$ ft/s\\ \textit{Check:} Find $\dfrac{ds}{dt}=\dfrac23\cdot5$. Give it to 2 decimal places. \A{3.33 ft/s.}
+\end{enumerate}
+\subsection*{Big ideas}\begin{itemize}\item Similar triangles give a relationship that is true at all times, like $r=\dfrac h2$. Use it before differentiating.
+\item A cylinder has a fixed radius, so only $h$ changes.
+\item A number true for one moment (like $h=4$) waits until the last move.
+\item For a shadow, the rate is the same at every moment: $\dfrac{ds}{dt}=\dfrac{h}{H-h}\dfrac{dx}{dt}$.\end{itemize}
+\section*{One worked sample of each skill}
+\subsection*{Use similar triangles}
+\noindent\textbf{Level 1.} A cone-shaped tank (point down) is 8 ft tall and 4 ft in radius at the top. When the water is 4 ft deep, what is the radius of the water surface? Give it to 2 decimal places.\\ \A{Answer: 2 ft} \quad $r=\dfrac{4}{8}(4)=2$ ft.\par\medskip
+\noindent\textbf{Level 2.} A cone-shaped tank (point down) is 8 ft tall and 4 ft in radius at the top. When the water is 7 ft deep, what is the radius of the water surface? Give it to 2 decimal places.\\ \A{Answer: 3.5 ft} \quad $r=\dfrac{4}{8}(7)=3.5$ ft.\par\medskip
+\noindent\textbf{Level 3.} A cone-shaped tank (point down) is 12 ft tall and 6 ft in radius at the top. When the water is 3.6 ft deep, what is the radius of the water surface? Give it to 2 decimal places.\\ \A{Answer: 1.8 ft} \quad $r=\dfrac{6}{12}(3.6)=1.8$ ft.\par\medskip
+\subsection*{Write V in one letter}
+\noindent\textbf{Level 1.} A cone-shaped tank (point down) is 8 ft tall and 4 ft in radius at the top. Water of depth $h$ has radius $r$ and volume $V=\tfrac13\pi r^2h$. Which line writes $V$ with $h$ only?\\ \A{(A) $V=\dfrac{1\pi}{12}h^3$} \quad (B) $V=\dfrac{3\pi}{4}h^3$ \quad (C) $V=\dfrac{1\pi}{4}h^3$ \quad (D) $V=\dfrac{1\pi}{6}h^3$\\ \A{Answer: A} \quad $r=\dfrac{4}{8}h$. Then $V=\tfrac13\pi\left(\dfrac{4}{8}h\right)^2h=\dfrac{1\pi}{12}h^3$.\par\medskip
+\noindent\textbf{Level 2.} A cone-shaped tank (point down) is 9 ft tall and 3 ft in radius at the top. Water of depth $h$ has radius $r$ and volume $V=\tfrac13\pi r^2h$. Which line writes $V$ with $h$ only?\\ (A) $V=\dfrac{1\pi}{9}h^3$ \quad \A{(B) $V=\dfrac{1\pi}{27}h^3$} \quad (C) $V=\dfrac{1\pi}{3}h^3$ \quad (D) $V=\dfrac{4\pi}{27}h^3$\\ \A{Answer: B} \quad $r=\dfrac{3}{9}h$. Then $V=\tfrac13\pi\left(\dfrac{3}{9}h\right)^2h=\dfrac{1\pi}{27}h^3$.\par\medskip
+\noindent\textbf{Level 3.} A cone-shaped tank (point down) is 4 ft tall and 3 ft in radius at the top. Water of depth $h$ has radius $r$ and volume $V=\tfrac13\pi r^2h$. Which line writes $V$ with $h$ only?\\ (A) $V=\dfrac{1\pi}{4}h^3$ \quad (B) $V=\dfrac{27\pi}{16}h^3$ \quad (C) $V=\dfrac{9\pi}{16}h^3$ \quad \A{(D) $V=\dfrac{3\pi}{16}h^3$}\\ \A{Answer: D} \quad $r=\dfrac{3}{4}h$. Then $V=\tfrac13\pi\left(\dfrac{3}{4}h\right)^2h=\dfrac{3\pi}{16}h^3$.\par\medskip
+\subsection*{Solve a volume problem}
+\noindent\textbf{Level 1.} Water is pumped into a cylinder tank of radius 3 ft at 18 ft\textsuperscript{3}/min. How fast is the depth rising? Give $\dfrac{dh}{dt}$ to 2 decimal places.\\ \A{Answer: 0.64 ft/min} \quad $18=\pi(3)^2\dfrac{dh}{dt}$, so $\dfrac{dh}{dt}=0.64$ ft/min.\par\medskip
+\noindent\textbf{Level 2.} Water is pumped into a cone-shaped tank (point down, 8 ft tall, top radius 4 ft) at 11 ft\textsuperscript{3}/min. How fast is the depth rising when the water is 7 ft deep? Give $\dfrac{dh}{dt}$ to 2 decimal places.\\ \A{Answer: 0.29 ft/min} \quad $11=\dfrac{16\pi}{64}(7)^2\dfrac{dh}{dt}$, so $\dfrac{dh}{dt}=0.29$ ft/min.\par\medskip
+\noindent\textbf{Level 3.} Water drains from a cone-shaped tank (point down, 12 ft tall, top radius 6 ft) at 10 ft\textsuperscript{3}/min. How fast is the depth changing when the water is 2 ft deep? Give $\dfrac{dh}{dt}$ to 2 decimal places.\\ \A{Answer: -3.18 ft/min} \quad $-10=\dfrac{36\pi}{144}(2)^2\dfrac{dh}{dt}$, so $\dfrac{dh}{dt}=-3.18$ ft/min. Negative: the level falls.\par\medskip
+\subsection*{Solve a shadow problem}
+\noindent\textbf{Level 1.} A 5 ft person walks away from a 15 ft lamp at 3 ft/s. How fast is the LENGTH of her shadow growing? Give it to 2 decimal places.\\ \A{Answer: 1.5 ft/s} \quad $s=\dfrac{5}{10}x$, so $\dfrac{ds}{dt}=\dfrac{5}{10}(3)=1.5$ ft/s.\par\medskip
+\noindent\textbf{Level 2.} A 4 ft person walks away from a 10 ft lamp at 6 ft/s. How fast is the LENGTH of her shadow growing? Give it to 2 decimal places.\\ \A{Answer: 4 ft/s} \quad $s=\dfrac{4}{6}x$, so $\dfrac{ds}{dt}=\dfrac{4}{6}(6)=4$ ft/s.\par\medskip
+\noindent\textbf{Level 3.} A 9 ft person walks away from a 18 ft lamp at 2 ft/s. How fast is the TIP of her shadow moving along the ground (measured from the lamp)? Give it to 2 decimal places.\\ \A{Answer: 4 ft/s} \quad The tip is at $x+s=\dfrac{18}{9}x$, so its speed is $\dfrac{18}{9}(2)=4$ ft/s.\par\medskip
+\end{document}

@@ -1,0 +1,80 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 4.7 Part 1 $\cdot$ L'H?pital's Rule: Spot 0/0 and Use It Once}\fancyhead[R]{\small Teacher key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{4.7 Part 1 $\cdot$ L'H?pital's Rule: Spot 0/0 and Use It Once --- teacher key}
+\textbf{Question:} What do I do when plugging in gives 0/0?\par
+\subsection*{Self-paced lesson}No clock, no trimming, no skipping, no end mark, no stamp. Every tab is required in order; progress saves on the device so a student can stop and finish the next day.\par
+\subsection*{Warm-up review (3 easy items)}\begin{itemize}
+\item The derivative of $e^{2x}$ is... \A{$2e^{2x}$.} Chain rule: the derivative of the inside, 2, rides along.
+\item $\displaystyle\lim_{x\to3}(x^2+1)$ is... \A{10.} The function is smooth, so plug in: $9+1=10$.
+\item The derivative of $\sin 3x$ is... \A{$3\cos 3x$.} The derivative of $\sin$ is $\cos$, and the 3 rides along.
+\end{itemize}
+\subsection*{Independent lesson}No huddle, no teacher talk, no codes. Students read a short picture tutorial (Concept), watch worked problems move by move (I do), then solve generated problems (You do). Add \texttt{\#key} to the lesson address to open every tab with answers marked.\par
+\subsection*{Targets}\begin{itemize}\item I can tell when plugging in gives 0/0, ?/?, a number, or a number over 0.
+\item I can use L'H?pital's Rule once, taking the top and bottom derivatives separately.
+\item I can say when the rule does not apply.\end{itemize}
+\subsection*{Predictions}\begin{itemize}
+\item Near $x=1$, $f(x)=6(x-1)$ and $g(x)=3(x-1)$ both go to 0. The ratio $f(x)/g(x)$ goes to... \A{2.} The factors $(x-1)$ cancel, leaving $6/3=2$. The slopes 6 and 3 give the ratio.
+\item $\displaystyle\lim_{x\to0}\dfrac{\sin x}{x}$ plugs in to $\dfrac00$. The limit is... \A{1.} Near 0, $\sin x$ looks like $x$, so the ratio is about 1. The tutorial shows the rule that proves it.
+\end{itemize}
+\section*{Tutorial script, with every question and answer}
+\subsection*{Concept tutorial (8 pictures)}
+\textit{I can say what each plug-in result means for a limit.}\par
+\begin{enumerate}
+\item \textbf{Plug in first.} To find a limit as $x\to a$, first put $x=a$ into the top and the bottom. \textit{(Picture: forms. The table has three rows: what plugging in gives, what it means, and what to do next. The gold row is the one we are on.)}\\ \textit{Question:} Plug $x=2$ into $\dfrac{x+4}{x+1}$. What number is the limit? \A{Answer: 2.} $\dfrac{6}{3}=2$. A plain number means we are done.
+\item \textbf{The form 0/0.} Plugging $x=2$ into $\dfrac{x^2-4}{x-2}$ gives $\dfrac00$. That tells us nothing yet. \textit{(Picture: forms. The second row is the form $\frac00$.)}\\ \textit{Question:} What does $\dfrac00$ tell us about the limit? \A{Answer: nothing yet: it needs another method.} Zero over zero could be any number. We need to look closer.
+\item \textbf{Watch a ratio settle.} Both go to 0, but their ratio does not: slide $x$ toward 2 and watch $f\div g$. \textit{(Picture: ratio. Blue is $f(x)=x^2-4$ and orange is $g(x)=x-2$. Both reach 0 at $x=2$. The table lists $f\div g$ as $x$ moves toward 2. Slide $x$ along the steps.)}\\ \textit{Question:} Slide to step 5 ($x=2.01$). The ratio $f\div g$ is close to what? \A{Answer: 4.} The ratio settles at about 4, so the limit is 4.
+\item \textbf{Slopes decide the ratio.} Near the point each function looks like a line. The ratio of the lines is the ratio of their slopes. \textit{(Picture: ratio. Two straight lines through $x=1$: $f$ has slope 6 and $g$ has slope 3. The ratio column is the same at every step.)}\\ \textit{Question:} $f$ has slope 6 and $g$ has slope 3. What does $f\div g$ settle at? \A{Answer: 2.} $6\div3=2$. The ratio of slopes is the ratio of the functions near the point.
+\item \textbf{Slopes are derivatives.} The slope of $f$ at 0 is $f'(0)=2$ and the slope of $g$ is $g'(0)=1$. So the ratio settles at $\dfrac{f'(0)}{g'(0)}=2$. \textit{(Picture: ratio. Blue is $f(x)=e^{2x}-1$ and orange is $g(x)=x$. Both are 0 at $x=0$. The ratio column settles near 2.)}\\ \textit{Question:} $f(x)=e^{2x}-1$ has $f'(0)=2$ and $g(x)=x$ has $g'(0)=1$. Find $\dfrac{f'(0)}{g'(0)}$. \A{Answer: 2.} $2$. This matches the table.
+\item \textbf{L'H?pital's Rule.} This is L'H?pital's Rule: for $\frac00$, the limit of $\dfrac fg$ equals the limit of $\dfrac{f'}{g'}$. \textit{(Picture: ratio. Blue is $\sin 3x$ and orange is $x$. The ratio settles at 3.)}\\ \textit{Question:} For $\dfrac{\sin3x}{x}$ at 0, $f'=3\cos3x$ and $g'=1$. Find $\dfrac{f'(0)}{g'(0)}$. \A{Answer: 3.} $\dfrac{3\cdot1}{1}=3$. This matches the table.
+\item \textbf{Top and bottom SEPARATELY.} Differentiate the top and the bottom each on its own. Do NOT use the quotient rule on the whole fraction. \textit{(Picture: forms. The $\frac00$ row. The rule says to take the derivative of the top and of the bottom on their own.)}\\ \textit{Question:} For $\dfrac{x^2-4}{x-2}$, which is the L'H?pital step? \A{Answer: $\dfrac{2x}{1}$.} Derivative of the top over derivative of the bottom.
+\item \textbf{When the rule does NOT apply.} The rule works only for $\frac00$ or $\frac{\infty}{\infty}$. For $\dfrac30$ the limit is not a finite number, and the rule does not apply. \textit{(Picture: forms. The third row: a number over 0.)}\\ \textit{Question:} Plugging $x=1$ into $\dfrac{x+2}{x-1}$ gives $\dfrac30$. Can we use the rule? \A{Answer: No: it is not 0/0 or ?/?.} The top is 3, not 0. The rule needs 0/0 or ?/?.
+\end{enumerate}
+\subsection*{I do: the five moves}\begin{enumerate}\item Plug in
+\item Name the form
+\item Differentiate top and bottom
+\item Plug in again\end{enumerate}
+\subsection*{I do (7 steps)}
+\textit{I can watch two 0/0 limits solved with the rule used once, and spot the common slip.}\par
+\begin{enumerate}
+\item \textbf{Plug in.} \textit{Move 1 $\cdot$ Plug in.} Put $x=0$ into the top and the bottom. \textit{(Picture: ratio. Blue is $e^{2x}-1$ and orange is $x$. At $x=0$ both are 0.)}\\ Top: $e^0-1=0$\\ Bottom: $0$\\ \textit{Question:} What is the top, $e^{2x}-1$, at $x=0$? \A{Answer: 0.} $e^0-1=0$.
+\item \textbf{Name the form.} \textit{Move 2 $\cdot$ Name the form.} Top 0 and bottom 0 is the form $\frac00$. The rule may be used. \textit{(Picture: forms. The gold row of the table is the form $\frac00$.)}\\ Form: $\dfrac00$\\ \textit{Question:} Which form is it? \A{Answer: $\dfrac00$.} Both the top and the bottom are 0.
+\item \textbf{Differentiate top and bottom.} \textit{Move 3 $\cdot$ Differentiate top and bottom.} Differentiate the top on its own and the bottom on its own. \textit{(Picture: ratio. The ratio of slopes: $f'=2e^{2x}$ and $g'=1$.)}\\ $\dfrac{(e^{2x}-1)'}{(x)'}=\dfrac{2e^{2x}}{1}$\\ \textit{Question:} Which line is the L'H?pital step? \A{Answer: $\dfrac{2e^{2x}}{1}$.} The derivative of $e^{2x}$ is $2e^{2x}$, and of $x$ is 1.
+\item \textbf{Plug in again.} \textit{Move 4 $\cdot$ Plug in again.} Now put $x=0$ into the new fraction. \textit{(Picture: ratio. The ratio is near 2 at the last step.)}\\ $\dfrac{2e^0}{1}=2$\\ So the limit is $2$\\ \textit{Question:} Find $\dfrac{2e^{0}}{1}$. \A{Answer: 2.} $2\times1=2$.
+\item \textbf{Problem 2: a polynomial.} \textit{Moves 1 and 2 $\cdot$ Plug in and name.} \textbf{Problem:} Find $\displaystyle\lim_{x\to1}\dfrac{x^3-1}{x^2-1}$. Put $x=1$ into both: $1-1=0$ on top and $1-1=0$ on the bottom. \textit{(Picture: forms. The table row to check: is the form $\frac00$?)}\\ Top: $1^3-1=0$\\ Bottom: $1^2-1=0$\\ Form: $\dfrac00$\\ \textit{Question:} Which form does $x=1$ give? \A{Answer: $\dfrac00$.} Top 0 and bottom 0.
+\item \textbf{Differentiate and plug in.} \textit{Moves 3 and 4.} The top becomes $3x^2$ and the bottom becomes $2x$. Then put $x=1$. \textit{(Picture: forms. The rule: top and bottom separately.)}\\ $\dfrac{3x^2}{2x}$\\ at $x=1$: $\dfrac32$\\ \textit{Question:} Find $\dfrac{3x^2}{2x}$ at $x=1$. \A{Answer: 1.5.} $\dfrac{3}{2}=1.5$.
+\item \textbf{The common slip.} Slip: using the quotient rule on the whole fraction. The rule takes the derivative of the top and of the bottom on their own. \textit{(Picture: forms. The quotient rule is for the derivative of a fraction. L'H?pital is a different tool.)}\\ Wrong: $\dfrac{3x^2(x^2-1)-(x^3-1)2x}{(x^2-1)^2}$\\ Right: $\dfrac{3x^2}{2x}$\\ \textit{Common slip.}\\ \textit{Question:} What is wrong with the first line? \A{Answer: It uses the quotient rule. The rule needs top and bottom derivatives separately..} L'H?pital says $\lim\dfrac fg=\lim\dfrac{f'}{g'}$, with no quotient rule.
+\end{enumerate}
+\subsection*{Big ideas}\begin{itemize}\item Always plug in first. A plain number means you are done.
+\item $\frac00$ and $\frac{\infty}{\infty}$ are indeterminate: the rule may be used.
+\item L'H?pital: $\lim\dfrac fg=\lim\dfrac{f'}{g'}$, with top and bottom differentiated separately.
+\item A number over 0 is not indeterminate. The rule does not apply.\end{itemize}
+\section*{Every level, with answers}
+\subsection*{Name the form}
+\noindent\textbf{Level 1.} Find $\displaystyle\lim_{x\to1}\dfrac{x^2-1}{x-1}$. Put $x=1$ into the top and bottom. What happens?\\ \A{(A) It gives $\frac00$, so L'H?pital's Rule may be used.} \quad (B) It gives a number over 0, so the rule does not apply. \quad (C) It gives a plain number, so just plug in. \quad (D) It gives $\frac{\infty}{\infty}$, so L'H?pital's Rule may be used.\\ \A{Answer: A} \quad Both the top and the bottom go to 0. That form tells us nothing yet. It gives $\frac00$, so L'H?pital's Rule may be used.\par\medskip
+\noindent\textbf{Level 2.} Find $\displaystyle\lim_{x\to0}\dfrac{e^x-1}{x}$. Put $x=0$ into the top and bottom. What happens?\\ (A) It gives $\frac{\infty}{\infty}$, so L'H?pital's Rule may be used. \quad \A{(B) It gives $\frac00$, so L'H?pital's Rule may be used.} \quad (C) It gives a plain number, so just plug in. \quad (D) It gives a number over 0, so the rule does not apply.\\ \A{Answer: B} \quad Both the top and the bottom go to 0. That form tells us nothing yet. It gives $\frac00$, so L'H?pital's Rule may be used.\par\medskip
+\noindent\textbf{Level 3.} Find $\displaystyle\lim_{x\to0}\dfrac{1-\cos x}{x^2}$. Put $x=0$ into the top and bottom. What happens?\\ (A) It gives $\frac{\infty}{\infty}$, so L'H?pital's Rule may be used. \quad (B) It gives a number over 0, so the rule does not apply. \quad (C) It gives a plain number, so just plug in. \quad \A{(D) It gives $\frac00$, so L'H?pital's Rule may be used.}\\ \A{Answer: D} \quad Both the top and the bottom go to 0. That form tells us nothing yet. It gives $\frac00$, so L'H?pital's Rule may be used.\par\medskip
+\subsection*{The L'H?pital step}
+\noindent\textbf{Level 1.} $\dfrac{x^2-9}{x-3}$ gives $\frac00$. Which line is the L'H?pital step?\\ \A{(A) $\dfrac{2x}{1}$} \quad (B) $\dfrac{x^2-9}{1}$ \quad (C) $\dfrac{2x}{x-3}$ \quad (D) $\dfrac{(2x)(x-3)-(x^2-9)(1)}{(x-3)^2}$\\ \A{Answer: A} \quad Top: $(x^2-9)'=2x$. Bottom: $(x-3)'=1$. The step is $\dfrac{2x}{1}$.\par\medskip
+\noindent\textbf{Level 2.} $\dfrac{e^x-1}{x}$ gives $\frac00$. Which line is the L'H?pital step?\\ (A) $\dfrac{(e^x)(x)-(e^x-1)(1)}{(x)^2}$ \quad \A{(B) $\dfrac{e^x}{1}$} \quad (C) $\dfrac{e^x}{x}$ \quad (D) $\dfrac{e^x-1}{1}$\\ \A{Answer: B} \quad Top: $(e^x-1)'=e^x$. Bottom: $(x)'=1$. The step is $\dfrac{e^x}{1}$.\par\medskip
+\noindent\textbf{Level 3.} $\dfrac{\sin 2x}{\sin 5x}$ gives $\frac00$. Which line is the L'H?pital step?\\ (A) $\dfrac{(2\cos 2x)(\sin 5x)-(\sin 2x)(5\cos 5x)}{(\sin 5x)^2}$ \quad (B) $\dfrac{\sin 2x}{5\cos 5x}$ \quad (C) $\dfrac{2\cos 2x}{\sin 5x}$ \quad \A{(D) $\dfrac{2\cos 2x}{5\cos 5x}$}\\ \A{Answer: D} \quad Top: $(\sin 2x)'=2\cos 2x$. Bottom: $(\sin 5x)'=5\cos 5x$. The step is $\dfrac{2\cos 2x}{5\cos 5x}$.\par\medskip
+\subsection*{Find the limit}
+\noindent\textbf{Level 1.} Find $\displaystyle\lim_{x\to3}\dfrac{x^2-9}{x-3}$. Give it to 2 decimal places if needed.\\ \A{Answer: 6} \quad Both go to 0, so use the rule. $\dfrac{2x}{1}$ at $x=3$ gives $6$.\par\medskip
+\noindent\textbf{Level 2.} Find $\displaystyle\lim_{x\to0}\dfrac{e^{6x}-1}{x}$. Give it to 2 decimal places if needed.\\ \A{Answer: 6} \quad Both go to 0, so use the rule. $\dfrac{6e^{6x}}{1}$ at $x=0$ gives $6$.\par\medskip
+\noindent\textbf{Level 3.} Find $\displaystyle\lim_{x\to1}\dfrac{x^2-1}{x^3-1}$. Give it to 2 decimal places if needed.\\ \A{Answer: 0.67} \quad Both go to 0, so use the rule. $\dfrac{2x}{3x^2}$ at $x=1$ gives $\dfrac{2}{3}$.\par\medskip
+\subsection*{Spot the slip}
+\noindent\textbf{Level 1.} A student uses L'H?pital's Rule on $\dfrac{x^2-9}{x-3}$ at $x=3$ and writes $\dfrac{2x(x-3)-(x^2-9)}{(x-3)^2}$. What is wrong?\\ \A{(A) It used the quotient rule instead of separate derivatives.} \quad (B) It used the right method but made an arithmetic error. \quad (C) There is no error. \quad (D) It should have differentiated the top twice.\\ \A{Answer: A} \quad It used the quotient rule instead of separate derivatives. L'H?pital takes the derivative of the top and of the bottom on their own: $\dfrac{2x}{1}$.\par\medskip
+\noindent\textbf{Level 2.} A student uses L'H?pital's Rule on $\dfrac{x^2-36}{x-6}$ at $x=6$ and writes $\dfrac{2x(x-6)-(x^2-36)}{(x-6)^2}$. What is wrong?\\ (A) It used the right method but made an arithmetic error. \quad (B) It should have differentiated the top twice. \quad \A{(C) It used the quotient rule instead of separate derivatives.} \quad (D) There is no error.\\ \A{Answer: C} \quad It used the quotient rule instead of separate derivatives. L'H?pital takes the derivative of the top and of the bottom on their own: $\dfrac{2x}{1}$.\par\medskip
+\noindent\textbf{Level 3.} A student writes: The limit of $\dfrac{x+4}{x+1}$ as $x\to2$: "this is a limit, so use the rule: $\dfrac11=1$." What is wrong?\\ (A) There is no error. \quad (B) It used the right method but made an arithmetic error. \quad (C) It should have differentiated the top twice. \quad \A{(D) The form was not $\frac00$, so the rule was not allowed. Plug in instead.}\\ \A{Answer: D} \quad The form was not $\frac00$, so the rule was not allowed. Plug in instead. At $x=2$ the top is 6 and the bottom is 3, a plain number. Just plug in: $\dfrac{6}{3}$.\par\medskip
+\section*{Common misconceptions}\begin{tabularx}{\textwidth}{@{}X X@{}}\toprule Students say & Say instead\\\midrule
+Use the quotient rule on the fraction. & L'H?pital: derivative of the top and derivative of the bottom, separately.\\
+0/0 means the limit is 0 (or 1, or does not exist). & 0/0 tells you nothing yet. It needs another method.\\
+Use the rule on any limit. & Only for 0/0 or ?/?. Plug in first.\\
+A number over 0 can use the rule. & It is not indeterminate. The limit is not a finite number.\\
+Forget to plug in again after differentiating. & The answer is the limit of the new fraction, so plug in again.\\
+\bottomrule\end{tabularx}
+\end{document}

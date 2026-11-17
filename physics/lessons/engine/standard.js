@@ -21,6 +21,84 @@
   /* Start: ID card, targets, the day's tabs. */
   steps.push(K.startStep({ title: SPEC.title, question: SPEC.question, targets: SPEC.targets, tabs: SPEC.tabs }));
 
+  /* Visual-tutorial lesson (SPEC.tutorial, calculus 4.4 on): fully independent, no huddle and no teacher talk.
+     Tabs: Start, Warm-up, Predict, Concept (a slide show of pictures with questions), I do (one problem worked out on a board, step by step),
+     You do (problems at the student's level), Practice (endless), Check, Wrap-up. Same save-and-resume, no clock, no stamp as the self-paced branch below.
+     The slide show is calculus/shared/vtut.js; its pictures are calculus/shared/scenes.js. SPEC.tutorial = { moves, concept:{title,target,frames}, ido:{target,problem,frames}, summary:[...] }. */
+  if (SPEC.tutorial) {
+    var TU = SPEC.tutorial, VTK = window.VT;
+    var mathQ2 = function (r, extra) { var q = { type: 'choice', math: MATH, head: r.title, prompt: r.prompt, options: r.options.map(opt), answer: r.answer, maxMiss: 2, worked: opt(r.why) }; q.id = r.id; for (var k in extra) q[k] = extra[k]; return q; };
+    var allDone2 = function (list) { return list.every(function (r) { return qdone(r.id); }); };
+    var rev2 = (SPEC.review || []).slice(0, 3), movesBar = function (card) { if (!TU.moves) return; var ol = el('ol', 'vt-moves'); TU.moves.forEach(function (m) { ol.appendChild(el('li', null, m)); }); card.appendChild(ol); };
+    var scriptHtml = function (frames) { return '<ol>' + VTK.script(frames).map(function (s) { return '<li><b>' + VTK.inline(s.head || '') + '</b>' + (s.move ? ' <i>(' + s.move + ')</i>' : '') + ' ' + VTK.inline(s.say || '') + (s.ask ? '<br><i>Question:</i> ' + VTK.inline(s.ask) + ' <b>Answer: ' + VTK.inline(s.answer) + '</b>' : '') + '</li>'; }).join('') + '</ol>'; };
+    steps.push({ id: 'warmup', label: T.warmup,
+      render: function (card, c) { var S = c.S; K.head(card, T.warmup, 'I can show what I already know.', 'Up next: you make predictions.'); if (!S.band0) { S.band0 = 1; S.band = 1; S.bandLog.push('start:1'); LE.save(); } rev2.forEach(function (r) { LE.ask(card, mathQ2(r)); }); },
+      canLeave: function () { return allDone2(rev2); },
+      teacher: function () { return '<p>Three easy review items, no placement. Everyone starts at band 1. Answers: ' + rev2.map(function (r) { return r.id + ' = ' + opt(r.options[r.answer]); }).join('; ') + '.</p>'; } });
+    steps.push({ id: 'predict', label: T.predict,
+      render: function (card, c) { K.head(card, T.predict, 'I can predict before I learn it.', 'Up next: a short picture tutorial.'); SPEC.predicts.forEach(function (p) { LE.ask(card, mathQ2(p, { maxMiss: 1 })); }); },
+      canLeave: function () { return allDone2(SPEC.predicts); },
+      teacher: function () { return '<p>Correct: ' + SPEC.predicts.map(function (p) { return p.id + ' = ' + opt(p.options[p.answer]); }).join('; ') + '. One try each; the reason is shown after. The tutorial that follows answers each one.</p>'; } });
+    steps.push({ id: 'concept', label: 'Concept',
+      render: function (card, c) { K.head(card, 'Concept: ' + TU.concept.title, TU.concept.target, 'Up next: you watch one problem worked out, move by move.'); VTK.show(card, TU.concept.frames, { tab: 'c', S: c.S, key: c.key, prefix: ID }); },
+      canLeave: function (c) { return VTK.complete(TU.concept.frames, 'c', ID, c.S); },
+      teacher: function () { return '<p>The concept tutorial: ' + TU.concept.frames.length + ' pictures, each with a short line and (usually) a question. No teacher talk is needed. Next unlocks when the question is answered; two misses show the answer. The script:</p>' + scriptHtml(TU.concept.frames); } });
+    steps.push({ id: 'ido', label: 'I do',
+      render: function (card, c) {
+        K.head(card, 'I do: watch me work one', TU.ido.target, 'Up next: you do the same moves on your own problems.');
+        movesBar(card); var pb = el('div', 'vt-problem'); pb.innerHTML = VTK.inline(TU.ido.problem); card.appendChild(pb);
+        VTK.show(card, TU.ido.frames, { tab: 'i', S: c.S, key: c.key, prefix: ID, boardTitle: 'My work so far' });
+      },
+      canLeave: function (c) { return VTK.complete(TU.ido.frames, 'i', ID, c.S); },
+      teacher: function () { return '<p>One problem worked out on a board, move by move. The student answers one small question at each move. The last frame names the common slip. The script:</p>' + scriptHtml(TU.ido.frames); } });
+    steps.push({ id: 'build', label: 'You do',
+      render: function (card, c) {
+        K.head(card, 'You do', SPEC.buildTarget || SPEC.targets[0], 'Up next: endless practice at your level.');
+        movesBar(card); card.appendChild(el('p', 'hint', 'Use the same moves you just watched. Hints come one at a time if you get stuck.'));
+        var b = LE.band(); for (var i = 0; i < 4; i++) LE.ask(card, skillQ(SPEC.skills[i % SPEC.skills.length], b, 'b', i));
+      },
+      canLeave: function () { for (var i = 0; i < 4; i++) if (!qdone('b.' + i)) return false; return true; },
+      teacher: function () { return '<p>Four problems at the student’s band, from the lesson’s generators. Hints appear one at a time and point to a move; named wrong answers explain the specific slip. Nothing is trimmed.</p>'; } });
+    steps.push({ id: 'practice', label: T.practice,
+      render: function (card, c) { K.head(card, T.practice, 'I can solve problems at my level.', 'Up next: a two-question check.'); K.morePractice(card, c); },
+      canLeave: function (c) { return (c.S.d.more && c.S.d.more.n || 0) >= 4; },
+      teacher: function () { return '<p>Practice never runs out. Everyone does at least four; the level moves with each answer.</p>'; } });
+    steps.push({ id: 'check', label: T.check,
+      render: function (card, c) { K.head(card, T.check, 'I can do it without help.', 'Up next: your notes.'); var b = LE.band(); ['C1', 'C2'].forEach(function (id, i) { var q = skillQ(SPEC.skills[i], b, 'chk', i); q.id = id; q.maxMiss = 2; LE.ask(card, q); }); },
+      canLeave: function () { return qdone('C1') && qdone('C2'); },
+      teacher: function () { return '<p>Two questions at the student’s level, two tries each.</p>'; } });
+    steps.push({ id: 'notes', label: T.notes,
+      render: function (card, c) {
+        card.appendChild(el('h2', null, 'Wrap-up and notes'));
+        var ul = el('ul'); (TU.summary || []).forEach(function (s) { var li = el('li'); li.innerHTML = VTK.inline(s); ul.appendChild(li); }); card.appendChild(el('h3', null, 'The big ideas')); card.appendChild(ul);
+        var ex = el('div', 'prose'); ex.innerHTML = '<p><b>My notes</b> is a study sheet the page writes from your own work: your predictions, the problem you watched, and the problems you solved. Print it or save it as a PDF to study from.</p><p>Your work is saved in this browser. You can close the page at any time and open it again on this device to pick up where you stopped.</p>'; card.appendChild(ex);
+        var row = el('div', 'row'), v = el('button', 'btn primary', 'View my notes'); v.type = 'button'; v.onclick = function () { LE.setViewNotes(true); LE.render(); window.scrollTo(0, 0); };
+        var pr = el('button', 'btn', 'Print or save as PDF'); pr.type = 'button'; pr.onclick = function () { LE.print(); };
+        var tx = el('button', 'btn', 'Download LaTeX (.tex)'); tx.type = 'button'; tx.onclick = function () { LE.downloadTex(); };
+        row.appendChild(v); row.appendChild(pr); row.appendChild(tx); card.appendChild(row);
+        card.appendChild(el('h3', null, 'Keep practicing')); card.appendChild(el('p', 'hint', 'The questions keep coming at your level, and each one goes into your notes. Stop whenever you are ready.'));
+        K.morePractice(card, c); if (window.MrD && MrD.profile) MrD.profile.record(K.profileRecord(c.S));
+      },
+      canLeave: function () { return true; },
+      teacher: function () { return '<p>No stamp and no report code. Scores are saved on this device (<code>MrD.profile.record</code>). A student can stop and resume on the same device.</p>'; } });
+    var notesDocTut = function (c) {
+      var S = c.S, secs = [], work = [];
+      secs.push({ title: 'My targets', blocks: [{ type: 'list', items: SPEC.targets }] });
+      secs.push({ title: 'My predictions', blocks: SPEC.predicts.map(function (p) { var s = LE.qs(p.id); return { type: 'box', label: p.title + ':', text: s && s.pick != null ? LK.plain(p.options[s.pick]) + (s.ok ? ' (right)' : ' (answer: ' + LK.plain(p.options[p.answer]) + ')') : '' }; }) });
+      secs.push({ title: 'The big ideas', blocks: [{ type: 'list', items: (TU.summary || []).map(LK.plain) }] });
+      TU.ido.frames.forEach(function (f) { if (f.workClear) work = []; (f.work || []).forEach(function (w) { work.push(LK.plain(w)); }); });
+      secs.push({ title: 'The problem I watched', blocks: [{ type: 'p', text: LK.plain(TU.ido.problem) }, { type: 'list', items: work }] });
+      var slip = TU.ido.frames.filter(function (f) { return f.slip; })[0]; if (slip) secs.push({ title: 'The common slip', blocks: [{ type: 'p', text: LK.plain(slip.say) }] });
+      var log = ((S.d.more && S.d.more.log) || []).map(function (x) { return { type: 'box', label: x.title + ':', text: x.p + ' → ' + x.a + '. ' + x.w }; });
+      secs.push({ title: 'Problems I solved', blocks: log.length ? log : [{ type: 'p', text: 'Your solved problems appear here.' }] });
+      return { title: SPEC.title, sections: secs };
+    };
+    var cfgTU = { id: ID, course: SPEC.course, version: 1, title: SPEC.title, subtitle: 'Online lesson · pictures first, then your turn · go at your own pace', identity: 'id', keypad: true, lock: true, selfPaced: true, tutorial: true, maxBand: 3,
+      steps: steps, notes: notesDocTut, concepts: SPEC.concepts, conceptTabs: null, gates: [] };
+    (window.LESSONS_REG = window.LESSONS_REG || {})[ID] = cfgTU;
+    return cfgTU;
+  }
+
   /* Self-paced lesson (SPEC.selfPaced): no clock, no trimming, no skipping, no end mark, no stamp or report code.
      Every tab is required, in order. Progress saves per device, so a student can stop and finish the next day.
      Warm-up is the spec's review items (3 at most). Explore is required and draws its own stations (opts.explore).

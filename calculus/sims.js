@@ -197,6 +197,110 @@ window.UNITS = [
           { label: "Teacher key PDF", href: "../keys/calc/4-3-rates-other-teacher.pdf" },
           { label: "Make-up notes PDF", href: "../keys/calc/4-3-rates-other-makeup.pdf" }
         ]
+      },
+      {
+        type: "lesson",
+        icon: "🎈",
+        title: "4.4 Part 1 · Related Rates: Set It Up",
+        href: "unit-4-contextual-applications/4-4-pt1-setup.html",
+        blurb: "Name what changes, write what you know and want, and link the changing quantities with one equation. A picture tutorial, a worked problem, then your turn. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["related rates", "setup", "picture tutorial", "self-paced", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-4-pt1-setup.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-4-pt1-setup-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-4-pt1-setup-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "🎈",
+        title: "4.4 Part 2 · Related Rates: Differentiate and Solve",
+        href: "unit-4-contextual-applications/4-4-pt2-differentiate.html",
+        blurb: "Differentiate the link in time, plug in last, and read the answer with its sign and units. Watch one worked, then solve your own. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["related rates", "chain rule in t", "picture tutorial", "self-paced", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-4-pt2-differentiate.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-4-pt2-differentiate-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-4-pt2-differentiate-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "🪜",
+        title: "4.5 Part 1 · Solving Related Rates: Ladders and Distances",
+        href: "unit-4-contextual-applications/4-5-pt1-triangles.html",
+        blurb: "Right triangles in motion: a sliding ladder and two cars leaving a corner. See it, watch it solved, then try it. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["ladder", "Pythagorean link", "picture tutorial", "self-paced", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-5-pt1-triangles.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-5-pt1-triangles-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-5-pt1-triangles-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "🔺",
+        title: "4.5 Part 2 · Solving Related Rates: Volumes, Cones and Shadows",
+        href: "unit-4-contextual-applications/4-5-pt2-volumes.html",
+        blurb: "Cones, cylinders and a shadow: use similar triangles to get down to one changing letter first. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["cones", "similar triangles", "picture tutorial", "self-paced", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-5-pt2-volumes.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-5-pt2-volumes-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-5-pt2-volumes-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "🔍",
+        title: "4.6 Part 1 · Local Linearity: Zoom In and Write the Line",
+        href: "unit-4-contextual-applications/4-6-pt1-local-linearity.html",
+        blurb: "Zoom in until a curve looks like its tangent line, then write that line from a point and a slope. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["local linearity", "tangent line", "picture tutorial", "self-paced", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-6-pt1-local-linearity.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-6-pt1-local-linearity-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-6-pt1-local-linearity-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "📏",
+        title: "4.6 Part 2 · Linearization: Estimate and Judge the Estimate",
+        href: "unit-4-contextual-applications/4-6-pt2-approximating.html",
+        blurb: "Use the tangent line to estimate a value, then decide from the bend whether the estimate is too big or too small. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["linearization", "over/under estimate", "picture tutorial", "self-paced", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-6-pt2-approximating.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-6-pt2-approximating-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-6-pt2-approximating-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "∞",
+        title: "4.7 Part 1 · L’Hôpital’s Rule: Spot 0/0 and Use It Once",
+        href: "unit-4-contextual-applications/4-7-pt1-lhopital-once.html",
+        blurb: "Plug in first, spot 0/0, then differentiate top and bottom once. The rule is built from slopes you can see. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["L’Hôpital", "indeterminate forms", "picture tutorial", "self-paced", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-7-pt1-lhopital-once.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-7-pt1-lhopital-once-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-7-pt1-lhopital-once-makeup.pdf" }
+        ]
+      },
+      {
+        type: "lesson",
+        icon: "∞",
+        title: "4.7 Part 2 · L’Hôpital’s Rule: Again, Infinity and When Not to Use It",
+        href: "unit-4-contextual-applications/4-7-pt2-lhopital-more.html",
+        blurb: "Use the rule twice, handle ∞/∞, and know when the rule does not apply. Go at your own pace; your work saves so you can finish tomorrow.",
+        tags: ["L’Hôpital", "∞/∞", "picture tutorial", "self-paced", "online notes + PDF"],
+        teacher: [
+          { label: "Teacher key (#key)", href: "unit-4-contextual-applications/4-7-pt2-lhopital-more.html#key" },
+          { label: "Teacher key PDF", href: "../keys/calc/4-7-pt2-lhopital-more-teacher.pdf" },
+          { label: "Make-up notes PDF", href: "../keys/calc/4-7-pt2-lhopital-more-makeup.pdf" }
+        ]
       }
     ]
   },
