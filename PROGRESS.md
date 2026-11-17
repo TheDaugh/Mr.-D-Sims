@@ -10,6 +10,8 @@ Linked from `physics/lessons/teacher.html` and `teacher/index.html`; documented 
 
 Checks run: `node tests/physics-board.e2e.js` all pass (new; 62 stencils, shelves, place, autosave, no errors, no outside requests); `BOARD=chem LESSON=zeff` and `LESSON=3.4` lesson-board tests 0 failures (shared bundle rebuilt); `node tests/smoke.js` 49 pages load clean (physics board added); `node tools/check-lessons.mjs --strict` 0 errors. Every stencil viewed in a screenshot of `#all`. Not run: the unit tests and the lock/template e2e (no lesson was touched).
 
+The physics and chemistry hub pages now show a "Physics board" / "Chem board" link in the top bar, between Review portal and Teacher page (`shared/hub.js` takes a `board: { label, href }` option; set in `physics/index.html` and `chemistry/index.html`). The hubs are the student view, so students can now reach both boards. Checked: smoke 49 pages clean, `labs-display.e2e.js` pass, links return 200.
+
 Not on `main`: branch `physics-whiteboard`. Netlify deploys when it merges. Direct URL after merge: `/physics/whiteboard/index.html`.
 
 ## 2026-11-16: Ramp-and-pulley sandbox, UbD slot 19 (branch `physics-ramp-pulley-sandbox`)
