@@ -1,0 +1,36 @@
+/* Visual tutorial (calculus/shared/vtut.js): a slide show of pictures, short text, a board and one question per frame. */
+.vt{margin:6px 0 10px}
+.vt-dots{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.vt-dot{font:700 .78rem var(--mono);width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;padding:0}
+.vt-dot.ok{border-color:var(--good);color:var(--good)}
+.vt-dot.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.vt-dot:disabled{opacity:.4;cursor:default}
+.vt-move{display:inline-block;font:700 .74rem var(--mono);letter-spacing:.06em;text-transform:uppercase;background:var(--accent);color:#fff;border-radius:999px;padding:3px 11px;margin:0 0 4px}
+.vt-head{margin:.2rem 0 .6rem!important;font-size:1.25rem}
+.vt-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.vt-grid{grid-template-columns:minmax(0,1fr)}}
+.vt-fig{min-width:0}
+.vt-fig .row{margin-top:8px}
+.vt-fig label{font-size:.92rem}
+.vt-read{margin:8px 0 0;font-size:1rem}
+.vt-guide{margin-top:8px}
+.vt-say{font-size:1.08rem;margin:0 0 10px;font-weight:500}
+.vt-side .q{margin-top:12px}
+.vt-side .q:first-child{border-top:0;padding-top:0}
+.vt-work{background:var(--stage);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:6px;padding:8px 14px;margin:8px 0}
+.vt-work-h{font:700 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.vt-line{padding:3px 0;font-size:1.08rem}
+.vt-line.new{background:color-mix(in srgb,var(--gold) 20%,transparent);border-radius:4px;padding-left:6px;margin-left:-6px}
+.vt-slip{border-left:5px solid var(--warn);padding-left:12px}
+.vt-nav{margin-top:14px}
+.vt-tbl{border-collapse:collapse;margin:8px 0;font-size:.95rem}
+.vt-tbl th,.vt-tbl td{border:1px solid var(--line);padding:3px 9px;text-align:center}
+.vt-tbl tr.on td,.vt-tbl tr.on th{background:color-mix(in srgb,var(--gold) 25%,transparent);font-weight:700}
+.vt-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:6px 0}
+.vt-card{border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface);text-align:center;font-size:.92rem}
+.vt-card.hi{border:2px solid var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--surface))}
+.vt-card svg{width:100%;max-height:70px}
+.vt-moves{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px;padding:0;list-style:none;counter-reset:mv}
+.vt-moves li{counter-increment:mv;font:600 .85rem var(--body);border:1px solid var(--line);border-radius:999px;padding:3px 12px 3px 8px;background:var(--stage)}
+.vt-moves li::before{content:counter(mv);display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;background:var(--accent);color:#fff;font:700 .75rem var(--mono);margin-right:6px}
+.vt-problem{border:1px solid var(--line);border-left:5px solid var(--gold);background:var(--stage);border-radius:6px;padding:8px 14px;margin:6px 0 10px;font-weight:600}

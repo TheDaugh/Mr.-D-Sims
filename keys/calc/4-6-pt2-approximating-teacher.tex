@@ -1,0 +1,78 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 4.6 Part 2 $\cdot$ Linearization: Estimate and Judge the Estimate}\fancyhead[R]{\small Teacher key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{4.6 Part 2 $\cdot$ Linearization: Estimate and Judge the Estimate --- teacher key}
+\textbf{Question:} How do I use the tangent line to estimate, and how do I know if the estimate is too big or too small?\par
+\subsection*{Self-paced lesson}No clock, no trimming, no skipping, no end mark, no stamp. Every tab is required in order; progress saves on the device so a student can stop and finish the next day.\par
+\subsection*{Warm-up review (3 easy items)}\begin{itemize}
+\item The tangent line to $f$ at $a=4$ is $L(x)=2+\tfrac14(x-4)$. $L(4.4)$ is... \A{2.1.} $2+\tfrac14(0.4)=2.1$.
+\item If $f''(x)>0$ on an interval, the graph there is... \A{concave up (bends upward).} A positive second derivative means the slope is increasing, so the curve bends up.
+\item The slope $f'(a)$ in the linearization is... \A{a number.} It is $f'$ evaluated at $a$, so one number.
+\end{itemize}
+\subsection*{Independent lesson}No huddle, no teacher talk, no codes. Students read a short picture tutorial (Concept), watch worked problems move by move (I do), then solve generated problems (You do). Add \texttt{\#key} to the lesson address to open every tab with answers marked.\par
+\subsection*{Targets}\begin{itemize}\item I can estimate f(x) near a using L(x).
+\item I can say whether the estimate is too big or too small, using concavity.
+\item I can use a rate from a story to estimate a nearby value.\end{itemize}
+\subsection*{Predictions}\begin{itemize}
+\item The curve $y=x^2$ bends upward. A tangent line to it touches at one point. Everywhere else the curve is... \A{above the tangent line.} A curve that bends upward lies above its tangent lines, so the tangent-line estimate is too small.
+\item The tangent line to $y=\sqrt{x}$ at $x=4$ is used to estimate $\sqrt{4.4}$. The estimate will be... \A{a little too big.} $\sqrt{x}$ bends downward, so its tangent lines lie above it.
+\end{itemize}
+\section*{Tutorial script, with every question and answer}
+\subsection*{Concept tutorial (7 pictures)}
+\textit{I can say whether a tangent-line estimate is too big or too small, from the shape of the curve.}\par
+\begin{enumerate}
+\item \textbf{Use the line as an estimate.} The red line is $L(x)=4+4(x-2)$. To estimate $f(2.1)$, put $x=2.1$ into the line. \textit{(Picture: approx. The curve is $y=x^2$. The red tangent line touches it at $x=2$. Slide $x$ and read $L(x)$ and $f(x)$ in the readout.)}\\ \textit{Question:} Find $L(2.1)=4+4(2.1-2)$. \A{Answer: 4.4.} $4+0.4=4.4$. The true $f(2.1)=4.41$.
+\item \textbf{The line is below the curve.} For $x^2$ the red line is below the blue curve. A line below the curve gives an estimate that is too small. \textit{(Picture: approx. The orange segment shows the gap at the chosen $x$. The readout says which one is on top.)}\\ \textit{Question:} For $x^2$ the tangent-line estimate is... \A{Answer: too small.} The line is below the curve, so $L(x)<f(x)$.
+\item \textbf{Sometimes the line is above.} For $\sqrt{x}$ the red line is above the blue curve. That makes the estimate too big. \textit{(Picture: approx. The curve is $\sqrt{x}$ and the tangent line is at $x=4$.)}\\ \textit{Question:} For $\sqrt{x}$ the tangent-line estimate is... \A{Answer: too big.} The line is above the curve, so $L(x)>f(x)$.
+\item \textbf{Why? The bend of the curve.} A curve that bends UP ($f''>0$) climbs away from its tangent line, so it ends above it. The estimate is too small. \textit{(Picture: approx. The curve $x^2$ bends up (concave up). Its slope keeps increasing.)}\\ \textit{Question:} If $f''>0$ near $a$ (concave up), the tangent-line estimate is... \A{Answer: too small.} The curve lies above its tangent line, so the line estimates too small.
+\item \textbf{Bending down.} A curve that bends DOWN ($f''<0$) falls away from its tangent line, so it ends below it. The estimate is too big. \textit{(Picture: approx. The curve $\sqrt{x}$ bends down (concave down). Its slope keeps decreasing.)}\\ \textit{Question:} If $f''<0$ near $a$ (concave down), the tangent-line estimate is... \A{Answer: too big.} The curve lies below its tangent line, so the line estimates too big.
+\item \textbf{Closer is better.} Whichever way the curve bends, the gap is smaller when $x$ is closer to $a$. \textit{(Picture: approx. Slide $x$ toward 4 and watch the orange gap shrink.)}\\ \textit{Question:} Which estimate of $\sqrt{x}$ from the tangent line at $x=4$ is better? \A{Answer: the one at $x=4.1$.} 4.1 is closer to 4 than 7 is.
+\item \textbf{A story with a rate.} The rate says 4 $^\circ$F per hour, so half an hour later it is about $70+4(0.5)=72$ $^\circ$F. \textit{(Picture: approx. The curve is the temperature $T(t)$ in $^\circ$F against the hour $t$. The red line is the tangent line at $t=3$, where $T(3)=70$ and $T'(3)=4$ $^\circ$F per hour.)}\\ \textit{Question:} $T(3)=70$ $^\circ$F and $T'(3)=4$ $^\circ$F/hr. Estimate $T(3.5)$. \A{Answer: 72 $^\circ$F.} $70+2=72$ $^\circ$F. The curve bends down, so the true value is a little less.
+\end{enumerate}
+\subsection*{I do: the five moves}\begin{enumerate}\item Write L(x)
+\item Put in x to estimate
+\item Judge: over or under
+\item Say it with units\end{enumerate}
+\subsection*{I do (6 steps)}
+\textit{I can watch an estimate made and judged on two problems and spot the common slip.}\par
+\begin{enumerate}
+\item \textbf{Write the line.} \textit{Move 1 $\cdot$ Write L(x).} We found it in Part 1: $f(4)=2$ and $f'(4)=\tfrac14$. \textit{(Picture: approx. The tangent line to $\sqrt{x}$ at $x=4$.)}\\ $L(x)=2+\tfrac14(x-4)$\\ \textit{Question:} Why is the point $a=4$ a good choice for estimating $\sqrt{4.4}$? \A{Answer: 4 is close to 4.4 and $\sqrt4$ is easy..} We want $a$ near our $x$, with an easy $f(a)$ and $f'(a)$.
+\item \textbf{Put in x.} \textit{Move 2 $\cdot$ Put in x to estimate.} Put $x=4.4$ into $L$. Then $4.4-4=0.4$. \textit{(Picture: approx. The orange gap at $x=4.4$ is tiny. Read the two values in the readout.)}\\ $L(4.4)=2+\tfrac14(0.4)=2.1$\\ \textit{Question:} Find $L(4.4)$. \A{Answer: 2.1.} $2+0.1=2.1$.
+\item \textbf{Judge the estimate.} \textit{Move 3 $\cdot$ Judge: over or under.} $f(x)=\sqrt{x}$ bends down, so $f''<0$. The tangent line is above the curve, so 2.1 is too big. \textit{(Picture: approx. The red line is above the blue curve, as the readout says.)}\\ $f''<0$: concave down\\ So $L(4.4)=2.1$ is too big\\ \textit{Question:} Because $f''<0$ (concave down), the estimate is... \A{Answer: too big.} A curve that bends down lies below its tangent line.
+\item \textbf{Say it.} \textit{Move 4 $\cdot$ Say it with units.} Check: the true $\sqrt{4.4}\approx2.0976$ is a bit smaller than 2.1. That agrees with "too big". \textit{(Picture: approx. The true value is $\sqrt{4.4}\approx2.0976$.)}\\ $\sqrt{4.4}\approx2.1$ (a little too big)\\ \textit{Question:} The true value is 2.0976 and the estimate is 2.1. The estimate is... \A{Answer: a bit too big.} 2.1 is slightly bigger than 2.0976.
+\item \textbf{Problem 2: a temperature.} \textit{Moves 1 to 3 $\cdot$ Estimate and judge.} \textbf{Problem:} At 3 pm the temperature is 70 $^\circ$F and rising 4 $^\circ$F per hour. The temperature curve bends down. Estimate the temperature at 3:30 pm, and say if the estimate is too big or too small. Half an hour is $0.5$ hr, so the estimate is $70+4(0.5)=72$ $^\circ$F. The curve bends down, so 72 is too big. \textit{(Picture: approx. Temperature $T(t)$ in $^\circ$F against hours. The red line is the tangent line at $t=3$.)}\\ $T(3.5)\approx70+4(0.5)=72$ $^\circ$F\\ Concave down: too big\\ \textit{Question:} The temperature curve bends down. The estimate of 72 $^\circ$F is... \A{Answer: too big.} Bending down means the curve is below its tangent line.
+\item \textbf{The common slip.} Slip: saying "the temperature is rising, so the estimate is too small." Rising is the slope. Too big or small depends on the bend, $f''$. \textit{(Picture: approx. The temperature is RISING (positive slope) but the curve is bending DOWN (negative $f''$).)}\\ Wrong: rising so too small\\ Right: bends down so too big\\ \textit{Common slip.}\\ \textit{Question:} What decides "too big or too small"? \A{Answer: whether the curve bends up or down ($f''$).} The slope is already in the line. The bend decides which side the curve is on.
+\end{enumerate}
+\subsection*{Big ideas}\begin{itemize}\item To estimate, write $L(x)=f(a)+f'(a)(x-a)$ and put in the nearby $x$.
+\item Concave up ($f''>0$): the line is below the curve, so the estimate is too small.
+\item Concave down ($f''<0$): the line is above the curve, so the estimate is too big.
+\item The closer $x$ is to $a$, the better the estimate.\end{itemize}
+\section*{Every level, with answers}
+\subsection*{Estimate with L(x)}
+\noindent\textbf{Level 1.} Use the tangent line to $f(x)=x^2$ at $a=3$ to estimate $f(3.2)$. You are given $f(3)=9$ and $f'(3)=6$. Give it to 2 decimal places.\\ \A{Answer: 10.2} \quad $L(3.2)=9+(6)(0.2)\approx10.2$.\par\medskip
+\noindent\textbf{Level 2.} Use the tangent line to $f(x)=\sqrt{x}$ at $a=4$ to estimate $f(4.8)$. You are given $f(4)=2$ and $f'(4)=\tfrac{1}{4}$. Give it to 2 decimal places.\\ \A{Answer: 2.2} \quad $L(4.8)=2+(\tfrac{1}{4})(0.8)\approx2.2$.\par\medskip
+\noindent\textbf{Level 3.} Use the tangent line to $f(x)=e^x$ at $a=0$ to estimate $f(0.1)$. You are given $f(0)=1$ and $f'(0)=1$. Give it to 2 decimal places.\\ \A{Answer: 1.1} \quad $L(0.1)=1+(1)(0.1)\approx1.1$.\par\medskip
+\subsection*{Too big or too small?}
+\noindent\textbf{Level 1.} Near $a$, the graph of $f$ bends upward (concave up). The tangent-line estimate is...\\ \A{(A) too small (an underestimate)} \quad (B) impossible to tell \quad (C) exactly right \quad (D) too big (an overestimate)\\ \A{Answer: A} \quad Bending up puts the curve above its tangent line. So the estimate is too small (an underestimate).\par\medskip
+\noindent\textbf{Level 2.} Near $a$, $f''(a)=6$. The tangent-line estimate is...\\ (A) too big (an overestimate) \quad (B) exactly right \quad \A{(C) too small (an underestimate)} \quad (D) impossible to tell\\ \A{Answer: C} \quad $f''>0$ means the curve bends up, above its tangent line. So the estimate is too small (an underestimate).\par\medskip
+\noindent\textbf{Level 3.} Use the tangent line to $f(x)=\sqrt[3]{x}$ at $a=8$ to estimate a value near $a$.  Is the estimate...\\ (A) too small (an underestimate) \quad (B) impossible to tell \quad (C) exactly right \quad \A{(D) too big (an overestimate)}\\ \A{Answer: D} \quad $f''(x)=-\tfrac29x^{-5/3}$ is negative, so the curve bends down. So the estimate is too big (an overestimate).\par\medskip
+\subsection*{Estimate from a story}
+\noindent\textbf{Level 1.} A plant is 45 cm tall at day 5 and growing 7 cm per day. Use the tangent line to estimate its height 3 days later. Give it to 2 decimal places if needed.\\ \A{Answer: 66 cm} \quad $L=45+(7)(3)=66$ cm.\par\medskip
+\noindent\textbf{Level 2.} A pond's water level is 90 ft and is falling at 8 ft per day. Use the tangent line to estimate the level 0.5 days later. Give it to 2 decimal places if needed.\\ \A{Answer: 86 ft} \quad $L=90+(-8)(0.5)=86$ ft.\par\medskip
+\noindent\textbf{Level 3.} A car is 21 miles from home and approaching at 7 miles per minute. Use the tangent line to estimate its distance 0.5 minutes from now. Give it to 2 decimal places if needed.\\ \A{Answer: 17.5 miles} \quad $L=21+(-7)(0.5)=17.5$ miles.\par\medskip
+\subsection*{Which estimate is better?}
+\noindent\textbf{Level 1.} The tangent line at $a=5$ is used to estimate $f(5.2)$ and $f(5.8)$. Which estimate is expected to be better?\\ (A) both are equally good \quad \A{(B) $x=5.2$} \quad (C) $x=5.8$ \quad (D) neither is useful\\ \A{Answer: B} \quad Distances from $a=5$: $0.2$ and $0.8$. The smaller distance, $x=5.2$, gives the better estimate.\par\medskip
+\noindent\textbf{Level 2.} The tangent line at $a=2$ is used to estimate $f(1.7)$ and $f(2.9)$. Which estimate is expected to be better?\\ (A) both are equally good \quad (B) neither is useful \quad (C) $x=2.9$ \quad \A{(D) $x=1.7$}\\ \A{Answer: D} \quad Distances from $a=2$: $0.3$ and $0.9$. The smaller distance, $x=1.7$, gives the better estimate.\par\medskip
+\noindent\textbf{Level 3.} The tangent line at $a=9$ is used to estimate $f(9.2)$ and $f(8.6)$. Which estimate is expected to be better?\\ (A) $x=8.6$ \quad (B) neither is useful \quad \A{(C) $x=9.2$} \quad (D) both are equally good\\ \A{Answer: C} \quad Distances from $a=9$: $0.2$ and $0.4$. The smaller distance, $x=9.2$, gives the better estimate.\par\medskip
+\section*{Common misconceptions}\begin{tabularx}{\textwidth}{@{}X X@{}}\toprule Students say & Say instead\\\midrule
+The curve is rising, so the estimate is too small. & Rising is the slope. Too big or too small depends on the bend (f?).\\
+Concave down means the estimate is too small. & Concave down puts the curve below the line, so the estimate is too big.\\
+The tangent line gives the exact value. & Only at x = a. Everywhere else it is an estimate.\\
+A bigger x gives a worse estimate. & Distance from a matters, not the size of x.\\
+Use x instead of (x -- a) in the estimate. & The step from a is (x -- a).\\
+\bottomrule\end{tabularx}
+\end{document}

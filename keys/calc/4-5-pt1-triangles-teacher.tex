@@ -1,0 +1,80 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 4.5 Part 1 $\cdot$ Solving Related Rates: Ladders and Distances}\fancyhead[R]{\small Teacher key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{4.5 Part 1 $\cdot$ Solving Related Rates: Ladders and Distances --- teacher key}
+\textbf{Question:} How do I solve a related-rates problem when the link is a right triangle?\par
+\subsection*{Self-paced lesson}No clock, no trimming, no skipping, no end mark, no stamp. Every tab is required in order; progress saves on the device so a student can stop and finish the next day.\par
+\subsection*{Warm-up review (3 easy items)}\begin{itemize}
+\item In $x^2+y^2=13^2$, if $x=5$ then $y=$... \A{12.} $y^2=169-25=144$, so $y=12$.
+\item $\dfrac{d}{dt}(x^2)$ equals... \A{$2x\dfrac{dx}{dt}$.} Power rule, then the chain factor.
+\item A car is driving toward an intersection. Its distance to the intersection has a rate that is... \A{negative.} The distance is getting smaller, so its rate is negative.
+\end{itemize}
+\subsection*{Independent lesson}No huddle, no teacher talk, no codes. Students read a short picture tutorial (Concept), watch worked problems move by move (I do), then solve generated problems (You do). Add \texttt{\#key} to the lesson address to open every tab with answers marked.\par
+\subsection*{Targets}\begin{itemize}\item I can find the missing side of the triangle at the moment.
+\item I can solve a ladder problem for the wanted rate.
+\item I can solve a two-moving-objects distance problem, with the sign of each rate.\end{itemize}
+\subsection*{Predictions}\begin{itemize}
+\item A ladder's foot is pulled away from a wall at a steady speed. The top of the ladder slides down... \A{slowly at first, then faster and faster.} When the foot is close to the wall, the ladder is almost straight up, so the top barely moves. Near the end it drops fast.
+\item One car drives east at 30 mph and another drives north at 40 mph from the same corner. The distance between them grows at... \A{50 mph.} The distance is the long side of a triangle, so it grows slower than $30+40=70$. The tutorial shows it is 50 mph.
+\end{itemize}
+\section*{Tutorial script, with every question and answer}
+\subsection*{Concept tutorial (7 pictures)}
+\textit{I can say how the sides of a changing right triangle depend on each other.}\par
+\begin{enumerate}
+\item \textbf{The sides trade off.} As the foot slides out, the top comes down. The ladder length stays 5 ft. \textit{(Picture: ladder. A 5 ft ladder. $x$ is the foot, $y$ is the top. Slide $x$ and watch $y$. The ladder length never changes.)}\\ \textit{Question:} The foot is $x=4$ ft from the wall on the 5 ft ladder. How high is the top? \A{Answer: 3 ft.} $y^2=25-16=9$, so $y=3$ ft.
+\item \textbf{The top barely moves at first.} When $x$ is small, a 1 ft move of the foot drops the top only a little. Near the end the same move drops it far. \textit{(Picture: ladder. Slide $x$ from 1 to 4 and compare how far $y$ drops for each 1 ft of $x$.)}\\ \textit{Question:} With the foot moving at a steady speed, the top falls... \A{Answer: slowly at first and faster later.} For $x$ from 1 to 2, $y$ drops 0.1. From 3 to 4, $y$ drops 1.
+\item \textbf{The rates are tied by the link.} Differentiate $x^2+y^2=25$ in time: $2x\dfrac{dx}{dt}+2y\dfrac{dy}{dt}=0$. So $\dfrac{dy}{dt}=-\dfrac{x}{y}\dfrac{dx}{dt}$. \textit{(Picture: ladder. Foot $x=3$, top $y=4$. Red arrows: the foot goes out, the top goes down.)}\\ \textit{Question:} Why does $\dfrac{dy}{dt}$ come out negative when $\dfrac{dx}{dt}$ is positive? \A{Answer: The foot goes out while the top comes down..} The minus sign says $y$ shrinks while $x$ grows.
+\item \textbf{Which side is bigger changes the speed.} The ratio $\dfrac{x}{y}$ is the speed ratio. Here $\dfrac43$ means the top falls faster than the foot moves. \textit{(Picture: ladder. Now the foot is $x=4$ and the top is $y=3$.)}\\ \textit{Question:} At $x=4$, $y=3$ with $\dfrac{dx}{dt}=3$ ft/s, find $\dfrac{dy}{dt}=-\dfrac{x}{y}\dfrac{dx}{dt}$. \A{Answer: -4 ft/s.} $-\dfrac43\times3=-4$ ft/s.
+\item \textbf{Two cars from one corner.} The two roads meet at a right angle, so $x$, $y$ and $z$ form a right triangle. \textit{(Picture: cars. The blue car goes east. The orange car goes north. The dashed red line $z$ is the distance between them. Slide the time.)}\\ \textit{Question:} Which equation links $x$, $y$ and $z$? \A{Answer: $x^2+y^2=z^2$.} $z$ is the long side of the triangle.
+\item \textbf{Both rates add in.} Differentiating gives $2x\dfrac{dx}{dt}+2y\dfrac{dy}{dt}=2z\dfrac{dz}{dt}$. So $\dfrac{dz}{dt}=\dfrac{x\dfrac{dx}{dt}+y\dfrac{dy}{dt}}{z}$. \textit{(Picture: cars. Arrows show both cars moving away from the corner.)}\\ \textit{Question:} At $x=30$, $y=40$, $z=50$ with $\dfrac{dx}{dt}=30$ and $\dfrac{dy}{dt}=40$ mph, find $\dfrac{dz}{dt}$. \A{Answer: 50 mph.} $(900+1600)/50=50$ mph.
+\item \textbf{Toward is negative.} If a car drives toward the corner, its distance $x$ shrinks, so $\dfrac{dx}{dt}$ is negative. \textit{(Picture: cars. Imagine the blue car turning around and driving back toward the corner.)}\\ \textit{Question:} A car is 30 mi east of the corner and drives toward it at 20 mph. What is $\dfrac{dx}{dt}$? \A{Answer: $-20$ mph.} Toward means $x$ shrinks, so the rate is $-20$. The 30 is where the car is, not a rate.
+\end{enumerate}
+\subsection*{I do: the five moves}\begin{enumerate}\item Draw and name
+\item List what you know and want
+\item Link with one equation
+\item Differentiate in t
+\item Plug in last\end{enumerate}
+\subsection*{I do (7 steps)}
+\textit{I can watch a ladder and a two-car problem solved in five moves and spot the common slip.}\par
+\begin{enumerate}
+\item \textbf{Name and list.} \textit{Moves 1 and 2 $\cdot$ Name and list.} The top is falling, so $\dfrac{dy}{dt}$ is negative. We want the foot's rate $\dfrac{dx}{dt}$. \textit{(Picture: ladder. A 10 ft ladder. $x$ is the foot, $y$ is the top.)}\\ Given: $\dfrac{dy}{dt}=-1.5$ ft/s\\ Want: $\dfrac{dx}{dt}$ when $y=6$ ft\\ \textit{Question:} The top slides DOWN at 1.5 ft/s. How is that written? \A{Answer: $\dfrac{dy}{dt}=-1.5$.} Down means $y$ shrinks, so the rate is negative.
+\item \textbf{Link and differentiate.} \textit{Moves 3 and 4 $\cdot$ Link and differentiate.} The link is the right triangle. The 10 is fixed, so its rate is 0. \textit{(Picture: ladder. The red arrows show the foot moving out and the top moving down.)}\\ Link: $x^2+y^2=10^2$\\ $2x\dfrac{dx}{dt}+2y\dfrac{dy}{dt}=0$\\ \textit{Question:} Which line is the derivative in time? \A{Answer: $2x\dfrac{dx}{dt}+2y\dfrac{dy}{dt}=0$.} Each square brings a 2 and its own rate. The 10 is fixed, so the right side is 0.
+\item \textbf{Find the missing side.} \textit{Move 5 $\cdot$ Plug in last.} We need $x$ at this moment. Put $y=6$ in the link: $x^2+36=100$. \textit{(Picture: ladder. The moment: the top is 6 ft up. The foot distance is missing.)}\\ At $y=6$: $x^2=100-36=64$, so $x=8$\\ \textit{Question:} When $y=6$ on the 10 ft ladder, find $x$. \A{Answer: 8 ft.} $x^2=100-36=64$, so $x=8$ ft.
+\item \textbf{Plug in and solve.} \textit{Move 5 $\cdot$ Plug in last.} Put in $x=8$, $y=6$ and $\dfrac{dy}{dt}=-1.5$. Solve for $\dfrac{dx}{dt}$. \textit{(Picture: ladder. All the moment's numbers are in.)}\\ $2(8)\dfrac{dx}{dt}+2(6)(-1.5)=0$\\ $16\dfrac{dx}{dt}=18$\\ $\dfrac{dx}{dt}=1.125$ ft/s\\ \textit{Question:} Solve $16\dfrac{dx}{dt}-18=0$ for $\dfrac{dx}{dt}$. \A{Answer: 1.125 ft/s.} $16\dfrac{dx}{dt}=18$, so $\dfrac{dx}{dt}=1.125$ ft/s. Positive: the foot is moving out.
+\item \textbf{Problem 2: two cars.} \textit{Moves 1 to 3 $\cdot$ Name, list, link.} \textbf{Problem:} One car drives east at 30 mph and another drives north at 40 mph from the same corner. How fast is the distance between them growing after 2 hours? Both cars move away from the corner. We want $\dfrac{dz}{dt}$. \textit{(Picture: cars. Two cars leave a corner: blue east, orange north. $z$ is the distance between them.)}\\ Given: $\dfrac{dx}{dt}=30$, $\dfrac{dy}{dt}=40$ mph\\ Want: $\dfrac{dz}{dt}$ at $t=2$ h\\ Link: $x^2+y^2=z^2$\\ \textit{Question:} After 2 hours, how far from the corner is each car? \A{Answer: $x=60$ mi, $y=80$ mi.} Distance is speed times time: $30\times2=60$ and $40\times2=80$.
+\item \textbf{Find z, then differentiate.} \textit{Moves 4 and 5.} First find $z$: $60^2+80^2=z^2$. Then differentiate: $x\dfrac{dx}{dt}+y\dfrac{dy}{dt}=z\dfrac{dz}{dt}$. \textit{(Picture: cars. At $t=2$: $x=60$, $y=80$ and $z$ is the long side.)}\\ $z^2=3600+6400=10000$, so $z=100$\\ $60(30)+80(40)=100\dfrac{dz}{dt}$\\ $\dfrac{dz}{dt}=\dfrac{5000}{100}=50$ mph\\ \textit{Question:} Find $z$ when $x=60$ and $y=80$. \A{Answer: 100 mi.} $z^2=10000$, so $z=100$ mi.
+\item \textbf{The common slip.} Slip: finding $z$ by adding, $z=60+80=140$. The straight line is the long side of a triangle, so use $x^2+y^2=z^2$. \textit{(Picture: cars. The red dashed line is shorter than the two roads added: $60+80=140$ is not 100.)}\\ Wrong: $z=60+80=140$\\ Right: $z=\sqrt{60^2+80^2}=100$\\ \textit{Common slip.}\\ \textit{Question:} Which line should we use to find $z$? \A{Answer: $z=\sqrt{x^2+y^2}$.} $z$ is the long side, so take the square root of the sum of squares.
+\end{enumerate}
+\subsection*{Big ideas}\begin{itemize}\item The triangle link is $x^2+y^2=z^2$. Differentiating gives $2x\,x'+2y\,y'=2z\,z'$.
+\item Find the third side from the link before plugging in the rates.
+\item Toward means a negative rate. Away means a positive rate.
+\item Ladders: the foot and top rates have opposite signs.\end{itemize}
+\section*{Every level, with answers}
+\subsection*{Find the missing side}
+\noindent\textbf{Level 1.} A 17 ft ladder leans on a wall. The foot is 8 ft from the wall. How high is the top?\\ \A{Answer: 15 ft} \quad $y^2=17^2-8^2=225$, so $y=15$ ft.\par\medskip
+\noindent\textbf{Level 2.} Two cars leave a corner, one east and one north. They are now 6 miles and 8 miles from the corner. How far apart are they?\\ \A{Answer: 10 mi} \quad $z^2=6^2+8^2=100$, so $z=10$ mi.\par\medskip
+\noindent\textbf{Level 3.} A 25 ft ladder leans on a wall. The foot is 7 ft from the wall. How high is the top?\\ \A{Answer: 24 ft} \quad $y^2=25^2-7^2=576$, so $y=24$ ft.\par\medskip
+\subsection*{Solve a ladder problem}
+\noindent\textbf{Level 1.} A 17 ft ladder slides away from a wall. The foot moves out at 2 ft/s. How fast is the top falling when the foot is 8 ft from the wall and the top is 15 ft up? Give $\dfrac{dy}{dt}$ to 2 decimal places.\\ \A{Answer: -1.07 ft/s} \quad $32+30\dfrac{dy}{dt}=0$, so $\dfrac{dy}{dt}=-32/30=-1.07$ ft/s.\par\medskip
+\noindent\textbf{Level 2.} A 10 ft ladder leans on a wall. The top slides down at 4 ft/s. How fast is the foot moving out when the top is 8 ft up and the foot is 6 ft from the wall? Give $\dfrac{dx}{dt}$ to 2 decimal places.\\ \A{Answer: 5.33 ft/s} \quad $12\dfrac{dx}{dt}-64=0$, so $\dfrac{dx}{dt}=5.33$ ft/s. Positive: the foot is moving out.\par\medskip
+\noindent\textbf{Level 3.} A 10 ft ladder slides away from a wall. The foot moves out at 3 ft/s. How fast is the top falling when the foot is 7 ft from the wall? Give $\dfrac{dy}{dt}$ to 2 decimal places.\\ \A{Answer: -2.94 ft/s} \quad $y=\sqrt{51}\approx7.14$. Then $\dfrac{dy}{dt}=-\dfrac{x}{y}\dfrac{dx}{dt}=-\dfrac{7}{7.14}(3)=-2.94$ ft/s.\par\medskip
+\subsection*{Solve a distance problem}
+\noindent\textbf{Level 1.} Two cars leave a corner, one east at 40 mph and one north at 40 mph. How fast is the distance between them growing after 3 hours? Give it to 2 decimal places.\\ \A{Answer: 56.57 mph} \quad $x=120$, $y=120$, $z=169.71$. $\dfrac{dz}{dt}=\dfrac{120(40)+120(40)}{169.71}=56.57$ mph.\par\medskip
+\noindent\textbf{Level 2.} A car is 3 miles east of a corner and drives toward it at 60 mph. A second car is 4 miles north of the corner and drives away from it at 54 mph. How fast is the distance between them changing? Give $\dfrac{dz}{dt}$ to 2 decimal places.\\ \A{Answer: 7.2 mph} \quad $5\dfrac{dz}{dt}=3(-60)+4(54)$, so $\dfrac{dz}{dt}=7.2$ mph (the cars are getting farther apart).\par\medskip
+\noindent\textbf{Level 3.} A plane flies level 8 miles up at 200 mph, moving away from a station. When it is 6 miles along the ground, how fast is its distance $s$ from the station growing? Give it to 2 decimal places.\\ \A{Answer: 120 mph} \quad $12(200)=20\dfrac{ds}{dt}$, so $\dfrac{ds}{dt}=120$ mph. It is less than the plane's speed because part of the motion is not along the line to the station.\par\medskip
+\subsection*{Toward or away}
+\noindent\textbf{Level 1.} A car is driving toward an intersection at 5 mph. Its distance $x$ from the intersection changes at...\\ \A{(A) $\dfrac{dx}{dt}=-5$} \quad (B) $\dfrac{dx}{dt}=5$ \quad (C) $x=5$ \quad (D) $x=-5$\\ \A{Answer: A} \quad The distance $x$ shrinks, so its rate is negative: $\dfrac{dx}{dt}=-5$.\par\medskip
+\noindent\textbf{Level 2.} The foot of a ladder is pulled away from a wall at 2 ft/s. Its distance $x$ from the wall changes at...\\ (A) $\dfrac{dx}{dt}=-2$ \quad (B) $x=2$ \quad \A{(C) $\dfrac{dx}{dt}=2$} \quad (D) $x=-2$\\ \A{Answer: C} \quad The distance $x$ grows, so its rate is positive: $\dfrac{dx}{dt}=2$.\par\medskip
+\noindent\textbf{Level 3.} Two ships sail toward each other. The distance $z$ between them shrinks by 9 km each hour. It changes at...\\ (A) $z=9$ \quad (B) $\dfrac{dz}{dt}=9$ \quad \A{(C) $\dfrac{dz}{dt}=-9$} \quad (D) $z=-9$\\ \A{Answer: C} \quad The distance $z$ shrinks, so its rate is negative: $\dfrac{dz}{dt}=-9$.\par\medskip
+\section*{Common misconceptions}\begin{tabularx}{\textwidth}{@{}X X@{}}\toprule Students say & Say instead\\\midrule
+z = x + y (adding the two legs). & The straight line is the long side: z = $\surd$(x\textsuperscript{2} + y\textsuperscript{2}).\\
+Use x = 5 in the link equation before differentiating. & Differentiate first. Then put in 5.\\
+The top of the ladder falls at the same speed the foot moves out. & The speeds are tied by x/y. They are equal only when x = y.\\
+A car driving toward the corner has a positive rate. & Toward means the distance shrinks, so the rate is negative.\\
+Forgetting to find the missing side before plugging in. & Get the third side from x\textsuperscript{2} + y\textsuperscript{2} = z\textsuperscript{2} first.\\
+\bottomrule\end{tabularx}
+\end{document}

@@ -1,0 +1,71 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.85in]{geometry}\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}\usepackage{amsmath,amssymb,enumitem,booktabs,array,xcolor,fancyhdr,tabularx}
+\setlist{itemsep=2pt,topsep=3pt}\pagestyle{fancy}\fancyhf{}\renewcommand{\headrulewidth}{0.3pt}
+\fancyhead[L]{\small 4.6 Part 1 $\cdot$ Local Linearity: Zoom In and Write the Line}\fancyhead[R]{\small Make-up key}\fancyfoot[C]{\small\thepage}
+\definecolor{ans}{RGB}{28,125,74}\newcommand{\A}[1]{\textcolor{ans}{\textbf{#1}}}
+\begin{document}
+
+\section*{4.6 Part 1 $\cdot$ Local Linearity: Zoom In and Write the Line}
+\textbf{You missed this lesson. Copy this into your notes. That is all you need to do.}\par\medskip
+\subsection*{Question of the day}
+Why does a smooth curve look like its tangent line up close, and how do I write that line?\par
+\subsection*{Targets}\begin{itemize}\item I can say what a smooth curve looks like when I zoom in on it.
+\item I can find the point and the slope of the tangent line at x = a.
+\item I can write the linearization L(x) = f(a) + f?(a)(x -- a).\end{itemize}
+\subsection*{Concepts}\begin{itemize}
+\item \textbf{Local linearity} (curve $\approx$ line): Zoom in on a smooth curve and it looks like a line. That line is the tangent line.
+\item \textbf{The tangent line} (L(x) = f(a) + f?(a)(x -- a)): It passes through $(a, f(a))$. Its slope is $f'(a)$.
+\item \textbf{Near the point only} (x near a): The line is a good estimate close to $a$. It gets worse farther away.
+\end{itemize}
+\subsection*{What the class predicted, and what is true}\begin{itemize}
+\item You zoom in a great deal on the parabola $y=x^2$ near $x=1$. What does it look like? \A{almost a straight line.} A smooth curve is nearly straight on a tiny piece. The tutorial lets you zoom to see it.
+\item The tangent line to a curve at $x=4$ is used to estimate the curve's height at $x=4.1$ and at $x=9$. Which estimate is better? \A{the one at 4.1.} The tangent line follows the curve closely only near the point of tangency.
+\end{itemize}
+\section*{The tutorial, written out}
+\subsection*{Concept tutorial (7 pictures)}
+\textit{I can say what a smooth curve becomes when I zoom in, and why that line matters.}\par
+\begin{enumerate}
+\item \textbf{A curve and its tangent line.} Right now you can see the curve bending away from the red line. \textit{(Picture: zoom. The blue curve is $y=x^2$. The thick red line is its tangent line at the black dot. Use the slider to zoom in on the dot.)}\\ \textit{Check:} At this zoom, the curve and the red line... \A{are clearly different.}
+\item \textbf{Zoom in a little.} The window shrank to a small piece around the dot. The curve has straightened out a lot. \textit{(Picture: zoom. The window is now about 10 times smaller around the dot. The readout shows the gap at the edge in pixels.)}\\ \textit{Check:} As the window shrinks, the gap between curve and red line... \A{gets smaller.}
+\item \textbf{Zoom in a lot.} Zoomed in a lot, the curve and the tangent line look like one line. This is called local linearity. \textit{(Picture: zoom. The window is now very tiny. You may only see one blue-and-red line.)}\\ \textit{Check:} A smooth curve zoomed in very close looks like... \A{its tangent line.}
+\item \textbf{Other functions too.} It works for $\sqrt{x}$ and for any smooth curve. Each point has its own tangent line. \textit{(Picture: zoom. Now the curve is $\sqrt{x}$ near $x=4$. Slide the zoom up and down.)}\\ \textit{Check:} What does the tangent line share with the curve at the black dot? \A{the point and the slope.}
+\item \textbf{Write the line.} The tangent line at $x=a$ starts at height $f(a)$ and goes up with slope $f'(a)$. So $L(x)=f(a)+f'(a)(x-a)$. \textit{(Picture: approx. The curve is $\sqrt{x}$. The red line touches it at $x=4$. The black dot is the point $(4,2)$.)}\\ \textit{Check:} For $\sqrt{x}$ at $a=4$ we have $f(4)=2$ and $f'(4)=\tfrac14$. Which is $L(x)$? \A{$2+\tfrac14(x-4)$.}
+\item \textbf{It works near the point.} Near $x=4$ the line and the curve are almost the same height. \textit{(Picture: approx. Slide $x$. The orange segment is the gap between the line and the curve. The readout says which is above.)}\\ \textit{Check:} Close to $x=4$, the estimate $L(x)$ for $\sqrt{x}$ is... \A{very close to the true value.}
+\item \textbf{It gets worse far away.} Far from $x=4$ the line and the curve separate. The estimate gets worse. \textit{(Picture: approx. Same picture, but $x$ is now 8. The orange gap is bigger.)}\\ \textit{Check:} The farther $x$ is from 4, the estimate from the line is... \A{worse.}
+\end{enumerate}
+\subsection*{I do: the five moves}\begin{enumerate}\item Find the point
+\item Find the slope
+\item Build the line
+\item Use the line near the point\end{enumerate}
+\subsection*{I do (6 steps)}
+\textit{I can watch the tangent line written in three moves on two functions and spot the common slip.}\par
+\begin{enumerate}
+\item \textbf{Find the point.} \textit{Move 1 $\cdot$ Find the point.} The line touches the curve where $x=4$. Its height is $f(4)=\sqrt4$. \textit{(Picture: approx. The curve $\sqrt{x}$ with its tangent line at $x=4$. The black dot is the point.)}\\ $a=4$\\ $f(4)=\sqrt4=2$\\ \textit{Check:} What is $f(4)$ for $f(x)=\sqrt{x}$? \A{2.}
+\item \textbf{Find the slope.} \textit{Move 2 $\cdot$ Find the slope.} The slope is the derivative. Differentiate first, then put in $x=4$. \textit{(Picture: zoom. Zoomed in on $\sqrt{x}$ at $x=4$: the curve is almost the tangent line.)}\\ $f'(x)=\dfrac{1}{2\sqrt{x}}$\\ $f'(4)=\dfrac{1}{2\cdot2}=\dfrac14$\\ \textit{Check:} What is $f'(4)$? \A{$\dfrac14$.}
+\item \textbf{Build the line.} \textit{Move 3 $\cdot$ Build the line.} Start at the height 2 and add the slope times $(x-4)$. \textit{(Picture: approx. The red line is $L(x)$.)}\\ $L(x)=f(a)+f'(a)(x-a)$\\ $L(x)=2+\tfrac14(x-4)$\\ \textit{Check:} Which line is the tangent line? \A{$L(x)=2+\tfrac14(x-4)$.}
+\item \textbf{Use it near the point.} \textit{Move 4 $\cdot$ Use the line near the point.} At $x=4.2$: $L(4.2)=2+\tfrac14(0.2)=2.05$. The true $\sqrt{4.2}$ is about $2.0494$. \textit{(Picture: approx. Slide $x$ near 4 and read the two values in the readout.)}\\ $L(4.2)=2+\tfrac14(0.2)=2.05$\\ \textit{Check:} Find $L(4.2)=2+\tfrac14(4.2-4)$. \A{2.05.}
+\item \textbf{Problem 2: $x^2$ at $x=1$.} \textit{Moves 1 to 3 $\cdot$ Point, slope, line.} \textbf{Problem:} Write the linearization of $f(x)=x^2$ at $a=1$. Point: $f(1)=1$. Slope: $f'(x)=2x$, so $f'(1)=2$. \textit{(Picture: zoom. Zoomed in on $y=x^2$ at $x=1$.)}\\ $f(1)=1$\\ $f'(1)=2$\\ $L(x)=1+2(x-1)$\\ \textit{Check:} Which is $L(x)$ for $x^2$ at $a=1$? \A{$1+2(x-1)$.}
+\item \textbf{The common slip.} Slip: leaving the slope as $2x$, like $L(x)=1+2x(x-1)$. The slope must be a NUMBER: put $a$ into $f'$ first. \textit{(Picture: zoom. The red tangent line has slope 2 at the dot, not slope $2x$.)}\\ Wrong: $L(x)=1+2x(x-1)$\\ Right: $L(x)=1+2(x-1)$\\ \textit{Common slip.}\\ \textit{Check:} Why must the slope be a number? \A{A line has one slope. $f'(a)$ is a single number..}
+\end{enumerate}
+\subsection*{Big ideas}\begin{itemize}\item A smooth curve zoomed in very close looks like its tangent line (local linearity).
+\item The tangent line at $x=a$ is $L(x)=f(a)+f'(a)(x-a)$.
+\item Find $f(a)$ and $f'(a)$ as numbers first, then build the line.
+\item The line is a good estimate only near $a$.\end{itemize}
+\section*{One worked sample of each skill}
+\subsection*{Find the point f(a)}
+\noindent\textbf{Level 1.} For $f(x)=x^2$, find $f(3)$. Give it to 2 decimal places if needed.\\ \A{Answer: 9} \quad $f(3)=9$.\par\medskip
+\noindent\textbf{Level 2.} For $f(x)=\sqrt{x}$, find $f(1)$. Give it to 2 decimal places if needed.\\ \A{Answer: 1} \quad $f(1)=1$.\par\medskip
+\noindent\textbf{Level 3.} For $f(x)=e^{2x}$, find $f(0)$. Give it to 2 decimal places if needed.\\ \A{Answer: 1} \quad $f(0)=1$.\par\medskip
+\subsection*{Find the slope f?(a)}
+\noindent\textbf{Level 1.} For $f(x)=x^2$, find $f'(3)$. Give it to 2 decimal places if needed.\\ \A{Answer: 6} \quad Differentiate, then put in $x=3$: $f'(3)=6$.\par\medskip
+\noindent\textbf{Level 2.} For $f(x)=\sqrt{x}$, find $f'(1)$. Give it to 2 decimal places if needed.\\ \A{Answer: 0.5} \quad Differentiate, then put in $x=1$: $f'(1)=\tfrac{1}{2}$.\par\medskip
+\noindent\textbf{Level 3.} For $f(x)=e^{2x}$, find $f'(0)$. Give it to 2 decimal places if needed.\\ \A{Answer: 2} \quad Differentiate, then put in $x=0$: $f'(0)=2$.\par\medskip
+\subsection*{Write the linearization}
+\noindent\textbf{Level 1.} Write the linearization of $f(x)=x^2$ at $a=3$. Here $f(3)=9$ and $f'(3)=6$.\\ \A{Answer: $9 + 6 \left(x - 3\right)$} \quad $L(x)=9+6(x-3)$.\par\medskip
+\noindent\textbf{Level 2.} Write the linearization of $f(x)=\sqrt{x}$ at $a=1$. Here $f(1)=1$ and $f'(1)=\tfrac{1}{2}$.\\ \A{Answer: $1 + \frac{1}{2} \left(x - 1\right)$} \quad $L(x)=1+\tfrac{1}{2}(x-1)$.\par\medskip
+\noindent\textbf{Level 3.} Write the linearization of $f(x)=e^{2x}$ at $a=0$. Here $f(0)=1$ and $f'(0)=2$.\\ \A{Answer: $1 + 2 \left(x - 0\right)$} \quad $L(x)=1+2(x-0)$.\par\medskip
+\subsection*{What the line says}
+\noindent\textbf{Level 1.} You zoom in a great deal on a smooth curve at one point. It looks more and more like...\\ \A{(A) a straight line} \quad (B) a corner \quad (C) a circle \quad (D) a parabola\\ \A{Answer: A} \quad The answer is a straight line. This is local linearity.\par\medskip
+\noindent\textbf{Level 2.} The tangent line gives a good estimate of $f(x)$ when $x$ is...\\ (A) far from $a$ \quad \A{(B) close to $a$} \quad (C) very large \quad (D) negative\\ \A{Answer: B} \quad The answer is close to $a$. The line is only a good estimate close to $a$.\par\medskip
+\noindent\textbf{Level 3.} If $f'(a)=0$, the linearization at $a$ is...\\ (A) undefined \quad (B) the vertical line $x=a$ \quad (C) the line $y=0$ \quad \A{(D) the horizontal line $y=f(a)$}\\ \A{Answer: D} \quad The answer is the horizontal line $y=f(a)$. This follows from $L(x)=f(a)+f'(a)(x-a)$.\par\medskip
+\end{document}

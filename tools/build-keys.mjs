@@ -60,11 +60,33 @@ function huddleBlock(spec, withAnswers) {
   }
   return out.join('\n');
 }
+/* Visual-tutorial lessons (spec.tutorial): no huddle. The frames are written out for the make-up key (what to copy) and the teacher key (script and answers). */
+const askAns = a => !a ? '' : a.type === 'choice' ? strip(a.options[a.answer]) : String(a.answer) + (a.unit ? ' ' + a.unit : '');
+function tutorialBlock(spec, forTeacher) {
+  const T = spec.tutorial, o = [];
+  const frames = (title, part) => {
+    o.push('\\subsection*{' + title + '}', '\\textit{' + tex(part.target) + '}\\par', '\\begin{enumerate}');
+    part.frames.forEach(f => {
+      let line = '\\item \\textbf{' + tex(f.head) + '.} ' + (f.move ? '\\textit{' + tex(f.move) + '.} ' : '') + (f.problem ? '\\textbf{Problem:} ' + tex(f.problem) + ' ' : '') + tex(f.say);
+      if (f.show) line += ' \\textit{(Picture: ' + tex(f.show) + '. ' + tex(f.guide) + ')}';
+      if (f.work && f.work.length) line += '\\\\ ' + f.work.map(w => tex(w)).join('\\\\ ');
+      if (f.slip) line += '\\\\ \\textit{Common slip.}';
+      if (f.ask) line += '\\\\ ' + (forTeacher ? '\\textit{Question:} ' + tex(f.ask.prompt) + ' \\A{Answer: ' + tex(askAns(f.ask)) + '.} ' + tex(f.ask.why || '') : '\\textit{Check:} ' + tex(f.ask.prompt) + ' \\A{' + tex(askAns(f.ask)) + '.}');
+      o.push(line);
+    });
+    o.push('\\end{enumerate}');
+  };
+  frames('Concept tutorial (' + T.concept.frames.length + ' pictures)', T.concept);
+  o.push('\\subsection*{I do: the five moves}\\begin{enumerate}' + T.moves.map(m => '\\item ' + tex(m)).join('\n') + '\\end{enumerate}');
+  frames('I do (' + T.ido.frames.length + ' steps)', T.ido);
+  o.push('\\subsection*{Big ideas}\\begin{itemize}' + T.summary.map(x => '\\item ' + tex(x)).join('\n') + '\\end{itemize}');
+  return o.join('\n');
+}
 function samples(spec, perBand) {
   const o = [];
   (spec.skills || []).forEach(sk => {
     o.push('\\subsection*{' + tex(sk.title) + '}');
-    for (let b = 1; b <= 4; b++) { const q = sk.gen(b, rng(b * 101 + 7));
+    for (let b = 1; b <= (spec.tutorial ? 3 : 4); b++) { const q = sk.gen(b, rng(b * 101 + 7));
       const opts = q.type === 'choice' ? '\\\\ ' + q.options.map((x, i) => (i === q.answer ? '\\A{(' + String.fromCharCode(65 + i) + ') ' : '(' + String.fromCharCode(65 + i) + ') ') + tex(typeof x === 'string' ? x : (x.alt || x.label || '')) + (i === q.answer ? '}' : '')).join(' \\quad ') : '';
       const a = q.type === 'choice' ? String.fromCharCode(65 + q.answer) : ans(q);
       o.push('\\noindent\\textbf{Level ' + b + '.} ' + tex(q.prompt) + opts + '\\\\ \\A{Answer: ' + tex(a) + '} \\quad ' + tex(q.worked) + (q.misc ? '\\\\ \\textit{Misconception targeted: ' + tex(q.misc) + '}' : '') + '\\par\\medskip'); }
@@ -78,7 +100,8 @@ function makeup(spec) {
   o.push('\\subsection*{Targets}\\begin{itemize}' + spec.targets.map(t => '\\item ' + tex(t)).join('\n') + '\\end{itemize}');
   if (spec.concepts) { o.push('\\subsection*{Concepts}\\begin{itemize}'); spec.concepts.forEach(c => o.push('\\item \\textbf{' + tex(c.title) + '}' + (c.eq ? ' (' + tex(c.eq) + ')' : '') + ': ' + c.points.map(tex).join(' '))); o.push('\\end{itemize}'); }
   if (spec.predicts) { o.push('\\subsection*{What the class predicted, and what is true}\\begin{itemize}'); spec.predicts.forEach(p => o.push('\\item ' + tex(p.prompt) + ' \\A{' + tex(strip(p.options[p.answer])) + '.} ' + tex(p.why))); o.push('\\end{itemize}'); }
-  o.push('\\section*{Huddle notes (answers filled in)}', huddleBlock(spec, true));
+  if (spec.tutorial) o.push('\\section*{The tutorial, written out}', tutorialBlock(spec, false));
+  else o.push('\\section*{Huddle notes (answers filled in)}', huddleBlock(spec, true));
   o.push('\\section*{One worked sample of each skill}', samples(spec));
   o.push('\\end{document}');
   return o.join('\n');
@@ -110,8 +133,9 @@ function teacher(spec) {
     const list = (title, items) => { if (items && items.length) { o.push('\\subsection*{' + title + '}\\begin{itemize}'); items.forEach(p => o.push('\\item ' + tex(p.prompt) + ' \\A{' + tex(strip(p.options[p.answer])) + '.} ' + tex(p.why || ''))); o.push('\\end{itemize}'); } };
     o.push('\\subsection*{Self-paced lesson}No clock, no trimming, no skipping, no end mark, no stamp. Every tab is required in order; progress saves on the device so a student can stop and finish the next day.\\par');
     list('Warm-up review (3 easy items)', spec.review);
-    o.push('\\subsection*{Explore stations}Four hands-on stations (' + (spec.exploreIds || []).map(tex).join(', ') + '). Station answers are in the teacher view of the lesson page (add \\texttt{\\#key} to its address).\\par');
-    list('Explore: what did you see', spec.observe); list('Mid-lesson check (Huddle tab)', spec.mid);
+    if (spec.tutorial) o.push('\\subsection*{Independent lesson}No huddle, no teacher talk, no codes. Students read a short picture tutorial (Concept), watch worked problems move by move (I do), then solve generated problems (You do). Add \\texttt{\\#key} to the lesson address to open every tab with answers marked.\\par');
+    else o.push('\\subsection*{Explore stations}Four hands-on stations (' + (spec.exploreIds || []).map(tex).join(', ') + '). Station answers are in the teacher view of the lesson page (add \\texttt{\\#key} to its address).\\par');
+    if (!spec.tutorial) { list('Explore: what did you see', spec.observe); list('Mid-lesson check (Huddle tab)', spec.mid); }
   } else {
   o.push('\\subsection*{Outline and pacing (' + P.budgetMin + ' min)}\\begin{tabular}{@{}llll@{}}\\toprule Tab & Priority & Minutes & If behind\\\\\\midrule');
   P.steps.forEach(s => o.push(tex(s.id) + ' & ' + s.prio + ' & ' + s.min + ' & ' + (s.prio === 1 ? 'never trimmed' : s.prio === 3 ? 'skipped first' : 'shrinks to ' + s.minItems + ' of ' + s.parts) + '\\\\'));
@@ -120,7 +144,8 @@ function teacher(spec) {
   }
   o.push('\\subsection*{Targets}\\begin{itemize}' + spec.targets.map(t => '\\item ' + tex(t)).join('\n') + '\\end{itemize}');
   if (spec.predicts) { o.push('\\subsection*{Predictions}\\begin{itemize}'); spec.predicts.forEach(p => o.push('\\item ' + tex(p.prompt) + ' \\A{' + tex(strip(p.options[p.answer])) + '.} ' + tex(p.why))); o.push('\\end{itemize}'); }
-  o.push('\\section*{Huddle script (answers in green)}', huddleBlock(spec, true));
+  if (spec.tutorial) o.push('\\section*{Tutorial script, with every question and answer}', tutorialBlock(spec, true));
+  else o.push('\\section*{Huddle script (answers in green)}', huddleBlock(spec, true));
   o.push('\\section*{Every level, with answers}', samples(spec));
   if (spec.v2) o.push(v2Block(spec));
   if (spec.misconceptions) { o.push('\\section*{Common misconceptions}\\begin{tabularx}{\\textwidth}{@{}X X@{}}\\toprule Students say & Say instead\\\\\\midrule'); spec.misconceptions.forEach(m => o.push(tex(m.say) + ' & ' + tex(m.fix) + '\\\\')); o.push('\\bottomrule\\end{tabularx}'); }
