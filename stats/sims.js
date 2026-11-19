@@ -21,5 +21,10 @@
     return { type: "lesson", icon: "🔔", title: p.title, href: l.href.replace(/^stats\//, ""), blurb: p.blurb, tags: ["adaptive", "online notes + PDF"],
       teacher: [{ label: "Teacher view (#key)", href: l.href.replace(/^stats\//, "") + "#key" }] };
   });
-  window.UNITS = [{ id: "unit-3", title: "Unit 3 · The Normal Distribution", blurb: "Guided lessons with hints and a concept sheet at every step. Practice days sit between lessons.", entries: entries }];
+  var unit4 = [
+    { type: "lesson", icon: "✅", title: "Practice: 4.1 and 4.2", href: "unit-4-two-variable/practice-4-1-4-2.html",
+      blurb: "Concept checker: two-way tables, the out-of, percents, segmented bar graphs and association. Three right in a row per part.",
+      tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-4-two-variable/practice-4-1-4-2.html#key" }] }
+  ];
+  window.UNITS = [{ id: "unit-3", title: "Unit 3 · The Normal Distribution", blurb: "Guided lessons with hints and a concept sheet at every step. Practice days sit between lessons.", entries: entries }, { id: "unit-4", title: "Unit 4 · Two-Variable Data", blurb: "Notes days are on paper. Practice days are concept checkers here.", entries: unit4 }];
 })();

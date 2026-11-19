@@ -31,6 +31,9 @@ const TARGETS = [
   /* the ramp-and-pulley sandbox (a standalone page, locked mode from the Begin click; physics' own period) */
   { name: 'physics ramp-pulley sandbox', url: '/physics/sandbox/ramp-pulley.html', clockAt: '2026-10-21T09:05:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
+  /* stats concept checker (practice day 4.1 and 4.2): standalone page, locked from the Begin click; the reopen card uses the shared label */
+  { name: 'stats practice 4.1-4.2 checker', url: '/stats/unit-4-two-variable/practice-4-1-4-2.html', clockAt: '2026-10-21T10:05:00-04:00', student: '65J-7TGT',
+    begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
   { name: 'chem electron-config-1', url: '/chemistry/unit-3-atoms-ions/electron-config-1.html', clockAt: '2026-10-21T10:45:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#btn-next'); } },
   ...[['unknown-solids', ''], ['heating', '?lab=heating'], ['rutherford', '?lab=rutherford'], ['flame', '?lab=flame'], ['pes', '?lab=pes'], ['zeff', '?lab=zeff']].map(([id, q]) => ({
