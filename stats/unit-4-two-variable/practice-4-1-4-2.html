@@ -42,6 +42,10 @@ svg.bars{width:100%;max-width:520px;height:auto;display:block}
 input[type=range]{flex:1;height:34px;accent-color:var(--orange)}
 .val{font-size:22px;font-weight:bold;min-width:70px;text-align:right;color:#A4510F}
 .help{float:right;font-size:15px}
+.clockchip{background:#fff;color:var(--deep)}
+.hold{font-size:22px;text-align:center}
+.kt table{border-collapse:collapse;font-size:15px;margin:6px 0}.kt td,.kt th{border:1px solid #bbb;padding:4px 8px;text-align:left;vertical-align:top}
+.endbar{position:sticky;bottom:0;background:#fff;border-top:3px solid var(--teal);padding:10px;text-align:center;z-index:4}
 .overlay{position:fixed;inset:0;background:rgba(20,40,40,.92);z-index:60;display:flex;align-items:center;justify-content:center}
 .overlay .card{max-width:560px}.overlay[hidden]{display:none}
 .pin{width:160px}.pesMsg.no{color:var(--bad);font-weight:bold}
@@ -58,6 +62,7 @@ table.sum{margin:10px auto;border-collapse:collapse;font-size:17px}table.sum td,
   <h2>Mr. D needs to see you</h2><p id="lockresTxt"></p>
   <div class="row"><input id="lockCode" type="password" inputmode="numeric" aria-label="Unlock code from Mr. D"><button class="btn" id="bUnlock">Unlock</button></div>
   <p id="lockMsg" class="pesMsg no"></p></div></div>
+<div class="overlay" id="hud" hidden><div class="card" id="hudHost" style="max-width:760px;max-height:92vh;overflow:auto"></div></div>
 <div class="overlay" id="cpLock" hidden><div class="card" id="cpLockHost"></div></div>
 <script src="../../shared/config.js"></script>
 <script src="../../shared/bell.js"></script>
@@ -65,14 +70,30 @@ table.sum{margin:10px auto;border-collapse:collapse;font-size:17px}table.sum td,
 <script src="../../shared/lock.js"></script>
 <script src="../../shared/teacherbar.js"></script>
 <script src="../../shared/ids.js"></script>
+<script src="../../shared/pace.js"></script>
+<script src="../../shared/huddle.js"></script>
+<script src="../../shared/profile.js"></script>
 <script type="module">
+/* Practice day, 4.1 and 4.2: a concept checker built to the day rules (docs/DAY-RULES.md, CLAUDE.md "Supersedes").
+   - The 42-minute clock (shared/bell.js, stats period): warm-up of 3 easy review items, huddle 1 at minute 3 (hold screen, code 1),
+     huddle 2 at minute 25 (the writable huddle tab, code 2), practice, endless mixed practice until the end mark, then End.
+     Codes are asked for only on school days 7:00 AM to 3:00 PM in the stats period, never in #key (shared/pace.js times).
+   - Six checkpoint parts with no click-through (shared/virtual-lab/checkpoint.js): 3 right in a row, generated questions,
+     a miss gives a hint from the student's own table and a fresh question, 3 misses or "I need Mr. D" lock until today's
+     MrD.codes.override(). Three hidden bands: a right answer moves the student up a band, a miss moves them down one,
+     so a pass always ends on band 3, the regular-level standard. Nothing is labeled by difficulty.
+   - Locked mode from the Begin click (shared/lock.js). No stamp, no report code. Scores go to MrD.profile.record.
+   - #key: teacher bar, every part open, answers on every question, the huddle answers, a key desk with timings,
+     huddle codes and sample problems from every band. Adding #key to an open page reloads it. */
 import * as CK from "../../shared/virtual-lab/checkpoint.js";
 import { h } from "../../shared/virtual-lab/dom.js";
 
-const LESSON_ID = "stats-4-1-4-2-practice";
+const LESSON_ID = "stats-4-1-4-2-practice", TITLE = "Practice: 4.1 and 4.2";
 const KEY = MrD.isKey(), NOLOCK = (/nolock=(\d+)/.exec(location.hash) || [])[1];
+const PACING = { budgetMin: 42, clock: "v3" };
 const $ = (i) => document.getElementById(i);
 const app = $("app");
+addEventListener("hashchange", () => location.reload());
 
 /* ---------- contexts: one 2x2 table each; rows are the groups, columns are yes / no ---------- */
 const CTX = [
@@ -89,11 +110,14 @@ const ri = (a, b) => a + Math.floor(rnd() * (b - a + 1));
 const pick = (a) => a[Math.floor(rnd() * a.length)];
 const pct = (p, o) => Math.round(100 * p / o);
 
-/* A table: n[r][c]. r = 0,1 (groups); c = 0 yes, 1 no. Totals worked out. */
-function makeTable(c, assoc) {
-  const R = [ri(2, 12) * 10, ri(2, 12) * 10];   // tens, so every group percent is a whole number
+/* Band 1: small round groups (20 to 50), percents in tens. Band 2: groups to 120. Band 3: any group in fives, percents in fives,
+   so answers need rounding. assoc: true = clearly different, false = the same percent. */
+function makeTable(c, band, assoc) {
+  const R = band === 1 ? [ri(2, 5) * 10, ri(2, 5) * 10] : band === 2 ? [ri(2, 12) * 10, ri(2, 12) * 10] : [ri(4, 24) * 5, ri(4, 24) * 5];
+  const step = band === 3 ? 5 : 10, gap = band === 1 ? 40 : band === 2 ? 30 : 20;
   let p0 = ri(2, 8) * 10, p1;
-  if (assoc === false) p1 = p0; else if (assoc === true) { do { p1 = ri(1, 9) * 10; } while (Math.abs(p1 - p0) < 30); } else p1 = ri(1, 9) * 10;
+  if (band === 3) p0 = ri(3, 17) * 5;
+  if (assoc === false) p1 = p0; else if (assoc === true) { do { p1 = ri(1, Math.floor(95 / step)) * step; } while (Math.abs(p1 - p0) < gap); } else p1 = ri(1, Math.floor(90 / step)) * step;
   const yes = [Math.round(R[0] * p0 / 100), Math.round(R[1] * p1 / 100)];
   const n = [[yes[0], R[0] - yes[0]], [yes[1], R[1] - yes[1]]];
   return { c, n, R, C: [n[0][0] + n[1][0], n[0][1] + n[1][1]], N: R[0] + R[1] };
@@ -105,39 +129,37 @@ function tableEl(t) {
     ...[0, 1].map(r => h("tr", {}, h("th", {}, c.lab[r]), h("td", {}, String(t.n[r][0])), h("td", {}, String(t.n[r][1])), h("td", { class: "tot" }, String(t.R[r])))),
     h("tr", {}, h("th", { class: "tot" }, "Total"), h("td", { class: "tot" }, String(t.C[0])), h("td", { class: "tot" }, String(t.C[1])), h("td", { class: "tot" }, String(t.N))));
 }
-
-/* One percent question, used by "out-of" and "percent" types. */
-function pctQ(t) {
-  const c = t.c, r = ri(0, 1), kind = pick(["row", "row", "col", "all", "joint"]);
+/* One percent question. Band 1 asks within a row only; band 2 adds "of all"; band 3 adds the column out-of and the one-cell (joint) question. */
+function pctQ(t, band) {
+  const c = t.c, r = ri(0, 1), kind = pick(band === 1 ? ["row"] : band === 2 ? ["row", "row", "all"] : ["row", "col", "all", "joint"]);
   if (kind === "row") return { text: `Of the ${c.grp[r]}, what percent ${c.yes}?`, part: t.n[r][0], outof: t.R[r], why: `the ${c.grp[r]} total` };
   if (kind === "col") return { text: `Of the ${c.who} who ${c.yes}, what percent are ${c.grp[r]}?`, part: t.n[r][0], outof: t.C[0], why: `the total of ${c.who} who ${c.yes}` };
   if (kind === "all") return { text: `What percent of all the ${c.who} ${c.yes}?`, part: t.C[0], outof: t.N, why: "the grand total, everyone" };
   return { text: `What percent of all the ${c.who} are ${c.grp[r]} who ${c.yes}?`, part: t.n[r][0], outof: t.N, why: "the grand total, everyone" };
 }
 
-/* ---------- the five checkpoint types ---------- */
+/* ---------- the five checkpoint types. make(band) returns { text, answer, hint, t?, opts?, c?, P? } ---------- */
 const TYPES = [
-  { id: "read", title: "Read the table", sub: "Find the row, find the column, read where they meet.",
-    make() {
-      const t = makeTable(pick(CTX)), c = t.c, r = ri(0, 1), k = pick(["cell", "cell", "row", "col"]), col = ri(0, 1);
+  { id: "read", title: "Read the table", sub: "Find the row, find the column, read where they meet.", skill: "stats.4-1.read",
+    make(b) {
+      const t = makeTable(pick(CTX), b), c = t.c, r = ri(0, 1), col = ri(0, 1), k = b === 1 ? "cell" : pick(b === 2 ? ["cell", "row"] : ["cell", "row", "col"]);
       if (k === "cell") return { t, text: `How many ${c.grp[r]} are in the "${c.cols[col]}" column?`, answer: t.n[r][col], hint: `Find the ${c.lab[r]} row and the ${c.cols[col]} column. Read where they meet.` };
       if (k === "row") return { t, text: `How many ${c.grp[r]} were asked in all?`, answer: t.R[r], hint: `All the ${c.grp[r]} is the total at the end of the ${c.lab[r]} row.` };
       return { t, text: `How many ${c.who} in all are in the "${c.cols[col]}" column?`, answer: t.C[col], hint: `A whole column's total is in the Total row at the bottom of the ${c.cols[col]} column.` };
     }, input: "num", check: (q, v) => +v === q.answer },
-  { id: "outof", title: "Pick the out-of", sub: "The out-of is the group right after \"Of the\". \"Of all\" means everyone.",
-    make() {
-      const t = makeTable(pick(CTX)), p = pctQ(t);
-      const opts = [...new Set([t.R[0], t.R[1], t.C[0], t.C[1], t.N])];
-      return { t, text: p.text + " Which number is the out-of?", answer: p.outof, opts, hint: `Read the words after "Of the" (or "of all"). Here the out-of is ${p.why}.` };
+  { id: "outof", title: "Pick the out-of", sub: "The out-of is the group right after \"Of the\". \"Of all\" means everyone.", skill: "stats.4-1.outof",
+    make(b) {
+      const t = makeTable(pick(CTX), b), p = pctQ(t, b);
+      return { t, text: p.text + " Which number is the out-of?", answer: p.outof, opts: [...new Set([t.R[0], t.R[1], t.C[0], t.C[1], t.N])], hint: `Read the words after "Of the" (or "of all"). Here the out-of is ${p.why}.` };
     }, input: "mc", check: (q, v) => +v === q.answer },
-  { id: "pct", title: "Percent from a table", sub: "percent = part ÷ out-of × 100. Round to a whole percent.",
-    make() {
-      const t = makeTable(pick(CTX)), p = pctQ(t);
+  { id: "pct", title: "Percent from a table", sub: "percent = part ÷ out-of × 100. Round to a whole percent.", skill: "stats.4-1.percent",
+    make(b) {
+      const t = makeTable(pick(CTX), b), p = pctQ(t, b);
       return { t, text: p.text, answer: pct(p.part, p.outof), hint: `The out-of is ${p.why}: ${p.outof}. The part is ${p.part}. Divide, then times 100.` };
     }, input: "num", unit: "%", check: (q, v) => Math.abs(+v - q.answer) <= 1 },
-  { id: "assoc", title: "Is there an association?", sub: "Compare percents, not counts.",
-    make() {
-      const c = pick(CTX), a = rnd() < 0.5, t = makeTable(c, a), P = [pct(t.n[0][0], t.R[0]), pct(t.n[1][0], t.R[1])];
+  { id: "assoc", title: "Is there an association?", sub: "Compare percents, not counts.", skill: "stats.4-2.association",
+    make(b) {
+      const c = pick(CTX), a = rnd() < 0.5, t = makeTable(c, b, a), P = [pct(t.n[0][0], t.R[0]), pct(t.n[1][0], t.R[1])];
       const hi = P[0] >= P[1] ? 0 : 1, lo = 1 - hi;
       const right = a ? `There is an association. Of the ${c.grp[hi]}, ${P[hi]}% ${c.yes}, but of the ${c.grp[lo]}, only ${P[lo]}%.`
                       : `There is no association. ${P[0]}% of the ${c.grp[0]} and ${P[1]}% of the ${c.grp[1]} ${c.yes}.`;
@@ -145,22 +167,21 @@ const TYPES = [
       const wrong = [
         a ? `There is no association. ${P[0]}% of the ${c.grp[0]} and ${P[1]}% of the ${c.grp[1]} ${c.yes}.`
           : `There is an association. Of the ${c.grp[0]}, ${P[0]}% ${c.yes}, but of the ${c.grp[1]}, ${P[1] >= 40 ? P[1] - 30 : P[1] + 30}%.`,
-        `There is an association, because ${t.n[big][0]} ${c.grp[big]} ${c.yes} and only ${t.n[1 - big][0]} ${c.grp[1 - big]} do.`,
+        t.n[0][0] === t.n[1][0] ? `There is no association, because the two groups have different totals.` : `There is an association, because ${t.n[big][0]} ${c.grp[big]} ${c.yes} and only ${t.n[1 - big][0]} ${c.grp[1 - big]} do.`,
         `There is an association. ${pct(t.n[0][0], t.N)}% of all ${c.who} are ${c.grp[0]} who ${c.yes}.`
       ];
-      if (t.n[0][0] === t.n[1][0]) wrong[1] = `There is no association, because the two groups have different totals.`;
       return { t, text: `Is ${c.head.toLowerCase()} associated with whether they ${c.yes}? Pick the best answer.`, answer: right, opts: [right, ...wrong].sort(() => rnd() - 0.5),
         hint: `Turn each group into a percent of its own group. ${c.grp[0]}: ${t.n[0][0]} ÷ ${t.R[0]} = ${P[0]}%. ${c.grp[1]}: ${t.n[1][0]} ÷ ${t.R[1]} = ${P[1]}%. Same or different?` };
     }, input: "mc", check: (q, v) => v === q.answer },
-  { id: "seg", title: "Read a segmented bar graph", sub: "Each bar is one group out of 100. Read where the line sits.",
-    make() {
-      const c = pick(CTX), P = [ri(1, 19) * 5, ri(1, 19) * 5], r = ri(0, 1), ask = pick(["yes", "no"]);
+  { id: "seg", title: "Read a segmented bar graph", sub: "Each bar is one group out of 100. Read where the line sits.", skill: "stats.4-2.segmented",
+    make(b) {
+      const c = pick(CTX), st = b === 3 ? 5 : 10, P = [ri(1, 100 / st - 1) * st, ri(1, 100 / st - 1) * st], r = ri(0, 1), ask = b === 1 ? "yes" : pick(["yes", "no"]);
       return { c, P, text: ask === "yes" ? `What percent of the ${c.grp[r]} ${c.yes}?` : `What percent of the ${c.grp[r]} do not ${c.yes}?`,
         answer: ask === "yes" ? P[r] : 100 - P[r], hint: `Find the line inside the ${c.lab[r]} bar and read the percent axis. The ${c.cols[0]} part is the shaded bottom; the rest of the bar is ${c.cols[1]}, and the bar adds to 100.` };
     }, input: "num", unit: "%", check: (q, v) => Math.abs(+v - q.answer) <= 2 }
 ];
-const NP = TYPES.length + 1;          // the bar builder sits between "pct" and "assoc"
 const ORDER = ["read", "outof", "pct", "build", "assoc", "seg"];
+const TYPE = Object.fromEntries(TYPES.map(T => [T.id, T]));
 
 function barsSvg(c, P, opt = {}) {
   const W = 520, H = 300, L = 54, B = 250, T = 20, bw = 110, xs = [L + 70, L + 260];
@@ -173,7 +194,7 @@ function barsSvg(c, P, opt = {}) {
     if (p != null) s.push(`<rect x="${x}" y="${y(p)}" width="${bw}" height="${B - y(p)}" fill="#F6E7A8" stroke="#222" stroke-width="2"/>`);
     s.push(`<rect x="${x}" y="${T}" width="${bw}" height="${B - T}" fill="none" stroke="#222" stroke-width="2"/>`);
     if (p != null) s.push(`<line x1="${x}" x2="${x + bw}" y1="${y(p)}" y2="${y(p)}" stroke="#222" stroke-width="3"/>`);
-    if (opt.labels && p != null) { s.push(`<text x="${xs[i]}" y="${(y(p) + B) / 2 + 6}" text-anchor="middle" font-weight="bold">${p}%</text><text x="${xs[i]}" y="${(y(p) + T) / 2 + 6}" text-anchor="middle" font-weight="bold">${100 - p}%</text>`); }
+    if (opt.labels && p != null) s.push(`<text x="${xs[i]}" y="${(y(p) + B) / 2 + 6}" text-anchor="middle" font-weight="bold">${p}%</text><text x="${xs[i]}" y="${(y(p) + T) / 2 + 6}" text-anchor="middle" font-weight="bold">${100 - p}%</text>`);
     s.push(`<text x="${xs[i]}" y="${B + 24}" text-anchor="middle" font-size="16" font-weight="bold">${c.lab[i]}</text>`);
   });
   s.push(`<rect x="${W - 140}" y="${T}" width="16" height="14" fill="#F6E7A8" stroke="#222"/><text x="${W - 118}" y="${T + 12}" font-size="14">${c.cols[0]}</text>`);
@@ -181,108 +202,189 @@ function barsSvg(c, P, opt = {}) {
   const d = document.createElement("div"); d.innerHTML = s.join(""); return d.firstChild;
 }
 
+/* ---------- warm-up: 3 easy review items, no lock, a miss just says try again ---------- */
+const WARM_TABLE = { c: CTX[0], n: [[24, 16], [18, 42]], R: [40, 60], C: [42, 58], N: 100 };
+const WARM = [
+  { text: "How many seniors have a job?", t: WARM_TABLE, answer: 24, input: "num" },
+  { text: "12 out of 40 is what percent?", answer: 30, input: "num", unit: "%" },
+  { text: "Of the seniors, what percent have a job? Pick the out-of.", t: WARM_TABLE, answer: 40, opts: [100, 40, 42], input: "mc" }
+];
+
+/* ---------- the huddle 2 tab (Mr. D formalizes; students fill blanks; nothing graded) ---------- */
+const HUDDLE = {
+  defs: [
+    { term: "out-of", text: "The out-of is the group right after \"[[Of the]]\". \"Of all\" means the [[grand total]]." },
+    { term: "percent", text: "percent = [[part]] ÷ [[out-of]] × 100" },
+    { term: "association", text: "Two variables are associated when the [[percents]] for each group are clearly [[different]]. Compare percents, not [[counts]]." }
+  ],
+  example: { prompt: "40 seniors: 24 have a job. 60 juniors: 18 have a job.",
+    steps: ["Seniors: 24 ÷ [[40]] = [[60]]%", "Juniors: 18 ÷ [[60]] = [[30]]%", "There [[is]] an association. Of the seniors, 60% have a job, but of the juniors, only [[30]]%."] }
+};
+
 /* ---------- state (saved per day, so a reload or a lock does not wipe it) ---------- */
 const SKEY = "cc:" + LESSON_ID + ":" + MrD.bell.dayKey();
-let ST = null;
-const fresh = () => ({ id: "", period: "", part: 0, started: false, finished: false, t0: Date.now(), cps: Object.fromEntries(TYPES.map(T => [T.id, CK.track()])), lock: null, build: 0, answered: 0, misses: 0 });
+let ST = null, lockArmed = false;
+const fresh = () => ({ id: "", period: "", stage: "warm", warm: 0, part: 0, started: false, ended: false, t0: Date.now(),
+  cps: Object.fromEntries([...TYPES.map(T => [T.id, CK.track()]), ["mix", CK.track()]]), band: Object.fromEntries([...TYPES.map(T => [T.id, 1]), ["mix", 3]]),
+  lock: null, build: 0, answered: 0, misses: 0, mixed: 0, items: [], fired: {}, hud: {} });
 const save = () => { if (KEY) return; try { localStorage.setItem(SKEY, JSON.stringify(ST)); } catch (e) { } if (lockArmed) LessonLock.save(ST.part, false, null); };
 const load = () => { try { return JSON.parse(localStorage.getItem(SKEY)); } catch (e) { return null; } };
-let lockArmed = false;
+const clk = () => MrD.bell.clock("stats");
+const minutesIn = () => { const c = clk(); return c.session ? (c.now - c.session.start) / 60000 : null; };
+const gatesOn = () => !KEY && clk().mode === "class" && !!clk().gates;
+const fmt = (ms) => { const s = Math.max(0, Math.round(ms / 1000)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
 
 function chips() {
-  $("chips").replaceChildren(...ORDER.map((id, i) => h("span", { class: "chip" + (i < ST.part || ST.finished ? " done" : i === ST.part ? " on" : "") }, (i < ST.part || ST.finished ? "✓ " : "") + (i + 1))),
-    ...(lockArmed ? [h("span", { class: "chip" }, "🔒 exits " + LessonLock.stats().total)] : []));
+  const c = clk(), list = ORDER.map((id, i) => h("span", { class: "chip" + (ST.stage === "parts" && i === ST.part ? " on" : (ST.stage !== "warm" && (i < ST.part || ST.stage !== "parts")) ? " done" : "") }, (ST.stage !== "warm" && (i < ST.part || ST.stage !== "parts") ? "✓ " : "") + (i + 1)));
+  const extra = [];
+  if (c.mode === "class" && c.msToEnd != null && c.msToEnd > 0) extra.push(h("span", { class: "chip clockchip" }, "⏱ " + fmt(c.msToEnd) + " to the end mark"));
+  if (lockArmed) extra.push(h("span", { class: "chip" }, "🔒 exits " + LessonLock.stats().total));
+  $("chips").replaceChildren(h("span", { class: "chip" + (ST.stage === "warm" ? " on" : " done") }, "Warm-up"), ...list, h("span", { class: "chip" + (ST.stage === "mix" ? " on" : "") }, "Practice"), ...extra);
 }
 
-/* ---------- a checkpoint part ---------- */
-function showType(T) {
-  const tr = ST.cps[T.id];
+/* ---------- band moves: right = up one, miss = down one ---------- */
+const bandUp = (id) => { ST.band[id] = Math.min(3, ST.band[id] + 1); };
+const bandDown = (id) => { ST.band[id] = Math.max(1, ST.band[id] - 1); };
+function logItem(T, band, ok, first) { ST.items.push({ skill: T.skill, title: T.title, band, firstTry: first, ok }); if (ST.items.length > 300) ST.items.shift(); }
+
+/* ---------- one checkpoint card (a part, or endless mixed practice when mix = true) ---------- */
+function checkpointCard(T, opts) {
+  const tid = opts.mix ? "mix" : T.id, tr = ST.cps[tid];
   const card = h("div", { class: "card" }), pips = h("div", { class: "streak" }), body = h("div"), fb = h("div");
-  const helpBtn = h("button", { class: "btn ghost help", onclick: () => { lockFor(T.id, "help"); } }, "I need Mr. D");
-  let q = null;
-  const drawPips = () => pips.replaceChildren(h("span", {}, "Right in a row:"), ...Array.from({ length: tr.need }, (_, i) => h("span", { class: "pip" + (i < tr.streak ? " on" : "") })), ...(tr.redo ? [h("span", {}, " (after an unlock: " + tr.need + " fresh ones)")] : []));
+  const helpBtn = h("button", { class: "btn ghost help", onclick: () => lockFor(tid, "help") }, "I need Mr. D");
+  let q = null, curT = T, band = 1, missed = false;
+  const drawPips = () => pips.replaceChildren(...(opts.mix ? [h("span", {}, "Practice until the end mark. Right so far: " + ST.mixed)] :
+    [h("span", {}, "Right in a row:"), ...Array.from({ length: tr.need }, (_, i) => h("span", { class: "pip" + (i < tr.streak ? " on" : "") }))]));
   function next() {
-    q = T.make(); window.__ccQ = q; body.replaceChildren();
+    curT = opts.mix ? TYPE[pick(TYPES.map(x => x.id))] : T; band = ST.band[tid]; missed = false;
+    q = curT.make(band); window.__ccQ = q; body.replaceChildren();
     if (q.t) body.append(tableEl(q.t));
-    if (T.id === "seg") body.append(barsSvg(q.c, q.P));
+    if (curT.id === "seg") body.append(barsSvg(q.c, q.P));
     body.append(h("div", { class: "q" }, q.text));
-    if (T.input === "num") {
-      const inp = h("input", { type: "number", inputmode: "decimal", "aria-label": "Your answer" });
-      const go = h("button", { class: "btn" }, "Check");
-      go.onclick = () => { if (inp.value.trim() === "") return; answer(inp.value); };
+    if (curT.input === "num") {
+      const inp = h("input", { type: "number", inputmode: "decimal", "aria-label": "Your answer" }), go = h("button", { class: "btn" }, "Check");
+      go.onclick = () => { if (inp.value.trim() !== "") answer(inp.value); };
       inp.addEventListener("keydown", e => { if (e.key === "Enter") go.click(); });
-      body.append(h("div", { class: "row" }, inp, T.unit ? h("b", {}, T.unit) : null, go)); setTimeout(() => inp.focus(), 0);
+      body.append(h("div", { class: "row" }, inp, curT.unit ? h("b", {}, curT.unit) : null, go)); setTimeout(() => inp.focus(), 0);
     } else q.opts.forEach(o => body.append(h("button", { class: "opt", onclick: (e) => answer(String(o), e.currentTarget) }, String(o))));
-    if (KEY) body.append(h("div", { class: "keyline" }, h("b", {}, "KEY "), String(q.answer) + (T.unit || "")));
+    if (KEY) body.append(h("div", { class: "keyline" }, h("b", {}, `KEY (band ${band}) `), String(q.answer) + (curT.unit || "")));
     drawPips();
   }
   function answer(v, btn) {
-    const ok = T.check(q, v); tr.att.push({ q: q.text, v, ok, at: Date.now() }); ST.answered++;
+    const ok = curT.check(q, v); tr.att.push({ q: q.text, v, ok, band, at: Date.now() }); ST.answered++; logItem(curT, band, ok, !missed);
     const r = CK.grade(tr, ok);
     if (ok) {
-      if (btn) btn.classList.add("ok");
-      if (r === "pass") { tr.passed = true; save(); fb.replaceChildren(h("div", { class: "fb ok" }, "✔ Three in a row. This part is done.")); drawPips(); setTimeout(() => nextPart(), 900); return; }
+      if (btn) btn.classList.add("ok"); bandUp(tid);
+      if (opts.mix) { ST.mixed++; tr.streak = 0; }
+      if (!opts.mix && r === "pass") { tr.passed = true; save(); fb.replaceChildren(h("div", { class: "fb ok" }, "✔ Three in a row. This part is done.")); drawPips(); setTimeout(() => opts.done(), 900); return; }
       fb.replaceChildren(h("div", { class: "fb ok" }, "✔ Right. Here is a new one.")); save(); setTimeout(next, 700); return;
     }
-    ST.misses++; if (btn) btn.classList.add("no");
-    fb.replaceChildren(h("div", { class: "fb no" }, "✖ Not this time. Your streak starts over."), h("div", { class: "hintbox" }, "💡 " + q.hint + " Now try a fresh one."));
+    ST.misses++; missed = true; bandDown(tid); if (btn) btn.classList.add("no");
+    fb.replaceChildren(h("div", { class: "fb no" }, opts.mix ? "✖ Not this time." : "✖ Not this time. Your streak starts over."), h("div", { class: "hintbox" }, "💡 " + q.hint + " Now try a fresh one."));
     save();
-    if (r === "lock") { lockFor(T.id, "miss"); return; }
+    if (r === "lock") { lockFor(tid, "miss"); return; }
     setTimeout(next, 1600);
   }
   card.append(helpBtn, pips, body, fb);
-  app.append(h("p", { class: "sub" }, T.sub), card);
   next();
+  return card;
 }
 
-/* ---------- the bar builder (a sim task, not a checkpoint): set each line to match the table ---------- */
-function showBuild() {
-  const rounds = 2;
-  const wrap = h("div");
-  app.append(h("div", { class: "card text" }, "Build the segmented bar graph for each table. Work out each group's percent, then slide the line in its bar to that percent. Finish two tables."), wrap);
+/* ---------- the bar builder (a sim task between the parts): slide each line to the group's percent ---------- */
+function showBuild(done) {
+  const rounds = 2, wrap = h("div");
+  app.append(h("div", { class: "card text" }, "Build the segmented bar graph for each table. Work out each group's percent, then slide the line in its bar to that percent."), wrap);
   function round() {
-    const c = pick(CTX), t = makeTable(c), P = [pct(t.n[0][0], t.R[0]), pct(t.n[1][0], t.R[1])], cur = [50, 50];
+    const c = pick(CTX), t = makeTable(c, ST.build === 0 ? 2 : 3), P = [pct(t.n[0][0], t.R[0]), pct(t.n[1][0], t.R[1])], cur = [50, 50];
     const svgHost = h("div"), status = h("div", { class: "fb no" }, "Not yet. Each bar's line should sit at that group's percent.");
-    const draw = () => { svgHost.replaceChildren(barsSvg(c, cur)); };
+    const draw = () => svgHost.replaceChildren(barsSvg(c, cur));
+    let doneR = false;
+    const test = () => { if (doneR) return; if (Math.abs(cur[0] - P[0]) <= 1 && Math.abs(cur[1] - P[1]) <= 1) { doneR = true; status.className = "fb ok"; status.textContent = "✔ That matches the table."; ST.build++; save(); setTimeout(() => { if (ST.build >= rounds) done(); else { wrap.replaceChildren(); round(); } }, 900); } };
     const sliders = [0, 1].map(i => { const r = h("input", { type: "range", min: 0, max: 100, step: 1, value: 50, "aria-label": c.lab[i] + " line" }), v = h("div", { class: "val" }, "50%");
       r.addEventListener("input", () => { cur[i] = +r.value; v.textContent = r.value + "%"; draw(); test(); }); return h("div", { class: "sliderrow" }, h("b", {}, c.lab[i] + ": " + c.cols[0]), r, v); });
-    let doneR = false;
-    function test() { if (doneR) return; if (Math.abs(cur[0] - P[0]) <= 1 && Math.abs(cur[1] - P[1]) <= 1) { doneR = true; status.className = "fb ok"; status.textContent = "✔ That matches the table."; ST.build++; save(); setTimeout(() => { if (ST.build >= rounds) nextPart(); else { wrap.replaceChildren(); round(); } }, 900); } }
     const card = h("div", { class: "card" }, h("div", { class: "q" }, `Table ${ST.build + 1} of ${rounds}`), tableEl(t), svgHost, ...sliders, status,
-      h("div", { class: "row" }, h("button", { class: "btn ghost", onclick: (e) => { e.currentTarget.after(h("div", { class: "hintbox" }, `💡 ${c.grp[0]}: ${t.n[0][0]} ÷ ${t.R[0]}. ${c.grp[1]}: ${t.n[1][0]} ÷ ${t.R[1]}. Times 100 each.`)); } }, "💡 Hint")));
-    if (KEY) card.append(h("div", { class: "keyline" }, h("b", {}, "KEY "), `${c.lab[0]} ${P[0]}%, ${c.lab[1]} ${P[1]}%`), h("button", { class: "btn ghost", onclick: () => { ST.build = rounds; nextPart(); } }, "Skip (key)"));
+      h("div", { class: "row" }, h("button", { class: "btn ghost", onclick: (e) => e.currentTarget.after(h("div", { class: "hintbox" }, `💡 ${c.grp[0]}: ${t.n[0][0]} ÷ ${t.R[0]}. ${c.grp[1]}: ${t.n[1][0]} ÷ ${t.R[1]}. Times 100 each.`)) }, "💡 Hint")));
+    if (KEY) card.append(h("div", { class: "keyline" }, h("b", {}, "KEY "), `${c.lab[0]} ${P[0]}%, ${c.lab[1]} ${P[1]}%`));
     wrap.append(card); draw();
   }
   round();
 }
 
-/* ---------- flow ---------- */
+/* ---------- screens ---------- */
+function screen(title, sub) { chips(); app.replaceChildren(); window.scrollTo(0, 0); app.append(h("h2", {}, title)); if (sub) app.append(h("p", { class: "sub" }, sub)); if (KEY) keyDesk(); }
+function show() {
+  if (ST.ended) return showFinal();
+  if (ST.stage === "warm") return showWarm();
+  if (ST.stage === "parts") return showPart();
+  return showMix();
+}
+function showWarm() {
+  screen("Warm-up", "Three quick review questions from 4.1.");
+  const it = WARM[ST.warm];
+  if (!it) { ST.stage = "parts"; save(); return show(); }
+  const card = h("div", { class: "card" }), fb = h("div");
+  if (it.t) card.append(tableEl(it.t));
+  card.append(h("div", { class: "q" }, `${ST.warm + 1} of 3. ${it.text}`));
+  const answer = (v, btn) => { if (+v === it.answer) { if (btn) btn.classList.add("ok"); fb.replaceChildren(h("div", { class: "fb ok" }, "✔ Right.")); ST.warm++; save(); setTimeout(show, 600); } else { if (btn) btn.classList.add("no"); fb.replaceChildren(h("div", { class: "fb no" }, "✖ Not quite. Look again and try once more.")); } };
+  if (it.input === "num") { const inp = h("input", { type: "number", "aria-label": "Your answer" }), go = h("button", { class: "btn", onclick: () => answer(inp.value) }, "Check"); inp.addEventListener("keydown", e => { if (e.key === "Enter") go.click(); }); card.append(h("div", { class: "row" }, inp, it.unit ? h("b", {}, it.unit) : null, go)); setTimeout(() => inp.focus(), 0); }
+  else it.opts.forEach(o => card.append(h("button", { class: "opt", onclick: (e) => answer(o, e.currentTarget) }, String(o))));
+  if (KEY) card.append(h("div", { class: "keyline" }, h("b", {}, "KEY "), String(it.answer) + (it.unit || "")), h("button", { class: "btn ghost", onclick: () => { ST.warm++; show(); } }, "Next (key)"));
+  card.append(fb); app.append(card);
+}
 function showPart() {
-  if (ST.finished) return showFinal();
-  chips(); app.replaceChildren(); window.scrollTo(0, 0);
   const id = ORDER[ST.part];
-  if (id === "build") { app.append(h("h2", {}, `Part ${ST.part + 1} of ${ORDER.length}: Build the bars`)); return showBuild(); }
-  const T = TYPES.find(x => x.id === id);
-  app.append(h("h2", {}, `Part ${ST.part + 1} of ${ORDER.length}: ${T.title}`));
-  if (KEY) app.append(h("div", { class: "row" }, h("button", { class: "btn ghost", onclick: () => nextPart() }, "Skip this part (key)")));
-  showType(T);
+  const done = () => { ST.part++; if (ST.part >= ORDER.length) ST.stage = "mix"; save(); show(); };
+  if (id === "build") { screen(`Part ${ST.part + 1} of ${ORDER.length}: Build the bars`); showBuild(done); }
+  else { const T = TYPE[id]; screen(`Part ${ST.part + 1} of ${ORDER.length}: ${T.title}`, T.sub); app.append(checkpointCard(T, { done })); }
+  if (KEY) app.append(h("div", { class: "row" }, h("button", { class: "btn ghost", onclick: done }, "Skip this part (key)")));
   if (ST.lock) showLock();
 }
-function nextPart() { ST.part++; if (ST.part >= ORDER.length) ST.finished = true; save(); showPart(); }
-
+function showMix() {
+  screen("Practice", "Mixed questions from every part. Keep going until the end mark.");
+  app.append(checkpointCard(TYPES[0], { mix: true }));
+  const bar = h("div", { class: "endbar" }), btn = h("button", { class: "btn big" }, "End practice"), note = h("span", { class: "sub" });
+  const upd = () => { const c = clk(); btn.disabled = !(KEY || c.canEnd); note.textContent = btn.disabled ? `  You can end at the end mark (${fmt(c.msToEnd)} left).` : ""; };
+  btn.onclick = () => { if (btn.disabled) return; ST.ended = true; save(); show(); };
+  bar.append(btn, note); app.append(bar); upd(); setInterval(upd, 1000);
+  if (ST.lock) showLock();
+}
 function showFinal() {
   if (lockArmed) { LessonLock.finish(); lockArmed = false; }
-  chips(); app.replaceChildren();
+  record();
+  screen("Done for today");
   const unl = Object.values(ST.cps).reduce((a, t) => a + t.unlocks, 0);
-  app.append(h("div", { class: "card", style: "text-align:center" }, h("h2", {}, "All six parts done"),
-    h("p", {}, "Show this screen to Mr. D, then start the practice sheet."),
+  app.append(h("div", { class: "card", style: "text-align:center" },
+    h("p", {}, "Your scores are saved on this computer. Turn in your exit ticket on paper."),
     h("table", { class: "sum" },
-      h("tr", {}, h("th", {}, "Student"), h("td", {}, ST.id || "(key)")),
-      h("tr", {}, h("th", {}, "Time"), h("td", {}, Math.round((Date.now() - ST.t0) / 60000) + " min")),
+      h("tr", {}, h("th", {}, "Parts done"), h("td", {}, `${Math.min(ST.part, ORDER.length)} of ${ORDER.length}`)),
       h("tr", {}, h("th", {}, "Questions answered"), h("td", {}, String(ST.answered))),
-      h("tr", {}, h("th", {}, "Misses"), h("td", {}, String(ST.misses))),
+      h("tr", {}, h("th", {}, "Right in practice"), h("td", {}, String(ST.mixed))),
       h("tr", {}, h("th", {}, "Times Mr. D unlocked you"), h("td", {}, String(unl))),
       h("tr", {}, h("th", {}, "Times you left the page"), h("td", {}, String(KEY ? 0 : LessonLock.stats().total))))));
+}
+function record() {
+  if (KEY || !ST.items.length) return;
+  try { MrD.profile.record({ course: "stats", lesson: LESSON_ID, title: TITLE, first: ST.id, period: ST.period, day: MrD.bell.dayKey(), reached: Math.min(ST.part, ORDER.length), of: ORDER.length, items: ST.items }); } catch (e) { }
+}
+
+/* ---------- huddles on the clock: h1 hold screen at minute 3, h2 writable tab at minute 25 ---------- */
+function huddleTick() {
+  if (KEY || !ST || !ST.started || ST.ended || !gatesOn() || !$("hud").hidden) return;
+  const m = minutesIn(); if (m == null) return;
+  const due = MrD.pace.huddleDue(PACING, m, Object.keys(ST.fired).filter(k => ST.fired[k]));
+  if (due) showHuddle(due.key);
+}
+function showHuddle(key) {
+  const host = $("hudHost"), mode = MrD.pace.huddleMode(PACING, key), code = MrD.codes.gateV3(LESSON_ID, key);
+  const inp = h("input", { type: "text", inputmode: "numeric", "aria-label": "Huddle code" }), msg = h("p", { class: "pesMsg no" });
+  const go = h("button", { class: "btn" }, "Unlock");
+  go.onclick = () => { if (inp.value.trim() === code) { ST.fired[key] = true; save(); $("hud").hidden = true; chips(); } else { msg.textContent = "Not the code. Eyes up and wait for Mr. D."; inp.value = ""; } };
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") go.click(); });
+  host.replaceChildren();
+  if (mode === "hold") host.append(h("h2", {}, "Huddle 1"), h("p", { class: "hold" }, "Eyes up. Mr. D is talking."), h("p", {}, "When he gives the code, type it here."));
+  else { host.append(h("h2", {}, "Huddle 2"), h("p", {}, "Fill in the blanks while Mr. D explains. Then type the code to go back.")); const w = h("div"); host.append(w); MrD.huddle.render(w, HUDDLE, ST.hud, {}); }
+  host.append(h("div", { class: "row" }, inp, go), msg);
+  $("hud").hidden = false; setTimeout(() => inp.focus(), 0);
 }
 
 /* ---------- checkpoint lock (3 misses, or "I need Mr. D") ---------- */
@@ -290,24 +392,43 @@ function lockFor(type, reason) { ST.lock = CK.lockInfo(type, reason, ST.part); i
 function showLock() {
   if (KEY) { ST.lock = null; return; }
   const L = ST.lock, host = $("cpLockHost");
-  host.replaceChildren(...CK.lockScreen(L, { head: "Mr. D needs to see you", miss: "Three misses in a row on this part.", help: "You asked for help.", body: "Raise your hand. Mr. D will look at your work with you, then type today's code.", word: "Code:", wrong: "Not the code. Hand up and wait for Mr. D.", go: "Unlock" },
-    { pin: "cpPin", go: "cpGo", msg: "cpMsg" }, () => { CK.unlockTrack(ST.cps[L.type]); ST.lock = null; CK.mirrorClear(LESSON_ID); save(); $("cpLock").hidden = true; showPart(); }));
+  host.replaceChildren(...CK.lockScreen(L, { head: "Mr. D needs to see you", miss: "Three misses in a row.", help: "You asked for help.", body: "Raise your hand. Mr. D will look at your work with you, then type today's code.", word: "Code:", wrong: "Not the code. Hand up and wait for Mr. D.", go: "Unlock" },
+    { pin: "cpPin", go: "cpGo", msg: "cpMsg" }, () => { CK.unlockTrack(ST.cps[L.type]); ST.lock = null; CK.mirrorClear(LESSON_ID); save(); $("cpLock").hidden = true; show(); }));
   $("cpLock").hidden = false; setTimeout(() => { const p = $("cpPin"); if (p) p.focus(); }, 0);
 }
 
+/* ---------- #key: the key desk (timings, codes, the huddle with answers, sample problems from every band) ---------- */
+let deskDone = false;
+function keyDesk() {
+  if (deskDone) { app.append($("keydesk")); return; }
+  deskDone = true;
+  const tbl = (head, rows) => h("table", {}, h("tr", {}, ...head.map(x => h("th", {}, x))), ...rows.map(r => h("tr", {}, ...r.map(c => h("td", {}, String(c))))));
+  const samples = [];
+  TYPES.forEach(T => [1, 2, 3].forEach(b => { for (let i = 0; i < 2; i++) { const q = T.make(b); samples.push([T.title, b, q.text, String(q.answer) + (T.unit || "")]); } }));
+  const hud = h("div"); MrD.huddle.render(hud, HUDDLE, {}, { key: true });
+  const d = h("details", { class: "card kt", id: "keydesk" }, h("summary", {}, h("b", {}, "Teacher key: timings, codes, huddle 2, sample problems")),
+    h("h3", {}, "The 42-minute day"),
+    tbl(["Minutes", "What"], [["0:00-0:03", "Warm-up: 3 easy review items from 4.1 (no lock)."], ["0:03", "Huddle 1: hold screen, code 1. Review the out-of and the association sentence."], ["0:03-0:25", "Parts 1 to 6. Each needs 3 right in a row; band rises with each right answer, so a pass ends on the standard."], ["0:25", "Huddle 2: the writable tab below, code 2. State what is tested."], ["0:25-0:42", "Finish the parts, then mixed practice until the end mark. End button unlocks at the mark (Friday: the bell)."], ["Exit", "Exit ticket on paper."]]),
+    h("p", {}, h("b", {}, "Huddle 1 code: "), MrD.codes.gateV3(LESSON_ID, "h1"), "   ", h("b", {}, "Huddle 2 code: "), MrD.codes.gateV3(LESSON_ID, "h2"), "   ", h("b", {}, "Unlock any locked student: "), MrD.codes.override()),
+    h("h3", {}, "Bands (hidden from students)"),
+    tbl(["Band", "What changes"], [[1, "Groups of 20 to 50, percents in tens; only \"Of the [group]\" questions; association gaps of 40 points or none."], [2, "Groups up to 120; adds \"of all\" questions and row totals; gaps of 30."], [3, "The standard. Groups in fives, percents in fives (rounding); column out-of and one-cell questions; gaps of 20; graphs in fives."]]),
+    h("h3", {}, "Huddle 2 (answers shown)"), hud,
+    h("h3", {}, "Sample problems, two per band per part"), tbl(["Part", "Band", "Question", "Answer"], samples));
+  app.append(d);
+}
+
 /* ---------- starting, and locked mode (shared/lock.js) ---------- */
-const clk = () => MrD.bell.clock("stats");
 const lockWanted = () => !KEY && !!ST.id && NOLOCK !== LessonLock.offCode() && !!clk().lockOn;
-function go() { ST.started = true; save(); $("lockres").hidden = true; showPart(); }
+function go() { ST.started = true; save(); $("lockres").hidden = true; show(); huddleTick(); }
 function startCard() {
   chips(); app.replaceChildren();
   const idHost = h("div"), msg = h("p", { class: "pesMsg no" });
-  const btn = h("button", { class: "btn big", id: "bBegin", disabled: "" }, "Begin →");
-  app.append(h("div", { class: "card", id: "start" }, h("h2", {}, "Practice: 4.1 and 4.2"),
-    h("p", {}, "Six short parts on two-way tables and association. Each part needs three right in a row. A miss gives you a hint and a fresh question. Three misses in a row, and Mr. D comes to check your work."),
+  const btn = h("button", { class: "btn big", id: "bBegin", disabled: "" }, ST.started ? "Continue →" : "Begin →");
+  app.append(h("div", { class: "card", id: "start" }, h("h2", {}, TITLE),
+    h("p", {}, "A warm-up, then six short parts on two-way tables and association, then mixed practice. Each part needs three right in a row. A miss gives you a hint and a fresh question. Three misses in a row, and Mr. D comes to check your work."),
     clk().lockOn && NOLOCK !== LessonLock.offCode() ? h("p", {}, h("b", {}, "This runs full screen. Leaving it is counted.")) : null,
     idHost, btn, msg));
-  const ask = MrD.ids.ask(idHost, { onChange: (i) => { btn.disabled = !i.valid; msg.textContent = ""; } });
+  const ask = MrD.ids.ask(idHost, { id: ST.id, period: ST.period, onChange: (i) => { btn.disabled = !i.valid; msg.textContent = ""; } });
   btn.onclick = () => {
     const info = ask.get(); if (!info.valid) return; ST.id = info.id; ST.period = info.period; MrD.ids.setMe(ST.id, ST.period);
     if (!lockWanted()) return go();
@@ -325,19 +446,19 @@ function lockResumeCard() {
 function boot() {
   if (KEY) {
     ST = fresh(); ST.started = true;
-    MrD.teacherBar($("tb"), { course: "stats", lessonId: LESSON_ID, gates: [], teacher: "../teacher.html", root: "../../" });
-    return showPart();
+    MrD.teacherBar($("tb"), { course: "stats", lessonId: LESSON_ID, gates: [{ key: "h1", label: "Huddle 1" }, { key: "h2", label: "Huddle 2" }], teacher: "../teacher.html", root: "../../" });
+    return show();
   }
   LessonLock.init({ id: LESSON_ID, root: app, onChange: () => chips() });
-  ST = load() || fresh();
+  ST = Object.assign(fresh(), load() || {});
   const me = MrD.ids.me(); if (me && !ST.id) { ST.id = me.id; ST.period = me.period; }
   const m = CK.mirrorGet(LESSON_ID); if (m && !ST.lock) ST.lock = m;
-  if (NOLOCK !== LessonLock.offCode() && clk().lockOn && LessonLock.pending()) { if (!ST.started) ST = Object.assign(fresh(), { id: ST.id }); lockResumeCard(); return; }
-  setInterval(() => { if (lockArmed && !clk().lockOn) { lockArmed = false; LessonLock.finish(); chips(); } }, 5000);
-  if (ST.finished) return showFinal();
+  setInterval(() => { if (lockArmed && !clk().lockOn) { lockArmed = false; LessonLock.finish(); } if (ST.started) { chips(); huddleTick(); } }, 2000);
+  if (NOLOCK !== LessonLock.offCode() && clk().lockOn && LessonLock.pending()) { lockResumeCard(); return; }
+  if (ST.ended) return showFinal();
   startCard();   // also after a reload: a fresh Begin click is needed for full screen, and saved progress is kept
 }
-window.__cc = { types: TYPES, st: () => ST, next: () => nextPart() };
+window.__cc = { types: TYPES, st: () => ST, show: () => show(), huddle: (k) => showHuddle(k) };
 boot();
 </script>
 </body>
