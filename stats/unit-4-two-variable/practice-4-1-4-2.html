@@ -13,7 +13,9 @@ header{background:var(--teal);color:#fff;padding:10px 18px;display:flex;gap:14px
 header h1{margin:0;font-size:21px}header a{color:#fff}
 #chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{background:rgba(255,255,255,.25);border-radius:999px;padding:3px 11px;font-size:14px;font-weight:bold;white-space:nowrap}
-.chip.on{background:#fff;color:var(--deep)}.chip.done{background:var(--deep)}
+.chip{border:0;color:#fff;font-family:inherit;cursor:pointer}.chip:disabled{opacity:.45;cursor:default}
+.chip.on{background:#fff;color:var(--deep)}.chip.done{background:var(--deep)}.chip.star{background:var(--gold);color:#3a2a00}.chip.star.on{background:#fff;color:#8a5a00}
+.tframe .say{font-size:19px;margin:6px 0}.tframe .guide{color:var(--mute);font-size:15px}
 #app{max-width:980px;margin:0 auto;padding:16px 14px 90px}
 .card{background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
 .text{background:var(--wash);border-color:var(--teal)}
@@ -62,7 +64,6 @@ table.sum{margin:10px auto;border-collapse:collapse;font-size:17px}table.sum td,
   <h2>Mr. D needs to see you</h2><p id="lockresTxt"></p>
   <div class="row"><input id="lockCode" type="password" inputmode="numeric" aria-label="Unlock code from Mr. D"><button class="btn" id="bUnlock">Unlock</button></div>
   <p id="lockMsg" class="pesMsg no"></p></div></div>
-<div class="overlay" id="hud" hidden><div class="card" id="hudHost" style="max-width:760px;max-height:92vh;overflow:auto"></div></div>
 <div class="overlay" id="cpLock" hidden><div class="card" id="cpLockHost"></div></div>
 <script src="../../shared/config.js"></script>
 <script src="../../shared/bell.js"></script>
@@ -71,26 +72,24 @@ table.sum{margin:10px auto;border-collapse:collapse;font-size:17px}table.sum td,
 <script src="../../shared/teacherbar.js"></script>
 <script src="../../shared/ids.js"></script>
 <script src="../../shared/pace.js"></script>
-<script src="../../shared/huddle.js"></script>
 <script src="../../shared/profile.js"></script>
 <script type="module">
-/* Practice day, 4.1 and 4.2: a concept checker built to the day rules (docs/DAY-RULES.md, CLAUDE.md "Supersedes").
-   - The 42-minute clock (shared/bell.js, stats period): warm-up of 3 easy review items, huddle 1 at minute 3 (hold screen, code 1),
-     huddle 2 at minute 25 (the writable huddle tab, code 2), practice, endless mixed practice until the end mark, then End.
-     Codes are asked for only on school days 7:00 AM to 3:00 PM in the stats period, never in #key (shared/pace.js times).
-   - Six checkpoint parts with no click-through (shared/virtual-lab/checkpoint.js): 3 right in a row, generated questions,
-     a miss gives a hint from the student's own table and a fresh question, 3 misses or "I need Mr. D" lock until today's
-     MrD.codes.override(). Three hidden bands: a right answer moves the student up a band, a miss moves them down one,
-     so a pass always ends on band 3, the regular-level standard. Nothing is labeled by difficulty.
+/* Practice day, 4.1 and 4.2: a concept checker with the site's teacher controls.
+   Tabs across the top, clickable once reached (all of them in #key): Warm-up, Notes (a self-paced picture tutorial like the
+   calculus visual-tutorial lessons: no huddle, no code), six checkpoint parts, two star tabs (extension), then mixed practice
+   until the end mark.
+   - Checkpoints have no click-through (shared/virtual-lab/checkpoint.js): 3 right in a row, generated questions, a miss gives a
+     hint from the student's own table and a fresh question, 3 misses or "I need Mr. D" lock until today's MrD.codes.override().
+     Three hidden bands: a right answer moves up one, a miss down one, so a pass ends on band 3, the regular-level standard.
    - Locked mode from the Begin click (shared/lock.js). No stamp, no report code. Scores go to MrD.profile.record.
-   - #key: teacher bar, every part open, answers on every question, the huddle answers, a key desk with timings,
-     huddle codes and sample problems from every band. Adding #key to an open page reloads it. */
+   - The End button opens at the end mark (42 min Mon-Thu, the bell Friday), always at home.
+   - #key: teacher bar, every tab open, answers on every question, skip buttons, and a key desk.
+   Ian asked for the star tabs on 2026-11-19, which overrides the "no tiers" line in CLAUDE.md for this page. */
 import * as CK from "../../shared/virtual-lab/checkpoint.js";
 import { h } from "../../shared/virtual-lab/dom.js";
 
 const LESSON_ID = "stats-4-1-4-2-practice", TITLE = "Practice: 4.1 and 4.2";
 const KEY = MrD.isKey(), NOLOCK = (/nolock=(\d+)/.exec(location.hash) || [])[1];
-const PACING = { budgetMin: 42, clock: "v3" };
 const $ = (i) => document.getElementById(i);
 const app = $("app");
 addEventListener("hashchange", () => location.reload());
@@ -210,37 +209,96 @@ const WARM = [
   { text: "Of the seniors, what percent have a job? Pick the out-of.", t: WARM_TABLE, answer: 40, opts: [100, 40, 42], input: "mc" }
 ];
 
-/* ---------- the huddle 2 tab (Mr. D formalizes; students fill blanks; nothing graded) ---------- */
-const HUDDLE = {
-  defs: [
-    { term: "out-of", text: "The out-of is the group right after \"[[Of the]]\". \"Of all\" means the [[grand total]]." },
-    { term: "percent", text: "percent = [[part]] ÷ [[out-of]] × 100" },
-    { term: "association", text: "Two variables are associated when the [[percents]] for each group are clearly [[different]]. Compare percents, not [[counts]]." }
-  ],
-  example: { prompt: "40 seniors: 24 have a job. 60 juniors: 18 have a job.",
-    steps: ["Seniors: 24 ÷ [[40]] = [[60]]%", "Juniors: 18 ÷ [[60]] = [[30]]%", "There [[is]] an association. Of the seniors, 60% have a job, but of the juniors, only [[30]]%."] }
-};
+/* ---------- star tabs (extension): same checkpoint rules, standard-band numbers ---------- */
+const STARS = [
+  { id: "undo", title: "★ Undo it: percent to count", sub: "count = percent ÷ 100 × out-of.", skill: "stats.4-2.undo",
+    make() {
+      const c = pick(CTX), r = ri(0, 1), R = ri(4, 24) * 5, p = ri(1, 19) * 5, n = Math.round(R * p / 100);
+      return { c, P: r === 0 ? [p, ri(1, 19) * 5] : [ri(1, 19) * 5, p], text: `There are ${R} ${c.grp[r]}. Read their bar. How many of them ${c.yes}?`, answer: n,
+        hint: `Their bar says ${p}%. Undo the × 100: ${p} ÷ 100 = ${p / 100}. Undo the ÷ out-of: ${p / 100} × ${R}.` };
+    }, input: "num", check: (q, v) => Math.abs(+v - q.answer) <= 0.5 },
+  { id: "error", title: "★ Spot the mistake", sub: "Read the student's claim and find what went wrong.", skill: "stats.4-2.error",
+    make() {
+      const t = makeTable(pick(CTX), 3), c = t.c, r = ri(0, 1), kind = pick(["total", "count", "col", "none"]);
+      let claim, answer;
+      const D = { total: "Used the grand total as the out-of instead of the group's total", count: "Compared counts instead of percents", col: "Used the wrong group as the out-of (the column, not the row)", none: "Nothing is wrong" };
+      if (kind === "total") { claim = `"Of the ${c.grp[r]}, ${pct(t.n[r][0], t.N)}% ${c.yes}, because ${t.n[r][0]} ÷ ${t.N}."`; answer = D.total; }
+      else if (kind === "col") { claim = `"Of the ${c.grp[r]}, ${pct(t.n[r][0], t.C[0])}% ${c.yes}, because ${t.n[r][0]} ÷ ${t.C[0]}."`; answer = D.col; }
+      else if (kind === "count") { const big = t.n[0][0] >= t.n[1][0] ? 0 : 1; claim = `"${c.grp[big][0].toUpperCase() + c.grp[big].slice(1)} are more likely to ${c.yes.replace(/^have /, "have ")}, because ${t.n[big][0]} is more than ${t.n[1 - big][0]}."`; answer = D.count; }
+      else { claim = `"Of the ${c.grp[r]}, ${pct(t.n[r][0], t.R[r])}% ${c.yes}, because ${t.n[r][0]} ÷ ${t.R[r]}."`; answer = D.none; }
+      if (kind === "count" && pct(t.n[0][0], t.R[0]) === pct(t.n[1][0], t.R[1]) && t.n[0][0] === t.n[1][0]) return this.make();
+      return { t, text: `A student says: ${claim} What is wrong?`, answer, opts: Object.values(D).sort(() => rnd() - 0.5),
+        hint: kind === "none" ? `Check it: the out-of for "Of the ${c.grp[r]}" is ${t.R[r]}, and the part is ${t.n[r][0]}. Does the claim use those?` : `Ask two things: which number is the out-of here, and is the claim comparing percents or counts?` };
+    }, input: "mc", check: (q, v) => v === q.answer }
+];
+STARS.forEach(S => { TYPE[S.id] = S; });
+
+/* ---------- Notes: a self-paced picture tutorial (the calculus visual-tutorial shape). No huddle, no code: each frame has a
+   picture, one short explanation and one question; a wrong pick explains and lets the student try again. ---------- */
+const PET = { c: Object.assign({}, CTX[0], { cols: ["Pet", "No pet"], yes: "have a pet" }), n: [[20, 20], [30, 30]], R: [40, 60], C: [50, 50], N: 100 };
+const NOTES = [
+  { head: "A two-way table counts people two ways at once", pic: () => tableEl(WARM_TABLE), guide: "Each row is a group (seniors, juniors). Each column is an answer (job, no job). The Total row and column add them up.",
+    say: "To read a count, find the row, find the column, and read where they meet.",
+    ask: { prompt: "How many juniors have no job?", options: ["42", "18", "60", "58"], answer: 0, why: "Junior row, No job column: 42." } },
+  { head: "Every percent is out of some group", pic: () => tableEl(WARM_TABLE), guide: "Same table. The senior total is 40, the job total is 42, the grand total is 100.",
+    say: "The out-of is the group right after \"Of the\". \"Of all\" means everyone, the grand total.",
+    ask: { prompt: "\"Of the seniors, what percent have a job?\" What is the out-of?", options: ["40, the seniors", "100, everyone", "42, the job-holders", "24"], answer: 0, why: "\"Of the seniors\" means out of the 40 seniors." } },
+  { head: "percent = part ÷ out-of × 100", pic: () => tableEl(WARM_TABLE), guide: "The part is the seniors who have a job: 24. The out-of is the seniors: 40.",
+    say: "Divide the part by the out-of, then multiply by 100.",
+    ask: { prompt: "Of the seniors, what percent have a job?", options: ["60%", "24%", "57%", "40%"], answer: 0, why: "24 ÷ 40 = 0.6, and 0.6 × 100 = 60%." } },
+  { head: "Compare percents, not counts", pic: () => tableEl(PET), guide: "The same 100 students and pets. More juniors have pets (30 against 20), but there are more juniors too.",
+    say: "Turn each group into a percent of its own group. Different percents: associated. The same: not associated.",
+    ask: { prompt: "20 of 40 seniors and 30 of 60 juniors have a pet. Is grade associated with having a pet?", options: ["No. Both are 50%.", "Yes. 30 is more than 20.", "Yes. Juniors are a bigger group.", "No. Pets are not a grade."], answer: 0, why: "20 ÷ 40 = 50% and 30 ÷ 60 = 50%. Same percent, no association." } },
+  { head: "A segmented bar graph shows the percents", pic: () => barsSvg(CTX[0], [60, 30], { labels: true }), guide: "One bar per group, each stretched to 100. The shaded bottom is the job part; the line inside the bar sits at its percent.",
+    say: "Lines at different heights mean the variables are associated. Level lines mean they are not.",
+    ask: { prompt: "What does this graph show?", options: ["An association: 60% of seniors have a job, but only 30% of juniors.", "No association: both bars reach 100.", "More juniors have jobs.", "60 seniors have a job."], answer: 0, why: "The lines sit at 60 and 30. Different heights, so grade and having a job are associated." } },
+  { head: "Say it with both percents", pic: () => barsSvg(CTX[0], [60, 30], { labels: true }), guide: "This is the sentence the test asks for.",
+    say: "There is an association. Of the ___, ___% ___, but of the ___, only ___%.",
+    ask: { prompt: "Which sentence is complete?", options: ["There is an association. Of the seniors, 60% have a job, but of the juniors, only 30%.", "There is an association.", "Seniors have more jobs.", "There is an association because 24 is more than 18."], answer: 0, why: "It says yes or no, and gives both percents as the reason." } }
+];
+function showNotes(done) {
+  const f = NOTES[ST.note];
+  if (!f) return done();
+  const card = h("div", { class: "card tframe" }), fb = h("div"), nextB = h("button", { class: "btn", disabled: "" }, ST.note === NOTES.length - 1 ? "Finish the notes →" : "Next →");
+  card.append(h("div", { class: "sub" }, `Notes ${ST.note + 1} of ${NOTES.length}`), h("h3", {}, f.head), f.pic(), h("p", { class: "guide" }, f.guide), h("p", { class: "say" }, f.say), h("div", { class: "q" }, f.ask.prompt));
+  const order = f.ask.options.map((_, i) => i).sort(() => rnd() - 0.5);
+  order.forEach(i => card.append(h("button", { class: "opt", onclick: (e) => {
+    if (i === f.ask.answer) { e.currentTarget.classList.add("ok"); card.querySelectorAll(".opt").forEach(b => b.disabled = true); fb.replaceChildren(h("div", { class: "fb ok" }, "✔ " + f.ask.why)); nextB.disabled = false; }
+    else { e.currentTarget.classList.add("no"); e.currentTarget.disabled = true; fb.replaceChildren(h("div", { class: "fb no" }, "✖ Not that one. Read the line above the question again, then try another.")); }
+  } }, f.ask.options[i])));
+  if (KEY) { card.append(h("div", { class: "keyline" }, h("b", {}, "KEY "), f.ask.options[f.ask.answer])); nextB.disabled = false; }
+  nextB.onclick = () => { ST.note++; save(); show(); };
+  card.append(fb, h("div", { class: "row" }, nextB));
+  app.append(card);
+}
 
 /* ---------- state (saved per day, so a reload or a lock does not wipe it) ---------- */
 const SKEY = "cc:" + LESSON_ID + ":" + MrD.bell.dayKey();
 let ST = null, lockArmed = false;
-const fresh = () => ({ id: "", period: "", stage: "warm", warm: 0, part: 0, started: false, ended: false, t0: Date.now(),
-  cps: Object.fromEntries([...TYPES.map(T => [T.id, CK.track()]), ["mix", CK.track()]]), band: Object.fromEntries([...TYPES.map(T => [T.id, 1]), ["mix", 3]]),
-  lock: null, build: 0, answered: 0, misses: 0, mixed: 0, items: [], fired: {}, hud: {} });
-const save = () => { if (KEY) return; try { localStorage.setItem(SKEY, JSON.stringify(ST)); } catch (e) { } if (lockArmed) LessonLock.save(ST.part, false, null); };
+const TABS = [{ id: "warm", label: "Warm-up" }, { id: "notes", label: "Notes" }, ...ORDER.map((id, i) => ({ id, label: String(i + 1) })),
+  { id: "undo", label: "★1", star: true }, { id: "error", label: "★2", star: true }, { id: "mix", label: "Practice" }];
+const CORE = TABS.filter(t => !t.star && t.id !== "mix" && t.id !== "warm" && t.id !== "notes").length;
+const fresh = () => ({ id: "", period: "", tab: 0, reached: 0, done: {}, warm: 0, note: 0, started: false, ended: false, t0: Date.now(),
+  cps: Object.fromEntries([...TYPES.map(T => [T.id, CK.track()]), ...STARS.map(T => [T.id, CK.track()]), ["mix", CK.track()]]),
+  band: Object.fromEntries([...TYPES.map(T => [T.id, 1]), ...STARS.map(T => [T.id, 3]), ["mix", 3]]),
+  lock: null, build: 0, answered: 0, misses: 0, mixed: 0, items: [] });
+const save = () => { if (KEY) return; try { localStorage.setItem(SKEY, JSON.stringify(ST)); } catch (e) { } if (lockArmed) LessonLock.save(ST.tab, false, null); };
 const load = () => { try { return JSON.parse(localStorage.getItem(SKEY)); } catch (e) { return null; } };
 const clk = () => MrD.bell.clock("stats");
-const minutesIn = () => { const c = clk(); return c.session ? (c.now - c.session.start) / 60000 : null; };
-const gatesOn = () => !KEY && clk().mode === "class" && !!clk().gates;
 const fmt = (ms) => { const s = Math.max(0, Math.round(ms / 1000)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
 
 function chips() {
-  const c = clk(), list = ORDER.map((id, i) => h("span", { class: "chip" + (ST.stage === "parts" && i === ST.part ? " on" : (ST.stage !== "warm" && (i < ST.part || ST.stage !== "parts")) ? " done" : "") }, (ST.stage !== "warm" && (i < ST.part || ST.stage !== "parts") ? "✓ " : "") + (i + 1)));
-  const extra = [];
+  const c = clk(), extra = [];
   if (c.mode === "class" && c.msToEnd != null && c.msToEnd > 0) extra.push(h("span", { class: "chip clockchip" }, "⏱ " + fmt(c.msToEnd) + " to the end mark"));
   if (lockArmed) extra.push(h("span", { class: "chip" }, "🔒 exits " + LessonLock.stats().total));
-  $("chips").replaceChildren(h("span", { class: "chip" + (ST.stage === "warm" ? " on" : " done") }, "Warm-up"), ...list, h("span", { class: "chip" + (ST.stage === "mix" ? " on" : "") }, "Practice"), ...extra);
+  $("chips").replaceChildren(...TABS.map((t, i) => {
+    const b = h("button", { type: "button", class: "chip" + (t.star ? " star" : "") + (i === ST.tab && !ST.ended ? " on" : ST.done[t.id] ? " done" : ""), title: t.star ? "Extension" : "" }, (ST.done[t.id] ? "✓ " : "") + t.label);
+    b.disabled = !(KEY || (ST.started && i <= ST.reached));
+    b.onclick = () => { if (b.disabled || ST.lock) return; ST.tab = i; ST.ended = false; save(); show(); };
+    return b;
+  }), ...extra);
 }
+function finishTab() { ST.done[TABS[ST.tab].id] = true; ST.tab = Math.min(ST.tab + 1, TABS.length - 1); ST.reached = Math.max(ST.reached, ST.tab); save(); show(); }
 
 /* ---------- band moves: right = up one, miss = down one ---------- */
 const bandUp = (id) => { ST.band[id] = Math.min(3, ST.band[id] + 1); };
@@ -314,14 +372,16 @@ function showBuild(done) {
 function screen(title, sub) { chips(); app.replaceChildren(); window.scrollTo(0, 0); app.append(h("h2", {}, title)); if (sub) app.append(h("p", { class: "sub" }, sub)); if (KEY) keyDesk(); }
 function show() {
   if (ST.ended) return showFinal();
-  if (ST.stage === "warm") return showWarm();
-  if (ST.stage === "parts") return showPart();
-  return showMix();
+  const t = TABS[ST.tab];
+  if (t.id === "warm") return showWarm();
+  if (t.id === "notes") { screen("Notes", "A picture tutorial. Read each card and answer its question."); showNotes(finishTab); return; }
+  if (t.id === "mix") return showMix();
+  return showPart();
 }
 function showWarm() {
   screen("Warm-up", "Three quick review questions from 4.1.");
   const it = WARM[ST.warm];
-  if (!it) { ST.stage = "parts"; save(); return show(); }
+  if (!it) return finishTab();
   const card = h("div", { class: "card" }), fb = h("div");
   if (it.t) card.append(tableEl(it.t));
   card.append(h("div", { class: "q" }, `${ST.warm + 1} of 3. ${it.text}`));
@@ -332,11 +392,10 @@ function showWarm() {
   card.append(fb); app.append(card);
 }
 function showPart() {
-  const id = ORDER[ST.part];
-  const done = () => { ST.part++; if (ST.part >= ORDER.length) ST.stage = "mix"; save(); show(); };
-  if (id === "build") { screen(`Part ${ST.part + 1} of ${ORDER.length}: Build the bars`); showBuild(done); }
-  else { const T = TYPE[id]; screen(`Part ${ST.part + 1} of ${ORDER.length}: ${T.title}`, T.sub); app.append(checkpointCard(T, { done })); }
-  if (KEY) app.append(h("div", { class: "row" }, h("button", { class: "btn ghost", onclick: done }, "Skip this part (key)")));
+  const t = TABS[ST.tab], n = ORDER.indexOf(t.id);
+  if (t.id === "build") { screen(`Part ${n + 1} of ${ORDER.length}: Build the bars`); if (ST.done.build) ST.build = 0; showBuild(finishTab); }
+  else { const T = TYPE[t.id]; screen(t.star ? T.title : `Part ${n + 1} of ${ORDER.length}: ${T.title}`, T.sub); if (ST.done[t.id]) Object.assign(ST.cps[t.id], { streak: 0, miss: 0 }); app.append(checkpointCard(T, { done: finishTab })); }
+  if (KEY) app.append(h("div", { class: "row" }, h("button", { class: "btn ghost", onclick: finishTab }, "Skip this tab (key)")));
   if (ST.lock) showLock();
 }
 function showMix() {
@@ -356,7 +415,8 @@ function showFinal() {
   app.append(h("div", { class: "card", style: "text-align:center" },
     h("p", {}, "Your scores are saved on this computer. Turn in your exit ticket on paper."),
     h("table", { class: "sum" },
-      h("tr", {}, h("th", {}, "Parts done"), h("td", {}, `${Math.min(ST.part, ORDER.length)} of ${ORDER.length}`)),
+      h("tr", {}, h("th", {}, "Parts done"), h("td", {}, `${ORDER.filter(id => ST.done[id]).length} of ${ORDER.length}`)),
+      h("tr", {}, h("th", {}, "Star tabs done"), h("td", {}, `${STARS.filter(x => ST.done[x.id]).length} of ${STARS.length}`)),
       h("tr", {}, h("th", {}, "Questions answered"), h("td", {}, String(ST.answered))),
       h("tr", {}, h("th", {}, "Right in practice"), h("td", {}, String(ST.mixed))),
       h("tr", {}, h("th", {}, "Times Mr. D unlocked you"), h("td", {}, String(unl))),
@@ -364,31 +424,11 @@ function showFinal() {
 }
 function record() {
   if (KEY || !ST.items.length) return;
-  try { MrD.profile.record({ course: "stats", lesson: LESSON_ID, title: TITLE, first: ST.id, period: ST.period, day: MrD.bell.dayKey(), reached: Math.min(ST.part, ORDER.length), of: ORDER.length, items: ST.items }); } catch (e) { }
-}
-
-/* ---------- huddles on the clock: h1 hold screen at minute 3, h2 writable tab at minute 25 ---------- */
-function huddleTick() {
-  if (KEY || !ST || !ST.started || ST.ended || !gatesOn() || !$("hud").hidden) return;
-  const m = minutesIn(); if (m == null) return;
-  const due = MrD.pace.huddleDue(PACING, m, Object.keys(ST.fired).filter(k => ST.fired[k]));
-  if (due) showHuddle(due.key);
-}
-function showHuddle(key) {
-  const host = $("hudHost"), mode = MrD.pace.huddleMode(PACING, key), code = MrD.codes.gateV3(LESSON_ID, key);
-  const inp = h("input", { type: "text", inputmode: "numeric", "aria-label": "Huddle code" }), msg = h("p", { class: "pesMsg no" });
-  const go = h("button", { class: "btn" }, "Unlock");
-  go.onclick = () => { if (inp.value.trim() === code) { ST.fired[key] = true; save(); $("hud").hidden = true; chips(); } else { msg.textContent = "Not the code. Eyes up and wait for Mr. D."; inp.value = ""; } };
-  inp.addEventListener("keydown", e => { if (e.key === "Enter") go.click(); });
-  host.replaceChildren();
-  if (mode === "hold") host.append(h("h2", {}, "Huddle 1"), h("p", { class: "hold" }, "Eyes up. Mr. D is talking."), h("p", {}, "When he gives the code, type it here."));
-  else { host.append(h("h2", {}, "Huddle 2"), h("p", {}, "Fill in the blanks while Mr. D explains. Then type the code to go back.")); const w = h("div"); host.append(w); MrD.huddle.render(w, HUDDLE, ST.hud, {}); }
-  host.append(h("div", { class: "row" }, inp, go), msg);
-  $("hud").hidden = false; setTimeout(() => inp.focus(), 0);
+  try { MrD.profile.record({ course: "stats", lesson: LESSON_ID, title: TITLE, first: ST.id, period: ST.period, day: MrD.bell.dayKey(), reached: ORDER.filter(id => ST.done[id]).length, of: ORDER.length, items: ST.items }); } catch (e) { }
 }
 
 /* ---------- checkpoint lock (3 misses, or "I need Mr. D") ---------- */
-function lockFor(type, reason) { ST.lock = CK.lockInfo(type, reason, ST.part); if (!KEY) CK.mirrorSet(LESSON_ID, ST.lock, ST.id); save(); showLock(); }
+function lockFor(type, reason) { ST.lock = CK.lockInfo(type, reason, ST.tab); if (!KEY) CK.mirrorSet(LESSON_ID, ST.lock, ST.id); save(); showLock(); }
 function showLock() {
   if (KEY) { ST.lock = null; return; }
   const L = ST.lock, host = $("cpLockHost");
@@ -397,35 +437,36 @@ function showLock() {
   $("cpLock").hidden = false; setTimeout(() => { const p = $("cpPin"); if (p) p.focus(); }, 0);
 }
 
-/* ---------- #key: the key desk (timings, codes, the huddle with answers, sample problems from every band) ---------- */
-let deskDone = false;
+/* ---------- #key: the key desk (how long each tab takes, the unlock code, bands, sample problems) ---------- */
+let deskDone = false, deskEl = null;
 function keyDesk() {
-  if (deskDone) { app.append($("keydesk")); return; }
+  if (deskDone) { app.append(deskEl); return; }
   deskDone = true;
   const tbl = (head, rows) => h("table", {}, h("tr", {}, ...head.map(x => h("th", {}, x))), ...rows.map(r => h("tr", {}, ...r.map(c => h("td", {}, String(c))))));
   const samples = [];
   TYPES.forEach(T => [1, 2, 3].forEach(b => { for (let i = 0; i < 2; i++) { const q = T.make(b); samples.push([T.title, b, q.text, String(q.answer) + (T.unit || "")]); } }));
-  const hud = h("div"); MrD.huddle.render(hud, HUDDLE, {}, { key: true });
-  const d = h("details", { class: "card kt", id: "keydesk" }, h("summary", {}, h("b", {}, "Teacher key: timings, codes, huddle 2, sample problems")),
-    h("h3", {}, "The 42-minute day"),
-    tbl(["Minutes", "What"], [["0:00-0:03", "Warm-up: 3 easy review items from 4.1 (no lock)."], ["0:03", "Huddle 1: hold screen, code 1. Review the out-of and the association sentence."], ["0:03-0:25", "Parts 1 to 6. Each needs 3 right in a row; band rises with each right answer, so a pass ends on the standard."], ["0:25", "Huddle 2: the writable tab below, code 2. State what is tested."], ["0:25-0:42", "Finish the parts, then mixed practice until the end mark. End button unlocks at the mark (Friday: the bell)."], ["Exit", "Exit ticket on paper."]]),
-    h("p", {}, h("b", {}, "Huddle 1 code: "), MrD.codes.gateV3(LESSON_ID, "h1"), "   ", h("b", {}, "Huddle 2 code: "), MrD.codes.gateV3(LESSON_ID, "h2"), "   ", h("b", {}, "Unlock any locked student: "), MrD.codes.override()),
+  STARS.forEach(T => { for (let i = 0; i < 3; i++) { const q = T.make(); samples.push([T.title, "star", q.text, String(q.answer)]); } });
+  const d = h("details", { class: "card kt", id: "keydesk" }, h("summary", {}, h("b", {}, "Teacher key: timing, codes, bands, sample problems")),
+    h("h3", {}, "About how long"),
+    tbl(["Tab", "Typical", "What"], [["Warm-up", "2-3 min", "3 easy review items from 4.1, no lock."], ["Notes", "6-8 min", "Six picture cards, one question each. A tutorial: no huddle, no code."],
+      ["Parts 1-6", "20-25 min", "About 3-4 min a part when the student gets three in a row quickly; the bar builder about 4 min. Each miss adds a fresh question, so a struggling student takes longer."],
+      ["★1, ★2", "6-8 min", "Extension. Same rule: three in a row."], ["Practice", "to the mark", "Mixed questions at the standard until the end mark (42 min Mon-Thu, the bell Friday). End opens then."]]),
+    h("p", {}, h("b", {}, "Unlock any locked student: "), MrD.codes.override(), " (also on the teacher bar)"),
     h("h3", {}, "Bands (hidden from students)"),
     tbl(["Band", "What changes"], [[1, "Groups of 20 to 50, percents in tens; only \"Of the [group]\" questions; association gaps of 40 points or none."], [2, "Groups up to 120; adds \"of all\" questions and row totals; gaps of 30."], [3, "The standard. Groups in fives, percents in fives (rounding); column out-of and one-cell questions; gaps of 20; graphs in fives."]]),
-    h("h3", {}, "Huddle 2 (answers shown)"), hud,
-    h("h3", {}, "Sample problems, two per band per part"), tbl(["Part", "Band", "Question", "Answer"], samples));
-  app.append(d);
+    h("h3", {}, "Sample problems"), tbl(["Tab", "Band", "Question", "Answer"], samples));
+  deskEl = d; app.append(d);
 }
 
 /* ---------- starting, and locked mode (shared/lock.js) ---------- */
 const lockWanted = () => !KEY && !!ST.id && NOLOCK !== LessonLock.offCode() && !!clk().lockOn;
-function go() { ST.started = true; save(); $("lockres").hidden = true; show(); huddleTick(); }
+function go() { ST.started = true; save(); $("lockres").hidden = true; show(); }
 function startCard() {
   chips(); app.replaceChildren();
   const idHost = h("div"), msg = h("p", { class: "pesMsg no" });
   const btn = h("button", { class: "btn big", id: "bBegin", disabled: "" }, ST.started ? "Continue →" : "Begin →");
   app.append(h("div", { class: "card", id: "start" }, h("h2", {}, TITLE),
-    h("p", {}, "A warm-up, then six short parts on two-way tables and association, then mixed practice. Each part needs three right in a row. A miss gives you a hint and a fresh question. Three misses in a row, and Mr. D comes to check your work."),
+    h("p", {}, "A warm-up, picture notes, then six short parts on two-way tables and association, then mixed practice. Each part needs three right in a row. A miss gives you a hint and a fresh question. Three misses in a row, and Mr. D comes to check your work."),
     clk().lockOn && NOLOCK !== LessonLock.offCode() ? h("p", {}, h("b", {}, "This runs full screen. Leaving it is counted.")) : null,
     idHost, btn, msg));
   const ask = MrD.ids.ask(idHost, { id: ST.id, period: ST.period, onChange: (i) => { btn.disabled = !i.valid; msg.textContent = ""; } });
@@ -446,19 +487,19 @@ function lockResumeCard() {
 function boot() {
   if (KEY) {
     ST = fresh(); ST.started = true;
-    MrD.teacherBar($("tb"), { course: "stats", lessonId: LESSON_ID, gates: [{ key: "h1", label: "Huddle 1" }, { key: "h2", label: "Huddle 2" }], teacher: "../teacher.html", root: "../../" });
+    MrD.teacherBar($("tb"), { course: "stats", lessonId: LESSON_ID, gates: [], teacher: "../teacher.html", root: "../../" });
     return show();
   }
   LessonLock.init({ id: LESSON_ID, root: app, onChange: () => chips() });
   ST = Object.assign(fresh(), load() || {});
   const me = MrD.ids.me(); if (me && !ST.id) { ST.id = me.id; ST.period = me.period; }
   const m = CK.mirrorGet(LESSON_ID); if (m && !ST.lock) ST.lock = m;
-  setInterval(() => { if (lockArmed && !clk().lockOn) { lockArmed = false; LessonLock.finish(); } if (ST.started) { chips(); huddleTick(); } }, 2000);
+  setInterval(() => { if (lockArmed && !clk().lockOn) { lockArmed = false; LessonLock.finish(); } if (ST.started && !document.activeElement?.matches?.("input")) chips(); }, 2000);
   if (NOLOCK !== LessonLock.offCode() && clk().lockOn && LessonLock.pending()) { lockResumeCard(); return; }
   if (ST.ended) return showFinal();
   startCard();   // also after a reload: a fresh Begin click is needed for full screen, and saved progress is kept
 }
-window.__cc = { types: TYPES, st: () => ST, show: () => show(), huddle: (k) => showHuddle(k) };
+window.__cc = { types: TYPES, tabs: TABS, st: () => ST, show: () => show() };
 boot();
 </script>
 </body>
