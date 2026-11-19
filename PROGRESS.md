@@ -2,6 +2,15 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-19: Stats practice day 4.1 and 4.2, concept checker (branch `stats-4-1-4-2-checker`)
+
+- New standalone page `stats/unit-4-two-variable/practice-4-1-4-2.html`, in the look of Ian's 2.4 and 3.4 Google Sites checkers, with the site's teacher controls.
+- Six parts: read the table, pick the out-of, percent from a table, build the segmented bars (two sliders per table, two tables), is there an association (pick the sentence), read a segmented bar graph.
+- Every question is generated (six contexts, random tables). Checkpoints use `shared/virtual-lab/checkpoint.js`: 3 right in a row; a miss gives a hint from the student's own table and a fresh question; 3 misses or "I need Mr. D" lock until today's `MrD.codes.override()`; after an unlock, 2 fresh ones. The lock and progress survive a reload.
+- Locked mode from the Begin click (`shared/lock.js`, stats period). `#key` shows the teacher bar, answers on every question, skip buttons, no lock. No stamp or report code.
+- Hub card added under a new Unit 4 in `stats/sims.js` (after Unit 3, so the hub test still finds Unit 3 first). Target added to `tests/lock.e2e.js`.
+- Checks run: `node tests/lock.e2e.js stats` (both stats targets pass), `node --test tests/unit/*.test.js` (437 pass, 0 fail), `node tools/check-lessons.mjs --strict` (0 errors), `tests/smoke.js` (all 57 pages load clean), plus a scripted run that finishes all six parts with no JS errors.
+
 ## 2026-11-17: Unit 4 visual-tutorial lessons, 4.4 to 4.7, two parts each (branch `calc-4-4-to-4-7-visual-tutorials`)
 
 Ian asked for the rest of Unit 4's guided lessons with no huddles, fully independent, a visual tutorial (concept, then "I do") before "You do", and each day split into two parts. Built eight lessons: 4.4, 4.5, 4.6 and 4.7, each Part 1 and Part 2 (`calculus/unit-4-contextual-applications/4-N-ptM-*.html`). The content comes from the CED topic list for 4.4 to 4.7, not from his pack, so check it against his materials.
