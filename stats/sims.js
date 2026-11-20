@@ -22,6 +22,9 @@
       teacher: [{ label: "Teacher view (#key)", href: l.href.replace(/^stats\//, "") + "#key" }] };
   });
   var unit4 = [
+    { type: "lesson", icon: "📖", title: "Textbook: Chapter 4, Two-Variable Data", href: "textbook/Unit4_Two-Variable_Data.pdf",
+      blurb: "The whole unit to reread at home: sections 4.1 to 4.6 with pictures, worked examples, Say it frames, exercises and answers at the back.",
+      tags: ["textbook", "PDF"] },
     { type: "lesson", icon: "✅", title: "Practice: 4.1 and 4.2", href: "unit-4-two-variable/practice-4-1-4-2.html",
       blurb: "Concept checker: two-way tables, the out-of, percents, segmented bar graphs and association. Three right in a row per part.",
       tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-4-two-variable/practice-4-1-4-2.html#key" }] }
