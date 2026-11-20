@@ -1,5 +1,5 @@
 /* Practice day 1 of Unit 4: lessons 4.1 (two-way tables) and 4.2 (association). Content only; checker/engine.js runs it. */
-import { h, rnd, ri, pick, pct, tableEl, barsSvg } from "./util.js";
+import { h, rnd, ri, pick, pct, tableEl, barsSvg } from "../../shared/checker/util.js";
 
 const CTX = [
   { who: "students", head: "Grade", lab: ["Senior", "Junior"], grp: ["seniors", "juniors"], cols: ["Job", "No job"], yes: "have a job" },

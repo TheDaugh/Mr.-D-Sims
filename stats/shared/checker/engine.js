@@ -1,6 +1,6 @@
-/* Stats concept-checker engine (practice days). One engine, one content file per practice day.
+/* Stats concept-checker engine (practice days), in stats/shared/checker/. One engine for every unit, one content file per practice day (in that unit's checker/ folder).
    A page loads the shared classic scripts (config, bell, codes, lock, teacherbar, ids, profile), then:
-     import { run } from "./checker/engine.js"; import DAY from "./checker/day-4-1-4-2.js"; run(DAY);
+     import { run } from "../shared/checker/engine.js"; import DAY from "./checker/day-4-1-4-2.js"; run(DAY);
    What every checker does (Ian, 2026-11-19):
    - Tabs across the top, clickable once reached (all of them in #key): Warm-up, Notes, the parts, star tabs, Practice.
    - Warm-up: 3 easy review items, no lock. Notes: a self-paced picture tutorial (the calculus visual-tutorial shape):

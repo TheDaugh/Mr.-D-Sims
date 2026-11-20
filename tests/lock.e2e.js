@@ -38,6 +38,12 @@ const TARGETS = [
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
   { name: 'stats practice 4-5-4-6 checker', url: '/stats/unit-4-two-variable/practice-4-5-4-6.html', clockAt: '2026-10-21T10:05:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
+  { name: 'stats practice 3-1-3-2 checker', url: '/stats/unit-3-normal-distribution/practice-3-1-3-2.html', clockAt: '2026-10-21T10:05:00-04:00', student: '65J-7TGT',
+    begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
+  { name: 'stats practice 3-3-3-4 checker', url: '/stats/unit-3-normal-distribution/practice-3-3-3-4.html', clockAt: '2026-10-21T10:05:00-04:00', student: '65J-7TGT',
+    begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
+  { name: 'stats practice 3-5-3-6 checker', url: '/stats/unit-3-normal-distribution/practice-3-5-3-6.html', clockAt: '2026-10-21T10:05:00-04:00', student: '65J-7TGT',
+    begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
   { name: 'chem electron-config-1', url: '/chemistry/unit-3-atoms-ions/electron-config-1.html', clockAt: '2026-10-21T10:45:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#btn-next'); } },
   ...[['unknown-solids', ''], ['heating', '?lab=heating'], ['rutherford', '?lab=rutherford'], ['flame', '?lab=flame'], ['pes', '?lab=pes'], ['zeff', '?lab=zeff']].map(([id, q]) => ({
