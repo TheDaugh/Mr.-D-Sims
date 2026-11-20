@@ -89,3 +89,24 @@ export function residSvg(R, opt = {}) {
   const m = Math.max(...R.map(p => Math.abs(p[1]))) * 1.2 || 1;
   return scatterSvg(R, Object.assign({ yr: [-m, m], xlab: opt.xlab, ylab: "Residual", line: { a: 0, b: 0 } }, opt));
 }
+
+/* dotplot of whole-number values; opt: lo, hi, step, hl (values <= hl drawn orange), xlab */
+export function dotplotSvg(vals, opt = {}) {
+  const W = 560, H = 190, L = 24, R = 24, B = 140;
+  const lo = opt.lo != null ? opt.lo : Math.min(...vals) - 1, hi = opt.hi != null ? opt.hi : Math.max(...vals) + 1, step = opt.step || 1;
+  const X = (v) => L + (W - L - R) * (v - lo) / (hi - lo), cnt = {};
+  const s = [`<svg class="bars" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dotplot">`, `<line x1="${L}" x2="${W - R}" y1="${B}" y2="${B}" stroke="#222" stroke-width="2"/>`];
+  for (let v = lo; v <= hi + 1e-9; v += step) s.push(`<line x1="${X(v)}" x2="${X(v)}" y1="${B}" y2="${B + 6}" stroke="#222"/><text x="${X(v)}" y="${B + 22}" text-anchor="middle" font-size="14">${round(v, 2)}</text>`);
+  vals.slice().sort((a, b) => a - b).forEach(v => { cnt[v] = (cnt[v] || 0) + 1; s.push(`<circle cx="${X(v)}" cy="${B - 10 - (cnt[v] - 1) * 17}" r="7" fill="${opt.hl != null && v <= opt.hl ? "#E8833A" : "#2AACAF"}" stroke="#1A1A1A" stroke-width="1.5"/>`); });
+  if (opt.xlab) s.push(`<text x="${W / 2}" y="${H - 4}" text-anchor="middle" font-size="15" font-weight="bold">${opt.xlab}</text>`);
+  s.push("</svg>"); return svg(s.join(""));
+}
+/* number line of hops: mean, SD, k = how many SDs each side; opt.mark = value to draw as an orange dot */
+export function hopsSvg(mean, sd, opt = {}) {
+  const k = opt.k || 3, W = 560, H = 120, L = 30, R = 30, Y = 70, lo = mean - k * sd, hi = mean + k * sd;
+  const X = (v) => L + (W - L - R) * (v - lo) / (hi - lo);
+  const s = [`<svg class="bars" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Number line in standard deviations">`, `<line x1="${L - 10}" x2="${W - R + 10}" y1="${Y}" y2="${Y}" stroke="#222" stroke-width="2"/>`];
+  for (let i = -k; i <= k; i++) { const v = mean + i * sd; s.push(`<line x1="${X(v)}" x2="${X(v)}" y1="${Y - 8}" y2="${Y + 8}" stroke="#222" stroke-width="2"/><text x="${X(v)}" y="${Y + 28}" text-anchor="middle" font-size="14">${round(v, 2)}</text><text x="${X(v)}" y="${Y - 16}" text-anchor="middle" font-size="13" fill="#17777A" font-weight="bold">z = ${i}</text>`); }
+  if (opt.mark != null) s.push(`<circle cx="${X(Math.max(lo, Math.min(hi, opt.mark)))}" cy="${Y}" r="9" fill="#E8833A" stroke="#1A1A1A" stroke-width="1.5"/>`);
+  s.push("</svg>"); return svg(s.join(""));
+}

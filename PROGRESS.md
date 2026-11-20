@@ -2,6 +2,13 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-20: Stats practice day 3.1-3.2, and the checker engine moved to stats/shared/checker (branch `stats-unit3-practice-3-1-3-2`)
+
+- Engine, util and CSS moved from `stats/unit-4-two-variable/checker/` to `stats/shared/checker/`; Unit 4 pages and day files point there. New units keep only their day files in `<unit>/checker/`. util.js gains `dotplotSvg` and `hopsSvg`.
+- `stats/unit-3-normal-distribution/practice-3-1-3-2.html` with `checker/day-3-1-3-2.js`: percentile from a dotplot, find the z-score, say the z-score, hop to the value (sim, 3 tasks), add or subtract a constant, multiply every value. Stars: value from z, who stands out more. Notes cards use the push-up class from the 3.1 and 3.2 notes.
+- Hub: a separate "Unit 3 · Practice days" block in `stats/sims.js`, because the Unit 3 plan list is held at 9 entries by `tests/unit/stats-course.test.js` (its titles are an old guess that does not match Math Medic; not changed without Ian).
+- Checks run: `node tests/lock.e2e.js stats` (all five stats targets pass), `node --test tests/unit/*.test.js` (437 pass), `node tools/check-lessons.mjs --strict` (0 errors), `tests/smoke.js` (57 pages clean), scripted runs on the new page (#key opens all 11 tabs; a student goes through every tab, the hop sim included, to practice, 8 mixed questions, End, score saved) and the Unit 4 checkers' runs again after the move (all pass).
+
 ## 2026-11-20: Stats textbook, Chapter 4 (branch `stats-unit4-textbook`)
 
 - `stats/textbook/Unit4_Two-Variable_Data.pdf`, 21 pages: sections 4.1 to 4.6 and answers. FHSST layout (from `chemistry/resources/Chemistry_Grade_10-12.pdf`), adapted: picture first with a reading guide, the class notes' stories, fading worked examples (Worked Examples 1 to 19), Definition, Say it and Watch out boxes, exercises, an "On the site" pointer to each practice checker, a summary per section. Original text (FHSST is GFDL; only its format is used).

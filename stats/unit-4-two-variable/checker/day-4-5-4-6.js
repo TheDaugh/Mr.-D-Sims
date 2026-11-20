@@ -1,6 +1,6 @@
 /* Practice day 3 of Unit 4: lessons 4.5 (regression lines: predict, residual, slope and intercept) and 4.6 (extrapolation,
    residual plots). Content only; checker/engine.js runs it. Every number is computed from the line shown. */
-import { h, rnd, ri, pick, shuffle, round, gauss, corr, scatterSvg, residSvg } from "./util.js";
+import { h, rnd, ri, pick, shuffle, round, gauss, corr, scatterSvg, residSvg } from "../../shared/checker/util.js";
 
 /* a story: line y-hat = a + b x over the data's x range [lo, hi]; units for the sentences */
 const LINES = [

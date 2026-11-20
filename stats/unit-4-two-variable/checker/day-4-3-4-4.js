@@ -1,6 +1,6 @@
 /* Practice day 2 of Unit 4: lessons 4.3 (scatterplots) and 4.4 (correlation), with 4.1-4.2 mixed into the practice tab.
    Content only; checker/engine.js runs it. Every scatterplot is generated, and its r is computed, never assumed. */
-import { h, rnd, ri, pick, shuffle, round, gauss, corr, cloud, scatterSvg } from "./util.js";
+import { h, rnd, ri, pick, shuffle, round, gauss, corr, cloud, scatterSvg } from "../../shared/checker/util.js";
 import D12 from "./day-4-1-4-2.js";
 
 /* x and y for each story; sign is the direction the story really has */
