@@ -2,6 +2,15 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-20: Stats practice days 4.3-4.4 and 4.5-4.6, and one checker engine (branch `stats-unit4-practice-days`)
+
+- The 4.1-4.2 checker is split into `stats/unit-4-two-variable/checker/engine.js` (every rule: tabs, warm-up, Notes tutorial, checkpoints with 3 in a row and the override lock, hidden bands, star tabs, practice to the end mark, locked mode, #key and key desk, profile scores), `checker/util.js` (seeded random, r and least squares, table, bar, scatter and residual pictures) and one content file per day: `checker/day-4-1-4-2.js`, `day-4-3-4-4.js`, `day-4-5-4-6.js`. Each page is a thin shell that runs its day. A rule change now goes in the engine once.
+- 4.3-4.4: read a point, explanatory or response, describe a scatterplot (direction, strength, form, outlier), make the scatterplot (sim: slide until r fits the task, three tasks), estimate r, correlation is not causation (lurking variable). Stars: what one dot does to r (answer computed from the dots), which r is stronger. Practice mixes in 4.1-4.2.
+- 4.5-4.6: predict with the line, find the residual, above or below the line, fit the line (sim: intercept and slope sliders with red residual bars, done within 10% of the least-squares error, two lines), say the slope, can you trust it (extrapolation or a curved residual plot). Stars: undo it (actual = predicted + residual), what the intercept means.
+- Every r, residual and best line is computed from the dots shown, never assumed.
+- Hub cards for both in `stats/sims.js`; both added to `tests/lock.e2e.js`.
+- Checks run: `node tests/lock.e2e.js stats` (all four stats targets pass), `node --test tests/unit/*.test.js` (437 pass, 0 fail), `node tools/check-lessons.mjs --strict` (0 errors), `tests/smoke.js` (57 pages clean), and scripted runs: on each new page `#key` opens all 11 tabs with no errors, and a student goes through every tab (both sims included) to practice, answers 8 mixed questions, ends and saves a score; the 4.1-4.2 checker still passes its 10 checks after the split.
+
 ## 2026-11-19: Stats practice day 4.1 and 4.2, concept checker (branch `stats-4-1-4-2-checker`)
 
 - New standalone page `stats/unit-4-two-variable/practice-4-1-4-2.html`, in the look of Ian's 2.4 and 3.4 Google Sites checkers, with the site's teacher controls.

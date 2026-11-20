@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Practice: 4.5 and 4.6 · Concept Checker · Mr. D</title>
+<meta name="description" content="Practice day for regression lines, residuals and extrapolation. Generated questions, three right in a row, locked mode.">
+<link rel="stylesheet" href="checker/checker.css">
+</head>
+<body>
+<div id="tb"></div>
+<header><h1><a href="../index.html">&larr;</a> Practice 4.5 &amp; 4.6 · Concept Checker</h1><div id="chips"></div></header>
+<main id="app"></main>
+<div class="overlay" id="lockres" hidden><div class="card">
+  <h2>Mr. D needs to see you</h2><p id="lockresTxt"></p>
+  <div class="row"><input id="lockCode" type="password" inputmode="numeric" aria-label="Unlock code from Mr. D"><button class="btn" id="bUnlock">Unlock</button></div>
+  <p id="lockMsg" class="pesMsg no"></p></div></div>
+<div class="overlay" id="cpLock" hidden><div class="card" id="cpLockHost"></div></div>
+<script src="../../shared/config.js"></script>
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
+<script src="../../shared/lock.js"></script>
+<script src="../../shared/teacherbar.js"></script>
+<script src="../../shared/ids.js"></script>
+<script src="../../shared/profile.js"></script>
+<script type="module">
+/* Practice: 4.5 and 4.6: content in checker/day-4-5-4-6.js, rules in checker/engine.js (read its header). */
+import { run } from "./checker/engine.js";
+import DAY from "./checker/day-4-5-4-6.js";
+run(DAY);
+</script>
+</body>
+</html>
