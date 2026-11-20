@@ -110,3 +110,37 @@ export function hopsSvg(mean, sd, opt = {}) {
   if (opt.mark != null) s.push(`<circle cx="${X(Math.max(lo, Math.min(hi, opt.mark)))}" cy="${Y}" r="9" fill="#E8833A" stroke="#1A1A1A" stroke-width="1.5"/>`);
   s.push("</svg>"); return svg(s.join(""));
 }
+
+/* ---------- the normal distribution ---------- */
+/* Phi(z): Abramowitz-Stegun 7.1.26 erf, error below 1.5e-7, good to the tenth of a percent students are asked for */
+export function phi(z) {
+  const t = 1 / (1 + 0.3275911 * Math.abs(z) / Math.SQRT2);
+  const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-z * z / 2);
+  return z >= 0 ? (1 + y) / 2 : (1 - y) / 2;
+}
+export const normalcdf = (lo, hi, mu, sd) => phi((hi - mu) / sd) - phi((lo - mu) / sd);
+export function invNorm(p, mu = 0, sd = 1) { let a = -10, b = 10; for (let i = 0; i < 80; i++) { const m = (a + b) / 2; if (phi(m) < p) a = m; else b = m; } return mu + sd * (a + b) / 2; }
+/* a normal curve with hops on the axis. opt: shade [[lo, hi], ...], color, labels (false hides numbers), xlab, mark (a value with a line) */
+export function normalSvg(mu, sd, opt = {}) {
+  const W = 560, H = 190, L = 20, R = 20, B = 140, T = 14, x0 = mu - 3.6 * sd, x1 = mu + 3.6 * sd;
+  const X = (v) => L + (W - L - R) * (v - x0) / (x1 - x0), Y = (v) => B - (B - T) * Math.exp(-(((v - mu) / sd) ** 2) / 2);
+  const pts = (a, b) => { const out = []; for (let i = 0; i <= 120; i++) { const v = a + (b - a) * i / 120; out.push(`${X(v).toFixed(1)},${Y(v).toFixed(1)}`); } return out; };
+  const s = [`<svg class="bars" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Normal curve">`];
+  (opt.shade || []).forEach(([a, b]) => { a = Math.max(a, x0); b = Math.min(b, x1); if (b > a) s.push(`<polygon points="${X(a)},${B} ${pts(a, b).join(" ")} ${X(b)},${B}" fill="${opt.color || "#F4C7A1"}"/>`); });
+  s.push(`<polyline points="${pts(x0, x1).join(" ")}" fill="none" stroke="#1A1A1A" stroke-width="2.5"/>`, `<line x1="${L}" x2="${W - R}" y1="${B}" y2="${B}" stroke="#222" stroke-width="2"/>`);
+  for (let k = -3; k <= 3; k++) { const v = mu + k * sd; s.push(`<line x1="${X(v)}" x2="${X(v)}" y1="${B}" y2="${B + 6}" stroke="#222"/>` + (opt.labels === false ? "" : `<text x="${X(v)}" y="${B + 22}" text-anchor="middle" font-size="14">${round(v, 2)}</text>`)); }
+  if (opt.mark != null) s.push(`<line x1="${X(opt.mark)}" x2="${X(opt.mark)}" y1="${T}" y2="${B}" stroke="#C0392B" stroke-width="2.5"/>`);
+  if (opt.xlab) s.push(`<text x="${W / 2}" y="${H - 4}" text-anchor="middle" font-size="15" font-weight="bold">${opt.xlab}</text>`);
+  s.push("</svg>"); return svg(s.join(""));
+}
+/* a flat density curve from a to b; opt.shade [lo, hi] */
+export function uniformSvg(a, b, opt = {}) {
+  const W = 560, H = 170, L = 50, R = 20, B = 120, T = 30, x0 = a - (b - a) * 0.15, x1 = b + (b - a) * 0.15, X = (v) => L + (W - L - R) * (v - x0) / (x1 - x0);
+  const s = [`<svg class="bars" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flat density curve">`, `<rect x="${X(a)}" y="${T}" width="${X(b) - X(a)}" height="${B - T}" fill="#BCD3EE" stroke="#1A1A1A" stroke-width="2"/>`];
+  if (opt.shade) s.push(`<rect x="${X(opt.shade[0])}" y="${T}" width="${X(opt.shade[1]) - X(opt.shade[0])}" height="${B - T}" fill="#F4C7A1" stroke="#1A1A1A" stroke-width="1.5"/>`);
+  s.push(`<line x1="${L}" x2="${W - R}" y1="${B}" y2="${B}" stroke="#222" stroke-width="2"/><text x="${L - 6}" y="${T + 5}" text-anchor="end" font-size="14">1/${b - a}</text>`);
+  const step = (b - a) / 4; for (let v = a; v <= b + 1e-9; v += step) s.push(`<line x1="${X(v)}" x2="${X(v)}" y1="${B}" y2="${B + 6}" stroke="#222"/><text x="${X(v)}" y="${B + 22}" text-anchor="middle" font-size="14">${round(v, 2)}</text>`);
+  if (opt.shade) opt.shade.forEach(v => { if (Math.abs(((v - a) / step) % 1) > 1e-9) s.push(`<text x="${X(v)}" y="${B + 22}" text-anchor="middle" font-size="14" fill="#A4510F">${v}</text>`); });
+  if (opt.xlab) s.push(`<text x="${W / 2}" y="${H - 4}" text-anchor="middle" font-size="15" font-weight="bold">${opt.xlab}</text>`);
+  s.push("</svg>"); return svg(s.join(""));
+}

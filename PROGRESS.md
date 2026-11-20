@@ -2,6 +2,14 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-20: Stats practice days 3.3-3.4 and 3.5-3.6 (branch `stats-unit3-practice-days`, includes 3.1-3.2)
+
+- `practice-3-3-3-4.html` (`checker/day-3-3-3-4.js`): area on a flat curve, shape and center, label the axis, shade the area (sim: two edges in whole hops, 3 tasks), 68-95-99.7, tails. Stars: near the peak, is it approximately normal. Practice mixes in 3.1-3.2.
+- `practice-3-5-3-6.html` (`checker/day-3-5-3-6.js`): area to the left, to the right, between, find the cutoff (sim: slide a line until the area left of it is the percent asked, 3 tasks), percentile to value, top and bottom percents. Stars: from a z-score, find the mean.
+- `stats/shared/checker/util.js` gains `phi`, `normalcdf`, `invNorm` (checked against scipy: error under 4e-7) and `normalSvg`, `uniformSvg`.
+- Hub cards in "Unit 3 · Practice days"; both in `tests/lock.e2e.js`.
+- Checks run: `node tests/lock.e2e.js stats` (all seven stats targets pass), `node --test tests/unit/*.test.js` (437 pass), `node tools/check-lessons.mjs --strict` (0 errors), `tests/smoke.js` (57 pages clean); scripted runs on both new pages (#key opens all 11 tabs; a student goes through every tab, both sims included, to practice, 8 mixed questions, End, score saved) and again on every Unit 4 checker and the 3.1-3.2 checker (all pass).
+
 ## 2026-11-20: Stats practice day 3.1-3.2, and the checker engine moved to stats/shared/checker (branch `stats-unit3-practice-3-1-3-2`)
 
 - Engine, util and CSS moved from `stats/unit-4-two-variable/checker/` to `stats/shared/checker/`; Unit 4 pages and day files point there. New units keep only their day files in `<unit>/checker/`. util.js gains `dotplotSvg` and `hopsSvg`.

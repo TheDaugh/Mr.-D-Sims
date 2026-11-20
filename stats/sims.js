@@ -24,7 +24,13 @@
   var unit3practice = [
     { type: "lesson", icon: "✅", title: "Practice: 3.1 and 3.2", href: "unit-3-normal-distribution/practice-3-1-3-2.html",
       blurb: "Concept checker: percentiles from a dotplot, z-scores and what they say, hop to a value, adding and multiplying every value.",
-      tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-3-normal-distribution/practice-3-1-3-2.html#key" }] }
+      tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-3-normal-distribution/practice-3-1-3-2.html#key" }] },
+    { type: "lesson", icon: "✅", title: "Practice: 3.3 and 3.4", href: "unit-3-normal-distribution/practice-3-3-3-4.html",
+      blurb: "Concept checker: areas on a flat curve, shape and center, labeling N(mean, SD), shading 68-95-99.7, tails.",
+      tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-3-normal-distribution/practice-3-3-3-4.html#key" }] },
+    { type: "lesson", icon: "✅", title: "Practice: 3.5 and 3.6", href: "unit-3-normal-distribution/practice-3-5-3-6.html",
+      blurb: "Concept checker: normalcdf to the left, right and between, finding a cutoff, invNorm for percentiles and top percents.",
+      tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-3-normal-distribution/practice-3-5-3-6.html#key" }] }
   ];
   var unit4 = [
     { type: "lesson", icon: "📖", title: "Textbook: Chapter 4, Two-Variable Data", href: "textbook/Unit4_Two-Variable_Data.pdf",
