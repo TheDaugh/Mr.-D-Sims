@@ -25,6 +25,13 @@
     { type: "lesson", icon: "✅", title: "Practice: 4.1 and 4.2", href: "unit-4-two-variable/practice-4-1-4-2.html",
       blurb: "Concept checker: two-way tables, the out-of, percents, segmented bar graphs and association. Three right in a row per part.",
       tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-4-two-variable/practice-4-1-4-2.html#key" }] }
+,
+    { type: "lesson", icon: "✅", title: "Practice: 4.3 and 4.4", href: "unit-4-two-variable/practice-4-3-4-4.html",
+      blurb: "Concept checker: read points, explanatory and response, describe a scatterplot, make one, estimate r, correlation vs. causation.",
+      tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-4-two-variable/practice-4-3-4-4.html#key" }] },
+    { type: "lesson", icon: "✅", title: "Practice: 4.5 and 4.6", href: "unit-4-two-variable/practice-4-5-4-6.html",
+      blurb: "Concept checker: predict with a line, residuals, fit a line, say the slope, extrapolation and residual plots.",
+      tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-4-two-variable/practice-4-5-4-6.html#key" }] }
   ];
   window.UNITS = [{ id: "unit-3", title: "Unit 3 · The Normal Distribution", blurb: "Guided lessons with hints and a concept sheet at every step. Practice days sit between lessons.", entries: entries }, { id: "unit-4", title: "Unit 4 · Two-Variable Data", blurb: "Notes days are on paper. Practice days are concept checkers here.", entries: unit4 }];
 })();
