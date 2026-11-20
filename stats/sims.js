@@ -22,6 +22,9 @@
       teacher: [{ label: "Teacher view (#key)", href: l.href.replace(/^stats\//, "") + "#key" }] };
   });
   var unit3practice = [
+    { type: "lesson", icon: "📖", title: "Textbook: Chapter 3, The Normal Distribution", href: "textbook/Unit3_The_Normal_Distribution.pdf",
+      blurb: "The whole unit to reread at home: sections 3.1 to 3.6 with pictures, worked examples, Say it frames, exercises and answers at the back.",
+      tags: ["textbook", "PDF"] },
     { type: "lesson", icon: "✅", title: "Practice: 3.1 and 3.2", href: "unit-3-normal-distribution/practice-3-1-3-2.html",
       blurb: "Concept checker: percentiles from a dotplot, z-scores and what they say, hop to a value, adding and multiplying every value.",
       tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-3-normal-distribution/practice-3-1-3-2.html#key" }] },
@@ -47,5 +50,5 @@
       blurb: "Concept checker: predict with a line, residuals, fit a line, say the slope, extrapolation and residual plots.",
       tags: ["practice day", "locked mode"], teacher: [{ label: "Teacher view (#key)", href: "unit-4-two-variable/practice-4-5-4-6.html#key" }] }
   ];
-  window.UNITS = [{ id: "unit-3", title: "Unit 3 · The Normal Distribution", blurb: "Guided lessons with hints and a concept sheet at every step. Practice days sit between lessons.", entries: entries }, { id: "unit-3-practice", title: "Unit 3 · Practice days", blurb: "Concept checkers for the days between notes lessons.", entries: unit3practice }, { id: "unit-4", title: "Unit 4 · Two-Variable Data", blurb: "Notes days are on paper. Practice days are concept checkers here.", entries: unit4 }];
+  window.UNITS = [{ id: "unit-3", title: "Unit 3 · The Normal Distribution", blurb: "Guided lessons with hints and a concept sheet at every step. Practice days sit between lessons.", entries: entries }, { id: "unit-3-practice", title: "Unit 3 · Textbook and practice days", blurb: "The chapter to reread at home, and the concept checkers for the days between notes lessons.", entries: unit3practice }, { id: "unit-4", title: "Unit 4 · Two-Variable Data", blurb: "Notes days are on paper. Practice days are concept checkers here.", entries: unit4 }];
 })();

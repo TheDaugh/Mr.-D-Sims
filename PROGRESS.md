@@ -2,6 +2,11 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-20: Stats textbook, Chapter 3 (branch `stats-unit3-practice-days`)
+
+- `stats/textbook/Unit3_The_Normal_Distribution.pdf`, 16 pages: sections 3.1 to 3.6 and answers, in the Chapter 4 layout, with the Unit 3 notes' stories and figures (push-ups, elevator rides, bus rides N(30, 4), sleep N(7.5, 1)) and Worked Examples 1 to 19. Source in `stats/textbook/src3/`; every number asserted with scipy. Hub card first in the "Unit 3 · Textbook and practice days" block.
+- Checks run: `node --test tests/unit/*.test.js`, `tests/smoke.js`, the PDF serves, and the hub shows the link with no JS errors (results in the commit message).
+
 ## 2026-11-20: Stats practice days 3.3-3.4 and 3.5-3.6 (branch `stats-unit3-practice-days`, includes 3.1-3.2)
 
 - `practice-3-3-3-4.html` (`checker/day-3-3-3-4.js`): area on a flat curve, shape and center, label the axis, shade the area (sim: two edges in whole hops, 3 tasks), 68-95-99.7, tails. Stars: near the peak, is it approximately normal. Practice mixes in 3.1-3.2.

@@ -35,7 +35,11 @@ Read this before running the unit pipeline (skills: unit-backwards-pipeline, sta
 24. **Part ids are reused as keys by the test runner, so keep them unique across all day files.** Unit 3 named a star tab `fit`, the same id as Unit 4's fit-the-line sim, and the test treated it as that sim.
 
 ## Step 8: study guide
-25. No new errors. The test-mirroring layout from Unit 4 (one section per test question, a "Know this" box, new numbers, a few answers deliberately different from the test) carried over unchanged.
+25. No new errors from the study guide itself. The test-mirroring layout from Unit 4 (one section per test question, a "Know this" box, new numbers, a few answers deliberately different from the test) carried over unchanged.
 
 ## Where the Unit 3 run's files are
 Notes packs, the test and the study guide were built in a chat workspace and delivered as PDFs plus source zips; only the practice checkers live in this repo (`stats/unit-3-normal-distribution/practice-*.html`, `checker/day-*.js`). Shared checker code: `stats/shared/checker/`.
+
+## Step 9: textbook chapter
+26. **`tests/smoke.js` once reported "57 of 57 pages have errors" right after the local server restarted; a re-run was clean.** If every page fails at once, re-run before looking for a code fault, and start `python3 -m http.server 8123` a second or two before the tests.
+27. **The chapter's layout preamble is copied from Chapter 4's `stats/textbook/src/build.py`** (`src3/pre.tex`, with the chapter title and section numbering changed). Copy it the same way for the next chapter rather than rebuilding the boxes and icons.

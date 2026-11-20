@@ -1,0 +1,32 @@
+\documentclass[11pt]{article}
+\usepackage[left=1.55in,right=0.8in,top=0.8in,bottom=0.8in,headheight=14pt]{geometry}
+\usepackage[scaled]{helvet}\renewcommand{\familydefault}{\sfdefault}
+\usepackage[table]{xcolor}\usepackage{amsmath,graphicx,tikz,array,enumitem,fancyhdr,titlesec}
+\usepackage[most]{tcolorbox}
+\definecolor{gbox}{HTML}{E4E4E4}\definecolor{ink}{HTML}{1A1A1A}\definecolor{teal}{HTML}{17777A}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\itshape CHAPTER 3. THE NORMAL DISTRIBUTION}\fancyhead[R]{\small\itshape\leftmark}\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+\setcounter{section}{0}\renewcommand{\thesection}{3.\arabic{section}}
+% margin icons, drawn so nothing depends on an icon font; each box draws its icon beside its top-left corner
+\newsavebox\IFlag\newsavebox\IPencil\newsavebox\IQ\newsavebox\IBang\newsavebox\ISay\newsavebox\ISim
+\newcommand{\mk}[2]{\sbox#1{\begin{tikzpicture}[scale=0.5,line width=1.2pt]#2\end{tikzpicture}}}
+\AtBeginDocument{%
+\mk\IFlag{\draw (0,0)--(0,2);\fill[ink] (0,2)--(1.3,1.7)--(0.9,1.45)--(1.4,1.15)--(0,1.25)--cycle;}%
+\mk\IPencil{\draw[rotate=-45] (0,0) rectangle (0.45,2.2);\fill[ink,rotate=-45] (0,0)--(0.45,0)--(0.225,-0.5)--cycle;}%
+\mk\IQ{\node[font=\fontsize{40}{40}\selectfont\bfseries] {?};}%
+\mk\IBang{\draw[line join=round] (0,0)--(1.8,0)--(0.9,1.6)--cycle;\node at (0.9,0.55) {\bfseries\Large !};}%
+\mk\ISay{\draw[rounded corners=4pt] (0,0.4) rectangle (2,1.7);\draw (0.4,0.4)--(0.2,0)--(0.8,0.4);}%
+\mk\ISim{\draw[rounded corners=2pt] (0,0.3) rectangle (2,1.6);\draw (0.8,0)--(1.2,0);\draw (1,0)--(1,0.3);\fill[teal] (0.6,0.6) circle (0.12) (1,1) circle (0.12) (1.4,1.25) circle (0.12);}}
+\tcbset{ico/.style={overlay unbroken and first={\node[anchor=north east,inner sep=0pt] at ([xshift=-0.28in]frame.north west) {\usebox{#1}};}}}
+\newtcolorbox{defbox}[1]{enhanced,ico=\IFlag,colback=gbox,colframe=gbox,arc=0pt,boxrule=0pt,left=6pt,right=6pt,before upper={\textbf{Definition: #1}\par}}
+\newtcolorbox{wexbox}[1]{enhanced,ico=\IPencil,colback=white,colframe=ink,arc=0pt,boxrule=0.6pt,left=8pt,right=8pt,breakable,before upper={\textbf{Worked Example #1}\par\medskip}}
+\newtcolorbox{exbox}[1]{enhanced,ico=\IQ,colback=white,colframe=ink,arc=0pt,boxrule=0pt,toprule=0.6pt,bottomrule=0.6pt,left=4pt,right=4pt,breakable,before upper={\textbf{Exercise: #1}\par}}
+\newtcolorbox{saybox}{enhanced,ico=\ISay,colback=teal!8,colframe=teal,arc=2pt,boxrule=0.8pt,left=8pt,right=8pt,before upper={\textbf{Say it}\par}}
+\newtcolorbox{watchbox}{enhanced,ico=\IBang,colback=yellow!14,colframe=ink,arc=0pt,boxrule=0.6pt,left=8pt,right=8pt,before upper={\textbf{Watch out}\par}}
+\newtcolorbox{simbox}{enhanced,ico=\ISim,colback=white,colframe=teal,arc=2pt,boxrule=0.6pt,left=8pt,right=8pt,before upper={\textbf{On the site}\par}}
+\newcommand{\step}[2]{\par\textbf{Step #1 :} \textbf{#2}\par}
+\newcommand{\blank}[1][3.5em]{\underline{\makebox[#1]{}}}
+\newcommand{\reading}[1]{\par{\small\color{black!70}\textit{Reading the picture.} #1}\par}
+\begin{document}
