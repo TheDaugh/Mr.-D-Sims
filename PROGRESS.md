@@ -2,6 +2,12 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-20: Stats textbook, Chapter 4 (branch `stats-unit4-textbook`)
+
+- `stats/textbook/Unit4_Two-Variable_Data.pdf`, 21 pages: sections 4.1 to 4.6 and answers. FHSST layout (from `chemistry/resources/Chemistry_Grade_10-12.pdf`), adapted: picture first with a reading guide, the class notes' stories, fading worked examples (Worked Examples 1 to 19), Definition, Say it and Watch out boxes, exercises, an "On the site" pointer to each practice checker, a summary per section. Original text (FHSST is GFDL; only its format is used).
+- Source in `stats/textbook/src/` (build.py, sections.py, lib.py, fig/); every number asserted. Hub card first in Unit 4 (`stats/sims.js`).
+- Checks run: `node --test tests/unit/*.test.js` (437 pass), `tests/smoke.js` (all 57 pages clean), the PDF serves as application/pdf, and the stats hub shows the link with no JS errors. Every page rendered and looked at.
+
 ## 2026-11-20: Stats practice days 4.3-4.4 and 4.5-4.6, and one checker engine (branch `stats-unit4-practice-days`)
 
 - The 4.1-4.2 checker is split into `stats/unit-4-two-variable/checker/engine.js` (every rule: tabs, warm-up, Notes tutorial, checkpoints with 3 in a row and the override lock, hidden bands, star tabs, practice to the end mark, locked mode, #key and key desk, profile scores), `checker/util.js` (seeded random, r and least squares, table, bar, scatter and residual pictures) and one content file per day: `checker/day-4-1-4-2.js`, `day-4-3-4-4.js`, `day-4-5-4-6.js`. Each page is a thin shell that runs its day. A rule change now goes in the engine once.
