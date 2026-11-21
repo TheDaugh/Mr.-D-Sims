@@ -2,6 +2,12 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-20: Chem Unit 4 day 1, periodic trends board (branch `chem-unit4-day1-trends`)
+
+- Lesson board `chemistry/whiteboard/index.html#lesson=trends` (`tools/whiteboard/src/lessons/chem-trends.js`): six frames (question and warm-up, two big ideas, atomic size, reactivity, electronegativity, practice and summary). College prep: no numbers, no Z_eff. Every blank under an orange cover; the periodic tables are bare so the arrows are drawn live.
+- Board script: `chemistry/unit-4-bonding/day-01-trends-board-script.pdf` (and .tex), in the slot 17 two-column format, blank for blank with the board.
+- Unit 4 standards (4.0 to 4.7) and test are in Ian's chat files, not yet in the repo.
+
 ## 2026-11-20: Stats textbook, Chapter 3 (branch `stats-unit3-practice-days`)
 
 - `stats/textbook/Unit3_The_Normal_Distribution.pdf`, 16 pages: sections 3.1 to 3.6 and answers, in the Chapter 4 layout, with the Unit 3 notes' stories and figures (push-ups, elevator rides, bus rides N(30, 4), sleep N(7.5, 1)) and Worked Examples 1 to 19. Source in `stats/textbook/src3/`; every number asserted with scipy. Hub card first in the "Unit 3 · Textbook and practice days" block.
