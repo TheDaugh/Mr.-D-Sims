@@ -6,7 +6,7 @@ Update this at the end of every session. Newest entry first.
 
 - Trailer: no Beyblade plane, no K.O.; keeps VS. Subshell-colored 3-D clouds (`atom-cloud.js`), a core-charge tug (Na +1, Cl +7), the electron cloud travels to Cl's open spot, numeric gauges (radius pm, ionization energy kJ/mol, electronegativity 0 to 4), an energy magnitude meter (411 kJ per mole of NaCl). Flat navy background, no neon grid (Ian, 11-21).
 - Explore rebuilt as the Trends Lab (`trends-explorer.html`): stage 1 one atom (size on pick, ionization energy by removing an outer electron), stage 2 one of each (electron moves or is shared, electronegativity measured), stage 3 a dish of up to 12 atoms. The periodic table stays dark until measured; "Find the pattern" is graded from the student's own tiles. `bond-engine.js` holds the gives/shares rules (unit test: 8). Locked mode, black at 20 minutes, `#key`.
-- Not built: the doom diorama sandbox (isometric lab-room style, magnitude meter only).
+- Energy Diorama (`energy-diorama.html`): flat isometric town, 11 textbook reactions, amount slider, log magnitude meter (kJ to TJ), glow/flatten/burn by amount, locked mode, `#key`. Hub card added. Hyperdoc updated to the Trends Lab.
 - Checks run: `node --test tests/unit/*.test.js` (454 pass), `node tools/check-lessons.mjs --strict` (0 errors), `tests/trends-explorer.e2e.js` (all pass). Audio not listened to.
 
 ## 2026-11-20: Chem Unit 4 day 1, periodic trends board (branch `chem-unit4-day1-trends`)

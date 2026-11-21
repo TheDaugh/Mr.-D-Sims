@@ -35,6 +35,9 @@ const TARGETS = [
   { name: 'chem trends-lab', url: '/chemistry/unit-4-bonding/trends-explorer.html', clockAt: '2026-10-21T10:45:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); },
     gateInput: 'input[aria-label="Unlock code from the teacher"]', gateButton: 'button:has-text("Unlock")' },
+  { name: 'chem energy-diorama', url: '/chemistry/unit-4-bonding/energy-diorama.html', clockAt: '2026-10-21T10:45:00-04:00', student: '65J-7TGT',
+    begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); },
+    gateInput: 'input[aria-label="Unlock code from the teacher"]', gateButton: 'button:has-text("Unlock")' },
   /* stats concept checker (practice day 4.1 and 4.2): standalone page, locked from the Begin click; the reopen card uses the shared label */
   { name: 'stats practice 4.1-4.2 checker', url: '/stats/unit-4-two-variable/practice-4-1-4-2.html', clockAt: '2026-10-21T10:05:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },

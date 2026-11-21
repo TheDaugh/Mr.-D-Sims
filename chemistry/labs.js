@@ -171,6 +171,16 @@ window.UNITS = [
         blurb: "Measure one atom, then one of each, then a whole dish. Every measurement fills in the periodic table until the trends show. The page goes black 20 minutes after the bell.",
         tags: ["periodic trends", "atomic size", "reactivity", "electronegativity"],
         teacher: [{ label: "Teacher key (#key)", href: "unit-4-bonding/trends-explorer.html#key" }, { label: "Board page", href: "whiteboard/index.html#lesson=trends" }]
+      },
+      {
+        title: "Energy Diorama (sandbox)",
+        type: "sim",
+        day: 1,
+        icon: "🏙️",
+        href: "unit-4-bonding/energy-diorama.html",
+        blurb: "Pick a textbook reaction and an amount. A flat isometric town shows how much energy comes out, with a magnitude meter from kilojoules to terajoules. Every reaction listed gives energy off.",
+        tags: ["energy", "bonding", "sandbox"],
+        teacher: [{ label: "Teacher key (#key)", href: "unit-4-bonding/energy-diorama.html#key" }]
       }
     ]
   }
