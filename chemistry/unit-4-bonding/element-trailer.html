@@ -30,7 +30,7 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
 <div id="play"><h1>WHERE DID SALT COME FROM?</h1><p>An 84-second trailer. Sound on.</p><div class="b">▶ Play</div></div>
 <div id="hint">Space pause · R replay · M mute · F full screen</div>
 <script src="trends-data.js"></script>
-<script src="atom-pixels.js"></script>
+<script src="atom-cloud.js"></script>
 <script>
 (function () {
   "use strict";
@@ -96,20 +96,13 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   var SK = (function () { var r = rng(3), a = [], i; for (i = 0; i < 80; i++) a.push({ x: Math.floor(r() * 160), y: Math.floor(r() * 38), p: r() * 6 }); return a; })();
   function skyPx(t, a) { SK.forEach(function (s) { if ((Math.floor(t * 2 + s.p) % 3) !== 0) { g.globalAlpha = a * 0.8; g.fillStyle = "#cfefff"; g.fillRect(s.x * CELL, s.y * CELL, CELL, CELL); } }); g.globalAlpha = 1; }
   function black() { g.fillStyle = C.bg; g.fillRect(0, 0, W, H); }
-  function bgSmooth(t, pulse) {
-    var gr = g.createRadialGradient(W / 2, H * 0.55, 60, W / 2, H * 0.55, 820); gr.addColorStop(0, pulse ? "#0d2030" : "#0a1622"); gr.addColorStop(1, "#02040a"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
-  }
-  /* the same floor, smooth: glowing lines */
-  function floorSmooth(t, a, hor) {
-    var i, j, z, y; g.save(); g.strokeStyle = "#19e6ff"; g.lineWidth = 2;
-    g.globalAlpha = a * 0.7; g.beginPath(); g.moveTo(0, hor); g.lineTo(W, hor); g.stroke();
-    for (i = 1; i < 26; i++) { z = i + (1 - ((t * 0.7) % 1)); y = hor + 420 / z; if (y > H) continue; g.globalAlpha = a * clamp(0.1 + (y - hor) / 380, 0, 0.6); g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
-    for (j = -14; j <= 14; j++) { g.globalAlpha = a * 0.28; g.beginPath(); g.moveTo(W / 2, hor); g.lineTo(W / 2 + j * 150, H); g.stroke(); }
-    g.restore();
-  }
+  /* the same flat navy as the rest of the site: no glow, no grid */
+  function bgSmooth(t, pulse) { g.fillStyle = "#0e1620"; g.fillRect(0, 0, W, H); }
+  function floorSmooth(t, a, hor) { }
 
   /* ---------- 3-D atoms: every subshell is a cloud of dots in its real shape ---------- */
-  var AC = window.AtomPixels, SUBC = AC.SUBC, config = AC.config, subKey = AC.subKey;
+  var AC = window.AtomCloud, SUBC = AC.SUBC, config = AC.config, subKey = AC.subKey;
+  function topProj(cx, cy, t, o) { return AC.proj(cx, cy, t, o); }
   function drawTop(sym, cx, cy, Ro, t, o) { return AC.draw(g, sym, cx, cy, Ro, t, o); }
   /* the key: one chip per subshell the atom has */
   function subKeyRow(sym, x, y, a, align) {
@@ -272,7 +265,7 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
     var fl = U < 4.5 ? 0.45 : 0.55 + 0.3 * Math.sin(U * 7), s = lerp(1, 1.8, eo(seg(U, 8.8, 10.4)));
     return { spin: -0.6, tilt: 0.55, ghostA: U < 7.9 ? fl : lerp(fl, 1, eo(seg(U, 7.9, 8.4))), outerS: s };
   }
-  function clTip(U) { var p = dpos(U); return AC.tip("Cl", p.cx, p.cy, CL_R, clOpts(U)); }
+  function clTip(U) { var p = dpos(U), pj = topProj(p.cx, p.cy, DUEL0 + U, clOpts(U)), a = pj(0, 0, CL_R), b = pj(0, 0, -CL_R); return a[0] < b[0] ? a : b; }
   function sparks(U, u0, x, y, n, len, col) {
     var d = U - u0; if (d < 0 || d > 0.7) return; var i, a = 1 - d / 0.7; g.save(); g.strokeStyle = col; g.lineWidth = 3; g.globalAlpha = a; g.globalCompositeOperation = "lighter";
     for (i = 0; i < n; i++) { var an = hsh(i * 3.7 + u0) * 6.283, r0 = len * (0.2 + 0.8 * hsh(i * 1.3)) * eo(d / 0.7), r1 = r0 + 10 + 28 * (1 - d / 0.7); g.beginPath(); g.moveTo(x + Math.cos(an) * r0, y + Math.sin(an) * r0); g.lineTo(x + Math.cos(an) * r1, y + Math.sin(an) * r1); g.stroke(); }
@@ -341,7 +334,7 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
 
   /* ---------- scene 8 (76.35 to 84.35): title card, back in pixels ---------- */
   function sTitle(t) {
-    var tt = t - LAT1; black(); skyPx(t, 1); floorPx(t, 1, 66, C.cy);
+    var tt = t - LAT1; g.fillStyle = "#0e1620"; g.fillRect(0, 0, W, H);
     if (tt < 4.1) {
       var c1 = [["UNIT 4", 64, 1, C.mint, 0.5], ["TRENDS,", 140, 2, C.white, 1.0], ["BONDING,", 268, 2, C.white, 1.6], ["NAMING", 396, 2, C.cy, 2.2]];
       c1.forEach(function (L) { if (tt < L[4]) return; var n = Math.floor((tt - L[4]) * 14) + 1; pxText(L[0], 640, L[1], L[2], L[3], 1, "center", n); });

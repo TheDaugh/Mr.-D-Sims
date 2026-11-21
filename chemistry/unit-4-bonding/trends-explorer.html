@@ -3,72 +3,83 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Trends Explorer · Mr. D's Sims</title>
-<meta name="description" content="Compare atoms of the periodic table: their size, how easily they let go of an electron, and how hard they pull. Then put two of them in a tug-of-war over an electron.">
+<title>Trends Lab · Mr. D's Sims</title>
+<meta name="description" content="Measure atoms one at a time, put two together, then mix a bunch. Your measurements fill in the periodic table until the trends show.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0e1620;--panel:#162230;--panel2:#1d2e40;--ink:#eaf0f6;--muted:#9fb0c1;--line:#2c3f53;--accent:#4f8cff;--gold:#f2b84b;--good:#2fae6b;--warn:#e0613f;--teal:#14b8a6}
+:root{--bg:#0b141d;--panel:#122030;--panel2:#1a2c40;--ink:#eaf0f6;--muted:#9fb0c1;--line:#28405a;--cy:#19c9e6;--mint:#2fe08a;--or:#ff9d2e;--bad:#ff6f5a}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Source Sans 3",system-ui,sans-serif;overflow:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.35 "Source Sans 3",system-ui,sans-serif;overflow:hidden}
 h1,h2{font-family:"Bricolage Grotesque","Source Sans 3",system-ui,sans-serif;margin:0}
 button{font:inherit;color:inherit}
 #app{display:flex;flex-direction:column;height:100%}
-header{display:flex;align-items:center;gap:12px;padding:6px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none}
-header h1{font-size:1.15rem;letter-spacing:.3px}
+header{display:flex;align-items:center;gap:10px;padding:5px 12px;background:var(--panel);border-bottom:1px solid var(--line);flex:none}
+header h1{font-size:1.1rem;letter-spacing:.3px;margin-right:6px}
 header .sp{flex:1}
 .hbtn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 12px;cursor:pointer}
+.chip{display:flex;align-items:center;gap:6px;background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:3px 12px;cursor:pointer;font-weight:700}
+.chip[aria-pressed=true]{border-color:var(--cy);color:#fff}
+.chip:disabled{opacity:.45;cursor:not-allowed}
+.chip small{font-weight:600;color:var(--muted)}
 #main{flex:1;display:flex;min-height:0}
-#left{width:560px;flex:none;padding:10px 12px;border-right:1px solid var(--line);overflow:auto}
-#left h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-family:"Source Sans 3",sans-serif;margin:0 0 6px}
-#table{display:grid;grid-template-columns:repeat(2,1fr) 14px repeat(6,1fr);gap:5px}
-.t{position:relative;height:52px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;padding:0;text-align:center}
-.t b{display:block;font-size:1.2rem;line-height:1.05;margin-top:7px}
-.t i{display:block;font-style:normal;font-size:.7rem;color:var(--muted)}
-.t:hover{border-color:var(--accent)}
-.t.noble{border-style:dashed}
-.t.f1{outline:3px solid var(--gold);outline-offset:1px}
-.t.f2{outline:3px solid var(--accent);outline-offset:1px}
-.t.pk{background:#24412f}
-.gap{border-left:2px dotted var(--line);margin:4px 5px}
-.empty{height:52px;border-radius:8px;border:1px dashed #223245}
-#scout{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
-#scout .r{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;margin:5px 0}
-#scout .r span{font-weight:600}
-#scout .chip{min-width:46px;text-align:center;padding:3px 8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);color:var(--gold);font-weight:700}
-.sb{min-height:38px;padding:3px 12px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);cursor:pointer}
-.sb:disabled{opacity:.4;cursor:not-allowed}
-.sb:not(:disabled):hover{border-color:var(--gold)}
+#left{width:540px;flex:none;padding:8px 10px;border-right:1px solid var(--line);overflow:auto}
+#views{display:flex;gap:6px;margin-bottom:6px}
+.vb{flex:1;padding:5px 4px;border-radius:8px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700;font-size:.9rem}
+.vb[aria-pressed=true]{border-color:var(--cy);color:#fff}
+#legend{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);margin:2px 0 6px}
+#legend i{flex:1;height:8px;border-radius:2px}
+#table{display:grid;grid-template-columns:repeat(2,1fr) 10px repeat(6,1fr);gap:4px}
+.t{position:relative;height:47px;border-radius:5px;border:2px solid #223348;background:#0e1824;cursor:pointer;padding:0;text-align:center;color:#6c8196}
+.t b{display:block;font-size:1.05rem;line-height:1;margin-top:5px}
+.t i{display:block;font-style:normal;font-size:.68rem;line-height:1.2;min-height:.8rem}
+.t:hover{border-color:var(--cy)}
+.t.known{color:#fff;border-color:rgba(255,255,255,.18)}
+.t.noval{background:repeating-linear-gradient(45deg,#0e1824,#0e1824 4px,#16273a 4px,#16273a 8px)}
+.t.a{outline:3px solid var(--or);outline-offset:1px}
+.t.b{outline:3px solid var(--cy);outline-offset:1px}
+.t.inDish{outline:3px solid var(--mint);outline-offset:1px}
+.gap{border-left:2px dotted var(--line);margin:3px 3px}
+.empty{height:47px;border-radius:5px;border:1px dashed #1a2a3c}
+#find{margin-top:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+#find h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-family:"Source Sans 3",sans-serif;margin:0 0 4px}
+#find .row{display:flex;align-items:center;gap:6px;margin:4px 0;flex-wrap:wrap}
+#find .row span{flex:1;min-width:190px}
+.dir{min-width:76px;padding:3px 10px;border-radius:8px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700}
+.dir.ok{border-color:var(--mint);background:#16402c}
+.dir.no{border-color:var(--bad)}
+.dir:disabled{opacity:.4;cursor:not-allowed}
+#findMsg{min-height:2.4em;font-size:.88rem;color:var(--muted);margin:4px 0 0}
+#findMsg.bad{color:var(--bad)}#findMsg.ok{color:var(--mint)}
 #right{flex:1;min-width:0;display:flex;flex-direction:column}
-#slots{display:flex;gap:8px;padding:8px 12px;flex:none}
-.slot{flex:1;text-align:center;padding:5px;border-radius:10px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700}
-.slot[aria-pressed=true]{border-color:var(--gold)}
-.slot.two[aria-pressed=true]{border-color:var(--accent)}
+#banner{padding:6px 14px;flex:none;font-size:1.02rem;min-height:2.6em;background:#0f1c2a;border-bottom:1px solid var(--line)}
+#banner b{color:var(--cy)}
 #stagewrap{flex:1;position:relative;min-height:0}
 #cv{position:absolute;inset:0;width:100%;height:100%;display:block}
-#msg{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-weight:700;font-size:1.15rem;pointer-events:none}
-#cards{display:flex;gap:10px;padding:8px 12px;flex:none;align-items:stretch}
-.card{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-height:128px}
-.card h3{margin:0 0 4px;font-size:1.05rem}
-.card .mut{color:var(--muted);font-size:.9rem}
-.bar{display:grid;grid-template-columns:92px 1fr;align-items:center;gap:8px;margin:5px 0;font-size:.85rem;font-weight:700;letter-spacing:.06em;color:var(--muted)}
-.bar div{height:14px;border-radius:7px;background:#0b121a;border:1px solid var(--line);overflow:hidden}
-.bar div i{display:block;height:100%;border-radius:7px;transition:width .35s}
-.bar.s i{background:#6aa7ff}.bar.l i{background:var(--good)}.bar.p i{background:var(--warn)}
-.bar .na{font-weight:400;letter-spacing:0;font-size:.85rem;color:var(--muted)}
-#mid{width:150px;flex:none;display:flex;flex-direction:column;justify-content:center;gap:8px}
-.big{min-height:52px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700;font-size:1.05rem}
-.big.go{background:var(--warn);border-color:var(--warn);color:#fff;font-family:"Bricolage Grotesque",sans-serif;letter-spacing:.06em}
+#bottom{display:flex;gap:10px;padding:8px 12px;flex:none;align-items:stretch;border-top:1px solid var(--line);background:var(--panel)}
+#readouts{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g .l{font-size:.74rem;font-weight:700;letter-spacing:.07em;color:var(--muted)}
+.g .v{font:800 1.35rem "Bricolage Grotesque",sans-serif;line-height:1.1;min-height:1.5rem}
+.g .v.no{color:#587086;font:600 .95rem "Source Sans 3",sans-serif}
+.g .tr{height:6px;background:#0b1520;border-radius:3px;margin-top:3px;position:relative}
+.g .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--cy)}
+.g .sc{display:flex;justify-content:space-between;font-size:.66rem;color:#587086}
+#acts{display:flex;flex-direction:column;gap:6px;width:230px}
+.big{min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700;font-size:1rem}
+.big.go{background:var(--cy);border-color:var(--cy);color:#02141a}
 .big:disabled{opacity:.4;cursor:not-allowed}
-.overlay{position:fixed;inset:0;background:rgba(6,10,16,.92);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+#result{flex:1.2;font-size:.98rem;min-width:260px}
+#result b{color:#fff}
+#dishrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.dchip{display:flex;align-items:center;gap:4px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:1px 4px 1px 8px;font-weight:700}
+.dchip button{border:0;background:#243a52;border-radius:5px;width:22px;height:22px;cursor:pointer;font-weight:700}
+.overlay{position:fixed;inset:0;background:rgba(6,10,16,.93);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .overlay[hidden]{display:none}
-.sheet{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 22px;max-width:860px;width:100%;max-height:96vh;overflow:auto}
+.sheet{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 22px;max-width:820px;width:100%;max-height:96vh;overflow:auto}
 .sheet h2{font-size:1.5rem;margin-bottom:6px}
 .sheet p{margin:6px 0}
-.how{display:flex;gap:18px;align-items:center;margin:8px 0}
-.how ul{margin:0;padding-left:18px}
-.how li{margin:4px 0}
+.sheet ol{margin:6px 0;padding-left:22px}.sheet li{margin:4px 0}
 .small{color:var(--muted);font-size:.92rem}
 .hint.bad{color:#ff8a73;min-height:1.2em;margin:4px 0}
 .mrd-idask label{margin-right:12px}
@@ -85,31 +96,32 @@ header .sp{flex:1}
 <body>
 <div id="app">
   <header>
-    <h1>Trends Explorer</h1>
+    <h1>Trends Lab</h1>
+    <button class="chip" id="st1" aria-pressed="true">1 One atom</button>
+    <button class="chip" id="st2" aria-pressed="false" disabled>2 One of each <small id="lk2"></small></button>
+    <button class="chip" id="st3" aria-pressed="false" disabled>3 A bunch <small id="lk3"></small></button>
     <span class="sp"></span>
     <button class="hbtn" id="btnHow">How to read this</button>
     <button class="hbtn" id="btnKey" hidden>Teacher key</button>
   </header>
   <div id="main">
     <div id="left">
-      <h2>Pick an atom</h2>
+      <div id="views"><button class="vb" data-v="size" aria-pressed="true">Size</button><button class="vb" data-v="ie" aria-pressed="false">Ionization energy</button><button class="vb" data-v="en" aria-pressed="false">Electronegativity</button></div>
+      <div id="legend"></div>
       <div id="table"></div>
-      <div id="scout">
-        <h2>Your three picks</h2>
-        <p class="small" style="margin:0 0 4px">Click an atom in the table, then lock it in as your pick.</p>
-        <div id="scoutRows"></div>
+      <div id="find">
+        <h2>Find the pattern</h2>
+        <div id="findBody"></div>
+        <p id="findMsg"></p>
       </div>
     </div>
     <div id="right">
-      <div id="slots">
-        <button class="slot" id="slot1" aria-pressed="true">Atom 1</button>
-        <button class="slot two" id="slot2" aria-pressed="false">Atom 2</button>
-      </div>
-      <div id="stagewrap"><canvas id="cv"></canvas><div id="msg"></div></div>
-      <div id="cards">
-        <div class="card" id="card1"></div>
-        <div id="mid"><button class="big go" id="bFight" disabled>TUG OF WAR</button><button class="big" id="bClear">Clear both</button></div>
-        <div class="card" id="card2"></div>
+      <div id="banner"></div>
+      <div id="stagewrap"><canvas id="cv"></canvas></div>
+      <div id="bottom">
+        <div id="readouts"></div>
+        <div id="result"></div>
+        <div id="acts"></div>
       </div>
     </div>
   </div>
@@ -117,28 +129,14 @@ header .sp{flex:1}
 
 <div class="overlay" id="start" hidden>
   <div class="sheet">
-    <h2>Trends Explorer</h2>
-    <p>Compare any two atoms, then put them in a tug-of-war over one electron.</p>
-    <div class="how">
-      <svg id="legend" width="300" height="214" viewBox="0 0 300 214" aria-label="A lithium atom with its parts labeled">
-        <circle cx="105" cy="108" r="86" fill="none" stroke="#6b8196" stroke-width="2"/>
-        <circle cx="105" cy="108" r="43" fill="none" stroke="#6b8196" stroke-width="2"/>
-        <circle cx="105" cy="108" r="13" fill="#e0613f"/><text x="105" y="113" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">+3</text>
-        <circle cx="191" cy="108" r="7" fill="#59d596"/>
-        <g font-size="12" fill="#eaf0f6"><text x="206" y="55">outer electron</text><line x1="230" y1="60" x2="194" y2="102" stroke="#9fb0c1"/>
-        <text x="206" y="150">outer edge</text><line x1="240" y1="154" x2="186" y2="146" stroke="#9fb0c1"/>
-        <text x="160" y="205">nucleus: protons</text><line x1="150" y1="196" x2="110" y2="121" stroke="#9fb0c1"/>
-        <text x="4" y="22">each ring = one shell</text><line x1="40" y1="28" x2="52" y2="66" stroke="#9fb0c1"/></g>
-      </svg>
-      <ul>
-        <li><b>Rings</b> are shells. The outer edge is drawn to scale, so a bigger circle is a bigger atom.</li>
-        <li><b>SIZE</b> bar: how big the atom is.</li>
-        <li><b>LETS GO</b> bar: how easily it gives up an outer electron.</li>
-        <li><b>PULLS</b> bar: how hard it pulls on an electron it shares with another atom.</li>
-        <li><b>TUG OF WAR</b>: one electron sits between two atoms. Watch which atom wins it.</li>
-      </ul>
-    </div>
-    <p class="small">Only the outer electrons are drawn as dots. A longer row of dots does not mean a bigger atom: compare the outer edges.</p>
+    <h2>Trends Lab</h2>
+    <p>Every atom you measure fills in a tile on the table. Measure enough and the pattern shows up on its own.</p>
+    <ol>
+      <li><b>One atom.</b> Pick an atom. Its size is measured. Press the button to pull off an outer electron and measure the energy it takes.</li>
+      <li><b>One of each.</b> Put two different atoms together. Watch what the electron does, and measure how hard each atom pulls on it.</li>
+      <li><b>A bunch.</b> Add as many atoms as you like and see what they make.</li>
+    </ol>
+    <p class="small">Colors show subshells, the regions where an atom's electrons are found. Nothing here is timed except the end of the activity.</p>
     <div id="idHost"></div>
     <p class="small" id="lockNote" hidden>During class this opens in full screen. Leaving it is counted, and the teacher has to see you to unlock it.</p>
     <p class="hint bad" id="startMsg"></p>
@@ -146,10 +144,11 @@ header .sp{flex:1}
   </div>
 </div>
 <div class="overlay" id="how" hidden><div class="sheet"><h2>How to read this</h2>
-  <p><b>Rings</b> are shells. The outer edge is drawn to scale, so a bigger circle is a bigger atom. Dots on the outer ring are outer electrons. Inner electrons are not drawn.</p>
-  <p><b>SIZE</b> is how big. <b>LETS GO</b> is how easily it gives up an outer electron. <b>PULLS</b> is how hard it pulls on an electron it shares. Noble gases rarely bond, so they have no PULLS bar.</p>
-  <p class="small">Dotted gap in the table: other columns exist there. They are not part of this.</p>
-  <button class="big" id="howClose" style="padding:0 24px">Back to the atoms</button></div></div>
+  <p><b>Atoms.</b> Each colored patch is a subshell: blue 1s, teal 2s, pink 2p, lime 3s, orange 3p. The gold block is the nucleus. A bigger atom is drawn bigger, to the same scale for every atom.</p>
+  <p><b>Table tiles.</b> A tile stays dark until you measure it. Size is measured when you pick an atom. Ionization energy is measured when you pull an electron off. Electronegativity is measured when two atoms meet. Darker to brighter means smaller to larger.</p>
+  <p><b>Electronegativity</b> is how hard an atom pulls on an electron it shares, on a scale of 0 to 4.</p>
+  <p class="small">Noble gases already have a full outer shell, so they have no electronegativity.</p>
+  <button class="big" id="howClose" style="padding:0 24px">Back to the lab</button></div></div>
 <div class="overlay" id="lockres" hidden><div class="sheet"><h2>🔒 Locked. Hand up, eyes forward.</h2>
   <p id="lockresTxt"></p><input id="lockCode" aria-label="Unlock code from the teacher" autocomplete="off" style="background:#0b121a;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px;font-size:1.1rem">
   <button class="big" id="bUnlock" style="padding:0 20px;margin-left:8px">Unlock</button><p class="hint bad" id="lockMsg"></p></div></div>
@@ -162,143 +161,333 @@ header .sp{flex:1}
 <script src="../../shared/profile.js"></script>
 <script src="../../shared/ids.js"></script>
 <script src="trends-data.js"></script>
+<script src="atom-cloud.js"></script>
+<script src="bond-engine.js"></script>
 <script>
 (function () {
   "use strict";
-  var D = window.TrendsData, MrD = window.MrD, $ = function (id) { return document.getElementById(id); };
+  var D = window.TrendsData, AP = window.AtomCloud, BE = window.BondEngine, MrD = window.MrD, $ = function (id) { return document.getElementById(id); };
   var KEY = /key/.test(location.hash), NOLOCK = (/nolock=(\d+)/.exec(location.hash) || [])[1];
-  var LESSON_ID = "chem-u4-d1-trends-explorer", COURSE = "chem";
-  var CUT_MIN = 20;                 // the page goes black this many minutes after the bell, in class only
-  var S = { id: "", period: "", a: null, b: null, slot: 1, picks: {}, mode: "idle", t0: 0, started: false };
-  var lockArmed = false, askH = null, DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  var LESSON_ID = "chem-u4-d1-trends-lab", COURSE = "chem", CUT_MIN = 20;       // the page goes black this many minutes after the bell, in class only
+  var NEED_IE = 3, NEED_PAIRS = 3, MAX_DISH = 12;
+  var SC = { size: { max: 260, unit: "pm", dec: 0, get: function (e) { return e.r; }, name: "ATOMIC RADIUS", low: "smaller", high: "bigger" },
+             ie: { max: 2100, unit: "kJ/mol", dec: 0, get: function (e) { return e.ie; }, name: "IONIZATION ENERGY", low: "easy to remove", high: "hard to remove" },
+             en: { max: 4, unit: "", dec: 2, get: function (e) { return e.en; }, name: "ELECTRONEGATIVITY", low: "weak pull", high: "strong pull" } };
+  var S = { id: "", period: "", stage: 1, view: "size", a: null, b: null, slot: 1, dish: {}, seen: {}, pairs: [], mixes: 0, trend: {}, started: false, mode: "idle", removed: false, result: null };
+  var lockArmed = false, askH = null, DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1)), evlog = [];
+  function log(s) { evlog.push([Date.now(), s]); if (evlog.length > 500) evlog.shift(); }
 
   /* ---------- the clock: black at the cutoff, never a code ---------- */
   function clk() { return MrD.bell.clock(COURSE); }
   function isDark() { if (KEY) return false; var c = clk(); return !!(c.session && c.minutesIn >= CUT_MIN); }
   function goDark() {
     if (lockArmed) { lockArmed = false; try { LessonLock.finish(); } catch (e) { } }   // closing the laptop must not count as leaving
-    $("dark").hidden = false; ["start", "how", "lockres", "keyPage"].forEach(function (i) { $(i).hidden = true; });
-    S.mode = "dark";
+    $("dark").hidden = false; ["start", "how", "lockres", "keyPage"].forEach(function (i) { $(i).hidden = true; }); S.mode = "dark";
   }
   function watchClock() { if (S.mode !== "dark" && isDark()) goDark(); }
 
-  /* ---------- the table ---------- */
+  /* ---------- what has been measured ---------- */
+  function seen(sym) { return S.seen[sym] || (S.seen[sym] = {}); }
+  function reveal(sym, what, v) { var s = seen(sym); if (!s[what]) { s[what] = v || 1; log("measured:" + what + ":" + sym); save(); record(); } }
+  function count(what) { return Object.keys(S.seen).filter(function (k) { return S.seen[k][what] === 1; }).length; }
+  var storeKey = function () { return "tl.v1:" + (S.id || "x") + ":" + MrD.bell.dayKey(); };
+  function save() { try { localStorage.setItem(storeKey(), JSON.stringify({ seen: S.seen, pairs: S.pairs, mixes: S.mixes, trend: S.trend, stage: S.stage })); } catch (e) { } }
+  function restore() { try { var j = JSON.parse(localStorage.getItem(storeKey())); if (j) { S.seen = j.seen || {}; S.pairs = j.pairs || []; S.mixes = j.mixes || 0; S.trend = j.trend || {}; S.stage = j.stage || 1; } } catch (e) { } }
+  function trendScore() { var n = 0; Object.keys(S.trend).forEach(function (v) { Object.keys(S.trend[v]).forEach(function (d) { if (S.trend[v][d] === "ok") n++; }); }); return n; }
+  function record() {
+    if (!S.id || !MrD.profile) return;
+    function it(skill, ok) { return { skill: "chem.trends." + skill, band: 1, firstTry: ok, ok: ok }; }
+    var items = [it("size", count("size") >= 6), it("ionization", count("ie") >= NEED_IE), it("pairs", S.pairs.length >= NEED_PAIRS), it("mix", S.mixes >= 1), it("patterns", trendScore() >= 6)];
+    MrD.profile.record({ course: COURSE, lesson: LESSON_ID, title: "Trends Lab", first: S.id, period: S.period, day: MrD.bell.dayKey(), reached: items.filter(function (x) { return x.ok; }).length, of: items.length, items: items, source: "sandbox" });
+  }
+
+  /* ---------- the table, filled in by what you measure ---------- */
   var tiles = {};
   function buildTable() {
     var host = $("table"), cols = D.GROUPS;
-    D.PERIODS.forEach(function (p) {
+    D.ROWS.forEach(function (p) {
       cols.forEach(function (g, i) {
         if (i === 2) { var gp = document.createElement("div"); gp.className = "gap"; host.appendChild(gp); }
         var e = D.ELEMENTS.filter(function (x) { return x.period === p && x.group === g; })[0], n;
-        if (!e) { n = document.createElement("div"); n.className = "empty"; if (p === 6 && g > 2) n.style.visibility = "hidden"; host.appendChild(n); return; }
-        n = document.createElement("button"); n.className = "t" + (e.en == null ? " noble" : ""); n.dataset.sym = e.sym;
-        n.innerHTML = "<b>" + e.sym + "</b><i>" + e.Z + "</i>"; n.setAttribute("aria-label", e.name);
+        if (!e) { n = document.createElement("div"); n.className = "empty"; if (p > 1 && g > 2 && p === 6) n.style.visibility = "hidden"; if (p === 1 && g !== 1) n.style.visibility = "hidden"; host.appendChild(n); return; }
+        n = document.createElement("button"); n.dataset.sym = e.sym; n.setAttribute("aria-label", e.name);
         n.addEventListener("click", function () { choose(e.sym); }); tiles[e.sym] = n; host.appendChild(n);
       });
     });
   }
-  function choose(sym) {
-    if (S.mode === "dark") return;
-    if (S.slot === 1) { S.a = sym; if (!S.b) setSlot(2); } else { S.b = sym; }
-    S.mode = "idle"; $("msg").textContent = ""; refresh(); log("meet:" + sym);
+  function shade(view, e) { var v = SC[view].get(e), k = view === "ie" ? (v - 370) / 1750 : v / SC[view].max, hue = view === "size" ? 212 : view === "ie" ? 150 : 28; k = Math.max(0, Math.min(1, k)); return "hsl(" + hue + "," + Math.round(55 + 25 * k) + "%," + Math.round(18 + 34 * k) + "%)"; }
+  function paintTable() {
+    var v = S.view;
+    Object.keys(tiles).forEach(function (sym) {
+      var e = D.BY[sym], n = tiles[sym], st = S.seen[sym] || {}, known = st[v] === 1 || (KEY && S.showAll), none = st[v] === "none" || (v === "en" && e.en == null && (st.en || (KEY && S.showAll)));
+      var cls = "t" + (known || none ? " known" : "") + (none ? " noval" : "") + (S.a === sym ? " a" : "") + (S.b === sym && S.stage === 2 ? " b" : "") + (S.stage === 3 && S.dish[sym] ? " inDish" : "");
+      n.className = cls; n.style.background = known && !none ? shade(v, e) : "";
+      var val = known && !none ? (+SC[v].get(e)).toFixed(SC[v].dec) : none ? "none" : "";
+      n.innerHTML = "<b>" + sym + "</b><i>" + val + "</i>";
+    });
+    var l = SC[v]; $("legend").innerHTML = "<span>" + l.low + "</span><i style='background:linear-gradient(90deg," + shade(v, v === "size" ? { r: 20 } : v === "ie" ? { ie: 380 } : { en: 0.7 }) + "," + shade(v, v === "size" ? { r: 260 } : v === "ie" ? { ie: 2100 } : { en: 4 }) + ")'></i><span>" + l.high + "</span><span style='margin-left:6px'>" + l.name.toLowerCase() + (l.unit ? " (" + l.unit + ")" : "") + "</span>";
+    $("views").querySelectorAll(".vb").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.v === v)); });
+    findUI();
   }
-  function setSlot(n) { S.slot = n; $("slot1").setAttribute("aria-pressed", String(n === 1)); $("slot2").setAttribute("aria-pressed", String(n === 2)); refresh(); }
 
-  /* ---------- cards ---------- */
-  function bar(cls, label, v) {
-    return '<div class="bar ' + cls + '"><span>' + label + '</span>' + (v == null ? '<span class="na">rarely bonds</span>' : '<div><i style="width:' + Math.round(v * 100) + '%"></i></div>') + '</div>';
+  /* ---------- find the pattern: judged against the tiles you have measured ---------- */
+  var RULE = { size: { across: "falls", down: "rises" }, ie: { across: "rises", down: "falls" }, en: { across: "rises", down: "falls" } };
+  function known(view, sym) { var st = S.seen[sym] || {}, e = D.BY[sym]; if (view === "en" && e.en == null) return false; return st[view] === 1 || (KEY && S.showAll); }
+  function pairFor(view, dir) {      // two measured tiles in one row (columns far apart) or one column
+    var list = D.ELEMENTS.filter(function (e) { return known(view, e.sym); }), best = null, i, j;
+    for (i = 0; i < list.length; i++) for (j = 0; j < list.length; j++) {
+      var a = list[i], b = list[j];
+      if (dir === "across" && a.period === b.period && D.GROUPS.indexOf(b.group) - D.GROUPS.indexOf(a.group) >= 3) { if (!best || (D.GROUPS.indexOf(b.group) - D.GROUPS.indexOf(a.group)) > (D.GROUPS.indexOf(best[1].group) - D.GROUPS.indexOf(best[0].group))) best = [a, b]; }
+      if (dir === "down" && a.group === b.group && b.period - a.period >= 1) { if (!best || (b.period - a.period) > (best[1].period - best[0].period)) best = [a, b]; }
+    }
+    return best;
   }
-  function card(host, sym) {
-    if (!sym) { host.innerHTML = '<h3 class="mut">Pick an atom</h3><p class="mut">Click one in the table.</p>'; return; }
-    var e = D.BY[sym];
-    host.innerHTML = "<h3>" + e.name + " (" + e.sym + ")</h3><div class='mut'>Period " + e.period + " · Group " + e.group + " · " + e.period + " shell" + (e.period > 1 ? "s" : "") + "</div>" +
-      bar("s", "SIZE", D.size(e)) + bar("l", "LETS GO", D.letsGo(e)) + bar("p", "PULLS", D.pulls(e));
+  function findUI() {
+    var v = S.view, host = $("findBody"); host.innerHTML = "";
+    [["across", "Across a period, left to right, the value"], ["down", "Down a group, top to bottom, the value"]].forEach(function (d) {
+      var row = document.createElement("div"); row.className = "row"; row.innerHTML = "<span>" + d[1] + "</span>"; var st = (S.trend[v] || {})[d[0]];
+      ["rises", "falls"].forEach(function (w) { var b = document.createElement("button"); b.className = "dir" + (st === "ok" && RULE[v][d[0]] === w ? " ok" : ""); b.textContent = (w === "rises" ? "↑ " : "↓ ") + w; b.disabled = st === "ok"; b.dataset.d = d[0]; b.dataset.w = w; b.addEventListener("click", function () { judge(v, d[0], w); }); row.appendChild(b); });
+      host.appendChild(row);
+    });
+    if (!$("findMsg").dataset.keep) $("findMsg").textContent = "Measure atoms in a row and in a column, then say which way the value goes.";
+  }
+  function judge(view, dir, w) {
+    var m = $("findMsg"), pr = pairFor(view, dir); m.dataset.keep = "1";
+    if (!pr) { m.className = ""; m.textContent = dir === "across" ? "Measure two atoms in the same row that are far apart, such as one at each end." : "Measure two atoms in the same column, such as one near the top and one lower down."; return; }
+    var a = pr[0], b = pr[1], va = SC[view].get(a), vb = SC[view].get(b), truth = vb > va ? "rises" : "falls", nm = SC[view].name.toLowerCase();
+    S.trend[view] = S.trend[view] || {}; log("trend:" + view + ":" + dir + ":" + w);
+    if (w === truth) { S.trend[view][dir] = "ok"; m.className = "ok"; m.textContent = "Yes. In your tiles, " + b.sym + " is " + (truth === "rises" ? "higher" : "lower") + " than " + a.sym + " (" + (+vb).toFixed(SC[view].dec) + " and " + (+va).toFixed(SC[view].dec) + ")."; save(); record(); paintTable(); }
+    else { m.className = "bad"; m.textContent = "Look at your tiles: compare " + a.sym + " and " + b.sym + ". Which has the larger " + nm + "?"; }
+  }
+
+  /* ---------- stages ---------- */
+  function unlocked(n) { return KEY || n === 1 || (n === 2 && count("ie") >= NEED_IE) || (n === 3 && S.pairs.length >= NEED_PAIRS); }
+  function setStage(n) {
+    if (!unlocked(n) || S.mode === "dark") return; S.stage = n; S.result = null; S.mode = "idle"; S.anim = null; S.removed = false;
+    if (n === 1) { S.b = null; } if (n === 2 && !S.a) S.slot = 1; if (n === 3) { S.a = S.b = null; }
+    refresh(); log("stage:" + n); save();
+  }
+  function choose(sym) {
+    if (S.mode === "dark" || !S.started) return;
+    S.anim = null; S.result = null; S.removed = false; S.mode = "idle";
+    if (S.stage === 1) { S.a = sym; }
+    else if (S.stage === 2) { if (S.slot === 1) { S.a = sym; S.slot = 2; } else { S.b = sym; S.slot = 1; } }
+    else { var tot = BE.total(S.dish); if (tot >= MAX_DISH) { S.result = { html: "The dish holds " + MAX_DISH + " atoms. Take one out with the − button." }; refresh(); return; } S.dish[sym] = (S.dish[sym] || 0) + 1; }
+    reveal(sym, "size"); log("pick:" + sym); refresh();
+  }
+  function bannerText() {
+    if (S.stage === 1) return "<b>One atom.</b> " + (!S.a ? "Click an atom in the table." : S.removed ? "That energy is the ionization energy. Pick another atom." : "Press <b>Remove an outer electron</b> to measure how much energy it takes.") + " " + (count("ie") < NEED_IE ? "Measure " + (NEED_IE - count("ie")) + " more to open stage 2." : "");
+    if (S.stage === 2) return "<b>One of each.</b> Pick two atoms, one for each side, then press <b>Bring together</b>. " + (S.pairs.length < NEED_PAIRS ? "Try " + (NEED_PAIRS - S.pairs.length) + " more pair" + (NEED_PAIRS - S.pairs.length > 1 ? "s" : "") + " to open stage 3." : "");
+    return "<b>A bunch.</b> Click atoms to add them to the dish, then press <b>Mix</b>. Try 2 of one atom and 1 of another.";
   }
   function refresh() {
-    card($("card1"), S.a); card($("card2"), S.b);
-    Object.keys(tiles).forEach(function (s) { tiles[s].className = "t" + (D.BY[s].en == null ? " noble" : "") + (S.a === s ? " f1" : "") + (S.b === s ? " f2" : "") + (pickedSet()[s] ? " pk" : ""); });
-    var ok = S.a && S.b && D.BY[S.a].en != null && D.BY[S.b].en != null;
-    $("bFight").disabled = !ok; scoutUI();
+    ["st1", "st2", "st3"].forEach(function (id, i) { var n = i + 1; $(id).setAttribute("aria-pressed", String(S.stage === n)); $(id).disabled = !unlocked(n); });
+    $("lk2").textContent = unlocked(2) ? "" : "measure " + Math.max(0, NEED_IE - count("ie")) + " more"; $("lk3").textContent = unlocked(3) ? "" : Math.max(0, NEED_PAIRS - S.pairs.length) + " more pairs";
+    $("banner").innerHTML = bannerText(); paintTable(); readouts(); actions(); resultUI();
   }
-  function pickedSet() { var o = {}; Object.keys(S.picks).forEach(function (k) { o[S.picks[k]] = 1; }); return o; }
 
-  /* ---------- scout report: three picks, logged, no verdict shown ---------- */
-  function scoutUI() {
-    var host = $("scoutRows"); host.innerHTML = "";
-    var sel = S.slot === 1 ? S.a : S.b; sel = sel || S.a || S.b;
-    D.PICKS.forEach(function (p) {
-      var r = document.createElement("div"); r.className = "r";
-      r.innerHTML = "<span>" + p.ask + "</span><span class='chip'>" + (S.picks[p.id] || "—") + "</span>";
-      var b = document.createElement("button"); b.className = "sb"; b.textContent = sel ? "Lock in " + sel : "Lock in"; b.disabled = !sel;
-      b.addEventListener("click", function () { S.picks[p.id] = sel; save(); record(); refresh(); log("pick:" + p.id + ":" + sel); });
-      r.appendChild(b); host.appendChild(r);
-    });
+  /* ---------- readouts under the stage ---------- */
+  function gauge(view, e, show, extra) {
+    var s = SC[view], v = e ? s.get(e) : null, ok = e && show && v != null;
+    return "<div class='g'><div class='l'>" + s.name + "</div>" + (ok ? "<div class='v'>" + (+v).toFixed(s.dec) + " " + s.unit + "</div><div class='tr'><i style='width:" + Math.min(100, 100 * v / s.max) + "%'></i></div><div class='sc'><span>0</span><span>" + s.max + (s.unit ? " " + s.unit : "") + "</span></div>"
+      : "<div class='v no'>" + (e && view === "en" && e.en == null && show ? "none: full outer shell" : extra) + "</div><div class='tr'></div><div class='sc'><span>0</span><span>" + s.max + (s.unit ? " " + s.unit : "") + "</span></div>") + "</div>";
   }
-  var storeKey = function () { return "te.v1:" + (S.id || "x") + ":" + MrD.bell.dayKey(); };
-  function save() { try { localStorage.setItem(storeKey(), JSON.stringify({ picks: S.picks })); } catch (e) { } }
-  function restore() { try { var j = JSON.parse(localStorage.getItem(storeKey())); if (j && j.picks) S.picks = j.picks; } catch (e) { } }
-  function record() {
-    if (!S.id || !MrD.profile) return;
-    var items = D.PICKS.map(function (p) { return { id: p.id, ask: p.ask, pick: S.picks[p.id] || "", ok: S.picks[p.id] === p.ans() }; });
-    MrD.profile.record({ course: COURSE, lesson: LESSON_ID, title: "Trends Explorer", first: S.id, period: S.period, day: MrD.bell.dayKey(), reached: items.filter(function (x) { return x.ok; }).length, of: items.length, items: items, source: "sandbox" });
+  function readouts() {
+    var e = S.a ? D.BY[S.a] : null, host = $("readouts"), st = e ? (S.seen[e.sym] || {}) : {};
+    if (S.stage === 3) { host.innerHTML = "<div class='g' style='grid-column:1/4'><div class='l'>THE DISH</div><div id='dishrow'></div></div>"; var row = $("dishrow"); Object.keys(S.dish).forEach(function (k) { var c = document.createElement("span"); c.className = "dchip"; c.innerHTML = k + " ×" + S.dish[k] + " "; var b = document.createElement("button"); b.textContent = "−"; b.setAttribute("aria-label", "remove one " + k); b.onclick = function () { S.dish[k]--; if (!S.dish[k]) delete S.dish[k]; S.anim = null; S.result = null; S.mode = "idle"; refresh(); }; c.appendChild(b); row.appendChild(c); }); if (!Object.keys(S.dish).length) row.innerHTML = "<span class='small'>Empty. Click atoms in the table.</span>"; return; }
+    var html = gauge("size", e, st.size === 1 || (KEY && S.showAll), "pick an atom");
+    html += gauge("ie", e, st.ie === 1 || (KEY && S.showAll), e ? "press Remove to measure" : "—");
+    html += gauge("en", e, st.en != null || (KEY && S.showAll), e ? "measured in stage 2" : "—");
+    host.innerHTML = html;
   }
-  var evlog = [];
-  function log(s) { evlog.push([Date.now(), s]); if (evlog.length > 400) evlog.shift(); }
+  function actions() {
+    var h = $("acts"); h.innerHTML = "";
+    function btn(txt, fn, go, dis) { var b = document.createElement("button"); b.className = "big" + (go ? " go" : ""); b.textContent = txt; b.disabled = !!dis; b.onclick = fn; h.appendChild(b); return b; }
+    if (S.stage === 1) { btn("Remove an outer electron", removeElectron, true, !S.a || S.removed || S.mode === "dark"); btn("Clear", function () { S.a = null; S.removed = false; S.anim = null; S.result = null; refresh(); }); }
+    else if (S.stage === 2) {
+      var s1 = btn("Atom 1: " + (S.a || "pick"), function () { S.slot = 1; }, false); var s2 = btn("Atom 2: " + (S.b || "pick"), function () { S.slot = 2; }, false);
+      s1.style.borderColor = S.slot === 1 ? "var(--or)" : ""; s2.style.borderColor = S.slot === 2 ? "var(--cy)" : "";
+      btn("Bring together", bringTogether, true, !S.a || !S.b || (S.mode === "anim"));
+    } else { btn("Mix", mix, true, !BE.total(S.dish) || S.mode === "anim"); btn("Empty the dish", function () { S.dish = {}; S.anim = null; S.result = null; S.mode = "idle"; refresh(); }); }
+  }
+  function resultUI() { $("result").innerHTML = S.result ? S.result.html : ""; }
+
+  /* ---------- the actions ---------- */
+  function removeElectron() {
+    if (!S.a || S.removed) return; var e = D.BY[S.a]; S.removed = true; S.anim = { kind: "remove", t0: performance.now() }; S.mode = "anim";
+    reveal(S.a, "ie"); log("remove:" + S.a);
+    S.result = { html: "<b>" + e.name + "</b>: it takes <b>" + e.ie.toFixed(0) + " kJ/mol</b> to pull off one outer electron." + (e.group === 18 ? " A full outer shell holds on tightly." : "") };
+    setTimeout(function () { if (S.anim && S.anim.kind === "remove") S.mode = "idle"; refresh(); }, 2000); refresh();
+  }
+  function pairText(P) {
+    var A = D.BY[P.a], B = D.BY[P.b], f;
+    if (P.mode === "gives") {
+      var d = D.BY[P.donor], t = D.BY[P.taker], done = P.leftDonor === 0 && P.leftTaker === 0;
+      f = done ? BE.formula(BE.ratio(P.a, P.b, "gives")) : null; var u = !done ? BE.react((function () { var o = {}; o[P.a] = 4; o[P.b] = 4; return o; })()) : null;
+      return "<b>" + d.sym + " gives " + P.moved + " electron" + (P.moved > 1 ? "s" : "") + ". " + t.sym + " takes " + P.moved + ".</b> " + (done ? d.sym + " now has a positive charge and " + t.sym + " a negative one, so they stick: <b>" + f + "</b>" + (BE.COMMON[f] ? " (" + BE.COMMON[f] + ")" : "") + "." :
+        (P.leftDonor ? d.sym + " still has " + P.leftDonor + " electron" + (P.leftDonor > 1 ? "s" : "") + " to give. " : "") + (P.leftTaker ? t.sym + " still has " + P.leftTaker + " open spot" + (P.leftTaker > 1 ? "s" : "") + ". " : "") + "It needs more atoms to finish. That is stage 3.");
+    }
+    if (P.mode === "shares") return "<b>" + A.sym + " and " + B.sym + " share " + P.pairs + " pair" + (P.pairs > 1 ? "s" : "") + " of electrons.</b> " + (P.even ? "Neither pulls harder, so the pair sits in the middle." : "The pair sits nearer " + D.BY[P.winner].name.toLowerCase() + ", which pulls harder.") + (P.leftA || P.leftB ? " " + (P.leftA ? A.sym + " still has " + P.leftA + " open spot" + (P.leftA > 1 ? "s" : "") + ". " : "") + (P.leftB ? B.sym + " still has " + P.leftB + " open spot" + (P.leftB > 1 ? "s" : "") + ". " : "") + "It needs more atoms to finish." : " Both have full outer shells: <b>" + BE.formula((function () { var o = {}; o[P.a] = (o[P.a] || 0) + 1; o[P.b] = (o[P.b] || 0) + 1; return o; })()) + "</b>.");
+    return "<b>Nothing happens.</b> " + P.why;
+  }
+  function bringTogether() {
+    if (!S.a || !S.b) return; var P = BE.pair(S.a, S.b), key = [S.a, S.b].sort().join("+");
+    S.anim = { kind: "pair", t0: performance.now(), P: P }; S.mode = "anim"; log("pair:" + key + ":" + P.mode);
+    [S.a, S.b].forEach(function (s) { if (D.BY[s].en == null) reveal(s, "en", "none"); else if (P.mode !== "none") reveal(s, "en"); });
+    if (P.mode === "gives") reveal(P.donor, "ie");
+    if (S.pairs.indexOf(key) < 0) S.pairs.push(key); save(); record();
+    S.result = { html: pairText(P) }; setTimeout(function () { S.mode = "idle"; refresh(); }, 4200); refresh();
+  }
+  function mix() {
+    var R = BE.react(S.dish); S.mixes++; S.mode = "anim"; S.anim = { kind: "mix", t0: performance.now(), R: R, dish: JSON.parse(JSON.stringify(S.dish)) }; log("mix:" + JSON.stringify(S.dish));
+    R.units.forEach(function (u) { Object.keys(u.members).forEach(function (s) { if (D.BY[s].en != null) reveal(s, "en"); }); if (u.donor) reveal(u.donor, "ie"); });
+    var h = R.units.map(function (u) { return "<b>" + u.count + " × " + u.formula + "</b>" + (u.name ? " (" + u.name + ")" : "") + (u.mode === "gives" ? ": " + D.BY[u.donor].sym + " gives, " + D.BY[u.taker].sym + " takes" : ": atoms share electrons"); }).join("<br>");
+    var left = Object.keys(R.left).map(function (s) { return R.left[s] + " " + s; }).join(", ");
+    if (!R.units.length) h = "<b>Nothing forms.</b> " + (R.near ? "Add " + Object.keys(R.near.add).map(function (s) { return R.near.add[s] + " more " + s; }).join(" and ") + " to make <b>" + R.near.formula + "</b>" + (R.near.name ? " (" + R.near.name + ")" : "") + "." : "These atoms do not combine at this level.");
+    else if (left) h += "<br>Left over: " + left + "." + (R.near ? " Add " + Object.keys(R.near.add).map(function (s) { return R.near.add[s] + " more " + s; }).join(" and ") + " to make <b>" + R.near.formula + "</b>." : "");
+    var hf = R.units.map(function (u) { return HF[u.formula] ? u : null; }).filter(Boolean)[0];
+    S.result = { html: h, hf: hf }; save(); record(); setTimeout(function () { S.mode = "idle"; refresh(); }, 3400); refresh();
+  }
+  /* energy released making one mole of the compound from its elements, kJ (standard enthalpy of formation, magnitude). Always out for these. */
+  var HF = { NaCl: 411, KCl: 436, LiF: 616, MgO: 602, CaO: 635, "MgCl₂": 641, "CaCl₂": 796, "Na₂O": 414, "Al₂O₃": 1676, "H₂O": 286, HCl: 92, HF: 273, "NH₃": 46, "CH₄": 75, "CO₂": 394, "H₂S": 21, NaH: 56, "Mg₃N₂": 461 };
+  var HF_MAX = 1700;
 
   /* ---------- drawing ---------- */
-  var cv = $("cv"), cx = cv.getContext("2d"), W = 0, H = 0, PXPM = 0.5;
-  function fit() { var r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); PXPM = Math.min(H * 0.46, W * 0.2) / 260; }
-  function dot(x, y, r, col) { cx.beginPath(); cx.arc(x, y, r, 0, 7); cx.fillStyle = col; cx.fill(); }
-  function atom(sym, x, y, tint, valenceSkip) {
-    var e = D.BY[sym], R = e.r * PXPM, i, n = e.period;
-    for (i = 1; i <= n; i++) {
-      cx.beginPath(); cx.arc(x, y, R * i / n, 0, 7); cx.lineWidth = i === n ? 3 : 1.5; cx.strokeStyle = i === n ? tint : "#546a80"; cx.stroke();
-      if (i === n) { cx.fillStyle = tint + "22"; cx.fill(); }
-    }
-    var k = e.valence, a0 = -Math.PI / 2 + 0.3;
-    for (i = 0; i < k; i++) { if (valenceSkip === i) continue; var a = a0 + i * 2 * Math.PI / k; dot(x + R * Math.cos(a), y + R * Math.sin(a), 6, "#59d596"); }
-    dot(x, y, 13, "#e0613f"); cx.fillStyle = "#fff"; cx.font = "700 12px Source Sans 3, sans-serif"; cx.textAlign = "center"; cx.fillText("+" + e.Z, x, y + 4);
-    cx.fillStyle = "#eaf0f6"; cx.font = "700 20px Bricolage Grotesque, sans-serif"; cx.fillText(sym, x, y + R + 24);
-  }
-  var duelS = null;   // { t0, d, ex, ey }
+  var cv = $("cv"), cx = cv.getContext("2d"), W = 0, H = 0, K = 0.8;
+  function fit() { var r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); K = Math.min(H * 0.38, W * 0.17) / 260; }
+  function T(s, x, y, size, col, align, weight) { cx.font = (weight || "700") + " " + size + "px 'Source Sans 3', sans-serif"; cx.fillStyle = col; cx.textAlign = align || "center"; cx.fillText(s, x, y); }
+  function ease(x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); }
+  function seg(t, a, b) { return Math.max(0, Math.min(1, (t - a) / (b - a))); }
+  function Rof(sym, k) { return D.BY[sym].r * k / 0.95; }
+  function atomAt(sym, x, y, k, t, o) { o = Object.assign({ spin: 0.7, tilt: 0.5 }, o || {}); AP.draw(cx, sym, x, y, Rof(sym, k), t / 1000, o); }
+  function sup(n, ch) { return (n > 1 ? String(n) : "") + ch; }
   function frame(ts) {
-    cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.clearRect(0, 0, W, H);
-    if (!S.a && !S.b) { cx.fillStyle = "#9fb0c1"; cx.font = "600 18px Source Sans 3, sans-serif"; cx.textAlign = "center"; cx.fillText("Click an atom in the table to meet it.", W / 2, H / 2); }
-    var cy = H / 2 - 6, two = S.a && S.b, xa = two ? W * 0.27 : W / 2, xb = W * 0.73;
-    if (S.mode === "duel" && duelS) {
-      var t = Math.min(1, (ts - duelS.t0) / 1800), ease = t * t * (3 - 2 * t), A = D.BY[S.a], B = D.BY[S.b];
-      var ra = A.r * PXPM, rb = B.r * PXPM;
-      var gone = duelS.d.winner && duelS.d.share >= 1 ? (duelS.d.winner === A.sym ? "b" : "a") : "";
-      atom(S.a, xa, cy, "#f2b84b", gone === "a" ? 0 : -1); atom(S.b, xb, cy, "#4f8cff", gone === "b" ? 0 : -1);
-      // the rope: two arrows whose length shows each pull
-      var pa = D.pulls(A), pb = D.pulls(B), my = cy - Math.max(ra, rb) - 22;
-      arrow(W / 2, my, -1, 120 * pa * (0.6 + 0.4 * ease), "#f2b84b"); arrow(W / 2, my, 1, 120 * pb * (0.6 + 0.4 * ease), "#4f8cff");
-      // the shared electron: starts midway, ends where the duel says
-      var mid = W / 2, dir = duelS.d.winner === A.sym ? -1 : (duelS.d.winner === B.sym ? 1 : 0);
-      var home = dir < 0 ? xa + ra : (dir > 0 ? xb - rb : mid);
-      var far = dir ? (mid + (home - mid) * duelS.d.share) : mid;
-      var ex = mid + (far - mid) * ease; dot(ex, cy, 9, "#59d596");
-      if (t >= 1) $("msg").textContent = duelS.text;
-    } else {
-      if (S.a) atom(S.a, xa, cy, "#f2b84b");
-      if (S.b) atom(S.b, xb, cy, "#4f8cff");
-    }
+    cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.clearRect(0, 0, W, H); cx.imageSmoothingEnabled = false;
+    if (S.stage === 1) stage1(ts); else if (S.stage === 2) stage2(ts); else stage3(ts);
     requestAnimationFrame(frame);
   }
-  function arrow(x, y, dir, len, col) {
-    cx.strokeStyle = col; cx.lineWidth = 7; cx.beginPath(); cx.moveTo(x, y); cx.lineTo(x + dir * len, y); cx.stroke();
-    cx.fillStyle = col; cx.beginPath(); cx.moveTo(x + dir * (len + 14), y); cx.lineTo(x + dir * len, y - 10); cx.lineTo(x + dir * len, y + 10); cx.closePath(); cx.fill();
+  function stage1(ts) {
+    if (!S.a) { T("Click an atom in the table.", W / 2, H / 2, 20, "#9fb0c1", "center", "600"); scaleBar(); return; }
+    var e = D.BY[S.a], x = W / 2, y = H * 0.46, an = S.anim && S.anim.kind === "remove" ? S.anim : null, p = an ? Math.max(0, (ts - an.t0) / 1800) : 0, f = 1 / e.valence, o = {};
+    if (an || S.removed) {
+      var q = Math.min(1, p);
+      atomAt(S.a, x, y, K, ts, { outerLo: f, outerHi: 1, outerS: e.valence === 1 ? 1 : 0.93 });
+      if (q < 1) atomAt(S.a, x + ease(q) * (W * 0.34), y - ease(q) * H * 0.2, K * (1 - 0.4 * ease(q)), ts, { outerOnly: true, outerLo: 0, outerHi: f, alpha: 1 - seg(q, 0.7, 1), noNuc: true });
+      T(e.sym + "⁺", x, y + Rof(S.a, K) * 0.95 + 34, 26, "#fff");
+      var tick = ease(Math.min(1, p / 0.9)); T("+ " + Math.round(e.ie * tick) + " kJ/mol", x + W * 0.17, y - H * 0.28, 24, "#2fe08a");
+    } else { atomAt(S.a, x, y, K, ts, { ghostA: e.group === 16 || e.group === 17 ? 0.5 : 0 }); T(e.sym, x, y + Rof(S.a, K) * 0.95 + 34, 26, "#fff"); }
+    T(e.name, x, H * 0.07, 26, "#eaf0f6", "center", "800"); scaleBar(); keyRow(e.sym, x, H * 0.94);
   }
-  function fight() {
-    var A = D.BY[S.a], B = D.BY[S.b], d = D.duel(A, B);
-    if (!d.ok) { $("msg").textContent = "A noble gas rarely bonds. No tug-of-war."; return; }
-    var text = !d.winner ? "Dead even. Same pull." : (D.BY[d.winner].name + " pulls harder." + (d.share >= 1 ? " The electron goes all the way over." : ""));
-    $("msg").textContent = ""; duelS = { t0: performance.now(), d: d, text: text }; S.mode = "duel"; log("fight:" + S.a + ":" + S.b);
+  function scaleBar() { var L = 100 * K; cx.fillStyle = "#9fb0c1"; cx.fillRect(14, H - 22, L, 3); cx.fillRect(14, H - 28, 2, 15); cx.fillRect(14 + L - 2, H - 28, 2, 15); T("100 pm", 14 + L + 8, H - 14, 14, "#9fb0c1", "left", "600"); }
+  function keyRow(sym, x, y) {
+    var keys = AP.config(D.BY[sym].Z).map(AP.subKey), w = keys.length * 62, x0 = x - w / 2;
+    keys.forEach(function (k, i) { cx.fillStyle = AP.SUBC[k]; cx.fillRect(x0 + i * 62, y - 12, 14, 14); T(k, x0 + i * 62 + 20, y, 17, "#cfe9f2", "left"); });
+  }
+  function ionR(sym, role, k) { var e = D.BY[sym]; return role === "cation" ? (e.period > 1 ? e.r * k * Math.pow((e.period - 1) / e.period, 1.1) : e.r * k * 0.2) : role === "anion" ? e.r * k * 1.35 : e.r * k; }
+  function stage2(ts) {
+    if (!S.a && !S.b) { T("Pick an atom for each side.", W / 2, H / 2, 20, "#9fb0c1", "center", "600"); scaleBar(); return; }
+    var an = S.anim && S.anim.kind === "pair" ? S.anim : null, ms = an ? ts - an.t0 : 0, P = an ? an.P : null, y = H * 0.46, k = K;
+    var ra = S.a ? D.BY[S.a].r : 0, rb = S.b ? D.BY[S.b].r : 0; if (S.a && S.b) k = Math.min(K, (W * 0.46) / (ra + rb));
+    var xa = W * 0.27, xb = W * 0.73, mid = W / 2;
+    var oa = {}, ob = {}, x1 = xa, x2 = xb;
+    if (!an) { if (S.a) atomAt(S.a, xa, y, k, ts, {}); if (S.b) atomAt(S.b, xb, y, k, ts, {}); }
+    else {
+      var gap = (ra + rb) * k * 1.0 + 30, ap = ease(seg(ms, 0, 1300)), dm = P.mode === "shares" ? (ra + rb) * k * 0.78 : gap, settle = ease(seg(ms, 2900, 3800));
+      var dist = (xb - xa) + (dm - (xb - xa)) * ap, fin = dm;
+      if (P.mode === "gives") { var ca = ionR(P.donor, "cation", k), an2 = ionR(P.taker, "anion", k); fin = ca + an2 + 40; dist = dist + (fin - dm) * settle; }
+      x1 = mid - dist / 2; x2 = mid + dist / 2;
+      var leftIsDonor = P.mode === "gives" ? P.donor === S.a : (P.winner ? P.winner !== S.a : false), moved = seg(ms, 1300, 2700), done = ms >= 2700;
+      if (P.mode === "gives") {
+        var dSym = P.donor, tSym = P.taker, dx = dSym === S.a ? x1 : x2, tx = tSym === S.a ? x1 : x2, de = D.BY[dSym], te = D.BY[tSym], f = P.moved / de.valence;
+        var lo = done ? 0 : 0; atomAt(dSym, dx, y, k, ts, { outerLo: Math.min(1, f * ease(moved) * 1) , outerHi: 1, outerS: 1 });
+        var dir = tx > dx ? 0 : Math.PI;
+        atomAt(tSym, tx, y, k, ts, { ghostA: done ? 0 : 0.55, ghostDir: tx > dx ? Math.PI : 0, outerS: 1 + 0.35 * ease(moved) });
+        if (moved > 0 && moved < 1) atomAt(dSym, dx + (tx - dx) * ease(moved), y, k * (1 - 0.65 * ease(moved)), ts, { outerOnly: true, outerLo: 0, outerHi: f, noNuc: true });
+        if (done) { T(dSym === S.a ? de.sym + "⁺" : de.sym + "⁺", dx, y - ionR(dSym, "cation", k) - 18, 28, "#fff"); T(te.sym + "⁻", tx, y - ionR(tSym, "anion", k) - 18, 28, "#fff"); }
+      } else if (P.mode === "shares") {
+        atomAt(S.a, x1, y, k, ts, { ghostA: 0, ghostDir: 0 }); atomAt(S.b, x2, y, k, ts, { ghostA: 0, ghostDir: Math.PI });
+        var sh = ease(seg(ms, 1300, 2400)); if (sh > 0) lens(x1, x2, y, ra * k, rb * k, P, sh, ts);
+      } else {
+        var rep = ease(seg(ms, 1300, 2000)) * 0.7; var bump = rep * 24;
+        atomAt(S.a, x1 - bump, y, k, ts, {}); atomAt(S.b, x2 + bump, y, k, ts, {}); if (ms > 1300) T("no change", mid, y - Math.max(ra, rb) * k - 20, 26, "#ff9d2e");
+      }
+      // electronegativity tags
+      var ta = ease(seg(ms, 500, 1100)); if (ta > 0) { tag(S.a, W * 0.04, 60, ta, "left"); tag(S.b, W * 0.96, 60, ta, "right"); }
+      if (P.mode === "gives" && done && HF[BE.formula(BE.ratio(P.a, P.b, "gives"))] && P.leftDonor === 0 && P.leftTaker === 0) meter(ts, HF[BE.formula(BE.ratio(P.a, P.b, "gives"))], seg(ms, 3000, 4000));
+      if (P.mode === "shares" && !(P.leftA || P.leftB)) { var ff = BE.formula((function () { var o = {}; o[P.a] = 1; o[P.b] = (o[P.b] || 0) + 1; return o; })()); if (HF[ff]) meter(ts, HF[ff], seg(ms, 3000, 4000)); }
+    }
+    if (!an) { if (S.a) T(S.a, xa, y + Rof(S.a, k) * 0.95 + 32, 24, "#fff"); if (S.b) T(S.b, xb, y + Rof(S.b, k) * 0.95 + 32, 24, "#fff"); if (S.a && S.b) T("VS", mid, y + 12, 48, "rgba(234,240,246,.7)", "center", "800"); }
+    else { T(S.a, x1, y + Rof(S.a, k) * 0.95 + 32, 24, "#fff"); T(S.b, x2, y + Rof(S.b, k) * 0.95 + 32, 24, "#fff"); }
+    scaleBar();
+  }
+  function lens(x1, x2, y, r1, r2, P, sh, ts) {      // the shared pair: blocks in the overlap, nearer the atom that pulls harder
+    var cell = Math.max(5, Math.round(Math.min(r1, r2) / 7)), ov = (r1 + r2) - (x2 - x1), lo = Math.max(x1 - r1 * 0.2, x2 - r2) , hi = Math.min(x2 + r2 * 0.2, x1 + r1), i, j, shift = P.winner ? (P.winner === S.b ? 1 : -1) * Math.min(0.35, P.diff / 5) : 0;
+    var cxm = (lo + hi) / 2 + shift * (hi - lo) * 0.6, w = Math.max(cell * 3, (hi - lo) * 0.7), h = Math.min(r1, r2) * 0.9, gx0 = Math.round((cxm - w / 2) / cell) * cell;
+    for (i = 0; i * cell < w; i++) for (j = -Math.floor(h / cell / 2); j <= Math.floor(h / cell / 2); j++) { var u = (i * cell - w / 2) / (w / 2), v = (j * cell) / (h / 2); if (u * u + v * v > 1) continue; var hh = (Math.sin(i * 12.9 + j * 78.2) * 43758.5) % 1; if (Math.abs(hh) > 0.85) continue; cx.globalAlpha = sh * 0.9; cx.fillStyle = Math.abs(hh) < 0.25 ? "#fff3b0" : "#ffe25a"; cx.fillRect(gx0 + i * cell, y + j * cell, cell - 1, cell - 1); }
+    cx.globalAlpha = 1; T(P.pairs + (P.pairs > 1 ? " shared pairs" : " shared pair"), (x1 + x2) / 2, y + Math.max(r1, r2) + 62, 20, "#ffe25a");
+  }
+  function tag(sym, x, y, a, align) {
+    if (!sym) return; var e = D.BY[sym]; cx.globalAlpha = a; T(e.name.toUpperCase(), x, y - 24, 22, "#eaf0f6", align, "800"); T(e.en == null ? "no electronegativity" : "ELECTRONEGATIVITY " + e.en.toFixed(2), x, y, 17, "#9fb0c1", align, "700");
+    if (e.en != null) { var w = 170, x0 = align === "left" ? x : x - w; cx.fillStyle = "#0b1520"; cx.fillRect(x0, y + 8, w, 6); cx.fillStyle = "#19c9e6"; cx.fillRect(x0, y + 8, w * e.en / 4 * a, 6); T("0", x0, y + 28, 12, "#587086", "left", "600"); T("4.0", x0 + w, y + 28, 12, "#587086", "right", "600"); }
+    cx.globalAlpha = 1;
+  }
+  function meter(ts, kj, p) {      // a magnitude meter: how much energy comes out, never a ledger
+    var w = Math.min(520, W * 0.6), x0 = W / 2 - w / 2, y = H - 30; cx.globalAlpha = Math.min(1, p * 3); cx.fillStyle = "#0b1520"; cx.fillRect(x0, y, w, 12); cx.fillStyle = "#2fe08a"; cx.fillRect(x0, y, Math.max(4, w * kj / HF_MAX * ease(p)), 12);
+    T("ENERGY RELEASED", x0, y - 8, 15, "#2fe08a", "left", "800"); T(Math.round(kj * ease(p)) + " kJ per mole made from its elements", x0 + w, y - 8, 15, "#eaf0f6", "right", "700"); cx.globalAlpha = 1;
+  }
+
+  /* stage 3: the dish. Atoms sit in rows; Mix slides them into the pieces they make. */
+  function dishList() { var out = []; Object.keys(S.dish).forEach(function (s) { for (var i = 0; i < S.dish[s]; i++) out.push(s); }); return out; }
+  function unitLayout(u, k) {
+    var syms = Object.keys(u.members), ionic = u.mode === "gives", items = [], n0 = syms[0], n1 = syms[1];
+    function role(s) { return ionic ? (s === u.donor ? "cation" : "anion") : "atom"; }
+    function rad(s) { return ionR(s, role(s), k); }
+    if (syms.length === 1) { var r = rad(n0), dd = r * 0.7; items.push({ sym: n0, x: -dd, y: 0, role: "atom" }, { sym: n0, x: dd, y: 0, role: "atom" }); }
+    else {
+      var cnt0 = u.members[n0], cnt1 = u.members[n1], cen, oth, nc, no;
+      if (Math.min(cnt0, cnt1) === 1) { if (cnt0 === 1 && (cnt1 > 1 || true)) { cen = n0; oth = n1; nc = cnt0; no = cnt1; } if (cnt0 !== 1) { cen = n1; oth = n0; no = cnt0; } if (cnt0 === 1 && cnt1 === 1) { cen = n0; oth = n1; no = 1; } }
+      if (cen) {
+        var dist = (rad(cen) + rad(oth)) * (ionic ? 1.02 : 0.72), angs = no === 1 ? [0] : no === 2 ? (!ionic && D.BY[cen].group === 16 ? [-37.75, -142.25] : [0, 180]) : no === 3 ? [-90, 30, 150] : [0, 90, 180, 270];
+        if (no === 1) { items.push({ sym: cen, x: -dist / 2, y: 0, role: role(cen) }, { sym: oth, x: dist / 2, y: 0, role: role(oth) }); }
+        else { items.push({ sym: cen, x: 0, y: 0, role: role(cen) }); angs.forEach(function (a) { items.push({ sym: oth, x: Math.cos(a * Math.PI / 180) * dist, y: Math.sin(a * Math.PI / 180) * dist, role: role(oth) }); }); }
+      } else {       // 2 and 3: two rows
+        var dm = Math.max(rad(n0), rad(n1)) * 2.1, row = function (s, c, yy) { for (var i = 0; i < c; i++) items.push({ sym: s, x: (i - (c - 1) / 2) * dm, y: yy, role: role(s) }); };
+        row(n0, cnt0, -dm * 0.5); row(n1, cnt1, dm * 0.5);
+      }
+    }
+    var b = 0; items.forEach(function (it) { b = Math.max(b, Math.hypot(it.x, it.y) + ionR(it.sym, it.role, k)); }); return { items: items, bound: b };
+  }
+  function stage3(ts) {
+    var dl = dishList(), an = S.anim && S.anim.kind === "mix" ? S.anim : null, k = Math.min(K * 0.55, 0.5);
+    if (!dl.length && !an) { T("Click atoms in the table to put them in the dish.", W / 2, H / 2, 20, "#9fb0c1", "center", "600"); return; }
+    var src = an ? (function () { var o = []; Object.keys(an.dish).forEach(function (s) { for (var i = 0; i < an.dish[s]; i++) o.push(s); }); return o; })() : dl;
+    var maxR = Math.max.apply(null, src.map(function (s) { return D.BY[s].r * k; })), cell = maxR * 2 + 22, cols = Math.max(1, Math.floor((W - 40) / cell)), pos = src.map(function (s, i) { var c = i % cols, r = Math.floor(i / cols), inRow = Math.min(cols, src.length - r * cols); return { sym: s, x: W / 2 + (c - (inRow - 1) / 2) * cell, y: H * 0.34 + r * cell * 0.9 }; });
+    if (!an) { pos.forEach(function (p) { atomAt(p.sym, p.x, p.y, k, ts, {}); T(p.sym, p.x, p.y + D.BY[p.sym].r * k + 22, 18, "#fff"); }); return; }
+    var R = an.R, ms = ts - an.t0, ready = R.units.length > 0, tgt = [], cursor = 0, units = [];
+    R.units.forEach(function (u) { var L = unitLayout(u, k); for (var c = 0; c < Math.min(u.count, 6); c++) units.push({ u: u, L: L }); });
+    var leftAtoms = []; Object.keys(R.left).forEach(function (s) { for (var i = 0; i < R.left[s]; i++) leftAtoms.push(s); });
+    var totalW = units.reduce(function (n, x) { return n + x.L.bound * 2 + 30; }, 0) + leftAtoms.reduce(function (n, s) { return n + D.BY[s].r * k * 2 + 20; }, 0), sc = Math.min(1, (W - 60) / Math.max(totalW, 1));
+    var x = W / 2 - totalW * sc / 2, yc = H * 0.46;
+    units.forEach(function (it) { var cxu = x + it.L.bound * sc; it.items = it.L.items.map(function (m) { return { sym: m.sym, role: m.role, x: cxu + m.x * sc, y: yc + m.y * sc }; }); it.cx = cxu; it.bound = it.L.bound * sc; x += (it.L.bound * 2 + 30) * sc; });
+    leftAtoms.forEach(function (s) { var r = D.BY[s].r * k * sc; tgt.push({ sym: s, role: "atom", x: x + r, y: yc }); x += (D.BY[s].r * k * 2 + 20) * sc; });
+    units.forEach(function (it) { it.items.forEach(function (m) { tgt.push(m); }); });
+    // match each dish atom to a slot with the same symbol
+    var used = {}, moveP = ease(seg(ms, 100, 1500)), styled = ms >= 1500;
+    pos.forEach(function (p) {
+      var j = -1, i; for (i = 0; i < tgt.length; i++) { if (!used[i] && tgt[i].sym === p.sym) { j = i; break; } } if (j < 0) { atomAt(p.sym, p.x, p.y, k, ts, {}); return; } used[j] = 1; var tg = tgt[j];
+      var x2 = p.x + (tg.x - p.x) * moveP, y2 = p.y + (tg.y - p.y) * moveP, o = {};
+      if (styled && tg.role === "cation") { o.outerA = 0; } if (styled && tg.role === "anion") { o.outerS = 1.5; }
+      atomAt(p.sym, x2, y2, k * (moveP >= 1 ? sc : 1 + (sc - 1) * moveP), ts, o);
+      if (styled && tg.role !== "atom") T(p.sym + (tg.role === "cation" ? "⁺" : "⁻"), x2, y2 - ionR(p.sym, tg.role, k * sc) - 12, 20, "#fff");
+    });
+    if (styled && ready) { units.forEach(function (it) { T(it.u.formula, it.cx, yc + it.bound + 34, 28, "#fff", "center", "800"); if (it.u.name) T(it.u.name, it.cx, yc + it.bound + 56, 16, "#9fb0c1", "center", "600"); }); }
+    if (styled && S.result && S.result.hf) { var u = S.result.hf; meter(ts, HF[u.formula], seg(ms, 1700, 2800)); }
+    if (styled && !ready) T("Nothing forms.", W / 2, H * 0.66, 26, "#ff9d2e");
   }
 
   /* ---------- starting, and locked mode (shared/lock.js) ---------- */
   function lockWanted() { return !KEY && !!S.id && NOLOCK !== LessonLock.offCode() && !!clk().lockOn; }
-  function go() { S.started = true; $("start").hidden = true; $("lockres").hidden = true; restore(); refresh(); record(); }
+  function go() { S.started = true; $("start").hidden = true; $("lockres").hidden = true; restore(); S.stage = unlocked(S.stage) ? S.stage : 1; refresh(); record(); }
   function begin() {
     var info = askH.get(); if (!info.valid) return; S.id = info.id; S.period = info.period; MrD.ids.setMe(S.id, S.period);
     if (!lockWanted()) { go(); return; }
@@ -318,28 +507,28 @@ header .sp{flex:1}
   /* ---------- the teacher key ---------- */
   function openKey() {
     var rows = D.ELEMENTS.map(function (e) { return "<tr><td>" + e.sym + "</td><td>" + e.r + "</td><td>" + e.ie + "</td><td>" + (e.en == null ? "—" : e.en) + "</td></tr>"; }).join("");
-    $("keyBody").innerHTML = "<h2>Teacher key: Trends Explorer</h2>" +
+    $("keyBody").innerHTML = "<h2>Teacher key: Trends Lab</h2>" +
       "<p><b>Goes black</b> " + CUT_MIN + " minutes after the bell in class (no code, no lock penalty). Outside class or in #key it never goes black.</p>" +
-      "<p><b>Pick answers:</b> " + D.PICKS.map(function (p) { return p.ask + " = <b>" + p.ans() + "</b>"; }).join("; ") + ". Biggest and easiest-to-lose land on the same corner of the table; that is the day's essential question.</p>" +
-      "<p><b>Tug of war:</b> the electron moves toward the larger PULLS. A gap of 1.7 or more and it goes all the way over; smaller gaps leave it between the two atoms, nearer the winner. Noble gases are left out.</p>" +
+      "<p><b>Stage 1</b> measures size (on picking) and ionization energy (the button). <b>Stage 2</b> opens after " + NEED_IE + " ionization energies. <b>Stage 3</b> opens after " + NEED_PAIRS + " pairs. Electronegativity is measured when atoms meet. In #key every stage is open and a <i>Show all values</i> button fills the table.</p>" +
+      "<p><b>Rules the sim uses:</b> a metal (groups 1, 2, 13) and a nonmetal with an electronegativity gap of " + BE.GIVE_GAP + " or more: the metal gives, the nonmetal takes. Two nonmetals share pairs, nearer the higher electronegativity. Two metals or a noble gas: nothing. Atoms combine in the smallest ratio that fills every spot. The words ionic and covalent are not used.</p>" +
+      "<p><b>Find the pattern</b> compares two tiles you measured (far apart in a row, or one above the other in a column), so the answer always comes from the student's own data.</p>" +
       "<p><b>Unlock code for a locked student today:</b> " + (MrD.codes && MrD.codes.override ? MrD.codes.override() : "see the teacher page") + "</p>" +
-      "<p class='small'>Left out on purpose: Ga, Ge, In, Sn (electronegativity rises there going down a group, an exception the day's notes do not teach).</p>" +
+      "<p class='small'>Left out on purpose: Ga, Ge, In, Sn (electronegativity rises there going down a group, an exception the day's notes do not teach) and helium. Energy meter: standard enthalpy of formation, per mole made from its elements, always energy out for the compounds listed.</p>" +
       "<table><tr><th>Atom</th><th>radius pm</th><th>first IE kJ/mol</th><th>EN</th></tr>" + rows + "</table>" +
-      "<p><button class='big' id='keyClose' style='padding:0 20px'>Close</button></p>";
-    $("keyPage").hidden = false; $("keyClose").onclick = function () { $("keyPage").hidden = true; };
+      "<p><button class='big' id='showAll' style='padding:0 20px'>Show all values</button> <button class='big' id='keyClose' style='padding:0 20px'>Close</button></p>";
+    $("keyPage").hidden = false; $("keyClose").onclick = function () { $("keyPage").hidden = true; }; $("showAll").onclick = function () { S.showAll = !S.showAll; $("keyPage").hidden = true; refresh(); };
   }
 
   /* ---------- boot ---------- */
   function boot() {
-    buildTable(); fit(); window.addEventListener("resize", fit); refresh();
-    $("slot1").onclick = function () { setSlot(1); }; $("slot2").onclick = function () { setSlot(2); };
-    $("bClear").onclick = function () { S.a = S.b = null; S.mode = "idle"; $("msg").textContent = ""; setSlot(1); };
-    $("bFight").onclick = fight;
+    buildTable(); refresh(); fit(); window.addEventListener("resize", fit); if (window.ResizeObserver) new ResizeObserver(fit).observe($("stagewrap"));
+    $("st1").onclick = function () { setStage(1); }; $("st2").onclick = function () { setStage(2); }; $("st3").onclick = function () { setStage(3); };
+    $("views").querySelectorAll(".vb").forEach(function (b) { b.onclick = function () { S.view = b.dataset.v; $("findMsg").dataset.keep = ""; paintTable(); }; });
     $("btnHow").onclick = function () { $("how").hidden = false; }; $("howClose").onclick = function () { $("how").hidden = true; };
     requestAnimationFrame(frame);
     if (isDark()) { goDark(); return; }
     setInterval(watchClock, 1000);
-    if (KEY) { $("start").hidden = true; S.started = true; $("btnKey").hidden = false; $("btnKey").onclick = openKey; return; }
+    if (KEY) { $("start").hidden = true; S.started = true; $("btnKey").hidden = false; $("btnKey").onclick = openKey; refresh(); return; }
     LessonLock.init({ id: LESSON_ID, root: $("app"), onChange: function () { } });
     var me = MrD.ids.me(); if (me) { S.id = me.id; S.period = me.period; }
     if (NOLOCK !== LessonLock.offCode() && clk().lockOn && LessonLock.pending()) { lockResumeCard(); return; }
@@ -347,7 +536,7 @@ header .sp{flex:1}
     askH = MrD.ids.ask($("idHost"), { onChange: function (i) { $("bBegin").disabled = !i.valid; $("startMsg").textContent = ""; } });
     $("bBegin").addEventListener("click", begin);
   }
-  window.__te = { S: S, choose: choose, fight: fight, isDark: isDark, log: function () { return evlog; }, started: function () { return S.started; } };
+  window.__te = { S: S, choose: choose, setStage: setStage, removeElectron: removeElectron, bringTogether: bringTogether, mix: mix, isDark: isDark, judge: judge, log: function () { return evlog; }, started: function () { return S.started; }, HF: HF };
   boot();
 })();
 </script>
