@@ -15,23 +15,23 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.35 "Source Sans 
 h1,h2{font-family:"Bricolage Grotesque","Source Sans 3",system-ui,sans-serif;margin:0}
 button{font:inherit;color:inherit}
 #app{display:flex;flex-direction:column;height:100%}
-header{display:flex;align-items:center;gap:10px;padding:5px 12px;background:var(--panel);border-bottom:1px solid var(--line);flex:none}
-header h1{font-size:1.1rem;letter-spacing:.3px;margin-right:6px}
+header{display:flex;align-items:center;gap:16px;padding:12px 20px;background:var(--panel);border-bottom:1px solid var(--line);flex:none}
+header h1{font-size:1.35rem;letter-spacing:.3px;margin-right:18px}
 header .sp{flex:1}
-.hbtn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 12px;cursor:pointer}
-.chip{display:flex;align-items:center;gap:6px;background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:3px 12px;cursor:pointer;font-weight:700}
+.hbtn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 16px;cursor:pointer}
+.chip{display:flex;align-items:center;gap:6px;background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:8px 20px;cursor:pointer;font-weight:700;font-size:1.02rem}
 .chip[aria-pressed=true]{border-color:var(--cy);color:#fff}
 .chip:disabled{opacity:.45;cursor:not-allowed}
 .chip small{font-weight:600;color:var(--muted)}
 #main{flex:1;display:flex;min-height:0}
-#left{width:540px;flex:none;padding:8px 10px;border-right:1px solid var(--line);overflow:auto}
-#views{display:flex;gap:6px;margin-bottom:6px}
+#left{width:560px;flex:none;padding:14px 16px;border-right:1px solid var(--line);overflow:auto}
+#views{display:flex;gap:10px;margin-bottom:10px}
 .vb{flex:1;padding:5px 4px;border-radius:8px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700;font-size:.9rem}
 .vb[aria-pressed=true]{border-color:var(--cy);color:#fff}
-#legend{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);margin:2px 0 6px}
+#legend{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);margin:4px 0 12px}
 #legend i{flex:1;height:8px;border-radius:2px}
-#table{display:grid;grid-template-columns:repeat(2,1fr) 10px repeat(6,1fr);gap:4px}
-.t{position:relative;height:47px;border-radius:5px;border:2px solid #223348;background:#0e1824;cursor:pointer;padding:0;text-align:center;color:#6c8196}
+#table{display:grid;grid-template-columns:repeat(2,1fr) 10px repeat(6,1fr);gap:6px}
+.t{position:relative;height:50px;border-radius:5px;border:2px solid #223348;background:#0e1824;cursor:pointer;padding:0;text-align:center;color:#6c8196}
 .t b{display:block;font-size:1.05rem;line-height:1;margin-top:5px}
 .t i{display:block;font-style:normal;font-size:.68rem;line-height:1.2;min-height:.8rem}
 .t:hover{border-color:var(--cy)}
@@ -41,35 +41,38 @@ header .sp{flex:1}
 .t.b{outline:3px solid var(--cy);outline-offset:1px}
 .t.inDish{outline:3px solid var(--mint);outline-offset:1px}
 .gap{border-left:2px dotted var(--line);margin:3px 3px}
-.empty{height:47px;border-radius:5px;border:1px dashed #1a2a3c}
-#find{margin-top:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.empty{height:50px;border-radius:5px;border:1px dashed #1a2a3c}
+#find{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+#find[hidden]{display:none}
 #find h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-family:"Source Sans 3",sans-serif;margin:0 0 4px}
 #find .row{display:flex;align-items:center;gap:6px;margin:4px 0;flex-wrap:wrap}
-#find .row span{flex:1;min-width:190px}
+#find .row span{flex:1;min-width:120px;font-weight:600}
 .dir{min-width:76px;padding:3px 10px;border-radius:8px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700}
 .dir.ok{border-color:var(--mint);background:#16402c}
 .dir.no{border-color:var(--bad)}
 .dir:disabled{opacity:.4;cursor:not-allowed}
-#findMsg{min-height:2.4em;font-size:.88rem;color:var(--muted);margin:4px 0 0}
+#findMsg{font-size:.88rem;color:var(--muted);margin:4px 0 0}
+#findMsg:empty{display:none}
 #findMsg.bad{color:var(--bad)}#findMsg.ok{color:var(--mint)}
-#right{flex:1;min-width:0;display:flex;flex-direction:column}
-#banner{padding:6px 14px;flex:none;font-size:1.02rem;min-height:2.6em;background:#0f1c2a;border-bottom:1px solid var(--line)}
+#right{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column}
+#banner{padding:10px 20px;flex:none;font-size:1.15rem;background:#0f1c2a;border-bottom:1px solid var(--line)}
 #banner b{color:var(--cy)}
 #stagewrap{flex:1;position:relative;min-height:0}
 #cv{position:absolute;inset:0;width:100%;height:100%;display:block}
-#bottom{display:flex;gap:10px;padding:8px 12px;flex:none;align-items:stretch;border-top:1px solid var(--line);background:var(--panel)}
-#readouts{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.g .l{font-size:.74rem;font-weight:700;letter-spacing:.07em;color:var(--muted)}
-.g .v{font:800 1.35rem "Bricolage Grotesque",sans-serif;line-height:1.1;min-height:1.5rem}
+#bottom{display:flex;gap:18px;padding:14px 18px;flex:none;align-items:stretch;border-top:1px solid var(--line);background:var(--panel)}
+#readouts{flex:3;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.g .l{white-space:nowrap;font-size:.76rem;font-weight:700;letter-spacing:.07em;color:var(--muted)}
+.g .v{font:800 1.45rem "Bricolage Grotesque",sans-serif;line-height:1.15;min-height:1.8rem;white-space:nowrap}
+.g .v small{font:600 .85rem "Source Sans 3",sans-serif;color:var(--muted);margin-left:4px}
 .g .v.no{color:#587086;font:600 .95rem "Source Sans 3",sans-serif}
 .g .tr{height:6px;background:#0b1520;border-radius:3px;margin-top:3px;position:relative}
 .g .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--cy)}
 .g .sc{display:flex;justify-content:space-between;font-size:.66rem;color:#587086}
-#acts{display:flex;flex-direction:column;gap:6px;width:230px}
+#acts{display:flex;flex-direction:column;gap:8px;width:210px;flex:none}
 .big{min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700;font-size:1rem}
 .big.go{background:var(--cy);border-color:var(--cy);color:#02141a}
 .big:disabled{opacity:.4;cursor:not-allowed}
-#result{flex:1.2;font-size:.98rem;min-width:260px}
+#result{flex:2;font-size:1.02rem;min-width:0}
 #result b{color:#fff}
 #dishrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
 .dchip{display:flex;align-items:center;gap:4px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:1px 4px 1px 8px;font-weight:700}
@@ -91,6 +94,12 @@ header .sp{flex:1}
 #keyBody table{border-collapse:collapse;font-size:.85rem}
 #keyBody td,#keyBody th{border:1px solid var(--line);padding:2px 8px;text-align:right}
 #keyBody th:first-child,#keyBody td:first-child{text-align:left}
+#arrow{position:fixed;z-index:40;pointer-events:none;background:#ffd23f;color:#1a1400;font-weight:800;padding:6px 12px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.5);white-space:nowrap}
+#arrow:after{content:"";position:absolute;left:50%;margin-left:-8px;border:8px solid transparent}
+#arrow.up:after{top:100%;border-top-color:#ffd23f}
+#arrow.dn:after{bottom:100%;border-bottom-color:#ffd23f}
+#arrow[hidden]{display:none}
+.tut{outline:3px solid #ffd23f!important;outline-offset:2px}
 </style>
 </head>
 <body>
@@ -101,7 +110,7 @@ header .sp{flex:1}
     <button class="chip" id="st2" aria-pressed="false" disabled>2 One of each <small id="lk2"></small></button>
     <button class="chip" id="st3" aria-pressed="false" disabled>3 A bunch <small id="lk3"></small></button>
     <span class="sp"></span>
-    <button class="hbtn" id="btnHow">How to read this</button>
+    <button class="hbtn" id="btnHow">Colors</button>
     <button class="hbtn" id="btnKey" hidden>Teacher key</button>
   </header>
   <div id="main">
@@ -110,7 +119,7 @@ header .sp{flex:1}
       <div id="legend"></div>
       <div id="table"></div>
       <div id="find">
-        <h2>Find the pattern</h2>
+        <h2>Pattern</h2>
         <div id="findBody"></div>
         <p id="findMsg"></p>
       </div>
@@ -130,29 +139,21 @@ header .sp{flex:1}
 <div class="overlay" id="start" hidden>
   <div class="sheet">
     <h2>Trends Lab</h2>
-    <p>Every atom you measure fills in a tile on the table. Measure enough and the pattern shows up on its own.</p>
-    <ol>
-      <li><b>One atom.</b> Pick an atom. Its size is measured. Press the button to pull off an outer electron and measure the energy it takes.</li>
-      <li><b>One of each.</b> Put two different atoms together. Watch what the electron does, and measure how hard each atom pulls on it.</li>
-      <li><b>A bunch.</b> Add as many atoms as you like and see what they make.</li>
-    </ol>
-    <p class="small">Colors show subshells, the regions where an atom's electrons are found. Nothing here is timed except the end of the activity.</p>
+    <p>Measure atoms. The table fills in. The patterns show up.</p>
     <div id="idHost"></div>
     <p class="small" id="lockNote" hidden>During class this opens in full screen. Leaving it is counted, and the teacher has to see you to unlock it.</p>
     <p class="hint bad" id="startMsg"></p>
     <button class="big go" id="bBegin" style="padding:0 30px" disabled>Begin</button>
   </div>
 </div>
-<div class="overlay" id="how" hidden><div class="sheet"><h2>How to read this</h2>
-  <p><b>Atoms.</b> Each colored patch is a subshell: blue 1s, teal 2s, pink 2p, lime 3s, orange 3p. The gold block is the nucleus. A bigger atom is drawn bigger, to the same scale for every atom.</p>
-  <p><b>Table tiles.</b> A tile stays dark until you measure it. Size is measured when you pick an atom. Ionization energy is measured when you pull an electron off. Electronegativity is measured when two atoms meet. Darker to brighter means smaller to larger.</p>
-  <p><b>Electronegativity</b> is how hard an atom pulls on an electron it shares, on a scale of 0 to 4.</p>
-  <p class="small">Noble gases already have a full outer shell, so they have no electronegativity.</p>
-  <button class="big" id="howClose" style="padding:0 24px">Back to the lab</button></div></div>
+<div class="overlay" id="how" hidden><div class="sheet"><h2>Colors</h2>
+  <p>Each colored patch is a subshell, a region where an atom's electrons are found. Blue 1s, teal 2s, pink 2p, lime 3s, orange 3p. The gold block is the nucleus.</p>
+  <button class="big" id="howClose" style="padding:0 24px">Back</button></div></div>
 <div class="overlay" id="lockres" hidden><div class="sheet"><h2>🔒 Locked. Hand up, eyes forward.</h2>
   <p id="lockresTxt"></p><input id="lockCode" aria-label="Unlock code from the teacher" autocomplete="off" style="background:#0b121a;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px;font-size:1.1rem">
   <button class="big" id="bUnlock" style="padding:0 20px;margin-left:8px">Unlock</button><p class="hint bad" id="lockMsg"></p></div></div>
 <div class="overlay" id="keyPage" hidden><div class="sheet" id="keyBody"></div></div>
+<div id="arrow" hidden></div>
 <div id="dark" hidden aria-hidden="true">Close your laptop.</div>
 
 <script src="../../shared/bell.js"></script>
@@ -244,12 +245,12 @@ header .sp{flex:1}
   }
   function findUI() {
     var v = S.view, host = $("findBody"); host.innerHTML = "";
-    [["across", "Across a period, left to right, the value"], ["down", "Down a group, top to bottom, the value"]].forEach(function (d) {
+    [["across", "Left to right →"], ["down", "Top to bottom ↓"]].forEach(function (d) {
       var row = document.createElement("div"); row.className = "row"; row.innerHTML = "<span>" + d[1] + "</span>"; var st = (S.trend[v] || {})[d[0]];
       ["rises", "falls"].forEach(function (w) { var b = document.createElement("button"); b.className = "dir" + (st === "ok" && RULE[v][d[0]] === w ? " ok" : ""); b.textContent = (w === "rises" ? "↑ " : "↓ ") + w; b.disabled = st === "ok"; b.dataset.d = d[0]; b.dataset.w = w; b.addEventListener("click", function () { judge(v, d[0], w); }); row.appendChild(b); });
       host.appendChild(row);
     });
-    if (!$("findMsg").dataset.keep) $("findMsg").textContent = "Measure atoms in a row and in a column, then say which way the value goes.";
+    var fk = D.ELEMENTS.filter(function (x) { return known(v, x.sym); }).length; $("find").hidden = fk < 2; if (!$("findMsg").dataset.keep) $("findMsg").textContent = "";
   }
   function judge(view, dir, w) {
     var m = $("findMsg"), pr = pairFor(view, dir); m.dataset.keep = "1";
@@ -263,7 +264,7 @@ header .sp{flex:1}
   /* ---------- stages ---------- */
   function unlocked(n) { return KEY || n === 1 || (n === 2 && count("ie") >= NEED_IE) || (n === 3 && S.pairs.length >= NEED_PAIRS); }
   function setStage(n) {
-    if (!unlocked(n) || S.mode === "dark") return; S.stage = n; S.result = null; S.mode = "idle"; S.anim = null; S.removed = false;
+    if (!unlocked(n) || S.mode === "dark") return; if (n === 2) S.sawSt2 = true; if (n === 3) S.sawSt3 = true; S.stage = n; S.result = null; S.mode = "idle"; S.anim = null; S.removed = false;
     if (n === 1) { S.b = null; } if (n === 2 && !S.a) S.slot = 1; if (n === 3) { S.a = S.b = null; }
     refresh(); log("stage:" + n); save();
   }
@@ -276,28 +277,28 @@ header .sp{flex:1}
     reveal(sym, "size"); log("pick:" + sym); refresh();
   }
   function bannerText() {
-    if (S.stage === 1) return "<b>One atom.</b> " + (!S.a ? "Click an atom in the table." : S.removed ? "That energy is the ionization energy. Pick another atom." : "Press <b>Remove an outer electron</b> to measure how much energy it takes.") + " " + (count("ie") < NEED_IE ? "Measure " + (NEED_IE - count("ie")) + " more to open stage 2." : "");
-    if (S.stage === 2) return "<b>One of each.</b> Pick two atoms, one for each side, then press <b>Bring together</b>. " + (S.pairs.length < NEED_PAIRS ? "Try " + (NEED_PAIRS - S.pairs.length) + " more pair" + (NEED_PAIRS - S.pairs.length > 1 ? "s" : "") + " to open stage 3." : "");
-    return "<b>A bunch.</b> Click atoms to add them to the dish, then press <b>Mix</b>. Try 2 of one atom and 1 of another.";
+    if (S.stage === 1) return S.a ? "<b>" + D.BY[S.a].name + "</b>" : "One atom";
+    if (S.stage === 2) return "One of each";
+    return "A bunch";
   }
   function refresh() {
     ["st1", "st2", "st3"].forEach(function (id, i) { var n = i + 1; $(id).setAttribute("aria-pressed", String(S.stage === n)); $(id).disabled = !unlocked(n); });
-    $("lk2").textContent = unlocked(2) ? "" : "measure " + Math.max(0, NEED_IE - count("ie")) + " more"; $("lk3").textContent = unlocked(3) ? "" : Math.max(0, NEED_PAIRS - S.pairs.length) + " more pairs";
-    $("banner").innerHTML = bannerText(); paintTable(); readouts(); actions(); resultUI();
+    $("lk2").textContent = unlocked(2) ? "" : "🔒"; $("lk3").textContent = unlocked(3) ? "" : "🔒";
+    $("banner").innerHTML = bannerText(); paintTable(); readouts(); actions(); resultUI(); $("readouts").style.display = S.stage === 2 ? "none" : ""; $("result").style.display = S.stage === 1 ? "none" : "";
   }
 
   /* ---------- readouts under the stage ---------- */
   function gauge(view, e, show, extra) {
     var s = SC[view], v = e ? s.get(e) : null, ok = e && show && v != null;
-    return "<div class='g'><div class='l'>" + s.name + "</div>" + (ok ? "<div class='v'>" + (+v).toFixed(s.dec) + " " + s.unit + "</div><div class='tr'><i style='width:" + Math.min(100, 100 * v / s.max) + "%'></i></div><div class='sc'><span>0</span><span>" + s.max + (s.unit ? " " + s.unit : "") + "</span></div>"
-      : "<div class='v no'>" + (e && view === "en" && e.en == null && show ? "none: full outer shell" : extra) + "</div><div class='tr'></div><div class='sc'><span>0</span><span>" + s.max + (s.unit ? " " + s.unit : "") + "</span></div>") + "</div>";
+    return "<div class='g'><div class='l'>" + s.name + "</div>" + (ok ? "<div class='v'>" + (+v).toFixed(s.dec) + "<small>" + s.unit + "</small></div><div class='tr'><i style='width:" + Math.min(100, 100 * v / s.max) + "%'></i></div><div class='sc'><span>0</span><span>" + s.max + (s.unit ? " " + s.unit : "") + "</span></div>"
+      : "<div class='v no'>" + (e && view === "en" && e.en == null && show ? "none" : extra) + "</div><div class='tr'></div><div class='sc'><span>0</span><span>" + s.max + (s.unit ? " " + s.unit : "") + "</span></div>") + "</div>";
   }
   function readouts() {
     var e = S.a ? D.BY[S.a] : null, host = $("readouts"), st = e ? (S.seen[e.sym] || {}) : {};
     if (S.stage === 3) { host.innerHTML = "<div class='g' style='grid-column:1/4'><div class='l'>THE DISH</div><div id='dishrow'></div></div>"; var row = $("dishrow"); Object.keys(S.dish).forEach(function (k) { var c = document.createElement("span"); c.className = "dchip"; c.innerHTML = k + " ×" + S.dish[k] + " "; var b = document.createElement("button"); b.textContent = "−"; b.setAttribute("aria-label", "remove one " + k); b.onclick = function () { S.dish[k]--; if (!S.dish[k]) delete S.dish[k]; S.anim = null; S.result = null; S.mode = "idle"; refresh(); }; c.appendChild(b); row.appendChild(c); }); if (!Object.keys(S.dish).length) row.innerHTML = "<span class='small'>Empty. Click atoms in the table.</span>"; return; }
-    var html = gauge("size", e, st.size === 1 || (KEY && S.showAll), "pick an atom");
-    html += gauge("ie", e, st.ie === 1 || (KEY && S.showAll), e ? "press Remove to measure" : "—");
-    html += gauge("en", e, st.en != null || (KEY && S.showAll), e ? "measured in stage 2" : "—");
+    var html = gauge("size", e, st.size === 1 || (KEY && S.showAll), "—");
+    html += gauge("ie", e, st.ie === 1 || (KEY && S.showAll), "—");
+    html += gauge("en", e, st.en != null || (KEY && S.showAll), "—");
     host.innerHTML = html;
   }
   function actions() {
@@ -311,6 +312,34 @@ header .sp{flex:1}
     } else { btn("Mix", mix, true, !BE.total(S.dish) || S.mode === "anim"); btn("Empty the dish", function () { S.dish = {}; S.anim = null; S.result = null; S.mode = "idle"; refresh(); }); }
   }
   function resultUI() { $("result").innerHTML = S.result ? S.result.html : ""; }
+
+  /* ---------- the yellow-arrow tutorial: one next action at a time, gone once the student has done it ---------- */
+  var viewedIE = false;
+  function nextStep() {
+    var q = function (s) { return document.querySelector(s); };
+    if (S.stage === 1) {
+      if (!S.a && count("size") < 1) return [q('.t[data-sym="Na"]'), "Pick an atom"];
+      if (S.a && count("ie") < 1 && !S.removed) return [q("#acts .big"), "Pull off an outer electron"];
+      if (count("ie") === 1 && !viewedIE) return [q('.vb[data-v="ie"]'), "Your result goes on the table"];
+      if (count("ie") < NEED_IE) { var nx = ["Cl", "Li", "F", "Cs", "K", "Mg"].filter(function (s) { return !(S.seen[s] || {}).ie; })[0]; return [q('.t[data-sym="' + nx + '"]'), count("ie") === 1 ? "Measure two more atoms" : "One more"]; }
+      if (unlocked(2) && !S.sawSt2) return [$("st2"), "Stage 2 is open"];
+    }
+    if (S.stage === 2 && S.pairs.length === 0) { if (!S.a || !S.b) return [q('.t[data-sym="' + (!S.a ? "Na" : "Cl") + '"]'), !S.a ? "Pick atom 1" : "Pick atom 2"]; return [q("#acts .big.go"), "Bring them together"]; }
+    if (S.stage === 2 && unlocked(3) && !S.sawSt3) return [$("st3"), "Stage 3 is open"];
+    if (S.stage === 3 && !BE.total(S.dish) && S.mixes === 0) return [q('.t[data-sym="Na"]'), "Add atoms to the dish"];
+    if (S.stage === 3 && BE.total(S.dish) && S.mixes === 0) return [q("#acts .big.go"), "Mix"];
+    return null;
+  }
+  function tutorial() {
+    var a = $("arrow"); document.querySelectorAll(".tut").forEach(function (n) { n.classList.remove("tut"); });
+    var st = (KEY || !S.started || S.mode === "dark") ? null : nextStep();
+    if (!st || !st[0] || st[0].disabled) { a.hidden = true; return; }
+    var r = st[0].getBoundingClientRect(); st[0].classList.add("tut"); a.textContent = st[1]; a.hidden = false;
+    var below = r.top < 90; a.className = below ? "dn" : "up";
+    a.style.left = Math.max(8, Math.min(innerWidth - a.offsetWidth - 8, r.left + r.width / 2 - a.offsetWidth / 2)) + "px";
+    a.style.top = (below ? r.bottom + 14 : r.top - a.offsetHeight - 14) + "px";
+  }
+  window.addEventListener("resize", tutorial); setInterval(tutorial, 400);
 
   /* ---------- the actions ---------- */
   function removeElectron() {
@@ -523,7 +552,7 @@ header .sp{flex:1}
   function boot() {
     buildTable(); refresh(); fit(); window.addEventListener("resize", fit); if (window.ResizeObserver) new ResizeObserver(fit).observe($("stagewrap"));
     $("st1").onclick = function () { setStage(1); }; $("st2").onclick = function () { setStage(2); }; $("st3").onclick = function () { setStage(3); };
-    $("views").querySelectorAll(".vb").forEach(function (b) { b.onclick = function () { S.view = b.dataset.v; $("findMsg").dataset.keep = ""; paintTable(); }; });
+    $("views").querySelectorAll(".vb").forEach(function (b) { b.onclick = function () { S.view = b.dataset.v; if (S.view === "ie") viewedIE = true; $("findMsg").dataset.keep = ""; paintTable(); }; });
     $("btnHow").onclick = function () { $("how").hidden = false; }; $("howClose").onclick = function () { $("how").hidden = true; };
     requestAnimationFrame(frame);
     if (isDark()) { goDark(); return; }
