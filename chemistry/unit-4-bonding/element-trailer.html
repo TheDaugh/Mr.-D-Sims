@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Where did salt come from? The trailer · Mr. D's Sims</title>
-<meta name="description" content="An 84-second trailer for Unit 4: a pixel-grid opener, the birth of sodium and chlorine in a star, then sodium and chlorine as spinning orbital tops in a fight over one electron. Played at the start of class, before the Explore.">
+<meta name="description" content="An 84-second trailer for Unit 4: a pixel-grid opener, the birth of sodium and chlorine in a star, then sodium and chlorine as electron clouds, with the numbers that decide who pulls an electron away. Played at the start of class, before the Explore.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -30,14 +30,15 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
 <div id="play"><h1>WHERE DID SALT COME FROM?</h1><p>An 84-second trailer. Sound on.</p><div class="b">▶ Play</div></div>
 <div id="hint">Space pause · R replay · M mute · F full screen</div>
 <script src="trends-data.js"></script>
+<script src="atom-cloud.js"></script>
 <script>
 (function () {
   "use strict";
   var D = window.TrendsData, cv = document.getElementById("cv"), G = cv.getContext("2d"), g = G, W = 1280, H = 720, CELL = 8;
   var BUF = document.createElement("canvas"); BUF.width = W; BUF.height = H; var BG = BUF.getContext("2d");
   var KEY = /key/.test(location.hash), STILL = (/[?&]t=([\d.]+)/.exec(location.search) || [])[1];
-  var PAUSE = 0.35, DUEL0 = 54, DUEL1 = 69.35, LAT1 = 76.35, DUR = 84.35;
-  var SCENES = [[0, "Pixel grid"], [8, "Big Bang"], [22, "Star"], [32.2, "Supernova"], [42, "Choose"], [DUEL0, "Duel"], [DUEL1, "Salt"], [LAT1, "Title"]];
+  var DUEL0 = 54, DUEL1 = 69.35, LAT1 = 76.35, DUR = 84.35;
+  var SCENES = [[0, "Pixel grid"], [8, "Big Bang"], [22, "Star"], [32.2, "Supernova"], [42, "Atoms"], [DUEL0, "Na vs Cl"], [DUEL1, "Salt"], [LAT1, "Title"]];
   var STAR = { x: 290, y: 360 };
   var K = 8;                                         // logical pixels per buffer pixel right now (8 = chunky, 1 = smooth)
   var paused = false, ctx = null, t0 = 0, playing = false, muted = false, master = null, wall0 = 0, wallPaused = 0, raf = 0;
@@ -108,65 +109,19 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   }
 
   /* ---------- 3-D atoms: every subshell is a cloud of dots in its real shape ---------- */
-  var ORDER = [[1, 0], [2, 0], [2, 1], [3, 0], [3, 1], [4, 0], [3, 2], [4, 1], [5, 0], [4, 2], [5, 1], [6, 0]];
-  function config(Z) { var left = Z, out = [], i; for (i = 0; i < ORDER.length && left > 0; i++) { var cap = 2 * (2 * ORDER[i][1] + 1), e = Math.min(cap, left); left -= e; out.push({ n: ORDER[i][0], l: ORDER[i][1], e: e }); } return out; }
-  var ANG = {
-    1: [function (u) { return u[0] * u[0]; }, function (u) { return u[1] * u[1]; }, function (u) { return u[2] * u[2]; }],
-    2: [function (u) { return 4 * u[0] * u[0] * u[1] * u[1]; }, function (u) { return 4 * u[0] * u[0] * u[2] * u[2]; }, function (u) { return 4 * u[1] * u[1] * u[2] * u[2]; }, function (u) { var q = u[0] * u[0] - u[1] * u[1]; return q * q; }, function (u) { var q = (3 * u[2] * u[2] - 1) / 2; return q * q; }]
-  };
-  function randU(r) { var z = 2 * r() - 1, ph = 6.2832 * r(), s = Math.sqrt(1 - z * z); return [s * Math.cos(ph), s * Math.sin(ph), z]; }
-  function sampleOrb(l, o, count, fr, r) {
-    var pts = [], tries = 0, u, rad; while (pts.length < count * 3 && tries++ < count * 80) { u = randU(r); if (r() < Math.pow(ANG[l][o](u), l === 1 ? 3.5 : 1.5)) { rad = fr * (0.4 + 0.6 * Math.pow(r(), 0.6)); pts.push(u[0] * rad, u[1] * rad, u[2] * rad); } } return pts;
-  }
-  var PCOL = ["#ff5fd0", "#ffa6f2", "#c84bff"];
-  function buildTop(sym, q) {
-    var el = D.BY[sym], cfg = config(el.Z), N = el.period, r = rng(el.Z * 131 + 7), subs = [], ringCol = sym === "Na" ? C.mint : sym === "Cl" ? C.or : (FAM[el.group] || C.cy);
-    cfg.forEach(function (c) {
-      var outer = c.n === N, fr = Math.pow(c.n / N, 1.25) * (c.l === 0 ? 0.8 : c.l === 1 ? (outer ? 0.95 : 1.25) : 0.92), col = c.l === 0 ? C.sCol : c.l === 1 ? C.pCol : C.dCol, i, o;
-      if (c.l === 0) { var cnt = Math.max(8, Math.round((120 + 90 * c.e) * q)), pts = []; for (i = 0; i < cnt; i++) { var u = randU(r), rad = fr * (0.9 + 0.2 * r()); pts.push(u[0] * rad, u[1] * rad, u[2] * rad); } subs.push({ pts: pts, col: col, outer: outer, tag: "orb", a: outer ? 0.4 : 0.28 }); }
-      else {
-        var nOrb = c.l === 1 ? 3 : 5, per = c.l === 1 ? 200 : 110;
-        for (o = 0; o < nOrb; o++) {
-          var ej = c.e <= nOrb ? (o < c.e ? 1 : 0) : (o < c.e - nOrb ? 2 : 1);
-          if (ej > 0) subs.push({ pts: sampleOrb(c.l, o, Math.max(6, Math.round(per * ej * q)), fr, r), col: c.l === 1 ? PCOL[o] : col, outer: outer, tag: "orb", a: outer ? 0.75 : 0.5 });
-          if (c.l === 1 && ej === 1 && c.e > nOrb) subs.push({ pts: sampleOrb(c.l, o, Math.max(6, Math.round(per * q)), fr, r), col: PCOL[o], outer: outer, tag: "ghost", a: 0.6 });
-        }
-      }
-    });
-    var rp = [], k, ri; for (ri = 0; ri < 3; ri++) for (k = 0; k < Math.max(24, Math.round(170 * q)); k++) { var an = k / Math.max(24, Math.round(170 * q)) * 6.2832, rd = 1.1 + ri * 0.035; rp.push(Math.cos(an) * rd, (ri - 1) * 0.025, Math.sin(an) * rd); }
-    subs.push({ pts: rp, col: ringCol, outer: false, tag: "ring", a: 0.8 });
-    return { subs: subs, N: N, Z: el.Z, ringCol: ringCol };
-  }
-  var SPR = {};
-  function sprite(col) { if (SPR[col]) return SPR[col]; var c = document.createElement("canvas"); c.width = c.height = 32; var x = c.getContext("2d"), gr = x.createRadialGradient(16, 16, 0, 16, 16, 16); gr.addColorStop(0, "rgba(255,255,255,.95)"); gr.addColorStop(0.22, col); gr.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = gr; x.fillRect(0, 0, 32, 32); return (SPR[col] = c); }
-  var TOPC = {}; function getTop(sym, q) { var k = sym + "|" + q; return TOPC[k] || (TOPC[k] = buildTop(sym, q)); }
-  function topProj(cx, cy, t, o) {
-    var spin = (o.spin == null ? 1.6 : o.spin) * t + (o.phase || 0), tilt = (o.tilt == null ? 0.62 : o.tilt) + 0.07 * Math.sin(t * 2.3 + (o.phase || 0)), cs = Math.cos(spin), sn = Math.sin(spin), ct = Math.cos(tilt), st = Math.sin(tilt);
-    return function (x, y, z) { var x1 = x * cs + z * sn, z1 = -x * sn + z * cs, y2 = y * ct - z1 * st, z2 = y * st + z1 * ct, f = 900 / (900 + z2); return [cx + x1 * f, cy + y2 * f, f, z2]; };
-  }
-  function drawTop(sym, cx, cy, Ro, t, o) {
-    o = o || {}; var T = getTop(sym, o.q || 1), pj = topProj(cx, cy, t, o), al = o.alpha == null ? 1 : o.alpha, nr = Math.max(5, Ro * 0.045), i, gr;
-    if (al <= 0.01) return pj;
-    gr = g.createRadialGradient(cx, cy, 0, cx, cy, nr * 2.4); gr.addColorStop(0, "rgba(255,248,215," + al + ")"); gr.addColorStop(0.3, "rgba(255,200,80," + 0.9 * al + ")"); gr.addColorStop(1, "rgba(255,150,40,0)"); g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, nr * 2.4, 0, 7); g.fill();
-    var rs = Ro * 1.12 * (o.ringS == null ? 1 : o.ringS), ra = (o.ringA == null ? 1 : o.ringA) * al, kk;
-    if (ra > 0.01) { g.beginPath(); for (kk = 0; kk <= 48; kk++) { var an = kk / 48 * 6.2832, qq = pj(Math.cos(an) * rs, 0, Math.sin(an) * rs); if (kk) g.lineTo(qq[0], qq[1]); else g.moveTo(qq[0], qq[1]); } g.closePath(); g.globalAlpha = 0.1 * ra; g.fillStyle = T.ringCol; g.fill(); g.globalAlpha = 1; }
-    var ax0 = pj(0, -Ro * 0.62, 0), ax1 = pj(0, Ro * 0.5, 0); g.strokeStyle = T.ringCol; g.globalAlpha = 0.45 * al; g.lineWidth = Math.max(2, Ro / 60); g.beginPath(); g.moveTo(ax0[0], ax0[1]); g.lineTo(ax1[0], ax1[1]); g.stroke(); g.globalAlpha = 1; glowDot(ax1[0], ax1[1], Math.max(3, Ro / 50), T.ringCol, 0.8 * al);
-    g.globalCompositeOperation = "lighter"; var base = Math.max(4, Ro / 24);
-    T.subs.forEach(function (s) {
-      var am = s.tag === "ghost" ? (o.ghostA == null ? 0 : o.ghostA) : s.tag === "ring" ? (o.ringA == null ? 1 : o.ringA) : s.outer ? (o.outerA == null ? 1 : o.outerA) : 1;
-      if (am <= 0.01) return; var sc = Ro * (s.tag === "ring" ? (o.ringS == null ? 1 : o.ringS) : s.outer ? (o.outerS == null ? 1 : o.outerS) : 1), p = s.pts, sz = base * (s.outer ? 1.25 : 0.9) * (s.tag === "ring" ? 0.8 : 1), spr = sprite(s.col);
-      for (i = 0; i < p.length; i += 3) {
-        var x = p[i] * sc, y = p[i + 1] * sc, z = p[i + 2] * sc, q = pj(x, y, z), b = clamp(0.8 - q[3] / (Ro * 2.6), 0.25, 1.15);
-        g.globalAlpha = clamp(am * al * s.a * b, 0, 1); g.drawImage(spr, q[0] - sz * q[2] / 2, q[1] - sz * q[2] / 2, sz * q[2], sz * q[2]);
-      }
-    });
-    g.globalCompositeOperation = "source-over"; g.globalAlpha = 1; return pj;
+  var AC = window.AtomCloud, SUBC = AC.SUBC, config = AC.config, subKey = AC.subKey;
+  function topProj(cx, cy, t, o) { return AC.proj(cx, cy, t, o); }
+  function drawTop(sym, cx, cy, Ro, t, o) { return AC.draw(g, sym, cx, cy, Ro, t, o); }
+  /* the key: one chip per subshell the atom has */
+  function subKeyRow(sym, x, y, a, align) {
+    var cfg = config(D.BY[sym].Z), keys = cfg.map(subKey), w = keys.length * 74, x0 = align === "right" ? x - w : x;
+    keys.forEach(function (k, i) { var cx = x0 + i * 74 + 12; glowDot(cx, y - 7, 6, SUBC[k], a); text(k, cx + 20, y, 22, "#cfe9f2", a, "left", "700"); });
+    return w;
   }
   function glowDot(x, y, r, col, a) {
     g.globalCompositeOperation = "lighter"; var gr = g.createRadialGradient(x, y, 0, x, y, r * 3); gr.addColorStop(0, "rgba(255,255,255," + a + ")"); gr.addColorStop(0.25, col); gr.addColorStop(1, "rgba(0,0,0,0)");
     g.globalAlpha = clamp(a, 0, 1); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r * 3, 0, 7); g.fill(); g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
   }
-  function elecOrbit(pj, Ro, t) { var u = t * 5.6, R = 0.93 * Ro; return pj(R * Math.cos(u), R * 0.55 * Math.sin(u), R * 0.83 * Math.sin(u)); }
 
   /* ---------- scene 1 (0 to 8): the pixel grid ---------- */
   var TYPED = [
@@ -262,62 +217,63 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   }
   function skyDots(t) { SK.forEach(function (s) { if ((Math.floor(t * 2 + s.p) % 3) !== 0) disc(s.x * CELL + 4, s.y * CELL * 1.6 + 4, 1.4, "#cfefff", 0.7); }); }
 
-  /* ---------- scene 5 (42 to 54): choose your atom ---------- */
+  /* ---------- scene 5 (42 to 54): the atoms, with their numbers ---------- */
   function cellOf(e) {
     var col = D.GROUPS.indexOf(e.group), row = D.PERIODS.indexOf(e.period), TW = 92, TH = 80, GAP = 8, gapX = 26, totalW = 8 * TW + 7 * GAP + gapX, x0 = (W - totalW) / 2;
     return { x: x0 + col * (TW + GAP) + (col >= 2 ? gapX : 0), y: 140 + row * (TH + GAP), w: TW, h: TH };
   }
-  var HOPS = [[43.4, "Cs"], [43.65, "O"], [43.9, "Ne"], [44.15, "K"], [44.4, "F"], [44.7, "Mg"], [45.0, "Na"], [49.0, "Br"], [49.2, "Cl"]];
+  var HOPS = [[44.4, "Na"], [49.0, "Cl"]];
   function roster(t) {
     var cur = null; HOPS.forEach(function (h) { if (t >= h[0]) cur = h[1]; }); if (t >= 45.2 && t < 49.0) cur = null;
-    text("CHOOSE YOUR ATOM", W / 2, 96, 52 * eb(seg(t, 42, 42.4)), C.white, clamp((t - 42) * 5, 0, 1));
+    text("THE ATOMS", W / 2, 96, 52 * eb(seg(t, 42, 42.4)), C.white, clamp((t - 42) * 5, 0, 1));
     D.ELEMENTS.forEach(function (e, i) {
       var c = cellOf(e), rev = t >= 49 ? 1 : seg(t, 42.3 + i * 0.05, 42.3 + i * 0.05 + 0.3); if (rev <= 0) return; var s = eb(rev), cx = c.x + c.w / 2, cy = c.y + c.h / 2, col = FAM[e.group];
-      g.save(); g.translate(cx, cy); g.scale(s, s); g.globalAlpha = clamp(rev * 3, 0, 1); g.fillStyle = "rgba(8,22,32,.92)"; rr(-c.w / 2, -c.h / 2, c.w, c.h, 10); g.fill(); g.lineWidth = 2.5; g.strokeStyle = col; g.stroke(); g.restore();
-      if (rev > 0.5) { drawTop(e.sym, cx, cy - 8, 23, t, { q: 0.2, spin: 1.7, phase: i * 0.7, alpha: clamp((rev - 0.5) * 2, 0, 1) }); text(e.sym, cx, cy + c.h / 2 - 9, 19, "#eafcff", clamp((rev - 0.5) * 2, 0, 1), "center", "700"); }
+      g.save(); g.translate(cx, cy); g.scale(s, s); g.globalAlpha = clamp(rev * 3, 0, 1); g.fillStyle = "rgba(8,22,32,.92)"; rr(-c.w / 2, -c.h / 2, c.w, c.h, 10); g.fill(); g.lineWidth = 2; g.strokeStyle = col; g.stroke(); g.restore();
+      if (rev > 0.5) { drawTop(e.sym, cx, cy - 8, 23, t, { q: 0.2, spin: 0.9, phase: i * 0.7, alpha: clamp((rev - 0.5) * 2, 0, 1) }); text(e.sym, cx, cy + c.h / 2 - 9, 19, "#eafcff", clamp((rev - 0.5) * 2, 0, 1), "center", "700"); }
     });
-    if (cur) {
-      var ce = D.BY[cur], cc = cellOf(ce), pu = 0.5 + 0.5 * Math.sin(t * 16); g.save(); g.strokeStyle = "#fff"; g.lineWidth = 4 + pu * 2; g.shadowColor = "#19e6ff"; g.shadowBlur = 18; rr(cc.x - 4, cc.y - 4, cc.w + 8, cc.h + 8, 12); g.stroke(); g.restore();
-    }
+    text("Each atom has its own numbers. Take two: sodium and chlorine.", W / 2, 650, 30, C.cy, fadeIO(t, 43.2, 43.8, 44.9, 45.2));
+    if (cur) { var cc = cellOf(D.BY[cur]); g.save(); g.strokeStyle = "#fff"; g.lineWidth = 3; rr(cc.x - 4, cc.y - 4, cc.w + 8, cc.h + 8, 12); g.stroke(); g.restore(); }
   }
-  function bar(label, v, x, y, w, prog, col, a) {
-    text(label, x, y + 6, 22, "#8fb4c4", a, "left", "700"); g.globalAlpha = a; g.fillStyle = "#06121a"; rr(x + 128, y - 14, w, 24, 12); g.fill(); g.strokeStyle = "#1f5a6b"; g.lineWidth = 2; g.stroke();
-    g.fillStyle = col; rr(x + 128, y - 14, Math.max(24, w * v * prog), 24, 12); g.fill(); g.globalAlpha = 1;
+  /* a plain gauge: label, what it means, the number, a thin track with both ends labeled */
+  function gauge(label, sub, val, dec, unit, v01, endTxt, x, y, w, prog, col, a) {
+    var ty = y + (sub ? 40 : 22), shown = (val * prog).toFixed(dec);
+    text(label, x, y, 22, "#8fb4c4", a, "left", "700"); if (sub) text(sub, x, y + 22, 18, "#5f8494", a, "left");
+    text(shown + (unit ? " " + unit : ""), x + w, y + 4, 32, C.white, a, "right", "700");
+    g.globalAlpha = a; g.fillStyle = "#0e2a35"; g.fillRect(x, ty, w, 6); g.fillStyle = col; g.fillRect(x, ty, Math.max(2, w * v01 * prog), 6); g.fillStyle = "#3a6a7a"; g.fillRect(x, ty - 4, 2, 14); g.fillRect(x + w - 2, ty - 4, 2, 14); g.globalAlpha = 1;
+    text("0", x, ty + 32, 16, "#5f8494", a, "left"); text(endTxt, x + w, ty + 32, 16, "#5f8494", a, "right");
   }
   function card(sym, dt, t, side) {
-    var e = D.BY[sym], isNa = sym === "Na", tint = isNa ? C.mint : C.or, Ro = isNa ? 230 : 128, tx = side === "left" ? 350 : 930, px = side === "left" ? 720 : 110, off = (1 - eo(seg(dt, 0, 0.5))) * (side === "left" ? -260 : 260), a = clamp(dt * 5, 0, 1);
-    g.fillStyle = "rgba(0,0,0,.35)"; g.beginPath(); g.ellipse(tx + off, 600, Ro * 1.1, 26, 0, 0, 7); g.fill();
-    var pj = drawTop(sym, tx + off, 365, Ro, t, { spin: 1.4, tilt: 0.62, ghostA: isNa ? 0 : 0.5 + 0.3 * Math.sin(t * 7), alpha: a });
-    if (isNa) { var ep = elecOrbit(pj, Ro, t), k; for (k = 9; k >= 0; k--) { var ep2 = elecOrbit(topProj(tx + off, 365, t - k * 0.02, { spin: 1.4, tilt: 0.62 }), Ro, t - k * 0.02); glowDot(ep2[0], ep2[1], 4 + (10 - k) * 0.5, C.mint, 0.1 + (10 - k) * 0.07); } }
+    var e = D.BY[sym], isNa = sym === "Na", tint = isNa ? SUBC["3s"] : SUBC["3p"], Ro = isNa ? 230 : 128, tx = side === "left" ? 350 : 930, px = side === "left" ? 740 : 110, off = (1 - eo(seg(dt, 0, 0.5))) * (side === "left" ? -260 : 260), a = clamp(dt * 5, 0, 1);
+    drawTop(sym, tx + off, 365, Ro, t, { spin: 0.7, tilt: 0.5, ghostA: isNa ? 0 : 0.5 + 0.3 * Math.sin(t * 7), alpha: a });
     var nm = eb(seg(dt, 0.15, 0.6)); g.save(); g.translate(px, 250); g.scale(nm, nm); text(e.name.toUpperCase(), 0, 0, 84, C.white, a, "left"); g.restore();
-    text(isNa ? "1 loose outer electron." : "1 open spot for an electron.", px, 300, 32, tint, seg(dt, 0.5, 1.0), "left", "700");
-    var pr = eo(seg(dt, 0.7, 1.9)); bar("SIZE", D.size(e), px, 400, 330, pr, "#6aa7ff", a); bar("LETS GO", D.letsGo(e), px, 452, 330, pr, "#2fe08a", a); bar("PULLS", D.pulls(e), px, 504, 330, pr, "#ff8a1f", a);
+    text("OUTER ELECTRONS: " + e.valence, px, 300, 30, tint, seg(dt, 0.5, 1.0), "left", "700");
+    var pr = eo(seg(dt, 0.7, 1.9)), w = 440;
+    gauge("ATOMIC RADIUS", "distance from the nucleus to the outer edge", e.r, 0, "pm", e.r / 260, "260 pm", px, 330, w, pr, C.cy, a);
+    gauge("IONIZATION ENERGY", "energy to remove one outer electron", e.ie, 0, "kJ/mol", e.ie / 2100, "2100 kJ/mol", px, 434, w, pr, C.cy, a);
+    gauge("ELECTRONEGATIVITY", "pull on a shared electron", e.en, 2, "", e.en / 4, "4.0", px, 538, w, pr, C.cy, a);
+    var kw = D_keyW(sym), ka = seg(dt, 0.6, 1.2); subKeyRow(sym, tx - kw / 2 + 4, 650, a * ka); text("Each color is one subshell, a region where electrons are found.", tx, 684, 18, "#5f8494", a * ka, "center");
   }
+  function D_keyW(sym) { return config(D.BY[sym].Z).length * 74; }
   function sCast(t) {
     bgSmooth(t, true); floorSmooth(t, 0.5, 340);
     if (t < 45.2 || (t >= 49.0 && t < 49.5)) roster(t); else if (t < 49.0) card("Na", t - 45.2, t, "left"); else card("Cl", t - 49.5, t, "right");
     flash(1 - seg(t, 45.2, 45.5) - (t < 45.2 ? 1 : 0)); flash(t >= 49.5 ? 1 - seg(t, 49.5, 49.8) : 0); flash(seg(t, 53.6, 54));
   }
 
-  /* ---------- scene 6 (54 to 69.35): the duel ---------- */
+  /* ---------- scene 6 (54 to 69.35): sodium vs chlorine ---------- */
   var NA_R = 185, CL_R = 103, DY = 355;
   function dpos(U) {
-    var ap = eo(seg(U, 0.9, 4.5)), nx = lerp(120, 470, ap), cx = lerp(1170, 800, ap), st = U > 4.6 && U < 8.2 ? 1 : 0;
-    nx += Math.sin(U * 38) * 3.5 * st; cx += Math.sin(U * 41) * 2.5 * st;
+    var ap = eo(seg(U, 0.9, 4.5)), nx = lerp(120, 470, ap), cx = lerp(1170, 800, ap);
     var at = eo(seg(U, 10.9, 12.4)); nx = lerp(nx, 515, at); cx = lerp(cx, 765, at);
     var bo = U > 12.4 ? Math.exp(-6 * (U - 12.4)) * Math.sin(20 * (U - 12.4)) : 0; nx -= bo * 14; cx += bo * 14;
     return { nx: nx, ny: DY + Math.sin(U * 2.1) * 5, cx: cx, cy: DY + 10 + Math.sin(U * 2.4 + 1) * 5 };
   }
-  function naOpts(U) { return { spin: 1.9, tilt: 0.6, outerA: 1 - eo(seg(U, 8.5, 9.1)), ringS: lerp(1, 0.6, eo(seg(U, 8.5, 10.0))) }; }
-  function clOpts(U) { var s = lerp(1, 1.8, eo(seg(U, 8.8, 10.4))); return { spin: -1.7, tilt: 0.66, ghostA: U < 8.2 ? (U < 4.5 ? 0.45 : 0.55 + 0.35 * Math.sin(U * 9)) : 1, outerS: s, ringS: s }; }
-  function clTip(U) {
-    var p = dpos(U), pj = topProj(p.cx, p.cy, U, clOpts(U)), a = pj(0, 0, CL_R), b = pj(0, 0, -CL_R); return a[0] < b[0] ? a : b;
+  function naOpts(U) { return { spin: 0.7, tilt: 0.5, outerA: 1 - eo(seg(U, 5.3, 5.6)) }; }
+  function clOpts(U) {
+    var fl = U < 4.5 ? 0.45 : 0.55 + 0.3 * Math.sin(U * 7), s = lerp(1, 1.8, eo(seg(U, 8.8, 10.4)));
+    return { spin: -0.6, tilt: 0.55, ghostA: U < 7.9 ? fl : lerp(fl, 1, eo(seg(U, 7.9, 8.4))), outerS: s };
   }
-  function elecPos(U) {
-    var p = dpos(U), pj = topProj(p.nx, p.ny, U, naOpts(U)), orb = elecOrbit(pj, NA_R, U), s = eo(seg(U, 6.4, 8.2)), tip = clTip(U);
-    return [lerp(orb[0], tip[0], s), lerp(orb[1], tip[1], s) - Math.sin(Math.PI * s) * 110, orb[2]];
-  }
-  function shakeAmp(T) { var a = 0; if (T > 4.5 && T < 5.5) a = 9 * Math.exp(-6 * (T - 4.5)); if (T > 8.2 && T < 9.2) a = Math.max(a, 18 * Math.exp(-5 * (T - 8.2))); var ts = 12.4 + PAUSE; if (T > ts && T < ts + 1) a = Math.max(a, 11 * Math.exp(-6 * (T - ts))); return a; }
+  function clTip(U) { var p = dpos(U), pj = topProj(p.cx, p.cy, DUEL0 + U, clOpts(U)), a = pj(0, 0, CL_R), b = pj(0, 0, -CL_R); return a[0] < b[0] ? a : b; }
   function sparks(U, u0, x, y, n, len, col) {
     var d = U - u0; if (d < 0 || d > 0.7) return; var i, a = 1 - d / 0.7; g.save(); g.strokeStyle = col; g.lineWidth = 3; g.globalAlpha = a; g.globalCompositeOperation = "lighter";
     for (i = 0; i < n; i++) { var an = hsh(i * 3.7 + u0) * 6.283, r0 = len * (0.2 + 0.8 * hsh(i * 1.3)) * eo(d / 0.7), r1 = r0 + 10 + 28 * (1 - d / 0.7); g.beginPath(); g.moveTo(x + Math.cos(an) * r0, y + Math.sin(an) * r0); g.lineTo(x + Math.cos(an) * r1, y + Math.sin(an) * r1); g.stroke(); }
@@ -330,38 +286,38 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
     g.fillStyle = "#fff"; g.fillRect(cx - 2, y - 18, 4, 36); g.globalAlpha = 1; text("ENERGY IN", cx - w - 12, y + 8, 22, C.red, a, "right", "700"); text("ENERGY OUT", cx + w + 12, y + 8, 22, C.mint, a, "left", "700");
   }
   function sDuel(T) {
-    var U = T < 8.2 ? T : T < 8.2 + PAUSE ? 8.2 : T - PAUSE, p = dpos(U), t = DUEL0 + U, k;
+    var U = T, p = dpos(U), t = DUEL0 + U;
     bgSmooth(t, true); floorSmooth(t, 0.4, 300);
-    var amp = shakeAmp(T); g.save(); if (amp > 0) g.translate((hsh(Math.floor(T * 60)) - 0.5) * amp * 2, (hsh(Math.floor(T * 60) + 9) - 0.5) * amp * 2);
-    var zo = 1 - 0.35 * eo(seg(U, 13.6, 15)); if (zo < 1) { g.translate(640, 400); g.scale(zo, zo); g.translate(-640, -400); }
-    // the stadium
-    var sg = g.createRadialGradient(640, 560, 40, 640, 560, 600); sg.addColorStop(0, "rgba(25,230,255,.22)"); sg.addColorStop(1, "rgba(25,230,255,0)"); g.fillStyle = sg; g.beginPath(); g.ellipse(640, 560, 620, 140, 0, 0, 7); g.fill();
-    g.strokeStyle = "rgba(25,230,255,.85)"; g.lineWidth = 3; g.beginPath(); g.ellipse(640, 560, 560, 120, 0, 0, 7); g.stroke(); g.strokeStyle = "rgba(25,230,255,.25)"; g.lineWidth = 2; g.beginPath(); g.ellipse(640, 560, 430, 92, 0, 0, 7); g.stroke();
-    g.fillStyle = "rgba(0,0,0,.4)"; g.beginPath(); g.ellipse(p.nx, 545, NA_R * 0.95, 24, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(p.cx, 545, CL_R * (U > 8.8 ? lerp(1, 1.8, eo(seg(U, 8.8, 10.4))) : 1) * 0.95, 20, 0, 0, 7); g.fill();
-    var na = drawTop("Na", p.nx, p.ny, NA_R, DUEL0 + U, naOpts(U)); drawTop("Cl", p.cx, p.cy, CL_R, DUEL0 + U, clOpts(U));
-    // the tug
-    if (U >= 5.0 && U < 8.2) {
-      var tip = clTip(U), ep = elecPos(U), pa = seg(U, 5.0, 6.4); g.save(); g.strokeStyle = C.or; g.lineWidth = 3; g.globalAlpha = 0.25 + 0.5 * pa; g.setLineDash([10, 14]); g.lineDashOffset = -U * 90; g.beginPath(); g.moveTo(tip[0], tip[1]); g.lineTo(ep[0], ep[1]); g.stroke(); g.restore();
-      glowDot(tip[0], tip[1], 12 + 6 * Math.sin(U * 14), C.or, 0.6);
-    }
-    if (U < 8.2 || (T >= 8.2 && T < 8.2 + PAUSE)) { for (k = 11; k >= 0; k--) { var e2 = elecPos(Math.max(0, U - k * 0.03)); glowDot(e2[0], e2[1], 3.5 + (12 - k) * 0.45, C.mint, 0.1 + (12 - k) * 0.06); } }
-    sparks(U, 4.5, (p.nx + p.cx) / 2, (p.ny + p.cy) / 2, 30, 90, "#ffffff");
-    if (U >= 8.2) { var tipH = clTip(U); sparks(U, 8.2, tipH[0], tipH[1], 28, 110, C.or); }
-    sparks(U, 12.4, (p.nx + p.cx) / 2, (p.ny + p.cy) / 2, 44, 160, C.mint);
+    var zo = 1 - 0.35 * eo(seg(U, 13.6, 15)); g.save(); if (zo < 1) { g.translate(640, 400); g.scale(zo, zo); g.translate(-640, -400); }
+    var tip = clTip(U), mv = eo(seg(U, 5.6, 8.0)), cloudA = eo(seg(U, 5.3, 5.6)) * (1 - eo(seg(U, 7.9, 8.4)));
+    drawTop("Na", p.nx, p.ny, NA_R, t, naOpts(U)); drawTop("Cl", p.cx, p.cy, CL_R, t, clOpts(U));
+    // Na's outer cloud leaves Na and settles into chlorine's open spot
+    if (cloudA > 0.01) drawTop("Na", lerp(p.nx, tip[0], mv), lerp(p.ny, tip[1], mv), lerp(NA_R, 38, mv), t, { only: "3s", noNuc: true, spin: 0.7, tilt: 0.5, alpha: cloudA });
+    sparks(U, 8.2, tip[0], tip[1], 20, 80, C.or); sparks(U, 12.4, (p.nx + p.cx) / 2, (p.ny + p.cy) / 2, 44, 160, C.mint);
     if (U >= 12.4) { var rr2 = eo(seg(U, 12.4, 13.4)) * 360; g.strokeStyle = C.mint; g.lineWidth = 5; g.globalAlpha = 1 - seg(U, 12.4, 13.4); g.beginPath(); g.arc((p.nx + p.cx) / 2, (p.ny + p.cy) / 2, rr2, 0, 7); g.stroke(); g.globalAlpha = 1; }
     g.restore();
-    // name tags with PULLS bars
-    var ta = fadeIO(U, 3.0, 3.5, 8.0, 8.2), pr = eo(seg(U, 3.2, 4.4));
-    if (ta > 0) { text("SODIUM", 60, 70, 34, C.mint, ta, "left"); bar("PULLS", D.pulls(D.BY.Na), 60, 104, 250, pr, C.mint, ta); text("CHLORINE", W - 60, 70, 34, C.or, ta, "right"); bar("PULLS", D.pulls(D.BY.Cl), W - 440, 104, 250, pr, C.or, ta); }
-    // READY? GO!
-    if (U < 2.6) { var rd = fadeIO(U, 0.2, 0.4, 1.4, 1.6), gs = eb(seg(U, 1.6, 1.9)); text("READY?", W / 2, 330, 120, C.white, rd); if (U >= 1.6) { g.save(); g.translate(W / 2, 340); g.scale(gs, gs); text("GO!", 0, 0, 170, C.mint, 1 - seg(U, 2.3, 2.6)); g.restore(); } }
-    // K.O.
-    if (T >= 8.2 && U < 9.9) { var ks = eb(seg(T, 8.3, 8.7)); g.save(); g.translate(W / 2, 250); g.rotate(-0.06); g.scale(ks, ks); text("K.O.", 0, 0, 150, C.or, 1 - seg(U, 9.4, 9.9)); g.restore(); }
-    flash(T >= 8.2 ? 0.85 * (1 - seg(T, 8.2, 8.55)) : 0); flash(T >= 4.5 && T < 4.7 ? 0.35 * (1 - seg(T, 4.5, 4.7)) : 0);
+    // names, with the number that decides it
+    var ta = fadeIO(U, 3.0, 3.5, 9.0, 9.5), pr = eo(seg(U, 3.2, 4.4));
+    if (ta > 0) {
+      text("SODIUM", 60, 70, 34, C.white, ta, "left"); gauge("ELECTRONEGATIVITY", "", D.BY.Na.en, 2, "", D.BY.Na.en / 4, "4.0", 60, 100, 270, pr, C.cy, ta);
+      text("CHLORINE", W - 60, 70, 34, C.white, ta, "right"); gauge("ELECTRONEGATIVITY", "", D.BY.Cl.en, 2, "", D.BY.Cl.en / 4, "4.0", W - 330, 100, 270, pr, C.cy, ta);
+    }
+    // the reason: core charge felt by each atom's outer electron
+    var ra = fadeIO(U, 5.0, 5.6, 7.8, 8.2);
+    if (ra > 0) {
+      var ay = 232, ex = 40; g.globalAlpha = ra; g.fillStyle = C.mint; g.fillRect(632 - ex, ay - 3, ex, 6); g.fillRect(648, ay - 3, ex * 7, 6); g.beginPath(); g.moveTo(632 - ex - 16, ay); g.lineTo(632 - ex, ay - 11); g.lineTo(632 - ex, ay + 11); g.fill(); g.beginPath(); g.moveTo(648 + ex * 7 + 16, ay); g.lineTo(648 + ex * 7, ay - 11); g.lineTo(648 + ex * 7, ay + 11); g.fill(); g.fillStyle = C.white; g.fillRect(638, ay - 14, 4, 28); g.globalAlpha = 1;
+      text("Na  +1", 632 - ex - 24, ay + 9, 28, C.white, ra, "right", "700"); text("+7  Cl", 648 + ex * 7 + 28, ay + 9, 28, C.white, ra, "left", "700");
+      text("core charge felt by the outer electrons", 640 + 120, ay + 40, 20, "#8fb4c4", ra, "center");
+    }
+    text("Electronegativity is the pull on a shared electron.", W / 2, 610, 34, C.white, fadeIO(U, 3.4, 3.9, 4.9, 5.2));
+    text("Same shell. Different core charge.", W / 2, 610, 40, C.white, fadeIO(U, 5.3, 5.8, 7.6, 8.0));
+    text("Chlorine pulls harder, so the electron moves.", W / 2, 610, 36, C.white, fadeIO(U, 8.4, 8.9, 9.8, 10.2));
+    // VS
+    if (U < 3.0) { var vs = eb(seg(U, 0.3, 0.7)); g.save(); g.translate(W / 2, 330); g.scale(vs, vs); text("VS", 0, 0, 190, C.white, fadeIO(U, 0.3, 0.5, 2.4, 3.0)); g.restore(); }
     // after the transfer
     if (U > 9.6) { var la = seg(U, 9.6, 10.2) * (1 - seg(U, 12.0, 12.5)); text("Na⁺", p.nx, p.ny - 215, 70, C.mint, la); text("Cl⁻", p.cx, p.cy - 238, 70, C.or, la); }
     text("One gives. One takes.", W / 2, 610, 44, C.white, fadeIO(U, 10.3, 10.9, 12.0, 12.4));
-    text("OPPOSITES STICK.", W / 2, 118, 54, C.white, fadeIO(U, 12.6, 13.0, 14.2, 14.7)); text("Bonding gives off energy.", W / 2, 168, 34, C.mint, fadeIO(U, 12.9, 13.4, 14.2, 14.7), "center", "700");
+    text("OPPOSITES ATTRACT.", W / 2, 118, 54, C.white, fadeIO(U, 12.6, 13.0, 14.2, 14.7)); text("Bonding gives off energy.", W / 2, 168, 34, C.mint, fadeIO(U, 12.9, 13.4, 14.2, 14.7), "center", "700");
     ledger(U);
     g.fillStyle = "#000"; g.globalAlpha = seg(U, 14.5, 15); g.fillRect(0, 0, W, H); g.globalAlpha = 1;
   }
@@ -390,7 +346,7 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
       var c1 = [["UNIT 4", 64, 1, C.mint, 0.5], ["TRENDS,", 140, 2, C.white, 1.0], ["BONDING,", 268, 2, C.white, 1.6], ["NAMING", 396, 2, C.cy, 2.2]];
       c1.forEach(function (L) { if (tt < L[4]) return; var n = Math.floor((tt - L[4]) * 14) + 1; pxText(L[0], 640, L[1], L[2], L[3], 1, "center", n); });
     } else {
-      var c2 = [["WHO WINS THE FIGHT", 200, C.white, 4.4], ["FOR AN ELECTRON?", 270, C.white, 5.0], ["TODAY: FIND OUT.", 400, C.mint, 6.2]];
+      var c2 = [["WHICH ATOM PULLS", 200, C.white, 4.4], ["HARDER ON AN ELECTRON?", 270, C.white, 5.0], ["TODAY: FIND OUT.", 400, C.mint, 6.2]];
       c2.forEach(function (L) { if (tt < L[3]) return; var n = Math.floor((tt - L[3]) * 18) + 1, d = pxText(L[0], 640, L[1], 1, L[2], 1, "center", n); if (n >= L[0].length && Math.floor(t * 3) % 2 === 0 && L[0] === "TODAY: FIND OUT.") { g.fillStyle = L[2]; g.fillRect(d.x + L[0].length * d.adv, L[1], CELL * 4, CELL * 7); } });
     }
     g.globalAlpha = seg(tt, 7.5, 8); g.fillStyle = "#000"; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
@@ -431,7 +387,7 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   function KICK(t, v) { TN(t, 150, 0.22, "sine", v || 0.5, 45); }
   function SNARE(t, v) { NZ(t, 0.14, v || 0.22, 1800, "bandpass", 1500, 1); TN(t, 210, 0.1, "triangle", 0.12, 120); }
   function HAT(t, v) { NZ(t, 0.04, v || 0.07, 8000, "highpass"); }
-  function UT(U) { return DUEL0 + U + (U > 8.2 ? PAUSE : 0); }
+  function UT(U) { return DUEL0 + U; }
   (function buildScore() {
     var i, t, scale = [220, 261.63, 293.66, 329.63, 392, 440, 523.25], B, bass, hops = HOPS;
     // 0 to 8: the drone and the typing
@@ -465,10 +421,10 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
     B = 60 / 140;
     for (i = 0; i * B < 4.4; i++) { var u = 0.4 + i * B; if (u > 4.4) break; KICK(UT(u), 0.5); TN(UT(u), 55, 0.2, "sawtooth", 0.09); TN(UT(u + B / 2), 55, 0.15, "sawtooth", 0.07); HAT(UT(u + B / 2)); }
     [3.2, 3.55, 3.9, 4.15, 4.3, 4.4].forEach(function (u, k) { SNARE(UT(u), 0.14 + k * 0.04); });
-    TN(UT(4.5), 100, 0.9, "sine", 0.7, 30); NZ(UT(4.5), 1.2, 0.4, 7000, "lowpass", 200); NZ(UT(4.5), 1.0, 0.12, 6000, "highpass", 3000);
+    TN(UT(4.5), 100, 0.9, "sine", 0.5, 30); NZ(UT(4.5), 1.0, 0.25, 7000, "lowpass", 200);
     for (u = 4.8; u < 8.2; u += 0.5) TN(UT(u), 80, 0.25, "sine", 0.4, 40);
     NZ(UT(4.7), 3.4, 0.1, 200, "bandpass", 3000, 4); TN(UT(4.7), 110, 3.4, "sawtooth", 0.05, 660); TN(UT(6.3), 300, 0.5, "sine", 0.08, 2000); NZ(UT(6.3), 0.5, 0.08, 2000, "bandpass", 5000, 4); TN(UT(7.0), 150, 1.2, "triangle", 0.05, 220);
-    TN(UT(8.2), 70, 2.2, "sine", 0.95, 22); NZ(UT(8.2), 2.6, 0.6, 9000, "lowpass", 150); TN(UT(8.2), 55, 2, "sawtooth", 0.3, 25); NZ(UT(8.2), 2.2, 0.14, 6000, "highpass", 2500);
+    TN(UT(8.2), 70, 1.6, "sine", 0.45, 22); NZ(UT(8.2), 1.8, 0.25, 9000, "lowpass", 150); TN(UT(8.2), 55, 1.4, "sawtooth", 0.12, 25);
     [261.63, 329.63, 392].forEach(function (f) { PD(UT(8.6), f, 6, 0.04); });
     TN(UT(8.8), 600, 1.4, "sine", 0.05, 200); TN(UT(10.9), 200, 1.5, "sine", 0.07, 900);
     TN(UT(12.4), 100, 1, "sine", 0.7, 40); [261.63, 329.63, 392, 523.25].forEach(function (f) { TN(UT(12.4), f, 1.6, "sawtooth", 0.06); }); NZ(UT(12.4), 1.4, 0.2, 6000, "highpass", 2500);
