@@ -30,7 +30,7 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
 <div id="play"><h1>WHERE DID SALT COME FROM?</h1><p>An 84-second trailer. Sound on.</p><div class="b">▶ Play</div></div>
 <div id="hint">Space pause · R replay · M mute · F full screen</div>
 <script src="trends-data.js"></script>
-<script src="atom-cloud.js"></script>
+<script src="atom-pixels.js"></script>
 <script>
 (function () {
   "use strict";
@@ -109,8 +109,7 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   }
 
   /* ---------- 3-D atoms: every subshell is a cloud of dots in its real shape ---------- */
-  var AC = window.AtomCloud, SUBC = AC.SUBC, config = AC.config, subKey = AC.subKey;
-  function topProj(cx, cy, t, o) { return AC.proj(cx, cy, t, o); }
+  var AC = window.AtomPixels, SUBC = AC.SUBC, config = AC.config, subKey = AC.subKey;
   function drawTop(sym, cx, cy, Ro, t, o) { return AC.draw(g, sym, cx, cy, Ro, t, o); }
   /* the key: one chip per subshell the atom has */
   function subKeyRow(sym, x, y, a, align) {
@@ -226,7 +225,7 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   function roster(t) {
     var cur = null; HOPS.forEach(function (h) { if (t >= h[0]) cur = h[1]; }); if (t >= 45.2 && t < 49.0) cur = null;
     text("THE ATOMS", W / 2, 96, 52 * eb(seg(t, 42, 42.4)), C.white, clamp((t - 42) * 5, 0, 1));
-    D.ELEMENTS.forEach(function (e, i) {
+    D.ELEMENTS.filter(function (e) { return e.period > 1; }).forEach(function (e, i) {
       var c = cellOf(e), rev = t >= 49 ? 1 : seg(t, 42.3 + i * 0.05, 42.3 + i * 0.05 + 0.3); if (rev <= 0) return; var s = eb(rev), cx = c.x + c.w / 2, cy = c.y + c.h / 2, col = FAM[e.group];
       g.save(); g.translate(cx, cy); g.scale(s, s); g.globalAlpha = clamp(rev * 3, 0, 1); g.fillStyle = "rgba(8,22,32,.92)"; rr(-c.w / 2, -c.h / 2, c.w, c.h, 10); g.fill(); g.lineWidth = 2; g.strokeStyle = col; g.stroke(); g.restore();
       if (rev > 0.5) { drawTop(e.sym, cx, cy - 8, 23, t, { q: 0.2, spin: 0.9, phase: i * 0.7, alpha: clamp((rev - 0.5) * 2, 0, 1) }); text(e.sym, cx, cy + c.h / 2 - 9, 19, "#eafcff", clamp((rev - 0.5) * 2, 0, 1), "center", "700"); }
@@ -264,7 +263,7 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   var NA_R = 185, CL_R = 103, DY = 355;
   function dpos(U) {
     var ap = eo(seg(U, 0.9, 4.5)), nx = lerp(120, 470, ap), cx = lerp(1170, 800, ap);
-    var at = eo(seg(U, 10.9, 12.4)); nx = lerp(nx, 515, at); cx = lerp(cx, 765, at);
+    var at = eo(seg(U, 10.9, 12.4)); nx = lerp(nx, 455, at); cx = lerp(cx, 755, at);
     var bo = U > 12.4 ? Math.exp(-6 * (U - 12.4)) * Math.sin(20 * (U - 12.4)) : 0; nx -= bo * 14; cx += bo * 14;
     return { nx: nx, ny: DY + Math.sin(U * 2.1) * 5, cx: cx, cy: DY + 10 + Math.sin(U * 2.4 + 1) * 5 };
   }
@@ -273,17 +272,18 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
     var fl = U < 4.5 ? 0.45 : 0.55 + 0.3 * Math.sin(U * 7), s = lerp(1, 1.8, eo(seg(U, 8.8, 10.4)));
     return { spin: -0.6, tilt: 0.55, ghostA: U < 7.9 ? fl : lerp(fl, 1, eo(seg(U, 7.9, 8.4))), outerS: s };
   }
-  function clTip(U) { var p = dpos(U), pj = topProj(p.cx, p.cy, DUEL0 + U, clOpts(U)), a = pj(0, 0, CL_R), b = pj(0, 0, -CL_R); return a[0] < b[0] ? a : b; }
+  function clTip(U) { var p = dpos(U); return AC.tip("Cl", p.cx, p.cy, CL_R, clOpts(U)); }
   function sparks(U, u0, x, y, n, len, col) {
     var d = U - u0; if (d < 0 || d > 0.7) return; var i, a = 1 - d / 0.7; g.save(); g.strokeStyle = col; g.lineWidth = 3; g.globalAlpha = a; g.globalCompositeOperation = "lighter";
     for (i = 0; i < n; i++) { var an = hsh(i * 3.7 + u0) * 6.283, r0 = len * (0.2 + 0.8 * hsh(i * 1.3)) * eo(d / 0.7), r1 = r0 + 10 + 28 * (1 - d / 0.7); g.beginPath(); g.moveTo(x + Math.cos(an) * r0, y + Math.sin(an) * r0); g.lineTo(x + Math.cos(an) * r1, y + Math.sin(an) * r1); g.stroke(); }
     g.restore();
   }
+  /* a magnitude meter, not a ledger: bonding always gives energy off. Standard enthalpy of formation of NaCl, 411 kJ per mole, on a 0 to 1700 scale (Al2O3 is about 1676). */
   function ledger(U) {
-    var a = fadeIO(U, 6.6, 7.0, 14.0, 14.6); if (a <= 0) return; var v = -0.22 * eo(seg(U, 7.0, 8.2)); if (U > 12.4) v = lerp(-0.22, 0.62, eo(seg(U, 12.4, 13.1))); var cx = 640, y = 672, w = 300;
+    var a = fadeIO(U, 12.9, 13.3, 14.0, 14.6); if (a <= 0) return; var v = eo(seg(U, 13.0, 14.0)), cx = 640, y = 672, w = 300;
     g.globalAlpha = a; g.fillStyle = "#06121a"; rr(cx - w, y - 12, 2 * w, 24, 12); g.fill(); g.strokeStyle = "#1f5a6b"; g.lineWidth = 2; g.stroke();
-    if (v < 0) { g.fillStyle = C.red; rr(cx + v * w * 1, y - 12, -v * w, 24, 12); g.fill(); } else if (v > 0) { g.fillStyle = C.mint; rr(cx, y - 12, v * w, 24, 12); g.fill(); }
-    g.fillStyle = "#fff"; g.fillRect(cx - 2, y - 18, 4, 36); g.globalAlpha = 1; text("ENERGY IN", cx - w - 12, y + 8, 22, C.red, a, "right", "700"); text("ENERGY OUT", cx + w + 12, y + 8, 22, C.mint, a, "left", "700");
+    g.fillStyle = C.mint; rr(cx - w, y - 12, Math.max(24, 2 * w * v * 411 / 1700), 24, 12); g.fill(); g.globalAlpha = 1;
+    text("ENERGY RELEASED", cx - w - 12, y + 8, 22, C.mint, a, "right", "700"); text(Math.round(411 * v) + " kJ per mole of NaCl", cx + w + 12, y + 8, 22, C.white, a, "left", "700");
   }
   function sDuel(T) {
     var U = T, p = dpos(U), t = DUEL0 + U;
