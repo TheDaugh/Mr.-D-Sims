@@ -158,8 +158,9 @@ window.UNITS = [
         day: 1,
         icon: "🎬",
         href: "unit-4-bonding/element-trailer.html",
-        blurb: "A 55-second trailer that opens Day 1: elements with faces and costumes, and sodium meets chlorine. Played by the teacher, full screen.",
-        tags: ["periodic trends", "engage", "trailer"]
+        blurb: "An 84-second trailer that opens Day 1: a pixel-grid opener, sodium and chlorine forged in a star, then the two as spinning orbital tops in a fight over one electron. Played by the teacher, full screen.",
+        tags: ["periodic trends", "engage", "trailer", "nucleosynthesis"],
+        teacher: [{ label: "Scene buttons (#key)", href: "unit-4-bonding/element-trailer.html#key" }]
       },
       {
         title: "Trends Explorer (Day 1 Explore)",
