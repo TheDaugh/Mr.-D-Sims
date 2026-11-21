@@ -146,5 +146,31 @@ window.UNITS = [
         teacher: [{ label: "Teacher key (#key)", href: "unit-3-atoms-ions/photoelectron-spectroscopy.html#key" }, { label: "Teacher page", href: "teacher.html" }]
       }
     ]
+  },
+  {
+    id: "unit-4",
+    title: "Unit 4 · Trends, Bonding and Naming",
+    blurb: "Why atoms at the bottom left are big and give electrons away, and atoms at the top right are small and grab them.",
+    entries: [
+      {
+        title: "Element Trailer (Day 1 opener)",
+        type: "sim",
+        day: 1,
+        icon: "🎬",
+        href: "unit-4-bonding/element-trailer.html",
+        blurb: "A 55-second trailer that opens Day 1: elements with faces and costumes, and sodium meets chlorine. Played by the teacher, full screen.",
+        tags: ["periodic trends", "engage", "trailer"]
+      },
+      {
+        title: "Trends Explorer (Day 1 Explore)",
+        type: "sim",
+        day: 1,
+        icon: "🧲",
+        href: "unit-4-bonding/trends-explorer.html",
+        blurb: "Click any two atoms and compare their size, how easily they let go of an electron, and how hard they pull. Then run a tug of war over one electron. The page goes black 20 minutes after the bell.",
+        tags: ["periodic trends", "atomic size", "reactivity", "electronegativity"],
+        teacher: [{ label: "Teacher key (#key)", href: "unit-4-bonding/trends-explorer.html#key" }, { label: "Board page", href: "whiteboard/index.html#lesson=trends" }]
+      }
+    ]
   }
 ];

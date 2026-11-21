@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trends Explorer · Mr. D's Sims</title>
+<meta name="description" content="Compare atoms of the periodic table: their size, how easily they let go of an electron, and how hard they pull. Then put two of them in a tug-of-war over an electron.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e1620;--panel:#162230;--panel2:#1d2e40;--ink:#eaf0f6;--muted:#9fb0c1;--line:#2c3f53;--accent:#4f8cff;--gold:#f2b84b;--good:#2fae6b;--warn:#e0613f;--teal:#14b8a6}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 "Source Sans 3",system-ui,sans-serif;overflow:hidden}
+h1,h2{font-family:"Bricolage Grotesque","Source Sans 3",system-ui,sans-serif;margin:0}
+button{font:inherit;color:inherit}
+#app{display:flex;flex-direction:column;height:100%}
+header{display:flex;align-items:center;gap:12px;padding:6px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none}
+header h1{font-size:1.15rem;letter-spacing:.3px}
+header .sp{flex:1}
+.hbtn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:4px 12px;cursor:pointer}
+#main{flex:1;display:flex;min-height:0}
+#left{width:560px;flex:none;padding:10px 12px;border-right:1px solid var(--line);overflow:auto}
+#left h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-family:"Source Sans 3",sans-serif;margin:0 0 6px}
+#table{display:grid;grid-template-columns:repeat(2,1fr) 14px repeat(6,1fr);gap:5px}
+.t{position:relative;height:52px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;padding:0;text-align:center}
+.t b{display:block;font-size:1.2rem;line-height:1.05;margin-top:7px}
+.t i{display:block;font-style:normal;font-size:.7rem;color:var(--muted)}
+.t:hover{border-color:var(--accent)}
+.t.noble{border-style:dashed}
+.t.f1{outline:3px solid var(--gold);outline-offset:1px}
+.t.f2{outline:3px solid var(--accent);outline-offset:1px}
+.t.pk{background:#24412f}
+.gap{border-left:2px dotted var(--line);margin:4px 5px}
+.empty{height:52px;border-radius:8px;border:1px dashed #223245}
+#scout{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+#scout .r{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;margin:5px 0}
+#scout .r span{font-weight:600}
+#scout .chip{min-width:46px;text-align:center;padding:3px 8px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);color:var(--gold);font-weight:700}
+.sb{min-height:38px;padding:3px 12px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);cursor:pointer}
+.sb:disabled{opacity:.4;cursor:not-allowed}
+.sb:not(:disabled):hover{border-color:var(--gold)}
+#right{flex:1;min-width:0;display:flex;flex-direction:column}
+#slots{display:flex;gap:8px;padding:8px 12px;flex:none}
+.slot{flex:1;text-align:center;padding:5px;border-radius:10px;border:2px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700}
+.slot[aria-pressed=true]{border-color:var(--gold)}
+.slot.two[aria-pressed=true]{border-color:var(--accent)}
+#stagewrap{flex:1;position:relative;min-height:0}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+#msg{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-weight:700;font-size:1.15rem;pointer-events:none}
+#cards{display:flex;gap:10px;padding:8px 12px;flex:none;align-items:stretch}
+.card{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-height:128px}
+.card h3{margin:0 0 4px;font-size:1.05rem}
+.card .mut{color:var(--muted);font-size:.9rem}
+.bar{display:grid;grid-template-columns:92px 1fr;align-items:center;gap:8px;margin:5px 0;font-size:.85rem;font-weight:700;letter-spacing:.06em;color:var(--muted)}
+.bar div{height:14px;border-radius:7px;background:#0b121a;border:1px solid var(--line);overflow:hidden}
+.bar div i{display:block;height:100%;border-radius:7px;transition:width .35s}
+.bar.s i{background:#6aa7ff}.bar.l i{background:var(--good)}.bar.p i{background:var(--warn)}
+.bar .na{font-weight:400;letter-spacing:0;font-size:.85rem;color:var(--muted)}
+#mid{width:150px;flex:none;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.big{min-height:52px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:700;font-size:1.05rem}
+.big.go{background:var(--warn);border-color:var(--warn);color:#fff;font-family:"Bricolage Grotesque",sans-serif;letter-spacing:.06em}
+.big:disabled{opacity:.4;cursor:not-allowed}
+.overlay{position:fixed;inset:0;background:rgba(6,10,16,.92);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.overlay[hidden]{display:none}
+.sheet{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 22px;max-width:860px;width:100%;max-height:96vh;overflow:auto}
+.sheet h2{font-size:1.5rem;margin-bottom:6px}
+.sheet p{margin:6px 0}
+.how{display:flex;gap:18px;align-items:center;margin:8px 0}
+.how ul{margin:0;padding-left:18px}
+.how li{margin:4px 0}
+.small{color:var(--muted);font-size:.92rem}
+.hint.bad{color:#ff8a73;min-height:1.2em;margin:4px 0}
+.mrd-idask label{margin-right:12px}
+.mrd-idask input{background:#0b121a;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 8px;font-size:1.05rem}
+.mrd-idask .hint{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.mrd-idask .hint.ok{color:#59d596}.mrd-idask .hint.bad{color:#ff8a73}
+#dark{position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:flex-end;justify-content:center;color:#1c1c1c;padding:18px;font-size:.9rem}
+#dark[hidden]{display:none}
+#keyBody table{border-collapse:collapse;font-size:.85rem}
+#keyBody td,#keyBody th{border:1px solid var(--line);padding:2px 8px;text-align:right}
+#keyBody th:first-child,#keyBody td:first-child{text-align:left}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Trends Explorer</h1>
+    <span class="sp"></span>
+    <button class="hbtn" id="btnHow">How to read this</button>
+    <button class="hbtn" id="btnKey" hidden>Teacher key</button>
+  </header>
+  <div id="main">
+    <div id="left">
+      <h2>Pick an atom</h2>
+      <div id="table"></div>
+      <div id="scout">
+        <h2>Your three picks</h2>
+        <p class="small" style="margin:0 0 4px">Click an atom in the table, then lock it in as your pick.</p>
+        <div id="scoutRows"></div>
+      </div>
+    </div>
+    <div id="right">
+      <div id="slots">
+        <button class="slot" id="slot1" aria-pressed="true">Atom 1</button>
+        <button class="slot two" id="slot2" aria-pressed="false">Atom 2</button>
+      </div>
+      <div id="stagewrap"><canvas id="cv"></canvas><div id="msg"></div></div>
+      <div id="cards">
+        <div class="card" id="card1"></div>
+        <div id="mid"><button class="big go" id="bFight" disabled>TUG OF WAR</button><button class="big" id="bClear">Clear both</button></div>
+        <div class="card" id="card2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="start" hidden>
+  <div class="sheet">
+    <h2>Trends Explorer</h2>
+    <p>Compare any two atoms, then put them in a tug-of-war over one electron.</p>
+    <div class="how">
+      <svg id="legend" width="300" height="214" viewBox="0 0 300 214" aria-label="A lithium atom with its parts labeled">
+        <circle cx="105" cy="108" r="86" fill="none" stroke="#6b8196" stroke-width="2"/>
+        <circle cx="105" cy="108" r="43" fill="none" stroke="#6b8196" stroke-width="2"/>
+        <circle cx="105" cy="108" r="13" fill="#e0613f"/><text x="105" y="113" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">+3</text>
+        <circle cx="191" cy="108" r="7" fill="#59d596"/>
+        <g font-size="12" fill="#eaf0f6"><text x="206" y="55">outer electron</text><line x1="230" y1="60" x2="194" y2="102" stroke="#9fb0c1"/>
+        <text x="206" y="150">outer edge</text><line x1="240" y1="154" x2="186" y2="146" stroke="#9fb0c1"/>
+        <text x="160" y="205">nucleus: protons</text><line x1="150" y1="196" x2="110" y2="121" stroke="#9fb0c1"/>
+        <text x="4" y="22">each ring = one shell</text><line x1="40" y1="28" x2="52" y2="66" stroke="#9fb0c1"/></g>
+      </svg>
+      <ul>
+        <li><b>Rings</b> are shells. The outer edge is drawn to scale, so a bigger circle is a bigger atom.</li>
+        <li><b>SIZE</b> bar: how big the atom is.</li>
+        <li><b>LETS GO</b> bar: how easily it gives up an outer electron.</li>
+        <li><b>PULLS</b> bar: how hard it pulls on an electron it shares with another atom.</li>
+        <li><b>TUG OF WAR</b>: one electron sits between two atoms. Watch which atom wins it.</li>
+      </ul>
+    </div>
+    <p class="small">Only the outer electrons are drawn as dots. A longer row of dots does not mean a bigger atom: compare the outer edges.</p>
+    <div id="idHost"></div>
+    <p class="small" id="lockNote" hidden>During class this opens in full screen. Leaving it is counted, and the teacher has to see you to unlock it.</p>
+    <p class="hint bad" id="startMsg"></p>
+    <button class="big go" id="bBegin" style="padding:0 30px" disabled>Begin</button>
+  </div>
+</div>
+<div class="overlay" id="how" hidden><div class="sheet"><h2>How to read this</h2>
+  <p><b>Rings</b> are shells. The outer edge is drawn to scale, so a bigger circle is a bigger atom. Dots on the outer ring are outer electrons. Inner electrons are not drawn.</p>
+  <p><b>SIZE</b> is how big. <b>LETS GO</b> is how easily it gives up an outer electron. <b>PULLS</b> is how hard it pulls on an electron it shares. Noble gases rarely bond, so they have no PULLS bar.</p>
+  <p class="small">Dotted gap in the table: other columns exist there. They are not part of this.</p>
+  <button class="big" id="howClose" style="padding:0 24px">Back to the atoms</button></div></div>
+<div class="overlay" id="lockres" hidden><div class="sheet"><h2>🔒 Locked. Hand up, eyes forward.</h2>
+  <p id="lockresTxt"></p><input id="lockCode" aria-label="Unlock code from the teacher" autocomplete="off" style="background:#0b121a;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px;font-size:1.1rem">
+  <button class="big" id="bUnlock" style="padding:0 20px;margin-left:8px">Unlock</button><p class="hint bad" id="lockMsg"></p></div></div>
+<div class="overlay" id="keyPage" hidden><div class="sheet" id="keyBody"></div></div>
+<div id="dark" hidden aria-hidden="true">Close your laptop.</div>
+
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
+<script src="../../shared/lock.js"></script>
+<script src="../../shared/profile.js"></script>
+<script src="../../shared/ids.js"></script>
+<script src="trends-data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = window.TrendsData, MrD = window.MrD, $ = function (id) { return document.getElementById(id); };
+  var KEY = /key/.test(location.hash), NOLOCK = (/nolock=(\d+)/.exec(location.hash) || [])[1];
+  var LESSON_ID = "chem-u4-d1-trends-explorer", COURSE = "chem";
+  var CUT_MIN = 20;                 // the page goes black this many minutes after the bell, in class only
+  var S = { id: "", period: "", a: null, b: null, slot: 1, picks: {}, mode: "idle", t0: 0, started: false };
+  var lockArmed = false, askH = null, DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+  /* ---------- the clock: black at the cutoff, never a code ---------- */
+  function clk() { return MrD.bell.clock(COURSE); }
+  function isDark() { if (KEY) return false; var c = clk(); return !!(c.session && c.minutesIn >= CUT_MIN); }
+  function goDark() {
+    if (lockArmed) { lockArmed = false; try { LessonLock.finish(); } catch (e) { } }   // closing the laptop must not count as leaving
+    $("dark").hidden = false; ["start", "how", "lockres", "keyPage"].forEach(function (i) { $(i).hidden = true; });
+    S.mode = "dark";
+  }
+  function watchClock() { if (S.mode !== "dark" && isDark()) goDark(); }
+
+  /* ---------- the table ---------- */
+  var tiles = {};
+  function buildTable() {
+    var host = $("table"), cols = D.GROUPS;
+    D.PERIODS.forEach(function (p) {
+      cols.forEach(function (g, i) {
+        if (i === 2) { var gp = document.createElement("div"); gp.className = "gap"; host.appendChild(gp); }
+        var e = D.ELEMENTS.filter(function (x) { return x.period === p && x.group === g; })[0], n;
+        if (!e) { n = document.createElement("div"); n.className = "empty"; if (p === 6 && g > 2) n.style.visibility = "hidden"; host.appendChild(n); return; }
+        n = document.createElement("button"); n.className = "t" + (e.en == null ? " noble" : ""); n.dataset.sym = e.sym;
+        n.innerHTML = "<b>" + e.sym + "</b><i>" + e.Z + "</i>"; n.setAttribute("aria-label", e.name);
+        n.addEventListener("click", function () { choose(e.sym); }); tiles[e.sym] = n; host.appendChild(n);
+      });
+    });
+  }
+  function choose(sym) {
+    if (S.mode === "dark") return;
+    if (S.slot === 1) { S.a = sym; if (!S.b) setSlot(2); } else { S.b = sym; }
+    S.mode = "idle"; $("msg").textContent = ""; refresh(); log("meet:" + sym);
+  }
+  function setSlot(n) { S.slot = n; $("slot1").setAttribute("aria-pressed", String(n === 1)); $("slot2").setAttribute("aria-pressed", String(n === 2)); refresh(); }
+
+  /* ---------- cards ---------- */
+  function bar(cls, label, v) {
+    return '<div class="bar ' + cls + '"><span>' + label + '</span>' + (v == null ? '<span class="na">rarely bonds</span>' : '<div><i style="width:' + Math.round(v * 100) + '%"></i></div>') + '</div>';
+  }
+  function card(host, sym) {
+    if (!sym) { host.innerHTML = '<h3 class="mut">Pick an atom</h3><p class="mut">Click one in the table.</p>'; return; }
+    var e = D.BY[sym];
+    host.innerHTML = "<h3>" + e.name + " (" + e.sym + ")</h3><div class='mut'>Period " + e.period + " · Group " + e.group + " · " + e.period + " shell" + (e.period > 1 ? "s" : "") + "</div>" +
+      bar("s", "SIZE", D.size(e)) + bar("l", "LETS GO", D.letsGo(e)) + bar("p", "PULLS", D.pulls(e));
+  }
+  function refresh() {
+    card($("card1"), S.a); card($("card2"), S.b);
+    Object.keys(tiles).forEach(function (s) { tiles[s].className = "t" + (D.BY[s].en == null ? " noble" : "") + (S.a === s ? " f1" : "") + (S.b === s ? " f2" : "") + (pickedSet()[s] ? " pk" : ""); });
+    var ok = S.a && S.b && D.BY[S.a].en != null && D.BY[S.b].en != null;
+    $("bFight").disabled = !ok; scoutUI();
+  }
+  function pickedSet() { var o = {}; Object.keys(S.picks).forEach(function (k) { o[S.picks[k]] = 1; }); return o; }
+
+  /* ---------- scout report: three picks, logged, no verdict shown ---------- */
+  function scoutUI() {
+    var host = $("scoutRows"); host.innerHTML = "";
+    var sel = S.slot === 1 ? S.a : S.b; sel = sel || S.a || S.b;
+    D.PICKS.forEach(function (p) {
+      var r = document.createElement("div"); r.className = "r";
+      r.innerHTML = "<span>" + p.ask + "</span><span class='chip'>" + (S.picks[p.id] || "—") + "</span>";
+      var b = document.createElement("button"); b.className = "sb"; b.textContent = sel ? "Lock in " + sel : "Lock in"; b.disabled = !sel;
+      b.addEventListener("click", function () { S.picks[p.id] = sel; save(); record(); refresh(); log("pick:" + p.id + ":" + sel); });
+      r.appendChild(b); host.appendChild(r);
+    });
+  }
+  var storeKey = function () { return "te.v1:" + (S.id || "x") + ":" + MrD.bell.dayKey(); };
+  function save() { try { localStorage.setItem(storeKey(), JSON.stringify({ picks: S.picks })); } catch (e) { } }
+  function restore() { try { var j = JSON.parse(localStorage.getItem(storeKey())); if (j && j.picks) S.picks = j.picks; } catch (e) { } }
+  function record() {
+    if (!S.id || !MrD.profile) return;
+    var items = D.PICKS.map(function (p) { return { id: p.id, ask: p.ask, pick: S.picks[p.id] || "", ok: S.picks[p.id] === p.ans() }; });
+    MrD.profile.record({ course: COURSE, lesson: LESSON_ID, title: "Trends Explorer", first: S.id, period: S.period, day: MrD.bell.dayKey(), reached: items.filter(function (x) { return x.ok; }).length, of: items.length, items: items, source: "sandbox" });
+  }
+  var evlog = [];
+  function log(s) { evlog.push([Date.now(), s]); if (evlog.length > 400) evlog.shift(); }
+
+  /* ---------- drawing ---------- */
+  var cv = $("cv"), cx = cv.getContext("2d"), W = 0, H = 0, PXPM = 0.5;
+  function fit() { var r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); PXPM = Math.min(H * 0.46, W * 0.2) / 260; }
+  function dot(x, y, r, col) { cx.beginPath(); cx.arc(x, y, r, 0, 7); cx.fillStyle = col; cx.fill(); }
+  function atom(sym, x, y, tint, valenceSkip) {
+    var e = D.BY[sym], R = e.r * PXPM, i, n = e.period;
+    for (i = 1; i <= n; i++) {
+      cx.beginPath(); cx.arc(x, y, R * i / n, 0, 7); cx.lineWidth = i === n ? 3 : 1.5; cx.strokeStyle = i === n ? tint : "#546a80"; cx.stroke();
+      if (i === n) { cx.fillStyle = tint + "22"; cx.fill(); }
+    }
+    var k = e.valence, a0 = -Math.PI / 2 + 0.3;
+    for (i = 0; i < k; i++) { if (valenceSkip === i) continue; var a = a0 + i * 2 * Math.PI / k; dot(x + R * Math.cos(a), y + R * Math.sin(a), 6, "#59d596"); }
+    dot(x, y, 13, "#e0613f"); cx.fillStyle = "#fff"; cx.font = "700 12px Source Sans 3, sans-serif"; cx.textAlign = "center"; cx.fillText("+" + e.Z, x, y + 4);
+    cx.fillStyle = "#eaf0f6"; cx.font = "700 20px Bricolage Grotesque, sans-serif"; cx.fillText(sym, x, y + R + 24);
+  }
+  var duelS = null;   // { t0, d, ex, ey }
+  function frame(ts) {
+    cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.clearRect(0, 0, W, H);
+    if (!S.a && !S.b) { cx.fillStyle = "#9fb0c1"; cx.font = "600 18px Source Sans 3, sans-serif"; cx.textAlign = "center"; cx.fillText("Click an atom in the table to meet it.", W / 2, H / 2); }
+    var cy = H / 2 - 6, two = S.a && S.b, xa = two ? W * 0.27 : W / 2, xb = W * 0.73;
+    if (S.mode === "duel" && duelS) {
+      var t = Math.min(1, (ts - duelS.t0) / 1800), ease = t * t * (3 - 2 * t), A = D.BY[S.a], B = D.BY[S.b];
+      var ra = A.r * PXPM, rb = B.r * PXPM;
+      var gone = duelS.d.winner && duelS.d.share >= 1 ? (duelS.d.winner === A.sym ? "b" : "a") : "";
+      atom(S.a, xa, cy, "#f2b84b", gone === "a" ? 0 : -1); atom(S.b, xb, cy, "#4f8cff", gone === "b" ? 0 : -1);
+      // the rope: two arrows whose length shows each pull
+      var pa = D.pulls(A), pb = D.pulls(B), my = cy - Math.max(ra, rb) - 22;
+      arrow(W / 2, my, -1, 120 * pa * (0.6 + 0.4 * ease), "#f2b84b"); arrow(W / 2, my, 1, 120 * pb * (0.6 + 0.4 * ease), "#4f8cff");
+      // the shared electron: starts midway, ends where the duel says
+      var mid = W / 2, dir = duelS.d.winner === A.sym ? -1 : (duelS.d.winner === B.sym ? 1 : 0);
+      var home = dir < 0 ? xa + ra : (dir > 0 ? xb - rb : mid);
+      var far = dir ? (mid + (home - mid) * duelS.d.share) : mid;
+      var ex = mid + (far - mid) * ease; dot(ex, cy, 9, "#59d596");
+      if (t >= 1) $("msg").textContent = duelS.text;
+    } else {
+      if (S.a) atom(S.a, xa, cy, "#f2b84b");
+      if (S.b) atom(S.b, xb, cy, "#4f8cff");
+    }
+    requestAnimationFrame(frame);
+  }
+  function arrow(x, y, dir, len, col) {
+    cx.strokeStyle = col; cx.lineWidth = 7; cx.beginPath(); cx.moveTo(x, y); cx.lineTo(x + dir * len, y); cx.stroke();
+    cx.fillStyle = col; cx.beginPath(); cx.moveTo(x + dir * (len + 14), y); cx.lineTo(x + dir * len, y - 10); cx.lineTo(x + dir * len, y + 10); cx.closePath(); cx.fill();
+  }
+  function fight() {
+    var A = D.BY[S.a], B = D.BY[S.b], d = D.duel(A, B);
+    if (!d.ok) { $("msg").textContent = "A noble gas rarely bonds. No tug-of-war."; return; }
+    var text = !d.winner ? "Dead even. Same pull." : (D.BY[d.winner].name + " pulls harder." + (d.share >= 1 ? " The electron goes all the way over." : ""));
+    $("msg").textContent = ""; duelS = { t0: performance.now(), d: d, text: text }; S.mode = "duel"; log("fight:" + S.a + ":" + S.b);
+  }
+
+  /* ---------- starting, and locked mode (shared/lock.js) ---------- */
+  function lockWanted() { return !KEY && !!S.id && NOLOCK !== LessonLock.offCode() && !!clk().lockOn; }
+  function go() { S.started = true; $("start").hidden = true; $("lockres").hidden = true; restore(); refresh(); record(); }
+  function begin() {
+    var info = askH.get(); if (!info.valid) return; S.id = info.id; S.period = info.period; MrD.ids.setMe(S.id, S.period);
+    if (!lockWanted()) { go(); return; }
+    LessonLock.enter(S.id).then(function (ok) {
+      if (!ok) { $("startMsg").textContent = "Full screen did not start. This needs Chrome on your Chromebook. Tell the teacher."; return; }
+      lockArmed = true; go();
+    });
+  }
+  function lockResumeCard() {
+    $("start").hidden = true; $("lockres").hidden = false;
+    $("lockresTxt").textContent = "You closed this page. That is lock number " + LessonLock.lockNo() + ". The teacher needs to see you and give you a code.";
+    var inp = $("lockCode"); inp.focus();
+    var tryIt = function () { LessonLock.resume(inp.value).then(function (r) { if (r === "ok") { lockArmed = true; $("lockMsg").textContent = ""; go(); } else $("lockMsg").textContent = r === "nofs" ? "Full screen did not start. Click again." : "Not the code. Hand up and wait."; }); };
+    $("bUnlock").onclick = tryIt; inp.onkeydown = function (e) { if (e.key === "Enter") tryIt(); };
+  }
+
+  /* ---------- the teacher key ---------- */
+  function openKey() {
+    var rows = D.ELEMENTS.map(function (e) { return "<tr><td>" + e.sym + "</td><td>" + e.r + "</td><td>" + e.ie + "</td><td>" + (e.en == null ? "—" : e.en) + "</td></tr>"; }).join("");
+    $("keyBody").innerHTML = "<h2>Teacher key: Trends Explorer</h2>" +
+      "<p><b>Goes black</b> " + CUT_MIN + " minutes after the bell in class (no code, no lock penalty). Outside class or in #key it never goes black.</p>" +
+      "<p><b>Pick answers:</b> " + D.PICKS.map(function (p) { return p.ask + " = <b>" + p.ans() + "</b>"; }).join("; ") + ". Biggest and easiest-to-lose land on the same corner of the table; that is the day's essential question.</p>" +
+      "<p><b>Tug of war:</b> the electron moves toward the larger PULLS. A gap of 1.7 or more and it goes all the way over; smaller gaps leave it between the two atoms, nearer the winner. Noble gases are left out.</p>" +
+      "<p><b>Unlock code for a locked student today:</b> " + (MrD.codes && MrD.codes.override ? MrD.codes.override() : "see the teacher page") + "</p>" +
+      "<p class='small'>Left out on purpose: Ga, Ge, In, Sn (electronegativity rises there going down a group, an exception the day's notes do not teach).</p>" +
+      "<table><tr><th>Atom</th><th>radius pm</th><th>first IE kJ/mol</th><th>EN</th></tr>" + rows + "</table>" +
+      "<p><button class='big' id='keyClose' style='padding:0 20px'>Close</button></p>";
+    $("keyPage").hidden = false; $("keyClose").onclick = function () { $("keyPage").hidden = true; };
+  }
+
+  /* ---------- boot ---------- */
+  function boot() {
+    buildTable(); fit(); window.addEventListener("resize", fit); refresh();
+    $("slot1").onclick = function () { setSlot(1); }; $("slot2").onclick = function () { setSlot(2); };
+    $("bClear").onclick = function () { S.a = S.b = null; S.mode = "idle"; $("msg").textContent = ""; setSlot(1); };
+    $("bFight").onclick = fight;
+    $("btnHow").onclick = function () { $("how").hidden = false; }; $("howClose").onclick = function () { $("how").hidden = true; };
+    requestAnimationFrame(frame);
+    if (isDark()) { goDark(); return; }
+    setInterval(watchClock, 1000);
+    if (KEY) { $("start").hidden = true; S.started = true; $("btnKey").hidden = false; $("btnKey").onclick = openKey; return; }
+    LessonLock.init({ id: LESSON_ID, root: $("app"), onChange: function () { } });
+    var me = MrD.ids.me(); if (me) { S.id = me.id; S.period = me.period; }
+    if (NOLOCK !== LessonLock.offCode() && clk().lockOn && LessonLock.pending()) { lockResumeCard(); return; }
+    $("start").hidden = false; $("lockNote").hidden = !(clk().lockOn && NOLOCK !== LessonLock.offCode());
+    askH = MrD.ids.ask($("idHost"), { onChange: function (i) { $("bBegin").disabled = !i.valid; $("startMsg").textContent = ""; } });
+    $("bBegin").addEventListener("click", begin);
+  }
+  window.__te = { S: S, choose: choose, fight: fight, isDark: isDark, log: function () { return evlog; }, started: function () { return S.started; } };
+  boot();
+})();
+</script>
+</body>
+</html>

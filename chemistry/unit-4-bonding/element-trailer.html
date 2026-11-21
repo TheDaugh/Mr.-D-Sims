@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meet the Elements: the trailer · Mr. D's Sims</title>
+<meta name="description" content="A 55-second trailer for Unit 4: elements with faces and costumes, and sodium meets chlorine. Played at the start of class, before the Explore.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Source Sans 3",system-ui,sans-serif;color:#eaf0f6}
+#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+canvas{background:#05080d;max-width:100vw;max-height:100vh;aspect-ratio:16/9;width:100vw;height:auto}
+#play{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,0,0,.82);cursor:pointer;text-align:center}
+#play h1{font:800 3rem "Bricolage Grotesque",system-ui,sans-serif;margin:0;letter-spacing:.04em}
+#play p{margin:0;color:#9fb0c1}
+#play .b{margin-top:10px;padding:12px 34px;border-radius:12px;background:#e0613f;color:#fff;font-weight:700;font-size:1.2rem}
+#play[hidden]{display:none}
+#hint{position:fixed;left:0;right:0;bottom:6px;text-align:center;font-size:.8rem;color:#44566a;pointer-events:none;opacity:0;transition:opacity .6s}
+#hint.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="cv" width="1280" height="720"></canvas></div>
+<div id="play"><h1>MEET THE ELEMENTS</h1><p>A 55-second trailer. Sound on.</p><div class="b">▶ Play</div></div>
+<div id="hint">Space pause · R replay · M mute · F full screen</div>
+<script src="trends-data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = window.TrendsData, cv = document.getElementById("cv"), g = cv.getContext("2d"), W = 1280, H = 720;
+  var DUR = 55, STILL = (/[?&]t=([\d.]+)/.exec(location.search) || [])[1];
+  var paused = false, ctx = null, t0 = 0, playing = false, muted = false, master = null, wall0 = 0, wallPaused = 0, raf = 0;
+
+  /* ---------- little helpers ---------- */
+  function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+  function seg(t, a, b) { return clamp((t - a) / (b - a), 0, 1); }
+  function eo(x) { return 1 - Math.pow(1 - x, 3); }
+  function eb(x) { var c = 1.70158; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); }  // overshoot
+  function fadeIO(t, a, b, c, d) { return Math.min(seg(t, a, b), 1 - seg(t, c, d)); }
+  function text(s, x, y, size, col, alpha, align, weight) {
+    g.globalAlpha = clamp(alpha == null ? 1 : alpha, 0, 1); g.fillStyle = col || "#eaf0f6";
+    g.font = (weight || "800") + " " + size + "px 'Bricolage Grotesque', 'Source Sans 3', system-ui, sans-serif"; g.textAlign = align || "center"; g.fillText(s, x, y); g.globalAlpha = 1;
+  }
+  function rr(x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+  function dot(x, y, r, col) { g.beginPath(); g.arc(x, y, r, 0, 7); g.fillStyle = col; g.fill(); }
+  var FAM = { 1: "#f2a33b", 2: "#f2a33b", 13: "#5fb0a8", 14: "#5fb0a8", 15: "#e0613f", 16: "#e0613f", 17: "#e0613f", 18: "#6a8cff" };
+
+  /* An atom drawn to scale: one ring per shell, the outer edge sized by its real radius, a dot for each outer electron. */
+  function atom(sym, x, y, pxpm, tint, alpha, skip, noNucleus) {
+    var e = D.BY[sym], R = e.r * pxpm, i, n = e.period; g.globalAlpha = clamp(alpha == null ? 1 : alpha, 0, 1);
+    for (i = 1; i <= n; i++) { g.beginPath(); g.arc(x, y, R * i / n, 0, 7); g.lineWidth = i === n ? 4 : 1.5; g.strokeStyle = i === n ? tint : "#546a80"; g.stroke(); if (i === n) { g.fillStyle = tint + "26"; g.fill(); } }
+    var k = e.valence, a0 = -Math.PI / 2 + 0.3;
+    for (i = 0; i < k; i++) { if (skip === i) continue; var a = a0 + i * 2 * Math.PI / k; dot(x + R * Math.cos(a), y + R * Math.sin(a), 7, "#59d596"); }
+    if (!noNucleus) { dot(x, y, 15, "#e0613f"); g.globalAlpha = 1; text("+" + e.Z, x, y + 5, 14, "#fff", alpha); } g.globalAlpha = 1;
+  }
+
+  /* ---------- characters: a face where the nucleus is, and a costume that says what the atom does ---------- */
+  function brow(x, y, w, tilt) { g.lineWidth = 4; g.strokeStyle = "#eaf0f6"; g.beginPath(); g.moveTo(x - w / 2, y + tilt); g.lineTo(x + w / 2, y - tilt); g.stroke(); }
+  function face(x, y, fr, kind, tint, look, Z, alpha) {
+    g.save(); g.globalAlpha = clamp(alpha == null ? 1 : alpha, 0, 1);
+    g.fillStyle = "#1d2e40"; g.beginPath(); g.arc(x, y, fr, 0, 7); g.fill(); g.lineWidth = 4; g.strokeStyle = tint; g.stroke();
+    var ex = fr * 0.36, ey = y - fr * 0.14, er = fr * 0.2, lk = (look || 0) * er * 0.45, side = [-1, 1];
+    if (kind !== "cool") side.forEach(function (sd) { dot(x + sd * ex, ey, er, "#fff"); dot(x + sd * ex + lk, ey, er * 0.5, "#111"); });
+    g.lineWidth = Math.max(3, fr * 0.07); g.strokeStyle = "#eaf0f6"; g.lineCap = "round";
+    if (kind === "giver" || kind === "friendly") { g.beginPath(); g.arc(x, y + fr * 0.12, fr * 0.42, 0.15 * Math.PI, 0.85 * Math.PI); g.stroke(); brow(x - ex, ey - er * 1.5, er * 1.6, -2); brow(x + ex, ey - er * 1.5, er * 1.6, 2); dot(x - fr * 0.62, y + fr * 0.2, fr * 0.1, "#e0613f55"); dot(x + fr * 0.62, y + fr * 0.2, fr * 0.1, "#e0613f55"); }
+    if (kind === "grabber") {   // a thief's mask over the eyes, and a greedy grin
+      g.fillStyle = "#06090d"; rr(x - fr * 0.82, ey - er * 1.5, fr * 1.64, er * 3, er); g.fill();
+      side.forEach(function (sd) { dot(x + sd * ex, ey, er * 0.95, "#fff"); dot(x + sd * ex + lk, ey, er * 0.5, "#111"); });
+      g.beginPath(); g.arc(x, y + fr * 0.1, fr * 0.46, 0.1 * Math.PI, 0.9 * Math.PI); g.stroke(); g.beginPath(); g.moveTo(x - fr * 0.4, y + fr * 0.34); g.lineTo(x + fr * 0.4, y + fr * 0.34); g.stroke(); }
+    if (kind === "smug") { brow(x - ex, ey - er * 1.5, er * 1.6, 4); brow(x + ex, ey - er * 1.5, er * 1.6, -1); g.beginPath(); g.moveTo(x - fr * 0.3, y + fr * 0.42); g.quadraticCurveTo(x, y + fr * 0.5, x + fr * 0.38, y + fr * 0.28); g.stroke(); }
+    if (kind === "cool") {   // sunglasses, flat mouth
+      g.fillStyle = "#06090d"; side.forEach(function (sd) { rr(x + sd * ex - fr * 0.3, ey - er * 1.1, fr * 0.6, er * 2.2, er * 0.7); g.fill(); });
+      g.beginPath(); g.moveTo(x - fr * 0.06, ey - er * 0.2); g.lineTo(x + fr * 0.06, ey - er * 0.2); g.stroke(); g.beginPath(); g.moveTo(x - fr * 0.28, y + fr * 0.4); g.lineTo(x + fr * 0.28, y + fr * 0.4); g.stroke(); }
+    g.restore(); text("+" + Z, x, y + fr + 26, Math.max(16, fr * 0.4), "#eaf0f6", alpha);
+  }
+  function crown(x, y, w, alpha) { g.save(); g.globalAlpha = clamp(alpha, 0, 1); g.fillStyle = "#f2b84b"; g.beginPath(); g.moveTo(x - w / 2, y); g.lineTo(x - w / 2, y - w * 0.5); g.lineTo(x - w / 4, y - w * 0.28); g.lineTo(x, y - w * 0.62); g.lineTo(x + w / 4, y - w * 0.28); g.lineTo(x + w / 2, y - w * 0.5); g.lineTo(x + w / 2, y); g.closePath(); g.fill(); dot(x, y - w * 0.66, w * 0.07, "#e0613f"); g.restore(); }
+  function cape(x, y, fr, alpha) { g.save(); g.globalAlpha = clamp(alpha, 0, 1); g.fillStyle = "#b8362a"; g.beginPath(); g.moveTo(x - fr * 0.9, y + fr * 0.4); g.quadraticCurveTo(x - fr * 1.9, y + fr * 1.8, x - fr * 1.3, y + fr * 2.5); g.lineTo(x + fr * 1.3, y + fr * 2.5); g.quadraticCurveTo(x + fr * 1.9, y + fr * 1.8, x + fr * 0.9, y + fr * 0.4); g.closePath(); g.fill(); g.restore(); }
+  function gloves(x, y, fr, R, t, alpha) {   // two reaching hands that grab outward
+    g.save(); g.globalAlpha = clamp(alpha, 0, 1); [-1, 1].forEach(function (sd) {
+      var reach = fr + (R - fr) * (0.45 + 0.35 * Math.abs(Math.sin(t * 3))); g.strokeStyle = "#e0613f"; g.lineWidth = fr * 0.18; g.beginPath(); g.moveTo(x + sd * fr, y + fr * 0.2); g.lineTo(x + sd * reach, y - fr * 0.2); g.stroke(); dot(x + sd * reach, y - fr * 0.2, fr * 0.34, "#e0613f"); }); g.restore(); }
+  function headphones(x, y, fr, alpha) { g.save(); g.globalAlpha = clamp(alpha, 0, 1); g.strokeStyle = "#6a8cff"; g.lineWidth = fr * 0.14; g.beginPath(); g.arc(x, y, fr * 1.12, Math.PI * 1.05, Math.PI * 1.95); g.stroke(); [-1, 1].forEach(function (sd) { g.fillStyle = "#6a8cff"; rr(x + sd * fr * 1.12 - fr * 0.14, y - fr * 0.28, fr * 0.28, fr * 0.56, fr * 0.1); g.fill(); }); g.restore(); }
+  function cap(x, y, fr, alpha) { g.save(); g.globalAlpha = clamp(alpha, 0, 1); g.fillStyle = "#f2a33b"; g.beginPath(); g.arc(x, y - fr * 0.55, fr * 0.8, Math.PI, 0); g.fill(); rr(x, y - fr * 0.62, fr * 1.2, fr * 0.2, fr * 0.1); g.fill(); g.restore(); }
+  function topHat(x, y, fr, alpha) { g.save(); g.globalAlpha = clamp(alpha, 0, 1); g.fillStyle = "#06090d"; rr(x - fr * 0.9, y - fr * 1.0, fr * 1.8, fr * 0.22, fr * 0.08); g.fill(); rr(x - fr * 0.55, y - fr * 1.75, fr * 1.1, fr * 0.85, fr * 0.1); g.fill(); g.fillStyle = "#e0613f"; g.fillRect(x - fr * 0.55, y - fr * 1.12, fr * 1.1, fr * 0.14); g.restore(); }
+  var STYLE = {   // who wears what
+    Cs: { kind: "giver", tint: "#f2a33b" }, F: { kind: "grabber", tint: "#e0613f" }, Ne: { kind: "cool", tint: "#6a8cff" },
+    Na: { kind: "friendly", tint: "#f2a33b" }, Cl: { kind: "smug", tint: "#e0613f" }
+  };
+  /* The atom drawn to scale (one ring per shell, the outer edge sized by its real radius) with a character at the center. */
+  function character(sym, x, y, pxpm, alpha, t, skip, look) {
+    var e = D.BY[sym], st = STYLE[sym], R = e.r * pxpm, fr = clamp(R * 0.3, 30, 84);
+    if (sym === "Cs") cape(x, y, fr, alpha);
+    atom(sym, x, y, pxpm, st.tint, alpha, skip, true);
+    if (sym === "F") gloves(x, y, fr, R, t, alpha);
+    face(x, y, fr, st.kind, st.tint, look, e.Z, alpha);
+    if (sym === "Cs") crown(x, y - fr - 2, fr * 1.2, alpha);
+    if (sym === "Ne") headphones(x, y, fr, alpha);
+    if (sym === "Na") cap(x, y, fr, alpha);
+    if (sym === "Cl") topHat(x, y, fr, alpha);
+    return { R: R, fr: fr };
+  }
+  function barRow(label, v, x, y, w, prog, col, alpha) {
+    text(label, x, y + 4, 18, "#9fb0c1", alpha, "left", "700");
+    g.globalAlpha = alpha; g.fillStyle = "#0b121a"; rr(x + 110, y - 12, w, 20, 10); g.fill(); g.strokeStyle = "#2c3f53"; g.lineWidth = 1.5; g.stroke();
+    if (v == null) { text("rarely bonds", x + 124, y + 4, 16, "#9fb0c1", alpha, "left", "600"); return; }
+    g.fillStyle = col; rr(x + 110, y - 12, Math.max(20, w * v * prog), 20, 10); g.fill(); g.globalAlpha = 1;
+  }
+  function bg(t) {
+    var gr = g.createRadialGradient(W / 2, H / 2, 80, W / 2, H / 2, 760); gr.addColorStop(0, "#101c2b"); gr.addColorStop(1, "#04070b"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    g.strokeStyle = "rgba(79,140,255,.06)"; g.lineWidth = 1; var off = (t * 14) % 40, i;
+    for (i = -40; i < W + 40; i += 40) { g.beginPath(); g.moveTo(i + off, 0); g.lineTo(i + off, H); g.stroke(); }
+    for (i = 0; i < H; i += 40) { g.beginPath(); g.moveTo(0, i); g.lineTo(W, i); g.stroke(); }
+  }
+
+  /* ---------- the roster grid (same layout as the Explore page) ---------- */
+  function cellOf(e) {
+    var col = D.GROUPS.indexOf(e.group), row = D.PERIODS.indexOf(e.period), TW = 92, TH = 74, GAP = 8, gapX = 26;
+    var totalW = 8 * TW + 7 * GAP + gapX, x0 = (W - totalW) / 2;
+    return { x: x0 + col * (TW + GAP) + (col >= 2 ? gapX : 0), y: 150 + row * (TH + GAP), w: TW, h: TH };
+  }
+  function roster(t, a, alpha) {
+    D.ELEMENTS.forEach(function (e, i) {
+      var c = cellOf(e), p = seg(t, a + i * 0.17, a + i * 0.17 + 0.35); if (p <= 0) return;
+      var s = eb(p), cx = c.x + c.w / 2, cy = c.y + c.h / 2; g.save(); g.translate(cx, cy); g.scale(s, s); g.globalAlpha = alpha * clamp(p * 3, 0, 1);
+      var col = FAM[e.group]; g.fillStyle = "#162230"; rr(-c.w / 2, -c.h / 2, c.w, c.h, 10); g.fill(); g.lineWidth = 3; g.strokeStyle = col; g.stroke();
+      text(e.sym, 0, 26, 30, "#eaf0f6", 1); text(String(e.Z), -c.w / 2 + 14, -c.h / 2 + 16, 12, "#9fb0c1", 1, "center", "600");
+      var gp = e.group; g.lineCap = "round"; g.lineWidth = 2.5; g.strokeStyle = "#eaf0f6";
+      if (gp === 18) { g.fillStyle = "#06090d"; rr(-17, -20, 15, 9, 3); g.fill(); rr(2, -20, 15, 9, 3); g.fill(); g.beginPath(); g.moveTo(-6, -5); g.lineTo(6, -5); g.stroke(); }
+      else { dot(-9, -14, 3.6, "#fff"); dot(9, -14, 3.6, "#fff"); dot(-9, -14, 1.8, "#111"); dot(9, -14, 1.8, "#111");
+        g.beginPath(); if (gp <= 2) g.arc(0, -9, 8, 0.15 * Math.PI, 0.85 * Math.PI); else if (gp >= 15) { g.moveTo(-8, -3); g.quadraticCurveTo(0, 4, 8, -5); } else { g.moveTo(-6, -3); g.lineTo(6, -3); } g.stroke();
+        if (gp >= 15) { g.beginPath(); g.moveTo(-14, -21); g.lineTo(-5, -19); g.moveTo(14, -21); g.lineTo(5, -19); g.stroke(); } }
+      g.restore();
+    });
+  }
+
+  /* ---------- the scenes ---------- */
+  function spotlight(t, a, b, sym, kind, tag, line, tint, pxpm) {
+    if (t < a - 0.4 || t > b + 0.4) return;
+    var al = fadeIO(t, a, a + 0.4, b - 0.4, b), e = D.BY[sym], slide = (1 - eo(seg(t, a, a + 0.6))) * 90;
+    g.save(); g.translate(slide, 0); var m = character(sym, 340, 370, pxpm, al, t, -1, Math.sin(t * 1.5)); text(sym, 340, 370 + m.R + 50, 46, tint, al); g.restore();
+    text(kind, 820, 205, 22, tint, al, "left", "700"); text(e.name.toUpperCase(), 820, 270, 64, "#eaf0f6", al, "left");
+    text(tag, 820, 318, 26, "#c9d6e3", al, "left", "700"); text(line, 820, 352, 20, "#9fb0c1", al, "left", "600");
+    var pr = eo(seg(t, a + 0.6, a + 1.8));
+    barRow("SIZE", D.size(e), 820, 430, 290, pr, "#6aa7ff", al); barRow("LETS GO", D.letsGo(e), 820, 478, 290, pr, "#2fae6b", al); barRow("PULLS", D.pulls(e), 820, 526, 290, pr, "#e0613f", al);
+  }
+  function versus(t, a) {
+    var T = t - a; if (T < 0) return;
+    var shake = T > 2 && T < 2.5 ? (Math.random() - 0.5) * 14 : 0; g.save(); g.translate(shake, shake);
+    var al = clamp(T / 0.4, 0, 1), pxpm = 1.0, xa = 330 + (1 - eo(seg(T, 0, 0.7))) * -300, xb = 950 + (1 - eo(seg(T, 0, 0.7))) * 300, cy = 380;
+    var tr = eo(seg(T, 5.2, 7.4)), ex = 640 + (xb - 640 - D.BY.Cl.r * pxpm) * tr;   // the electron sails toward chlorine
+    var gone = T > 7.4;
+    character("Na", xa, cy, pxpm, al, t, T >= 4.8 ? 0 : -1, T > 4 ? 1 : 0); character("Cl", xb, cy, pxpm, al, t, -1, T > 4 ? -1 : 0);
+    text("NA", xa, 120, 44, "#f2a33b", al); text("CL", xb, 120, 44, "#e0613f", al);
+    text("SODIUM", xa, 152, 20, "#9fb0c1", al, "center", "700"); text("CHLORINE", xb, 152, 20, "#9fb0c1", al, "center", "700");
+    var vs = eb(seg(T, 1.6, 2.2)); if (vs > 0 && T < 7.4) { g.save(); g.translate(640, 300); g.scale(vs, vs); text("VS", 0, 30, 110, "#f2b84b", 1); g.restore(); }
+    if (T > 2 && T < 2.4) { g.globalAlpha = .55 * (1 - (T - 2) / .4); g.fillStyle = "#fff"; g.fillRect(0, 0, W, H); g.globalAlpha = 1; }
+    if (T >= 4.8) { // the rope: pulls
+      var p = eo(seg(T, 4.8, 6)); g.strokeStyle = "#f2a33b"; g.lineWidth = 8; g.beginPath(); g.moveTo(640, 580); g.lineTo(640 - 60 * D.pulls(D.BY.Na) * 2 * p, 580); g.stroke();
+      g.strokeStyle = "#e0613f"; g.beginPath(); g.moveTo(640, 580); g.lineTo(640 + 60 * D.pulls(D.BY.Cl) * 2 * p, 580); g.stroke();
+      text("who pulls harder?", 640, 620, 22, "#9fb0c1", fadeIO(T, 4.8, 5.4, 8, 8.6), "center", "700");
+      if (T < 7.6) dot(ex, cy, 11, "#59d596"); else dot(xb - D.BY.Cl.r * pxpm, cy, 11, "#59d596");
+    }
+    if (gone) { var k = eb(seg(T, 7.6, 8.2)); g.save(); g.translate(640, 300); g.scale(k, k); text("K.O.", 0, 30, 100, "#e0613f", 1); g.restore();
+      text("One gives. One takes.", 640, 650, 34, "#eaf0f6", eo(seg(T, 8.6, 9.4))); }
+    g.restore();
+  }
+  function frame(t) {
+    g.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0); g.clearRect(0, 0, W, H); bg(t);
+    // 0 to 6: cold open
+    text("Meet the elements.", W / 2, 350, 56, "#eaf0f6", fadeIO(t, 0.6, 1.4, 2.8, 3.4));
+    text("Every one of them wants something.", W / 2, 350, 56, "#eaf0f6", fadeIO(t, 3.6, 4.4, 5.4, 6));
+    // 6 to 17: the roster
+    if (t >= 6 && t < 17.5) {
+      var al = 1 - seg(t, 16.4, 17.4), sh = t > 6.2 && t < 6.55 ? (Math.random() - 0.5) * 12 : 0;
+      g.save(); g.translate(sh, sh); text("MEET THE CAST", W / 2, 96, 64 * eb(seg(t, 6, 6.35)), "#f2b84b", al * clamp((t - 6) * 6, 0, 1)); g.restore();
+      roster(t, 6.8, al);
+      text("Givers. Grabbers. Bystanders.", W / 2, 690, 26, "#9fb0c1", fadeIO(t, 12.5, 13.2, 15.8, 16.6), "center", "700");
+    }
+    // 17 to 33: three characters
+    spotlight(t, 17, 23, "Cs", "THE GIVER", "Huge. Loose grip.", "Hands over its outer electron without a fight.", "#f2a33b", 1.0);
+    spotlight(t, 23, 29, "F", "THE GRABBER", "Tiny. Greedy.", "Pulls an electron away from nearly anyone.", "#e0613f", 2.3);
+    spotlight(t, 29, 33.5, "Ne", "THE BYSTANDER", "Full shell. Not interested.", "Rarely bonds with anybody.", "#6a8cff", 2.4);
+    // 33.5 to 46: the match
+    if (t >= 33.5 && t < 47) { var vf = 1 - seg(t, 45.8, 47); g.globalAlpha = vf; versus(t, 34.5); g.globalAlpha = 1; text("TOMORROW", W / 2, 60, 26, "#f2b84b", fadeIO(t, 34.6, 35.2, 45, 45.8), "center", "700"); }
+    // 47 to 55: end card
+    if (t >= 47) {
+      var ea = fadeIO(t, 47, 48.2, 53.6, 55);
+      text("UNIT 4", W / 2, 250, 28, "#f2b84b", ea, "center", "700"); text("TRENDS, BONDING", W / 2, 330, 76, "#eaf0f6", ea); text("AND NAMING", W / 2, 410, 76, "#eaf0f6", ea);
+      text("Who wins when two atoms fight over an electron?", W / 2, 490, 30, "#9fb0c1", eo(seg(t, 49.5, 50.5)) * ea, "center", "600");
+      text("Today: find out who is strongest.", W / 2, 540, 30, "#59d596", eo(seg(t, 51.2, 52.2)) * ea, "center", "700");
+    }
+    // letterbox bars for the trailer feel
+    g.fillStyle = "#000"; g.fillRect(0, 0, W, 24); g.fillRect(0, H - 24, W, 24);
+  }
+
+  /* ---------- sound: built from oscillators, scheduled on the audio clock so pause freezes it ---------- */
+  function tone(c, at, f, dur, type, vol, f2) {
+    var o = c.createOscillator(), gn = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, at); if (f2) o.frequency.exponentialRampToValueAtTime(f2, at + dur);
+    gn.gain.setValueAtTime(0.0001, at); gn.gain.exponentialRampToValueAtTime(vol, at + 0.02); gn.gain.exponentialRampToValueAtTime(0.0001, at + dur); o.connect(gn); gn.connect(master); o.start(at); o.stop(at + dur + 0.05);
+  }
+  function score(c) {
+    var b = c.currentTime + 0.15, i, arp = [220, 261.6, 329.6, 392, 329.6, 261.6];
+    tone(c, b, 55, 6, "sine", 0.12);                                   // low drone under the cold open
+    tone(c, b + 6, 55, 1.4, "sawtooth", 0.18, 40); tone(c, b + 6, 220, 1.2, "square", 0.07); tone(c, b + 6, 329.6, 1.2, "square", 0.05);   // the title hit
+    D.ELEMENTS.forEach(function (e, k) { tone(c, b + 6.8 + k * 0.17, 520 + (k % 8) * 55, 0.09, "square", 0.04); });                             // tiles pop in
+    for (i = 0; i < 100; i++) { var at = b + 7 + i * 0.25; if (at > b + 33) break; tone(c, at, arp[i % arp.length] * (i % 12 < 6 ? 1 : 1.5), 0.22, "triangle", 0.05); }   // the loop
+    for (i = 0; i < 3; i++) tone(c, b + 17 + i * 6, 110, 0.5, "sawtooth", 0.1, 55);                                                           // a hit per character card
+    tone(c, b + 32, 200, 2.4, "sawtooth", 0.05, 1400);                                                                                        // riser into the match
+    tone(c, b + 36.3, 60, 1.2, "sawtooth", 0.2, 38); tone(c, b + 36.3, 440, 0.5, "square", 0.08);                                             // VS
+    tone(c, b + 39.3, 300, 2.2, "sine", 0.08, 1200);                                                                                          // the electron sails
+    tone(c, b + 42, 70, 1.6, "sawtooth", 0.22, 36); tone(c, b + 42, 523.3, 1.4, "square", 0.08); tone(c, b + 42, 659.3, 1.4, "square", 0.06);   // K.O.
+    [261.6, 329.6, 392].forEach(function (f) { tone(c, b + 47, f, 6, "sine", 0.05); });                                                        // end card chord
+    return b;
+  }
+
+  /* ---------- play, pause, replay ---------- */
+  function now() { return ctx ? ctx.currentTime - t0 : (performance.now() - wall0 - wallPaused) / 1000; }
+  function start() {
+    document.getElementById("play").hidden = true; document.getElementById("hint").classList.add("on");
+    paused = false; try { if (ctx) ctx.close().catch(function () { }); ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = muted ? 0 : 0.8; master.connect(ctx.destination); t0 = score(ctx); }
+    catch (e) { ctx = null; wall0 = performance.now(); wallPaused = 0; }
+    playing = true; cancelAnimationFrame(raf); loop();
+  }
+  function loop() { var t = now(); frame(clamp(t, 0, DUR)); if (t >= DUR + 1) { playing = false; document.getElementById("play").hidden = false; document.querySelector("#play .b").textContent = "↻ Replay"; return; } raf = requestAnimationFrame(loop); }
+  function toggle() { if (!ctx) return; paused = !paused; (paused ? ctx.suspend() : ctx.resume()).catch(function () { }); }
+  document.getElementById("play").addEventListener("click", start);
+  document.addEventListener("keydown", function (e) {
+    var k = e.key.toLowerCase();
+    if (k === " ") { e.preventDefault(); if (!playing) start(); else toggle(); }
+    else if (k === "r") start();
+    else if (k === "m") { muted = !muted; if (master) master.gain.value = muted ? 0 : 0.8; }
+    else if (k === "f") { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
+  });
+  window.__trailer = { frame: frame, DUR: DUR };
+  if (STILL != null) { document.getElementById("play").hidden = true; document.fonts.ready.then(function () { frame(parseFloat(STILL)); }); }
+  else { g.fillStyle = "#05080d"; g.fillRect(0, 0, cv.width, cv.height); }
+})();
+</script>
+</body>
+</html>
