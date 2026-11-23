@@ -158,19 +158,29 @@ window.UNITS = [
         day: 1,
         icon: "🎬",
         href: "unit-4-bonding/element-trailer.html",
-        blurb: "An 84-second trailer that opens Day 1: a pixel-grid opener, sodium and chlorine forged in a star, then the two as spinning orbital tops in a fight over one electron. Played by the teacher, full screen.",
+        blurb: "An 84-second trailer that opens Day 1: a pixel-grid opener, sodium and chlorine forged in a star, then a head-to-head on one electron with numbers for size, ionization energy and electronegativity. Played by the teacher, full screen.",
         tags: ["periodic trends", "engage", "trailer", "nucleosynthesis"],
         teacher: [{ label: "Scene buttons (#key)", href: "unit-4-bonding/element-trailer.html#key" }]
       },
       {
-        title: "Trends Explorer (Day 1 Explore)",
+        title: "Trends Lab (Day 1 Explore)",
         type: "sim",
         day: 1,
         icon: "🧲",
         href: "unit-4-bonding/trends-explorer.html",
-        blurb: "Click any two atoms and compare their size, how easily they let go of an electron, and how hard they pull. Then run a tug of war over one electron. The page goes black 20 minutes after the bell.",
+        blurb: "Measure one atom, then one of each, then a whole dish. Every measurement fills in the periodic table until the trends show. The page goes black 20 minutes after the bell.",
         tags: ["periodic trends", "atomic size", "reactivity", "electronegativity"],
         teacher: [{ label: "Teacher key (#key)", href: "unit-4-bonding/trends-explorer.html#key" }, { label: "Board page", href: "whiteboard/index.html#lesson=trends" }]
+      },
+      {
+        title: "Energy Diorama (sandbox)",
+        type: "sim",
+        day: 1,
+        icon: "🏙️",
+        href: "unit-4-bonding/energy-diorama.html",
+        blurb: "Pick a textbook reaction and an amount. A flat isometric town shows how much energy comes out, with a magnitude meter from kilojoules to terajoules. Every reaction listed gives energy off.",
+        tags: ["energy", "bonding", "sandbox"],
+        teacher: [{ label: "Teacher key (#key)", href: "unit-4-bonding/energy-diorama.html#key" }]
       }
     ]
   }

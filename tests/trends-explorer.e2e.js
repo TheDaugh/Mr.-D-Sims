@@ -1,7 +1,7 @@
 /* Trends Explorer (chemistry/unit-4-bonding/trends-explorer.html) in Chromium.
      python3 -m http.server 8123 &
      node tests/trends-explorer.e2e.js
-   Checks: #key opens with every tile and a working fight; a student in class starts locked, picks and logs; the page goes black
+   Checks: #key opens every stage and the table fills with what is measured; a student in class starts locked, picks and logs; the page goes black
    20 minutes after the bell with no code, stays black on reload, and does not count as leaving; after the bell it opens normally. */
 const fs = require('fs');
 const PW = process.env.PLAYWRIGHT_DIR || ['/opt/npm-tools/node_modules/playwright', '/home/claude/.npm-global/lib/node_modules/playwright'].find(p => fs.existsSync(p));
@@ -22,30 +22,37 @@ async function open(br, at, hash) {
 }
 (async () => {
   const br = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox'] });
-  // 1. teacher key
+  // 1. teacher key: every stage open, measured tiles fill the table, patterns graded from the student's own tiles
   { const { ctx, page, errors } = await open(br, '2026-10-21T10:55:00-04:00', '#key');
-    ok(await page.locator('.t').count() === 30, '30 atoms in the table');
-    await page.click('.t[data-sym="Na"]'); await page.click('.t[data-sym="Cl"]'); await page.click('#bFight'); await page.waitForTimeout(2200);
-    ok((await page.textContent('#msg')).includes('Chlorine pulls harder'), 'Na vs Cl: chlorine wins and the electron goes over');
-    if (SHOTS) await page.screenshot({ path: SHOTS + '/te-fight.png' });
-    await page.click('#bClear'); await page.click('.t[data-sym="Ne"]'); await page.click('.t[data-sym="F"]');
-    ok(await page.locator('#bFight').isDisabled(), 'a noble gas has no fight');
-    await page.click('#bClear'); await page.click('.t[data-sym="Cs"]'); await page.click('.t[data-sym="Li"]');
-    ok((await page.locator('#card1').textContent()).includes('Cesium') || (await page.locator('#card2').textContent()).includes('Cesium'), 'cards name the atoms');
-    await page.click('#btnKey'); ok((await page.textContent('#keyBody')).includes('Cs'), 'key lists the answers'); 
+    ok(await page.locator('.t').count() === 31, '31 atoms in the table (H through Cs and Ba)');
+    ok(!(await page.locator('#st3').isDisabled()), 'all stages open in #key');
+    await page.click('.t[data-sym="Na"]'); ok((await page.locator('.t[data-sym="Na"] i').textContent()) === '180', 'picking an atom measures its size on the table');
+    ok((await page.locator('.t[data-sym="Cl"] i').textContent()) === '', 'an atom you did not pick stays blank');
+    await page.click('#acts .big >> nth=0'); await page.waitForTimeout(300);
+    await page.click('.vb[data-v="ie"]'); ok((await page.locator('.t[data-sym="Na"] i').textContent()) === '496', 'removing an electron measures ionization energy');
+    await page.click('#st2'); await page.click('.t[data-sym="Na"]'); await page.click('.t[data-sym="Cl"]'); await page.click('#acts .big >> nth=2'); await page.waitForTimeout(600);
+    ok((await page.textContent('#result')).includes('NaCl'), 'Na + Cl makes NaCl');
+    await page.click('.vb[data-v="en"]'); ok((await page.locator('.t[data-sym="Cl"] i').textContent()) === '3.16', 'electronegativity appears once the atoms meet');
+    await page.click('.t[data-sym="Ne"]'); await page.click('.t[data-sym="F"]'); await page.click('#acts .big >> nth=2'); await page.waitForTimeout(300);
+    ok((await page.textContent('#result')).includes('Nothing happens'), 'a noble gas does nothing');
+    if (SHOTS) await page.screenshot({ path: SHOTS + '/te-pair.png' });
+    await page.click('#st3'); for (const s of ['Na', 'Na', 'O']) await page.click('.t[data-sym="' + s + '"]'); await page.click('#acts .big >> nth=0'); await page.waitForTimeout(500);
+    ok((await page.textContent('#result')).includes('Na₂O'), 'two Na and one O make Na2O');
+    if (SHOTS) await page.screenshot({ path: SHOTS + '/te-mix.png' });
+    await page.click('#btnKey'); ok((await page.textContent('#keyBody')).includes('Unlock code'), 'key shows the unlock code');
     ok(errors.length === 0, 'no JS errors in #key ' + errors.join('|')); await ctx.close(); }
-  // 2. a student at 10 minutes in: locked start, picks, record
+  // 2. a student at 10 minutes in: locked start; stages unlock by measuring; record
   { const { ctx, page, errors } = await open(br, '2026-10-21T10:50:00-04:00');
     await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400);
     if (SHOTS) await page.screenshot({ path: SHOTS + '/te-start.png' });
     await page.click('#bBegin'); await page.waitForTimeout(300);
     ok(await page.evaluate(() => !!document.fullscreenElement), 'full screen starts at Begin');
-    await page.click('.t[data-sym="Cs"]'); await page.click('.t[data-sym="F"]');
-    const rows = page.locator('#scoutRows .sb'); await page.click('.slot >> nth=0'); await rows.nth(0).click(); await rows.nth(1).click();
-    await page.click('.slot >> nth=1'); await rows.nth(2).click();
-    const rec = await page.evaluate(() => MrD.profile.all().filter(r => r.lesson === 'chem-u4-d1-trends-explorer')[0]);
-    ok(rec && rec.reached === 3 && rec.of === 3, 'three right picks are recorded locally: ' + JSON.stringify(rec && rec.reached));
-    ok((await page.textContent('#scout')).includes('Cs'), 'no verdict is shown to the student');
+    ok(await page.locator('#st2').isDisabled(), 'stage 2 starts closed');
+    for (const s of ['Cs', 'F', 'Li']) { await page.click('.t[data-sym="' + s + '"]'); await page.click('#acts .big >> nth=0'); await page.waitForTimeout(150); }
+    ok(!(await page.locator('#st2').isDisabled()), 'stage 2 opens after three ionization energies');
+    const rec = await page.evaluate(() => MrD.profile.all().filter(r => r.lesson === 'chem-u4-d1-trends-lab')[0]);
+    ok(rec && rec.items.length === 5 && rec.items[1].ok === true, 'ionization energies are recorded locally');
+    await page.click('.dir >> nth=0'); ok((await page.textContent('#findMsg')).length > 0, 'a pattern guess gets feedback from the student\'s own tiles');
     if (SHOTS) await page.screenshot({ path: SHOTS + '/te-explore.png' });
     // 3. the clock reaches 20 minutes: black, no code, no lock counted
     await page.clock.fastForward(11 * 60 * 1000); await page.waitForTimeout(1200);

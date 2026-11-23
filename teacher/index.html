@@ -121,7 +121,7 @@ tr.stuck td{background:rgba(184,59,36,.15)}tr.idle td{color:var(--muted)}tr.done
     $("hc").onclick=function(e){e.preventDefault();$("fsc").textContent=hc;$("fsd").textContent="Huddle code · all classes";$("fs").hidden=false};
     $("codes").innerHTML="<tr><th>Lesson</th><th>Teacher view</th></tr>"+L.map(function(l){
       return "<tr><td>"+esc(cname[l.course])+": "+esc(l.title)+'</td><td><a href="../'+l.href+'#key">#key view</a>'+(l.teacher?' · <a href="../'+l.teacher+'">teacher page</a>':'')+'</td></tr>';
-    }).join("");
+    }).join("")+[["Chem: Unit 4 Day 1 Trailer","chemistry/unit-4-bonding/element-trailer.html#key"],["Chem: Unit 4 Day 1 Trends Lab","chemistry/unit-4-bonding/trends-explorer.html#key"]].map(function(x){return "<tr><td>"+x[0]+'</td><td><a href="../'+x[1]+'">#key view</a></td></tr>'}).join("");
   }
   $("fsx").onclick=function(){$("fs").hidden=true};
   paint();setInterval(paint,30000);

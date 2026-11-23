@@ -1,5 +1,5 @@
 /* Trends Explorer: the data behind the Unit 4 Day 1 Explore (trends-explorer.html).
-   Every element here is a main-group atom from period 2 to 6. Shown only as bars, never as numbers.
+   Every element here is a main-group atom from period 2 to 6, plus hydrogen (period 1, so water and the hydrogen compounds can form). Helium is left out: its radius is not on the same table. Shown only as bars, never as numbers.
    Sources (standard reference tables; the bars are relative, so only the order and the gaps matter):
      r   atomic radius in pm, the calculated values from the usual reference table (Clementi et al., as tabulated in the CRC Handbook)
      ie  first ionization energy in kJ/mol, NIST Atomic Spectra Database
@@ -11,6 +11,7 @@
   "use strict";
   // sym, name, Z, period, group, r, ie, en
   var RAW = [
+    ["H", "Hydrogen", 1, 1, 1, 25, 1312.0, 2.20],
     ["Li", "Lithium", 3, 2, 1, 145, 520.2, 0.98], ["Be", "Beryllium", 4, 2, 2, 105, 899.5, 1.57], ["B", "Boron", 5, 2, 13, 85, 800.6, 2.04],
     ["C", "Carbon", 6, 2, 14, 70, 1086.5, 2.55], ["N", "Nitrogen", 7, 2, 15, 65, 1402.3, 3.04], ["O", "Oxygen", 8, 2, 16, 60, 1313.9, 3.44],
     ["F", "Fluorine", 9, 2, 17, 50, 1681.0, 3.98], ["Ne", "Neon", 10, 2, 18, 38, 2080.7, null],
@@ -48,6 +49,6 @@
   ];
   function best(f) { var b = ELEMENTS[0]; ELEMENTS.forEach(function (e) { if (f(e) > f(b)) b = e; }); return b.sym; }
 
-  root.TrendsData = { ELEMENTS: ELEMENTS, BY: BY, size: size, letsGo: letsGo, pulls: pulls, duel: duel, PICKS: PICKS, GROUPS: [1, 2, 13, 14, 15, 16, 17, 18], PERIODS: [2, 3, 4, 5, 6] };
+  root.TrendsData = { ELEMENTS: ELEMENTS, BY: BY, size: size, letsGo: letsGo, pulls: pulls, duel: duel, PICKS: PICKS, GROUPS: [1, 2, 13, 14, 15, 16, 17, 18], PERIODS: [2, 3, 4, 5, 6], ROWS: [1, 2, 3, 4, 5, 6] };
   if (typeof module !== "undefined" && module.exports) module.exports = root.TrendsData;
 })(typeof window !== "undefined" ? window : globalThis);

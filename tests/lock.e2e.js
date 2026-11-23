@@ -32,7 +32,10 @@ const TARGETS = [
   { name: 'physics ramp-pulley sandbox', url: '/physics/sandbox/ramp-pulley.html', clockAt: '2026-10-21T09:05:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
   /* Unit 4 Day 1 Explore: Trends Explorer, a standalone page (chem's own period; also goes black 20 minutes after the bell, see tests/trends-explorer.e2e.js) */
-  { name: 'chem trends-explorer', url: '/chemistry/unit-4-bonding/trends-explorer.html', clockAt: '2026-10-21T10:45:00-04:00', student: '65J-7TGT',
+  { name: 'chem trends-lab', url: '/chemistry/unit-4-bonding/trends-explorer.html', clockAt: '2026-10-21T10:45:00-04:00', student: '65J-7TGT',
+    begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); },
+    gateInput: 'input[aria-label="Unlock code from the teacher"]', gateButton: 'button:has-text("Unlock")' },
+  { name: 'chem energy-diorama', url: '/chemistry/unit-4-bonding/energy-diorama.html', clockAt: '2026-10-21T10:45:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); },
     gateInput: 'input[aria-label="Unlock code from the teacher"]', gateButton: 'button:has-text("Unlock")' },
   /* stats concept checker (practice day 4.1 and 4.2): standalone page, locked from the Begin click; the reopen card uses the shared label */
