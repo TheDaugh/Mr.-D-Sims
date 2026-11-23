@@ -206,6 +206,7 @@ header h1{font-size:1.35rem}header .sp{flex:1}
     askH = MrD.ids.ask($("idHost"), { onChange: function (i) { $("bBegin").disabled = !i.valid; $("startMsg").textContent = ""; } }); $("bBegin").addEventListener("click", begin);
   }
   window.__ed = { S: S, energy: energy, amount: amount, rmax: rmax };
+  window.addEventListener("hashchange", function () { location.reload(); });
   boot();
 })();
 </script>

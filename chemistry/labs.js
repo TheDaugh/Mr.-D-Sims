@@ -158,7 +158,7 @@ window.UNITS = [
         day: 1,
         icon: "🎬",
         href: "unit-4-bonding/element-trailer.html",
-        blurb: "An 84-second trailer that opens Day 1: a pixel-grid opener, sodium and chlorine forged in a star, then a head-to-head on one electron with numbers for size, ionization energy and electronegativity. Played by the teacher, full screen.",
+        blurb: "A 98-second trailer that opens Day 1: a pixel-grid opener, sodium and chlorine forged in a star, then a head-to-head on one electron with numbers for size, ionization energy and electronegativity. Played by the teacher, full screen.",
         tags: ["periodic trends", "engage", "trailer", "nucleosynthesis"],
         teacher: [{ label: "Scene buttons (#key)", href: "unit-4-bonding/element-trailer.html#key" }]
       },

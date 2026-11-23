@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Where did salt come from? The trailer · Mr. D's Sims</title>
-<meta name="description" content="An 84-second trailer for Unit 4: a pixel-grid opener, the birth of sodium and chlorine in a star, then sodium and chlorine as electron clouds, with the numbers that decide who pulls an electron away. Played at the start of class, before the Explore.">
+<meta name="description" content="A 98-second trailer for Unit 4: a pixel-grid opener, the birth of sodium and chlorine in a star, then sodium and chlorine as electron clouds, with the numbers that decide who pulls an electron away. Played at the start of class, before the Explore.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Source+Sans+3:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -18,6 +18,12 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
 #play[hidden]{display:none}
 #hint{position:fixed;left:0;right:0;bottom:6px;text-align:center;font-size:.8rem;color:#44566a;pointer-events:none;opacity:0;transition:opacity .6s}
 #hint.on{opacity:1}
+#ctl{position:fixed;left:0;right:0;bottom:0;display:none;align-items:center;gap:12px;padding:10px 18px 14px;background:linear-gradient(0deg,rgba(0,0,0,.78),rgba(0,0,0,0));z-index:6;transition:opacity .4s}
+#ctl.on{display:flex}#ctl.fade{opacity:0}
+#ctl button{font:700 1rem "Source Sans 3",system-ui,sans-serif;background:#0b1b22;color:#cfefff;border:1px solid #1f5a6b;border-radius:10px;min-width:48px;height:40px;cursor:pointer}
+#ctl button:hover{background:#12303b}
+#ctl input[type=range]{flex:1;height:28px;accent-color:#19c9e6;cursor:pointer}
+#ctl .tm{font:700 .95rem "Source Sans 3",system-ui,sans-serif;color:#9fdcec;min-width:96px;text-align:right}
 #keybar{position:fixed;left:8px;top:8px;display:none;gap:6px;flex-wrap:wrap;z-index:5}
 #keybar.on{display:flex}
 #keybar button{font:700 .8rem "Source Sans 3",system-ui,sans-serif;background:#0b1b22;color:#9fdcec;border:1px solid #1f5a6b;border-radius:8px;padding:5px 10px;cursor:pointer}
@@ -27,8 +33,9 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
 <body>
 <div id="wrap"><canvas id="cv" width="1280" height="720"></canvas></div>
 <div id="keybar" aria-label="Teacher scene jump"></div>
-<div id="play"><h1>WHERE DID SALT COME FROM?</h1><p>An 84-second trailer. Sound on.</p><div class="b">▶ Play</div></div>
-<div id="hint">Space pause · R replay · M mute · F full screen</div>
+<div id="play"><h1>WHERE DID SALT COME FROM?</h1><p>An 98-second trailer. Sound on.</p><div class="b">▶ Play</div></div>
+<div id="ctl"><button id="cBack" aria-label="Back 5 seconds">⏪ 5</button><button id="cPlay" aria-label="Pause or play">⏸</button><button id="cFwd" aria-label="Forward 5 seconds">5 ⏩</button><input id="cBar" type="range" min="0" max="1000" value="0" aria-label="Position in the trailer"><span class="tm" id="cTime">0:00</span></div>
+<div id="hint">Space pause · ← → 5 seconds · R replay · M mute · F full screen</div>
 <script src="trends-data.js"></script>
 <script src="atom-cloud.js"></script>
 <script>
@@ -37,8 +44,9 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   var D = window.TrendsData, cv = document.getElementById("cv"), G = cv.getContext("2d"), g = G, W = 1280, H = 720, CELL = 8;
   var BUF = document.createElement("canvas"); BUF.width = W; BUF.height = H; var BG = BUF.getContext("2d");
   var KEY = /key/.test(location.hash), STILL = (/[?&]t=([\d.]+)/.exec(location.search) || [])[1];
-  var DUEL0 = 54, DUEL1 = 69.35, LAT1 = 76.35, DUR = 84.35;
-  var SCENES = [[0, "Pixel grid"], [8, "Big Bang"], [22, "Star"], [32.2, "Supernova"], [42, "Atoms"], [DUEL0, "Na vs Cl"], [DUEL1, "Salt"], [LAT1, "Title"]];
+  var DUEL0 = 54, DUEL1 = 69.35, LAT1 = 76.35;
+  var D1 = 4.5, FL = 9, G1 = 8 + D1, FORM0 = DUEL1 + D1, FORM1 = FORM0 + FL, DUR = 84.35 + D1 + FL;   // scene 1 holds D1 longer; the lattice scene is inserted FL seconds long after the pair
+  var SCENES = [[0, "Pixel grid"], [G1, "Big Bang"], [22 + D1, "Star"], [32.2 + D1, "Supernova"], [42 + D1, "Atoms"], [DUEL0 + D1, "Na vs Cl"], [FORM0, "Lattice forms"], [FORM1, "Salt crystal"], [LAT1 + D1 + FL, "Title"]];
   var STAR = { x: 290, y: 360 };
   var K = 8;                                         // logical pixels per buffer pixel right now (8 = chunky, 1 = smooth)
   var paused = false, ctx = null, t0 = 0, playing = false, muted = false, master = null, wall0 = 0, wallPaused = 0, raf = 0;
@@ -117,14 +125,14 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
 
   /* ---------- scene 1 (0 to 8): the pixel grid ---------- */
   var TYPED = [
-    { t0: 0.8, s: "WHERE DID SALT", y: 150, sz: 1, cps: 16, off: 4.1, col: C.white },
-    { t0: 1.7, s: "COME FROM?", y: 224, sz: 1, cps: 16, off: 4.1, col: C.cy },
-    { t0: 4.4, s: "NOT THE OCEAN.", y: 176, sz: 1, cps: 18, off: 6.0, col: C.white },
-    { t0: 6.0, s: "OLDER.", y: 150, sz: 2, cps: 99, off: 8.0, col: C.mint }
+    { t0: 0.8, s: "WHERE DID SALT", y: 150, sz: 1, cps: 9, off: 6.2, col: C.white },
+    { t0: 2.6, s: "COME FROM?", y: 224, sz: 1, cps: 9, off: 6.2, col: C.cy },
+    { t0: 6.8, s: "NOT THE OCEAN.", y: 176, sz: 1, cps: 10, off: 9.9, col: C.white },
+    { t0: 10.2, s: "OLDER.", y: 150, sz: 2, cps: 99, off: 12.5, col: C.mint }
   ];
   function sGrid(t) {
     black(); skyPx(t, clamp(t, 0, 1)); floorPx(t, clamp((t - 0.2), 0, 1), 40, C.cy);
-    var sh = t > 6 && t < 6.5 ? Math.round((hsh(Math.floor(t * 40)) - 0.5) * 3) * CELL : 0; g.save(); g.translate(sh, sh);
+    var sh = t > 10.2 && t < 10.7 ? Math.round((hsh(Math.floor(t * 40)) - 0.5) * 3) * CELL : 0; g.save(); g.translate(sh, sh);
     TYPED.forEach(function (L) {
       if (t < L.t0 || t >= L.off) return; var n = Math.floor((t - L.t0) * L.cps) + 1, d = pxText(L.s, 640, L.y, L.sz, L.col, 1, "center", n);
       if (n <= L.s.length || Math.floor(t * 3) % 2 === 0) if (L.cps < 90) { g.fillStyle = L.col; g.fillRect(d.x + Math.min(n, L.s.length) * d.adv, Math.round(L.y / CELL) * CELL, CELL * L.sz * 4, CELL * 7 * L.sz); }
@@ -214,17 +222,22 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
     var col = D.GROUPS.indexOf(e.group), row = D.PERIODS.indexOf(e.period), TW = 92, TH = 80, GAP = 8, gapX = 26, totalW = 8 * TW + 7 * GAP + gapX, x0 = (W - totalW) / 2;
     return { x: x0 + col * (TW + GAP) + (col >= 2 ? gapX : 0), y: 140 + row * (TH + GAP), w: TW, h: TH };
   }
-  var HOPS = [[44.4, "Na"], [49.0, "Cl"]];
+  var HOPS = [[43.8, "Na"], [48.4, "Cl"]], BLINK = [[43.8, 45.2], [48.4, 50.0]];
   function roster(t) {
-    var cur = null; HOPS.forEach(function (h) { if (t >= h[0]) cur = h[1]; }); if (t >= 45.2 && t < 49.0) cur = null;
+    var cur = null; HOPS.forEach(function (h) { if (t >= h[0]) cur = h[1]; }); if (t >= 45.2 && t < 48.4) cur = null;
     text("THE ATOMS", W / 2, 96, 52 * eb(seg(t, 42, 42.4)), C.white, clamp((t - 42) * 5, 0, 1));
     D.ELEMENTS.filter(function (e) { return e.period > 1; }).forEach(function (e, i) {
-      var c = cellOf(e), rev = t >= 49 ? 1 : seg(t, 42.3 + i * 0.05, 42.3 + i * 0.05 + 0.3); if (rev <= 0) return; var s = eb(rev), cx = c.x + c.w / 2, cy = c.y + c.h / 2, col = FAM[e.group];
+      var c = cellOf(e), rev = t >= 45 ? 1 : seg(t, 42.3 + i * 0.05, 42.3 + i * 0.05 + 0.3); if (rev <= 0) return; var s = eb(rev), cx = c.x + c.w / 2, cy = c.y + c.h / 2, col = FAM[e.group];
       g.save(); g.translate(cx, cy); g.scale(s, s); g.globalAlpha = clamp(rev * 3, 0, 1); g.fillStyle = "rgba(8,22,32,.92)"; rr(-c.w / 2, -c.h / 2, c.w, c.h, 10); g.fill(); g.lineWidth = 2; g.strokeStyle = col; g.stroke(); g.restore();
       if (rev > 0.5) { drawTop(e.sym, cx, cy - 8, 23, t, { q: 0.2, spin: 0.9, phase: i * 0.7, alpha: clamp((rev - 0.5) * 2, 0, 1) }); text(e.sym, cx, cy + c.h / 2 - 9, 19, "#eafcff", clamp((rev - 0.5) * 2, 0, 1), "center", "700"); }
     });
     text("Each atom has its own numbers. Take two: sodium and chlorine.", W / 2, 650, 30, C.cy, fadeIO(t, 43.2, 43.8, 44.9, 45.2));
-    if (cur) { var cc = cellOf(D.BY[cur]); g.save(); g.strokeStyle = "#fff"; g.lineWidth = 3; rr(cc.x - 4, cc.y - 4, cc.w + 8, cc.h + 8, 12); g.stroke(); g.restore(); }
+    text("Now chlorine.", W / 2, 650, 30, C.cy, fadeIO(t, 48.5, 48.9, 49.6, 50.0));
+    if (cur) {      // the chosen atom blinks, so the eye is on it before its numbers open
+      var cc = cellOf(D.BY[cur]), on = Math.floor(t * 5) % 2 === 0;
+      g.save(); g.strokeStyle = on ? "#fff" : "#19e6ff"; g.lineWidth = on ? 6 : 3; rr(cc.x - 5, cc.y - 5, cc.w + 10, cc.h + 10, 12); g.stroke();
+      if (on) { g.globalAlpha = 0.28; g.fillStyle = "#fff"; rr(cc.x, cc.y, cc.w, cc.h, 10); g.fill(); } g.restore();
+    }
   }
   /* a plain gauge: label, what it means, the number, a thin track with both ends labeled */
   function gauge(label, sub, val, dec, unit, v01, endTxt, x, y, w, prog, col, a) {
@@ -248,8 +261,8 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   function D_keyW(sym) { return config(D.BY[sym].Z).length * 74; }
   function sCast(t) {
     bgSmooth(t, true); floorSmooth(t, 0.5, 340);
-    if (t < 45.2 || (t >= 49.0 && t < 49.5)) roster(t); else if (t < 49.0) card("Na", t - 45.2, t, "left"); else card("Cl", t - 49.5, t, "right");
-    flash(1 - seg(t, 45.2, 45.5) - (t < 45.2 ? 1 : 0)); flash(t >= 49.5 ? 1 - seg(t, 49.5, 49.8) : 0); flash(seg(t, 53.6, 54));
+    if (t < 45.2 || (t >= 48.4 && t < 50.0)) roster(t); else if (t < 48.4) card("Na", t - 45.2, t, "left"); else card("Cl", t - 50.0, t, "right");
+    flash(1 - seg(t, 45.2, 45.5) - (t < 45.2 ? 1 : 0)); flash(t >= 50.0 ? 1 - seg(t, 50.0, 50.3) : 0); flash(seg(t, 53.6, 54));
   }
 
   /* ---------- scene 6 (54 to 69.35): sodium vs chlorine ---------- */
@@ -332,6 +345,33 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
     flash(1 - seg(lt, 0, 0.3));
   }
 
+  /* ---------- new scene (FL seconds): ions arrive one at a time and lock into a lattice ---------- */
+  var GC = 7, GR = 5, SP = 118, SLOTS = (function () {
+    var a = [], i, j; for (i = 0; i < GC; i++) for (j = 0; j < GR; j++) a.push({ i: i, j: j, na: (i + j) % 2 === 0, d: Math.hypot(i - 3, j - 2) });
+    a.sort(function (p, q) { return p.d - q.d || p.i - q.i || p.j - q.j; }); var seedIdx = 0; a.forEach(function (s, k) { s.k = k; s.x = 640 + (s.i - 3) * SP; s.y = 372 + (s.j - 2) * SP * 0.86; s.land = k < 2 ? 0 : 1.3 + (k - 2) * 0.2; var an = hsh(k * 7.1) * 6.283; s.fx = 640 + Math.cos(an) * 900; s.fy = 372 + Math.sin(an) * 520; });
+    return a;
+  })();
+  function ionDisc(x, y, na, a, sc) {
+    var r = (na ? 30 : 50) * (sc || 1); g.globalAlpha = a; g.fillStyle = na ? C.mint : C.or; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+    g.globalAlpha = a * 0.5; g.fillStyle = "#fff"; g.beginPath(); g.arc(x - r * 0.3, y - r * 0.3, r * 0.34, 0, 7); g.fill(); g.globalAlpha = a; text(na ? "+" : "−", x, y + r * 0.32, r * 0.95, "#02141a", a * 0.85, "center", "800"); g.globalAlpha = 1;
+  }
+  function sForm(u) {
+    bgSmooth(u, true); var here = {}, i;
+    SLOTS.forEach(function (s) { var p = clamp((u - s.land) / 0.7, 0, 1); if (p <= 0 && s.k >= 2) return; here[s.i + "," + s.j] = { s: s, p: p }; });
+    g.strokeStyle = "#8fe9ff"; g.lineWidth = 3; g.globalAlpha = 0.4; g.beginPath();
+    SLOTS.forEach(function (s) { var h = here[s.i + "," + s.j]; if (!h || h.p < 1 && s.k >= 2) return; [[1, 0], [0, 1]].forEach(function (d) { var n = here[(s.i + d[0]) + "," + (s.j + d[1])]; if (n && (n.p >= 1 || n.s.k < 2)) { g.moveTo(s.x, s.y); g.lineTo(n.s.x, n.s.y); } }); });
+    g.stroke(); g.globalAlpha = 1;
+    SLOTS.forEach(function (s) {
+      var p = s.k < 2 ? 1 : clamp((u - s.land) / 0.7, 0, 1); if (p <= 0) return; var e = eo(p), x = s.k < 2 ? s.x : lerp(s.fx, s.x, e), y = s.k < 2 ? s.y : lerp(s.fy, s.y, e), a = s.k < 2 ? clamp(u / 0.4, 0, 1) : clamp(p * 3, 0, 1);
+      var sc = 1 + (p >= 1 && u - s.land - 0.7 < 0.25 && s.k >= 2 ? 0.25 * (1 - (u - s.land - 0.7) / 0.25) : 0); ionDisc(x, y, s.na, a, sc);
+      if (s.k >= 2 && p >= 1 && u - s.land - 0.7 < 0.3) { var q = (u - s.land - 0.7) / 0.3; g.strokeStyle = "#fff"; g.lineWidth = 3; g.globalAlpha = 1 - q; g.beginPath(); g.arc(s.x, s.y, (s.na ? 30 : 50) + 8 + q * 30, 0, 7); g.stroke(); g.globalAlpha = 1; }
+    });
+    text("One pair is not enough.", W / 2, 84, 44, C.white, fadeIO(u, 0.3, 0.8, 1.9, 2.3));
+    text("Each ion pulls on every neighbor of opposite charge.", W / 2, 84, 40, C.white, fadeIO(u, 2.6, 3.1, 5.4, 5.9));
+    text("A crystal: Na⁺ and Cl⁻ in an alternating grid.", W / 2, 84, 40, C.mint, fadeIO(u, 6.3, 6.8, 8.2, 8.7));
+    flash(seg(u, 8.6, 9));
+  }
+
   /* ---------- scene 8 (76.35 to 84.35): title card, back in pixels ---------- */
   function sTitle(t) {
     var tt = t - LAT1; g.fillStyle = "#0e1620"; g.fillRect(0, 0, W, H);
@@ -352,10 +392,16 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   function world(t) {
     if (t < 8) sGrid(t); else if (t < 22) sBang(t); else if (t < 32.2) sStar(t); else if (t < 42) sNova(t); else if (t < DUEL0) sCast(t); else if (t < DUEL1) sDuel(t - DUEL0); else if (t < LAT1) sLattice(t); else sTitle(t);
   }
+  /* real time to scene time: scene 1 is held D1 longer, and the lattice scene is inserted after the pair */
+  function draw(t) {
+    if (t < G1) { K = 8; sGrid(t); return; }
+    if (t >= FORM0 && t < FORM1) { K = 1; sForm(t - FORM0); return; }
+    var s = t < FORM0 ? t - D1 : t - D1 - FL; K = pixK(s); world(s);
+  }
   function frame(t) {
-    K = pixK(t); G.setTransform(1, 0, 0, 1, 0, 0);
-    if (K > 1) { g = BG; g.setTransform(1 / K, 0, 0, 1 / K, 0, 0); g.globalAlpha = 1; world(t); G.imageSmoothingEnabled = false; G.drawImage(BUF, 0, 0, Math.round(W / K), Math.round(H / K), 0, 0, cv.width, cv.height); g = G; }
-    else { g = G; g.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0); g.globalAlpha = 1; world(t); }
+    var s = t < G1 ? 0 : t < FORM0 ? t - D1 : t < FORM1 ? 0 : t - D1 - FL; K = t < G1 ? 8 : (t >= FORM0 && t < FORM1) ? 1 : pixK(s); G.setTransform(1, 0, 0, 1, 0, 0);
+    if (K > 1) { g = BG; g.setTransform(1 / K, 0, 0, 1 / K, 0, 0); g.globalAlpha = 1; draw(t); G.imageSmoothingEnabled = false; G.drawImage(BUF, 0, 0, Math.round(W / K), Math.round(H / K), 0, 0, cv.width, cv.height); g = G; }
+    else { g = G; g.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0); g.globalAlpha = 1; draw(t); }
     g = G; G.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0); G.fillStyle = "#000"; G.fillRect(0, 0, W, 24); G.fillRect(0, H - 24, W, 24);
   }
 
@@ -372,7 +418,7 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
     var s = c.createBufferSource(), f = c.createBiquadFilter(), gn = c.createGain(); s.buffer = c._nb; s.loop = true; f.type = kind || "lowpass"; f.Q.value = q || 1; f.frequency.setValueAtTime(fc, at); if (fc2) f.frequency.exponentialRampToValueAtTime(fc2, at + dur);
     gn.gain.setValueAtTime(0.0001, at); gn.gain.exponentialRampToValueAtTime(vol, at + 0.01); gn.gain.exponentialRampToValueAtTime(0.0001, at + dur); s.connect(f); f.connect(gn); gn.connect(master); s.start(at); s.stop(at + dur + 0.05);
   }
-  var EV = [];
+  var EV = [], SPLIT = 0;
   function ev(t, fn) { EV.push([t, fn]); }
   function TN(t, f, d, type, v, f2) { ev(t, function (c, at) { tone(c, at, f, d, type, v, f2); }); }
   function NZ(t, d, v, fc, kind, fc2, q) { ev(t, function (c, at) { noise(c, at, d, v, fc, kind, fc2, q); }); }
@@ -384,9 +430,10 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
   (function buildScore() {
     var i, t, scale = [220, 261.63, 293.66, 329.63, 392, 440, 523.25], B, bass, hops = HOPS;
     // 0 to 8: the drone and the typing
-    TN(0, 55, 8, "sine", 0.1); TN(0.2, 110, 7.8, "sine", 0.035);
+    TN(0, 55, G1, "sine", 0.1); TN(0.2, 110, G1 - 0.2, "sine", 0.035);
     TYPED.forEach(function (L) { var k; if (L.cps > 90) return; for (k = 0; k < L.s.length; k++) if (L.s[k] !== " ") TN(L.t0 + k / L.cps, 1320 + (k % 4) * 110, 0.035, "square", 0.03); });
-    NZ(6.3, 1.7, 0.1, 300, "bandpass", 5000, 6); TN(6.0, 110, 1.0, "sine", 0.55, 34); NZ(6.0, 0.6, 0.22, 1500, "lowpass", 200); TN(6.0, 220, 0.3, "square", 0.07);
+    NZ(10.5, 1.7, 0.1, 300, "bandpass", 5000, 6); TN(10.2, 110, 1.0, "sine", 0.55, 34); NZ(10.2, 0.6, 0.22, 1500, "lowpass", 200); TN(10.2, 220, 0.3, "square", 0.07);
+    SPLIT = EV.length;
     // 8 to 22: the Big Bang
     TN(8, 90, 1.8, "sine", 0.65, 26); NZ(8, 2.2, 0.35, 7000, "lowpass", 120); TN(8, 60, 2.2, "sawtooth", 0.15, 30);
     for (i = 0; 8.4 + i * 0.2 < 22; i++) TN(8.4 + i * 0.2, scale[(i * 3 + (i >> 3)) % 7] * (i % 16 < 8 ? 1 : 2), 0.15, "square", 0.09);
@@ -408,7 +455,8 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
     }
     for (i = 0; i < 30; i++) TN(42.3 + i * 0.05, 500 + (i % 8) * 60, 0.06, "square", 0.03);
     hops.forEach(function (h, k) { TN(h[0], 1500 + (k % 7) * 80, 0.04, "square", 0.05); });
-    [45.2, 49.5].forEach(function (s0, k) { TN(s0, 90, 1, "sine", 0.6, 35); (k ? [261.63, 329.63, 392, 523.25] : [220, 261.63, 329.63, 440]).forEach(function (f) { TN(s0, f, 0.7, "sawtooth", 0.06); }); NZ(s0, 0.8, 0.2, 5000, "highpass"); });
+    for (i = 0; i < 7; i++) { TN(43.8 + i * 0.2, 1800, 0.05, "square", 0.04); TN(48.4 + i * 0.2 + 0.0, 1800, 0.05, "square", 0.04); }
+    [45.2, 50.0].forEach(function (s0, k) { TN(s0, 90, 1, "sine", 0.6, 35); (k ? [261.63, 329.63, 392, 523.25] : [220, 261.63, 329.63, 440]).forEach(function (f) { TN(s0, f, 0.7, "sawtooth", 0.06); }); NZ(s0, 0.8, 0.2, 5000, "highpass"); });
     NZ(52, 2, 0.1, 300, "bandpass", 6000, 3);
     // 54 to 69.35: the duel (times in U, mapped by UT)
     B = 60 / 140;
@@ -433,30 +481,65 @@ canvas{background:#02040a;max-width:100vw;max-height:100vh;aspect-ratio:16/9;wid
     TN(LAT1 + 6.2, 523.25, 1.8, "square", 0.09); [261.63, 329.63, 392].forEach(function (f) { TN(LAT1 + 6.2, f, 1.8, "triangle", 0.09); });
     ev(LAT1 + 6.6, function (c, at) { master.gain.setValueAtTime(muted ? 0 : 0.6, at); master.gain.linearRampToValueAtTime(0, at + 1.4); });
   })();
+  (function retime() {
+    var n = EV.length, i, k;
+    for (i = SPLIT; i < n; i++) { var T0 = EV[i][0]; EV[i][0] = T0 + D1 + (T0 >= DUEL1 - 0.001 ? FL : 0); }
+    // the lattice scene: a tick as each ion lands, rising, then a chord
+    for (k = 2; k < SLOTS.length; k++) { var at = FORM0 + SLOTS[k].land + 0.7; TN(at, 330 * Math.pow(1.0595, Math.min(24, k * 0.7)), 0.12, "triangle", 0.07); if (k % 4 === 0) TN(at, 1800, 0.04, "square", 0.03); }
+    [130.81, 196, 261.63, 329.63].forEach(function (f) { ev(FORM0, function (c, at) { padTone(c, at, f, FL - 0.4, 0.08); }); });
+    TN(FORM0 + 0.3, 523.25, 0.5, "triangle", 0.08); TN(FORM0 + 0.3, 659.25, 0.5, "triangle", 0.08);
+    TN(FORM0 + 7.0, 100, 1.0, "sine", 0.5, 40); [261.63, 329.63, 392, 523.25].forEach(function (f) { TN(FORM0 + 7.0, f, 1.4, "sawtooth", 0.05); });
+    EV.sort(function (a, b) { return a[0] - b[0]; });
+  })();
   function schedule(c, from) { var base = c.currentTime + 0.15; EV.forEach(function (e) { if (e[0] >= from - 0.001) e[1](c, base + (e[0] - from)); }); return base - from; }
 
   /* ---------- play, pause, replay, jump ---------- */
   function now() { return ctx ? ctx.currentTime - t0 : (performance.now() - wall0 - wallPaused) / 1000; }
   function start(from) {
-    from = typeof from === "number" ? from : 0; document.getElementById("play").hidden = true; document.getElementById("hint").classList.add("on"); paused = false;
+    from = typeof from === "number" ? from : 0; lastMove = performance.now(); document.getElementById("play").hidden = true; document.getElementById("hint").classList.add("on"); paused = false;
     try {
       if (ctx) ctx.close().catch(function () { }); ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = muted ? 0 : 0.6;
       var comp = ctx.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 6; master.connect(comp); comp.connect(ctx.destination); t0 = schedule(ctx, from);
     } catch (e) { ctx = null; wall0 = performance.now() - from * 1000; wallPaused = 0; }
     playing = true; cancelAnimationFrame(raf); loop();
   }
-  function loop() { var t = now(); frame(clamp(t, 0, DUR)); if (t >= DUR + 0.8) { playing = false; document.getElementById("play").hidden = false; document.querySelector("#play .b").textContent = "↻ Replay"; return; } raf = requestAnimationFrame(loop); }
-  function toggle() { if (!ctx) return; paused = !paused; (paused ? ctx.suspend() : ctx.resume()).catch(function () { }); }
+  function loop() { var t = dragging ? dragT : now(); frame(clamp(t, 0, DUR)); uiTick(clamp(t, 0, DUR)); if (t >= DUR + 0.8) { playing = false; document.getElementById("play").hidden = false; document.querySelector("#play .b").textContent = "↻ Replay"; return; } raf = requestAnimationFrame(loop); }
+  function toggle() { if (!ctx) return; paused = !paused; (paused ? ctx.suspend() : ctx.resume()).catch(function () { }); syncBtn(); }
+  var dragging = false, dragT = 0, lastMove = 0;
+  function fmt(s) { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2); }
+  function syncBtn() { document.getElementById("cPlay").textContent = paused ? "▶" : "⏸"; }
+  function uiTick(t) {
+    var ctl = document.getElementById("ctl"); ctl.classList.add("on");
+    if (!dragging) document.getElementById("cBar").value = Math.round(1000 * t / DUR);
+    document.getElementById("cTime").textContent = fmt(t) + " / " + fmt(DUR);
+    ctl.classList.toggle("fade", !paused && !dragging && performance.now() - lastMove > 2600);
+  }
+  function seekTo(s, hold) { s = clamp(s, 0, DUR - 0.05); var was = hold === undefined ? paused : hold; start(s); if (was) { paused = true; if (ctx) ctx.suspend().catch(function () { }); } syncBtn(); }
+  function skip(d) { if (!playing) return; seekTo(now() + d); }
+  (function wireCtl() {
+    var bar = document.getElementById("cBar");
+    document.getElementById("cPlay").addEventListener("click", function () { if (!playing) start(0); else toggle(); });
+    document.getElementById("cBack").addEventListener("click", function () { skip(-5); });
+    document.getElementById("cFwd").addEventListener("click", function () { skip(5); });
+    bar.addEventListener("input", function () { if (!playing) return; dragging = true; dragT = DUR * bar.value / 1000; });
+    bar.addEventListener("change", function () { if (!playing) return; dragging = false; seekTo(DUR * bar.value / 1000); });
+    document.addEventListener("mousemove", function () { lastMove = performance.now(); });
+    document.addEventListener("keydown", function () { lastMove = performance.now(); });
+  })();
   function jump(dir) { var t = now(), i, cur = 0; for (i = 0; i < SCENES.length; i++) if (t >= SCENES[i][0]) cur = i; start(SCENES[clamp(cur + dir, 0, SCENES.length - 1)][0]); }
   document.getElementById("play").addEventListener("click", function () { start(0); });
   document.addEventListener("keydown", function (e) {
     var k = e.key.toLowerCase();
     if (k === " ") { e.preventDefault(); if (!playing) start(0); else toggle(); }
     else if (k === "r") start(0);
+    else if (k === "arrowright" && !KEY) skip(5);
+    else if (k === "arrowleft" && !KEY) skip(-5);
     else if (k === "m") { muted = !muted; if (master) master.gain.value = muted ? 0 : 0.6; }
     else if (k === "f") { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
-    else if (KEY && (k === "]" || k === "arrowright")) jump(1);
-    else if (KEY && (k === "[" || k === "arrowleft")) jump(-1);
+    else if (k === "]") jump(1);
+    else if (k === "[") jump(-1);
+    else if (KEY && k === "arrowright") skip(5);
+    else if (KEY && k === "arrowleft") skip(-5);
   });
   if (KEY) { var kb = document.getElementById("keybar"); kb.classList.add("on"); SCENES.forEach(function (s, i) { var b = document.createElement("button"); b.textContent = (i + 1) + " " + s[1]; b.addEventListener("click", function (e) { e.stopPropagation(); start(s[0]); }); kb.appendChild(b); }); }
   function renderAudio(sec) { var oc = new OfflineAudioContext(1, 44100 * sec, 44100), keep = master; master = oc.createGain(); master.gain.value = 0.6; var comp = oc.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 6; master.connect(comp); comp.connect(oc.destination); schedule(oc, 0); return oc.startRendering().then(function (b) { master = keep; return b; }); }

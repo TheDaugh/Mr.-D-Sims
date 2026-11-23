@@ -566,6 +566,7 @@ header .sp{flex:1}
     $("bBegin").addEventListener("click", begin);
   }
   window.__te = { S: S, choose: choose, setStage: setStage, removeElectron: removeElectron, bringTogether: bringTogether, mix: mix, isDark: isDark, judge: judge, log: function () { return evlog; }, started: function () { return S.started; }, HF: HF };
+  window.addEventListener("hashchange", function () { location.reload(); });
   boot();
 })();
 </script>
