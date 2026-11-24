@@ -1,0 +1,133 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.8in]{geometry}
+\usepackage{enumitem,array,booktabs,xcolor,tikz,amssymb}
+\usetikzlibrary{calc}\usepackage{needspace}
+\newcommand{\dbl}[2]{\draw([yshift=1.5pt]#1.east)--([yshift=1.5pt]#2.west);\draw([yshift=-1.5pt]#1.east)--([yshift=-1.5pt]#2.west);}
+% dots on a side of node #1: side t/r/b/l, count #3
+\newcommand{\sd}[3]{\ifnum#3>0
+ \def\a{north}\def\dx{1}\def\dy{0}\def\nx{0}\def\ny{1}
+ \if#2r\def\a{east}\def\dx{0}\def\dy{1}\def\nx{1}\def\ny{0}\fi
+ \if#2b\def\a{south}\def\dx{1}\def\dy{0}\def\nx{0}\def\ny{-1}\fi
+ \if#2l\def\a{west}\def\dx{0}\def\dy{1}\def\nx{-1}\def\ny{0}\fi
+ \ifnum#3=1 \fill ($(#1.\a)+(\nx*0.06,\ny*0.06)$) circle (1.2pt);\else
+ \fill ($(#1.\a)+(\nx*0.06+\dx*0.07,\ny*0.06+\dy*0.07)$) circle (1.2pt);
+ \fill ($(#1.\a)+(\nx*0.06-\dx*0.07,\ny*0.06-\dy*0.07)$) circle (1.2pt);\fi\fi}
+\newcommand{\ld}[5]{\tikz[baseline=-0.6ex]{\node[inner sep=1.5pt,font=\large](s){#1};\sd{s}{t}{#2}\sd{s}{r}{#3}\sd{s}{b}{#4}\sd{s}{l}{#5}}}
+\usepackage[version=4]{mhchem}
+\usepackage[T1]{fontenc}\usepackage{lmodern}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\renewcommand{\arraystretch}{1.6}
+\newif\ifkey \input{mode}
+\newcommand{\ans}[2][1]{\ifkey{\color{red!70!black}\itshape #2}\par\else\par\foreach\i in{1,...,#1}{\vspace{0.75cm}\noindent\rule{\linewidth}{0.4pt}\par}\fi}
+\newcommand{\fa}[1]{\ifkey{\color{red!70!black}\bfseries #1}\else\fi}
+\newcommand{\kv}[2]{\ifkey#1\else#2\fi}
+\newcommand{\pts}[1]{\hfill{\small[#1]}}
+\newcommand{\sect}[1]{\par\needspace{10\baselineskip}\vspace{8pt}\noindent{\large\bfseries #1}\par\vspace{-4pt}\noindent\rule{\linewidth}{0.8pt}\par}
+\newcommand{\know}[1]{\par\vspace{4pt}\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{\small\textbf{Know this.} #1}}\par}
+\newcommand{\q}[1]{\par\needspace{7\baselineskip}\vspace{6pt}\noindent\textbf{#1}\ }
+
+\pagestyle{plain}
+\begin{document}
+\ifkey{\color{red!70!black}\bfseries ANSWER KEY}\par\fi
+{\LARGE\bfseries Unit 4 Study Guide: Periodic Trends, Bonding and Naming}\par\vspace{6pt}
+Name: \rule{6.5cm}{0.4pt}\hfill Date: \rule{3cm}{0.4pt}\par
+Each part follows a part of the test. Read the box, then do the questions with new atoms.
+
+\sect{Part A: Periodic trends}
+\know{\textbf{Down a group:} more shells, so atoms are larger, metals are more reactive, and electronegativity is lower. \textbf{Across a period:} more protons pull on the same shell, so atoms are smaller and electronegativity is higher. Frame: ``\_\_\_ is larger than \_\_\_ because it has more shells / because \_\_\_ has more protons pulling on the same shell.''}
+\q{1.} Circle the larger atom in each pair. Give the reason in a few words.\par
+\begin{tabular}{p{2.6cm}p{11.5cm}}
+(a) Mg \quad Ba & Reason: \kv{\fa{Ba has more shells, so its outer electrons are farther out.}}{\rule{9.5cm}{0.4pt}}\\
+(b) Na \quad Cl & Reason: \kv{\fa{Same shell, but Cl has more protons pulling the electrons in, so Na is larger.}}{\rule{9.5cm}{0.4pt}}\\
+\end{tabular}
+\ifkey\par{\color{red!70!black}\itshape (a) Ba. (b) Na.}\fi
+
+\q{2.} Which is more reactive, cesium or sodium? Explain using shells.
+\ans[2]{Cesium. Its outer electron is in a shell much farther out, so it is lost more easily.}
+
+\q{3.} Rank from least to most electronegative: Si, Cl, Na, P.\ \ifkey\fa{Na, Si, P, Cl}\else\rule{5cm}{0.4pt}\fi
+
+\q{4.} Circle the more electronegative atom in each pair. (a) S \quad Se \hspace{2cm} (b) Mg \quad Cl
+\ifkey\par{\color{red!70!black}\itshape (a) S (higher in the group). (b) Cl (farther right in the period).}\fi
+
+\sect{Part B: Why atoms bond}
+\know{Atoms bond to get a full outer level, an \textbf{octet}. Noble gases already have one, so they do not bond. Lewis dot symbol: one dot on each side (top, right, bottom, left), then pair up starting at the top. Unpaired electrons: equal to the valence electrons for groups 1, 2, 13 and 14 (up to 4), then 8 minus the valence electrons for groups 15 to 17.}
+\q{5.} Explain why sulfur bonds but argon does not.
+\ans[2]{Sulfur has 6 valence electrons, so it bonds to fill its outer level. Argon already has a full outer level of 8.}
+
+\q{6.} Draw the Lewis dot symbol for each atom.\par\vspace{4pt}
+\begin{tabular}{*{4}{>{\centering\arraybackslash}p{3.2cm}}}
+\kv{\ld{Li}{1}{0}{0}{0}}{\Large Li} & \kv{\ld{C}{1}{1}{1}{1}}{\Large C} & \kv{\ld{O}{2}{2}{1}{1}}{\Large O} & \kv{\ld{Ar}{2}{2}{2}{2}}{\Large Ar}\\[16pt]
+\end{tabular}
+
+\q{7.} How many unpaired electrons does each atom have? (a) As \ifkey\fa{3}\else\rule{1.5cm}{0.4pt}\fi \hspace{2cm} (b) Cl \ifkey\fa{1}\else\rule{1.5cm}{0.4pt}\fi
+
+\sect{Part C: Ions and ionic compounds}
+\know{A \textbf{metal} gives its valence electrons and becomes a positive ion; a \textbf{nonmetal} gains enough to make 8 and becomes a negative ion. Charge: groups 1, 2, 13 are $+1,+2,+3$; groups 15, 16, 17 are $-3,-2,-1$. An ionic compound is neutral: balance the charges, reduce to the lowest ratio, name the metal, then the nonmetal with \textbf{-ide}.}
+\q{8.} Use Lewis dot symbols to show magnesium and sulfur forming ions. Draw the dots, brackets and charges.\par\vspace{4pt}
+\ifkey
+{\color{red!70!black}\ld{Mg}{1}{1}{0}{0}\ $+$\ \ld{S}{2}{2}{1}{1}\ $\to$\ $\left[\text{Mg}\right]^{2+}$\ $\left[\ld{S}{2}{2}{2}{2}\right]^{2-}$}\par
+{\color{red!70!black}\itshape Magnesium gives both valence electrons to sulfur: no dots on the metal ion, 8 on the nonmetal ion.}
+\else
+\ld{Mg}{1}{1}{0}{0}\ $+$\ \ld{S}{2}{2}{1}{1}\ $\to$\ $\left[\hspace{2.2cm}\right]$\ $\left[\hspace{2.2cm}\right]$\par\vspace{1cm}
+\fi
+
+\q{9.} Give the ion each atom forms.\par
+\begin{tabular}{*{5}{p{2.8cm}}}
+(a) Li \ifkey\fa{\ce{Li+}}\else\rule{1.4cm}{0.4pt}\fi & (b) Mg \ifkey\fa{\ce{Mg^2+}}\else\rule{1.4cm}{0.4pt}\fi & (c) Al \ifkey\fa{\ce{Al^3+}}\else\rule{1.4cm}{0.4pt}\fi & (d) P \ifkey\fa{\ce{P^3-}}\else\rule{1.4cm}{0.4pt}\fi & (e) Br \ifkey\fa{\ce{Br-}}\else\rule{1.4cm}{0.4pt}\fi\\
+\end{tabular}
+
+\q{10.} Write the formula for each compound.\par
+\begin{tabular}{p{4.6cm}p{2.6cm}p{4.6cm}p{2.6cm}}
+(a) sodium and fluorine & \fa{\ce{NaF}}\ifkey\else\rule{2cm}{0.4pt}\fi & (b) magnesium and iodine & \fa{\ce{MgI2}}\ifkey\else\rule{2cm}{0.4pt}\fi\\
+(c) calcium and phosphorus & \fa{\ce{Ca3P2}}\ifkey\else\rule{2cm}{0.4pt}\fi & (d) aluminum and nitrogen & \fa{\ce{AlN}}\ifkey\else\rule{2cm}{0.4pt}\fi\\
+\end{tabular}
+
+\q{11.} Name each compound.\par
+\begin{tabular}{p{1.9cm}p{5.1cm}p{1.9cm}p{5.1cm}}
+(a) \ce{Li2S} & \fa{lithium sulfide}\ifkey\else\rule{4.5cm}{0.4pt}\fi & (b) \ce{BaI2} & \fa{barium iodide}\ifkey\else\rule{4.5cm}{0.4pt}\fi\\
+(c) \ce{AlP} & \fa{aluminum phosphide}\ifkey\else\rule{4.5cm}{0.4pt}\fi & (d) \ce{Ca3N2} & \fa{calcium nitride}\ifkey\else\rule{4.5cm}{0.4pt}\fi\\
+\end{tabular}
+
+\sect{Part D: Molecular compounds}
+\know{Two nonmetals \textbf{share} electrons. An atom makes as many bonds as it has unpaired electrons; the leftover pairs are \textbf{lone pairs}. A double bond is 2 shared pairs, a triple bond 3. Naming: prefix + element, prefix + element-ide, and \textbf{never} mono- on the first element (mono 1, di 2, tri 3, tetra 4, penta 5).}
+\q{12.} Draw the Lewis structure of each molecule. The central atom is in bold.\par\vspace{4pt}
+\begin{tabular}{*{3}{>{\centering\arraybackslash}p{4.6cm}}}
+\ce{H\textbf{Br}} & \ce{H2\textbf{Se}} & \ce{\textbf{As}H3}\\[8pt]
+\kv{\tikz[baseline=-0.6ex]{\node(b){Br};\node(h) at (-0.9,0){H};\draw(h)--(b);\sd{b}{t}{2}\sd{b}{b}{2}\sd{b}{r}{2}}}{\rule{0pt}{2.4cm}} & \kv{\tikz[baseline=-0.6ex]{\node(s){Se};\node(a) at (-0.9,0){H};\node(c) at (0.9,0){H};\draw(a)--(s)--(c);\sd{s}{t}{2}\sd{s}{b}{2}}}{\rule{0pt}{2.4cm}} & \kv{\tikz[baseline=-0.6ex]{\node(n){As};\node(a) at (-0.9,0){H};\node(b) at (0.9,0){H};\node(c) at (0,-0.9){H};\draw(a)--(n)--(b);\draw(n)--(c);\sd{n}{t}{2}}}{\rule{0pt}{2.4cm}}\\
+\end{tabular}
+
+\q{13.} Here are bromine and ethyne: \quad \tikz[baseline=-0.6ex]{\node(a){Br};\node(b) at (1.2,0){Br};\draw(a)--(b);\sd{a}{t}{2}\sd{a}{b}{2}\sd{a}{l}{2}\sd{b}{t}{2}\sd{b}{b}{2}\sd{b}{r}{2}} \qquad \tikz[baseline=-0.6ex]{\node(h){H};\node(a) at (1,0){C};\node(b) at (2.4,0){C};\node(g) at (3.4,0){H};\draw(h)--(a);\draw(b)--(g);\draw([yshift=2.5pt]a.east)--([yshift=2.5pt]b.west);\draw(a)--(b);\draw([yshift=-2.5pt]a.east)--([yshift=-2.5pt]b.west)}\par
+(a) How many pairs of electrons do the two bromine atoms share? \ifkey\fa{1 (a single bond)}\else\rule{2cm}{0.4pt}\fi\par
+(b) What kind of bond holds the two carbon atoms together? \ifkey\fa{a triple bond (3 shared pairs)}\else\rule{4cm}{0.4pt}\fi
+
+\q{14.} Name each compound.\par
+\begin{tabular}{p{1.9cm}p{5.1cm}p{1.9cm}p{5.1cm}}
+(a) \ce{SiBr4} & \fa{silicon tetrabromide}\ifkey\else\rule{4.5cm}{0.4pt}\fi & (b) \ce{P2O3} & \fa{diphosphorus trioxide}\ifkey\else\rule{4.5cm}{0.4pt}\fi\\
+(c) \ce{Cl2O5} & \fa{dichlorine pentoxide}\ifkey\else\rule{4.5cm}{0.4pt}\fi & (d) \ce{SCl2} & \fa{sulfur dichloride}\ifkey\else\rule{4.5cm}{0.4pt}\fi\\
+\end{tabular}
+
+\q{15.} Write the formula for each compound.\par
+\begin{tabular}{p{4.6cm}p{2.6cm}p{4.6cm}p{2.6cm}}
+(a) boron trichloride & \fa{\ce{BCl3}}\ifkey\else\rule{2cm}{0.4pt}\fi & (b) diphosphorus pentasulfide & \fa{\ce{P2S5}}\ifkey\else\rule{2cm}{0.4pt}\fi\\
+(c) nitrogen dioxide & \fa{\ce{NO2}}\ifkey\else\rule{2cm}{0.4pt}\fi & & \\
+\end{tabular}
+
+\sect{Part E: Types of bonds}
+\know{Metal + nonmetal: \textbf{ionic} (electrons move). Nonmetal + nonmetal: \textbf{covalent} (electrons shared). Metal only: \textbf{metallic}. A metal is a lattice of positive ions in a \textbf{sea of electrons}: free electrons carry current, and the ions slide past each other so the metal bends.}
+\q{16.} Classify the bonding in each substance as ionic, covalent or metallic.\par
+\begin{tabular}{|l|*{6}{>{\centering\arraybackslash}p{1.6cm}|}}\hline
+Substance & KI & \ce{PH3} & Sn & \ce{CaF2} & \ce{Cl2} & Au\\\hline
+Bond type & \fa{ionic} & \fa{covalent} & \fa{metallic} & \fa{ionic} & \fa{covalent} & \fa{metallic}\\\hline
+\end{tabular}
+
+\q{17.} In a metal, which particles carry an electric current: the ions, the atoms or the electrons? Explain, and say what the other particles do when the metal bends.
+\ans[2]{The electrons carry the current, because the sea of electrons is free to move. The positive ions stay in place and slide past one another when the metal bends.}
+
+\q{18.} Sort these formulas into ionic and molecular, and state the rule you used: \ce{PBr3}, \ce{SrBr2}, \ce{NO2}, \ce{Na3N}.
+\ans[2]{Ionic: \ce{SrBr2}, \ce{Na3N} (a metal plus a nonmetal). Molecular: \ce{PBr3}, \ce{NO2} (only nonmetals).}
+
+\sect{Stretch}
+\q{19.} Draw the Lewis structure of ethyne, \ce{C2H2}, with no help. Then say whether the bond in hydrogen fluoride, HF, is polar or nonpolar, and why.
+\ifkey\par{\color{red!70!black}\tikz[baseline=-0.6ex]{\node(h){H};\node(a) at (1,0){C};\node(b) at (2.4,0){C};\node(g) at (3.4,0){H};\draw(h)--(a);\draw(b)--(g);\draw([yshift=2.5pt]a.east)--([yshift=2.5pt]b.west);\draw(a)--(b);\draw([yshift=-2.5pt]a.east)--([yshift=-2.5pt]b.west)}\quad A triple bond between the carbons and one H on each. The H--F bond is polar: fluorine is more electronegative than hydrogen and pulls the shared electrons toward itself.}\par\else\par\vspace{4.2cm}\fi
+\end{document}

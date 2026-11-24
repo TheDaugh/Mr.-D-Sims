@@ -1,0 +1,91 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.8in]{geometry}
+\usepackage{enumitem,array,booktabs,xcolor,tikz,amssymb}
+\usetikzlibrary{calc}\usepackage{needspace}
+\newcommand{\dbl}[2]{\draw([yshift=1.5pt]#1.east)--([yshift=1.5pt]#2.west);\draw([yshift=-1.5pt]#1.east)--([yshift=-1.5pt]#2.west);}
+% dots on a side of node #1: side t/r/b/l, count #3
+\newcommand{\sd}[3]{\ifnum#3>0
+ \def\a{north}\def\dx{1}\def\dy{0}\def\nx{0}\def\ny{1}
+ \if#2r\def\a{east}\def\dx{0}\def\dy{1}\def\nx{1}\def\ny{0}\fi
+ \if#2b\def\a{south}\def\dx{1}\def\dy{0}\def\nx{0}\def\ny{-1}\fi
+ \if#2l\def\a{west}\def\dx{0}\def\dy{1}\def\nx{-1}\def\ny{0}\fi
+ \ifnum#3=1 \fill ($(#1.\a)+(\nx*0.06,\ny*0.06)$) circle (1.2pt);\else
+ \fill ($(#1.\a)+(\nx*0.06+\dx*0.07,\ny*0.06+\dy*0.07)$) circle (1.2pt);
+ \fill ($(#1.\a)+(\nx*0.06-\dx*0.07,\ny*0.06-\dy*0.07)$) circle (1.2pt);\fi\fi}
+\newcommand{\ld}[5]{\tikz[baseline=-0.6ex]{\node[inner sep=1.5pt,font=\large](s){#1};\sd{s}{t}{#2}\sd{s}{r}{#3}\sd{s}{b}{#4}\sd{s}{l}{#5}}}
+\usepackage[version=4]{mhchem}
+\usepackage[T1]{fontenc}\usepackage{lmodern}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\renewcommand{\arraystretch}{1.6}
+\newif\ifkey \input{mode}
+\newcommand{\ans}[2][1]{\ifkey{\color{red!70!black}\itshape #2}\par\else\par\foreach\i in{1,...,#1}{\vspace{0.75cm}\noindent\rule{\linewidth}{0.4pt}\par}\fi}
+\newcommand{\fa}[1]{\ifkey{\color{red!70!black}\bfseries #1}\else\fi}
+\newcommand{\kv}[2]{\ifkey#1\else#2\fi}
+\newcommand{\pts}[1]{\hfill{\small[#1]}}
+\newcommand{\sect}[1]{\par\needspace{10\baselineskip}\vspace{8pt}\noindent{\large\bfseries #1}\par\vspace{-4pt}\noindent\rule{\linewidth}{0.8pt}\par}
+\newcommand{\q}[1]{\par\needspace{7\baselineskip}\vspace{6pt}\noindent\textbf{#1}\ }
+
+\pagestyle{plain}
+\begin{document}
+\ifkey{\color{red!70!black}\bfseries ANSWER KEY}\par\fi
+{\LARGE\bfseries Unit 4 Quiz 1: Trends, Octets, Ions and Formulas}\par\vspace{6pt}
+Name: \rule{6.5cm}{0.4pt}\hfill Date: \rule{3cm}{0.4pt}\par
+Use the periodic table provided. Total: 28 points.
+
+\sect{Trends}
+\q{1.} Circle the larger atom in each pair. Give the reason in a few words. \pts{4}\par
+\begin{tabular}{p{2.6cm}p{11.5cm}}
+(a) Ca \quad Sr & Reason: \kv{\fa{Sr has more shells, so its outer electrons are farther out.}}{\rule{9.5cm}{0.4pt}}\\
+(b) Si \quad P & Reason: \kv{\fa{Same shell, but P has more protons pulling the electrons in, so Si is larger.}}{\rule{9.5cm}{0.4pt}}\\
+\end{tabular}
+\ifkey\par{\color{red!70!black}\itshape (a) Sr. (b) Si.}\fi
+
+\q{2.} Circle the more electronegative atom in each pair. \pts{2}\par
+(a) Br \quad I \hspace{3cm} (b) Si \quad S
+\ifkey\par{\color{red!70!black}\itshape (a) Br (higher in the group). (b) S (farther right in the period).}\fi
+
+\sect{Octets and dots}
+\q{3.} Why do most atoms form bonds? Why does argon not? \pts{2}
+\ans[2]{Atoms bond to get a full outer level (an octet). Argon's outer level is already full.}
+
+\q{4.} Draw the Lewis dot symbol for each atom. \pts{4}\par\vspace{4pt}
+\begin{tabular}{*{4}{>{\centering\arraybackslash}p{3.2cm}}}
+\kv{\ld{Be}{1}{1}{0}{0}}{\Large Be} & \kv{\ld{Ga}{1}{1}{1}{0}}{\Large Ga} & \kv{\ld{Se}{2}{2}{1}{1}}{\Large Se} & \kv{\ld{Xe}{2}{2}{2}{2}}{\Large Xe}\\[16pt]
+\end{tabular}
+
+\q{5.} How many unpaired electrons does each atom have? \pts{2}\par
+(a) B \ifkey\fa{1}\else\rule{1.5cm}{0.4pt}\fi \hspace{2cm} (b) Te \ifkey\fa{2}\else\rule{1.5cm}{0.4pt}\fi
+
+\sect{Ions and ionic bonds}
+\q{6.} Give the symbol and the name of the ion each atom forms. \pts{3}\par
+\begin{tabular}{p{2cm}p{5.5cm}p{5.5cm}}
+ & Symbol & Name\\
+(a) Sr & \kv{\fa{\ce{Sr^2+}}}{\rule{3cm}{0.4pt}} & \kv{\fa{strontium}}{\rule{4cm}{0.4pt}}\\
+(b) Ga & \kv{\fa{\ce{Ga^3+}}}{\rule{3cm}{0.4pt}} & \kv{\fa{gallium}}{\rule{4cm}{0.4pt}}\\
+(c) Se & \kv{\fa{\ce{Se^2-}}}{\rule{3cm}{0.4pt}} & \kv{\fa{selenide}}{\rule{4cm}{0.4pt}}\\
+\end{tabular}
+
+\q{7.} Use Lewis dot symbols to show beryllium and oxygen forming ions. Draw the dots, the brackets and the charges. \pts{3}\par\vspace{4pt}
+\ifkey
+{\color{red!70!black}\ld{Be}{1}{1}{0}{0}\ $+$\ \ld{O}{2}{2}{1}{1}\ $\to$\ $\left[\text{Be}\right]^{2+}$\ $\left[\ld{O}{2}{2}{2}{2}\right]^{2-}$}\par
+{\color{red!70!black}\itshape Beryllium gives both valence electrons to oxygen: no dots left on the metal, 8 dots on the nonmetal.}
+\else
+\ld{Be}{1}{1}{0}{0}\ $+$\ \ld{O}{2}{2}{1}{1}\ $\to$\ $\left[\hspace{2.2cm}\right]$\ $\left[\hspace{2.2cm}\right]$\par\vspace{1cm}
+\fi
+
+\sect{Formulas and names}
+\q{8.} Write the formula for the compound of each pair. \pts{3}\par
+\begin{tabular}{p{4.6cm}p{2.6cm}p{4.6cm}p{2.6cm}}
+(a) lithium and sulfur & \fa{\ce{Li2S}}\ifkey\else\rule{2cm}{0.4pt}\fi & (b) strontium and bromine & \fa{\ce{SrBr2}}\ifkey\else\rule{2cm}{0.4pt}\fi\\
+(c) aluminum and iodine & \fa{\ce{AlI3}}\ifkey\else\rule{2cm}{0.4pt}\fi & & \\
+\end{tabular}
+
+\q{9.} Name each compound. \pts{3}\par
+\begin{tabular}{p{1.9cm}p{5.1cm}p{1.9cm}p{5.1cm}}
+(a) \ce{SrF2} & \fa{strontium fluoride}\ifkey\else\rule{4.5cm}{0.4pt}\fi & (b) \ce{Ga2S3} & \fa{gallium sulfide}\ifkey\else\rule{4.5cm}{0.4pt}\fi\\
+(c) \ce{Rb3P} & \fa{rubidium phosphide}\ifkey\else\rule{4.5cm}{0.4pt}\fi & & \\
+\end{tabular}
+
+\q{10.} A student writes the formula for barium and sulfur as \ce{Ba2S2}. What is wrong with it? Write the correct formula. \pts{2}
+\ans[2]{The charges (2+ and 2$-$) cancel one to one, so the ratio must be reduced: \ce{BaS}.}
+\end{document}

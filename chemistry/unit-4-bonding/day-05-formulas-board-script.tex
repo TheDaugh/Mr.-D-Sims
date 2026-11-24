@@ -1,0 +1,85 @@
+\documentclass[10.5pt]{article}
+\usepackage{fontspec}\defaultfontfeatures{Ligatures=TeX}
+\usepackage[letterpaper,margin=0.6in]{geometry}
+\usepackage{amsmath,xcolor,longtable,array,tikz}
+\usetikzlibrary{arrows.meta}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\definecolor{pblue}{HTML}{1971C2}\definecolor{pred}{HTML}{E03131}\definecolor{pgreen}{HTML}{2F9E44}\definecolor{ppurple}{HTML}{7048E8}\definecolor{pgray}{HTML}{868E96}
+\newfontfamily\mono{TeX Gyre Cursor}
+\newcommand{\mtag}[2]{\colorbox{#1}{\textcolor{white}{\textsf{\fontsize{6.5}{7}\selectfont\bfseries #2}}}}
+\newcommand{\clock}[1]{{\mono\fontsize{7}{8}\selectfont #1}\ }
+% numbered step: \step{num}{tagcolor}{TAG}{text}
+\newcommand{\step}[4]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\mtag{#2}{#3}\ {\small #4}\par\vspace{2pt}}
+\newcommand{\pic}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.42,every node/.style={font=\scriptsize}]#1\end{tikzpicture}\par\vspace{3pt}}
+\newcommand{\CHECK}[3]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\fcolorbox{black}{black!4}{\parbox{2.55in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries CHECK}\ {\fontsize{7.5}{9}\selectfont #2}\par{\fontsize{7.5}{9}\selectfont\textbf{Answer:} #3}\par{\fontsize{7}{8.5}\selectfont\color{pgray} 4 of 5 right: go on. Fewer: one more example, ask again.}}}\par\vspace{3pt}}
+\newcommand{\WATCH}[1]{\par\hspace{0.32in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries\color{pred} WATCH FOR}\ {\small\itshape\color{pred} #1}}\par}
+\newcommand{\bl}[1]{\underline{\textcolor{pgreen}{\textbf{#1}}}}
+\newcommand{\pen}[2]{\textcolor{#1}{\rule{8pt}{8pt}}\ #2}
+\newcommand{\picL}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.6,every node/.style={font=\footnotesize}]#1\end{tikzpicture}\par\vspace{3pt}}
+% shell picture: x, y, shells (list of electron counts is drawn by \shells), label
+\newcommand{\ring}[4]{\draw[pblue] (#1,#2) circle (#3);\foreach \k in {1,...,#4}{\pgfmathsetmacro{\ang}{90+360*\k/#4}\fill ({#1+#3*cos(\ang)},{#2+#3*sin(\ang)}) circle (0.07);}}
+\newcommand{\nuc}[3]{\fill[pred!20] (#1,#2) circle (0.3);\node[pred] at (#1,#2){\tiny #3};}
+% Lewis dots: \sd{x}{y}{n}{offset x}{offset y}{pair spread x}{pair spread y}
+\newcommand{\sd}[7]{\ifnum#3=1 \fill ({#1+#4},{#2+#5}) circle (0.07);\fi\ifnum#3=2 \fill ({#1+#4-#6},{#2+#5-#7}) circle (0.07);\fill ({#1+#4+#6},{#2+#5+#7}) circle (0.07);\fi}
+% \lw{x}{y}{symbol}{top}{right}{bottom}{left}: a box with the symbol and the dots
+\newcommand{\lw}[7]{\draw[pgray] (#1-0.65,#2-0.65) rectangle (#1+0.65,#2+0.65);\node at (#1,#2){\scriptsize #3};\sd{#1}{#2}{#4}{0}{0.45}{0.14}{0}\sd{#1}{#2}{#5}{0.45}{0}{0}{0.14}\sd{#1}{#2}{#6}{0}{-0.45}{0.14}{0}\sd{#1}{#2}{#7}{-0.45}{0}{0}{0.14}}
+\newcommand{\nb}[3]{\draw[pgray] (#1-0.65,#2-0.65) rectangle (#1+0.65,#2+0.65);\node at (#1,#2){\scriptsize #3};}
+% bracket pair with symbol and charge: \bk{x}{y}{symbol}{charge}
+\newcommand{\bk}[4]{\draw (#1-0.7,#2-0.65)--(#1-0.85,#2-0.65)--(#1-0.85,#2+0.65)--(#1-0.7,#2+0.65);\draw (#1+0.7,#2-0.65)--(#1+0.85,#2-0.65)--(#1+0.85,#2+0.65)--(#1+0.7,#2+0.65);\node at (#1,#2){\scriptsize #3};\node[pred,font=\tiny] at (#1+1.15,#2+0.8){#4};}
+\pagestyle{plain}
+\begin{document}
+\begin{center}{\Large\bfseries Unit 4, Day 5 board script: Ionic Formulas and Names}\\[2pt]{\normalsize College prep \textbullet{} 50 minutes \textbullet{} \texttt{chemistry/whiteboard/index.html\#lesson=formulas}}\end{center}
+\noindent\textbf{Pens.} \pen{pblue}{shells, distance} \quad \pen{pred}{protons, pull} \quad \pen{pgreen}{new words (labels)} \quad \pen{ppurple}{shared, not today} \quad \pen{black}{everything else}\par
+\noindent\textbf{Steps.} Numbered by frame. Each DRAW step has a small picture of the finished board. Tick the green Words box as you write each label.\par
+\noindent\textbf{Not today.} No polyatomic ions, no Roman numerals, no prefixes (di-, tri-), no metals with more than one charge. Every compound today is a metal and a nonmetal.\par\smallskip
+\noindent\fcolorbox{black}{black!3}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small
+\textbf{Time checkpoints.} Frame 2 by \textbf{12:00}, frame 3 by \textbf{24:00}, frame 4 by \textbf{32:00}, exit check by \textbf{39:00}. Checks are never cut.\par
+\textbf{If you are behind,} cut in this order: (1) the Mg and O column in frame 2 becomes a whiteboard question; (2) two names in frame 3 instead of four; (3) the ``try it'' in frame 4; (4) the summary becomes homework.\par
+\textbf{If you are ahead,} on whiteboards: \emph{Formula for sodium and nitrogen.} ($\text{Na}_3\text{N}$.) \emph{Name $\text{K}_2\text{S}$.} (Potassium sulfide.) \emph{Formula for beryllium and oxygen.} (BeO.) \emph{Why is there no $\text{CaCl}_3$?} (Ca$^{2+}$ needs only two Cl$^{-}$.)}}\par\medskip
+\begin{longtable}{@{}>{\setlength{\parskip}{5pt}}p{3.55in}@{\hspace{0.25in}}p{3.05in}@{}}
+\multicolumn{2}{@{}l}{\large\bfseries Frame 0: question and warm-up \hfill{\mono\small 0:00--7:00}}\tabularnewline*[2pt]
+\textbf{Essential question.} How do we write the formula and the name of an ionic compound from the ions that make it?\par
+\textbf{Warm-up.} The ion magnesium forms? The ion bromine forms? The name of the oxygen ion? &
+\step{0.1}{black}{SAY}{\clock{0:00}Warm-up is up as they walk in. At 3:00 remove the covers: $\text{Mg}^{2+}$; $\text{Br}^{-}$; oxide.}
+\step{0.2}{black}{SAY}{\clock{5:00}Read the question. ``Yesterday we made the ions. Today we count how many of each.''} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 1: balanced charge \hfill{\mono\small 7:00--16:00}}\tabularnewline*[2pt]
+An \bl{ionic compound} is neutral. The positive and negative charges must \bl{cancel}, so the total charge is zero.\par
+The \bl{subscript} in a formula says how many of that ion. A \bl{1} is never written.\par\smallskip
+\textbf{1.} A student writes MgBr for magnesium and bromine because both ions have a charge of 1. What is wrong? &
+\step{1.1}{black}{DRAW}{Fill the Na and O column: total charge $+1-2=-1$, not balanced. Say: ``One sodium cannot cancel an oxide.'' Fix it: 2 Na$^{+}$ for each O$^{2-}$.}
+\pic{\node[right] at (0,0){$\text{Na}^{+}$ and $\text{O}^{2-}$};\node[right] at (0,-0.9){$+1-2=-1$};\node[pgreen,right] at (0,-1.8){2 Na$^{+}$ for each O$^{2-}$};}
+\step{1.2}{black}{DRAW}{Mg and Br column: $+2-1=+1$, not balanced; 2 Br$^{-}$ for each Mg$^{2+}$.}
+\pic{\node[right] at (0,0){$\text{Mg}^{2+}$ and $\text{Br}^{-}$};\node[right] at (0,-0.9){$+2-1=+1$};\node[pgreen,right] at (0,-1.8){2 Br$^{-}$ for each Mg$^{2+}$};}
+\step{1.3}{pgreen}{WORDS}{Tick \textbf{ionic compound}, \textbf{neutral}, \textbf{cancel}, \textbf{subscript}, \textbf{1}, \textbf{formula}.}
+\CHECK{1.4}{MgBr because both ions have a charge of 1?}{Mg$^{2+}$ is 2+ and Br$^{-}$ is 1$-$: two Br$^{-}$ are needed, MgBr$_2$.}
+\WATCH{``Just take the number off each ion.'' Ask: do the charges add to zero?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 2: writing a formula \hfill{\mono\small 16:00--26:00}}\tabularnewline*[2pt]
+Write each ion with its charge. Use the \bl{number} of one ion's charge as the subscript of the other. \bl{Reduce} to the \bl{lowest ratio}.\par
+\textbf{Example.} Magnesium and oxygen first give $\text{Mg}_2\text{O}_2$, which reduces to \bl{MgO}.\par\smallskip
+\textbf{2.} A student writes $\text{Al}_3\text{S}_2$ for aluminum and sulfur. What is wrong? &
+\step{2.1}{black}{DRAW}{Al$^{3+}$ and S$^{2-}$: subscripts Al 2, S 3, formula $\text{Al}_2\text{S}_3$. Say: ``Three goes to sulfur, two goes to aluminum.'' Check: $+6-6=0$.}
+\pic{\node[right] at (0,0){Al$^{3+}$, S$^{2-}$: Al 2, S 3};\node[pgreen,right] at (0,-0.9){$\text{Al}_2\text{S}_3$};}
+\step{2.2}{black}{DRAW}{Ca$^{2+}$ and N$^{3-}$: Ca 3, N 2, $\text{Ca}_3\text{N}_2$; check $+6-6=0$.}
+\step{2.3}{black}{DRAW}{Mg$^{2+}$ and O$^{2-}$: first $\text{Mg}_2\text{O}_2$, then reduce by 2 to MgO. Write REDUCE and tick \textbf{number}, \textbf{reduce}, \textbf{lowest ratio}, \textbf{MgO}.}
+\CHECK{2.4}{$\text{Al}_3\text{S}_2$ for aluminum and sulfur?}{Subscripts are swapped: $\text{Al}_2\text{S}_3$.}
+\WATCH{Leaving the unreduced $\text{Mg}_2\text{O}_2$. Ask: can both subscripts be divided by the same number?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 3: naming \hfill{\mono\small 26:00--34:00}}\tabularnewline*[2pt]
+Name the \bl{metal} first with its element name. Then name the nonmetal with the \bl{-ide} ending. Subscripts are not in the name. A compound of just two elements is a \bl{binary compound}.\par\smallskip
+\textbf{3.} A student names $\text{Al}_2\text{S}_3$ ``dialuminum trisulfide.'' What is wrong? &
+\step{3.1}{pgreen}{DRAW}{Fill the Name row: lithium oxide, magnesium bromide, barium fluoride, aluminum sulfide. Underline each ending. Tick \textbf{metal}, \textbf{-ide}, \textbf{binary compound}.}
+\CHECK{3.2}{``Dialuminum trisulfide''?}{Ionic names do not show subscripts: aluminum sulfide.}
+\WATCH{Writing a number or prefix in the name. Ask: does the name change if the subscript changes?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 4: formula from a name \hfill{\mono\small 34:00--39:00}}\tabularnewline*[2pt]
+Find each ion's charge from its \bl{group}. Balance, then reduce. Example: potassium oxide, $\text{K}^{+}$ and $\text{O}^{2-}$, \bl{$\text{K}_2\text{O}$}. Try it: calcium fluoride, \bl{$\text{CaF}_2$}.\par\smallskip
+\textbf{4.} A student writes KP for potassium phosphide. What is wrong? &
+\step{4.1}{black}{DRAW}{Worked: potassium oxide. K group 1, $\text{K}^{+}$; O group 16, $\text{O}^{2-}$; $\text{K}_2\text{O}$. Then students do calcium fluoride on whiteboards: $\text{Ca}^{2+}$, $\text{F}^{-}$, $\text{CaF}_2$. Tick \textbf{group}, \textbf{K$_2$O}, \textbf{CaF$_2$}.}
+\CHECK{4.2}{KP for potassium phosphide?}{P is group 15, so $\text{P}^{3-}$: it takes three $\text{K}^{+}$, $\text{K}_3\text{P}$.}
+\WATCH{Using the nonmetal's valence count as its charge. Ask: gains or loses, and how many?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 5: exit check and summary \hfill{\mono\small 39:00--50:00}}\tabularnewline*[2pt]
+\textbf{a.} Formula: barium and chlorine. \textbf{b.} Name: $\text{Li}_2\text{S}$. \textbf{c.} Formula: gallium and oxygen; show each ion's charge.\par
+\textbf{Summary.} Answer the essential question in two or three sentences. Use the words ``neutral'' and ``ratio.'' &
+\step{5.1}{black}{SAY}{\clock{39:00}Alone, silent, 6 minutes. Remove the covers at 45:00: $\text{BaCl}_2$; lithium sulfide; $\text{Ga}^{3+}$, $\text{O}^{2-}$, $\text{Ga}_2\text{O}_3$.}
+\step{5.2}{black}{SAY}{\clock{45:00}Summary: silent writing, read two aloud. Listen for ``neutral'' and the lowest ratio.}
+\step{5.3}{black}{SAY}{\clock{48:00}``Tomorrow is practice: ions, ionic bonds, formulas and names, all together.'' Stop there.} \tabularnewline
+\end{longtable}
+\end{document}
