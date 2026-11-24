@@ -40,7 +40,7 @@ function table(x, y, c) {
   });
   return out;
 }
-function atom(cx, cy, sym, pm) { var r = pm * 0.34; return [ellipse(cx - r, cy - r, 2 * r, 2 * r, { strokeColor: GRAY, backgroundColor: '#f1f3f5' }), ctext(cx, cy - 13, sym, 22)]; }
+function atom(cx, cy, sym, pm) { var r = pm * 0.27; return [ellipse(cx - r, cy - r, 2 * r, 2 * r, { strokeColor: GRAY, backgroundColor: '#f1f3f5' }), ctext(cx, cy - 13, sym, 22)]; }
 function swatch(x, y, col, label) { return [rect(x, y, 60, 30, { strokeColor: col, backgroundColor: col }), note(x + 80, y - 2, label, 28)]; }
 
 function build(convert) {
@@ -71,11 +71,13 @@ function build(convert) {
   /* ---- 2 atomic size ---- */
   x0 = F(2); E = E.concat(title(x0, y0, 2, 'Atomic size'));
   E = E.concat(words(x0, ['bigger', 'shells', 'smaller', 'protons', 'potassium']));
-  [['Li', 152], ['Na', 186], ['K', 227]].forEach(function (a, i) { E = E.concat(atom(x0 + 140, 170 + i * 175, a[0], a[1])); });
-  E.push(note(x0 + 100, 640, 'Group 1', 22, { strokeColor: GRAY }));
-  [['Na', 186], ['Mg', 160], ['Al', 143], ['Si', 118], ['P', 110], ['S', 103], ['Cl', 99]].forEach(function (a, i) { E = E.concat(atom(x0 + 340 + i * 112, 170, a[0], a[1])); });
-  E.push(note(x0 + 640, 260, 'Period 3', 22, { strokeColor: GRAY }));
-  E.push(note(x0 + 420, 380, 'Worked: potassium or bromine?', 24, { strokeColor: GRAY }));
+  var GRID = [[['Li', 152], ['Be', 112], ['B', 85], ['C', 77], ['N', 75], ['O', 73], ['F', 72]], [['Na', 186], ['Mg', 160], ['Al', 143], ['Si', 118], ['P', 110], ['S', 103], ['Cl', 99]], [['K', 227], ['Ca', 197], ['Ga', 135], ['Ge', 122], ['As', 120], ['Se', 119], ['Br', 114]]];
+  ['Group 1', '2', '13', '14', '15', '16', '17'].forEach(function (g, c) { E.push(ctext(x0 + 260 + c * 122, 100, g, 18, { strokeColor: GRAY })); });
+  GRID.forEach(function (row, r) {
+    E.push(note(x0 + 60, 160 + r * 150, 'Period ' + (r + 2), 20, { strokeColor: GRAY }));
+    row.forEach(function (a, c) { E = E.concat(atom(x0 + 260 + c * 122, 172 + r * 150, a[0], a[1])); });
+  });
+  E.push(note(x0 + 1100, 420, 'Worked: potassium or bromine?', 22, { strokeColor: GRAY }));
   E = E.concat(check(x0, 2, 'A student says chlorine is bigger than sodium because it has more electrons. What is wrong?', 'The extra electrons are on the same shell, and the extra protons pull that shell in: chlorine is smaller.'));
 
   /* ---- 3 reactivity ---- */
@@ -105,7 +107,7 @@ function build(convert) {
   E.push(note(x0 + 40, 330, 'c.  More reactive: calcium or magnesium? Why?', 28)); E = E.concat(answer(x0 + 760, 320, 680, 90, 'Calcium: outer electrons one shell farther out'));
   E.push(rect(x0 + 40, 560, 1420, 200, { strokeWidth: 2, backgroundColor: '#e7f5ff' }));
   E.push(note(x0 + 60, 575, 'Summary', 28, { strokeWidth: 2, strokeColor: BLUE }));
-  E.push(note(x0 + 60, 625, 'Answer the essential question in two or three sentences. Use the words shell and proton.', 26));
+  E.push(note(x0 + 60, 625, 'Answer the essential question in two or three sentences. Use the words “shell” and “proton.”', 26));
 
   var els = convert(E, { regenerateIds: false });
   els.forEach(function (e) { if (e.type === 'text') e.width = Math.ceil(e.width * 1.3); });
