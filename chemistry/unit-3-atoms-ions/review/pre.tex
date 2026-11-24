@@ -1,0 +1,16 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{amsmath,array,booktabs,enumitem,tikz}
+\usepackage[version=4]{mhchem}
+\usetikzlibrary{arrows.meta}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\renewcommand{\arraystretch}{1.5}
+\pagestyle{plain}
+% orbital box: 0 empty, 1 up, 2 paired
+\newcommand{\ob}[1]{\tikz[baseline=-0.7ex]{\draw (0,-0.28) rectangle (0.5,0.28);%
+\ifcase#1\or\draw[-{Stealth[length=3pt]}](0.25,-0.2)--(0.25,0.2);%
+\or\draw[-{Stealth[length=3pt]}](0.17,-0.2)--(0.17,0.2);\draw[-{Stealth[length=3pt]}](0.33,0.2)--(0.33,-0.2);\fi}}
+\newcommand{\sub}[2]{\begin{tabular}[b]{@{}c@{}}#2\\[-6pt]\small #1\end{tabular}\hspace{10pt}}
+\newcommand{\pb}[3]{\ob{#1}\hspace{-0.4pt}\ob{#2}\hspace{-0.4pt}\ob{#3}}
+\newcommand{\ans}[1][1]{\par\foreach \i in {1,...,#1}{\vspace{0.8cm}\hrule}\vspace{4pt}}
+\newcommand{\nm}{Name: \rule{7cm}{0.4pt}\par}
