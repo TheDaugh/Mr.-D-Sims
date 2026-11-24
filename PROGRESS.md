@@ -2,6 +2,12 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-24: Chem Unit 4 day 1 board, hybrid style (branch `chem-unit4-day1-hybrid`)
+
+- `#lesson=trends` rebuilt: preset pictures only (bare tables, atoms to scale, empty reactivity grid), empty space to draw in, a green Words box per frame to tick off, a check question with a covered answer at the foot of each part, an exit-check frame. Pen colors fixed for the lesson (legend on frame 0): blue shells/distance, red protons/pull, green new words, purple shared electrons.
+- Board script rewritten as SAY / DRAW (in the pen color) / ASK / WORDS / CHECK with the 4-of-5 rule; `chemistry/unit-4-bonding/day-01-trends-board-script.pdf`.
+- Chem board cache bumped to v8 so browsers drop the old offline copy.
+
 ## 2026-11-21: Chem Unit 4 day 1, trailer v3 and Trends Lab (branch `chem-unit4-trends-v2`; the trailer v2 is on `main`, this is not)
 
 - Trailer: no Beyblade plane, no K.O.; keeps VS. Subshell-colored 3-D clouds (`atom-cloud.js`), a core-charge tug (Na +1, Cl +7), the electron cloud travels to Cl's open spot, numeric gauges (radius pm, ionization energy kJ/mol, electronegativity 0 to 4), an energy magnitude meter (411 kJ per mole of NaCl). Flat navy background, no neon grid (Ian, 11-21).

@@ -1,0 +1,124 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.8in]{geometry}
+\usepackage{enumitem,array,booktabs,xcolor,tikz,amssymb}
+\usetikzlibrary{calc}\usepackage{needspace}
+\newcommand{\dbl}[2]{\draw([yshift=1.5pt]#1.east)--([yshift=1.5pt]#2.west);\draw([yshift=-1.5pt]#1.east)--([yshift=-1.5pt]#2.west);}
+% dots on a side of node #1: side t/r/b/l, count #3
+\newcommand{\sd}[3]{\ifnum#3>0
+ \def\a{north}\def\dx{1}\def\dy{0}\def\nx{0}\def\ny{1}
+ \if#2r\def\a{east}\def\dx{0}\def\dy{1}\def\nx{1}\def\ny{0}\fi
+ \if#2b\def\a{south}\def\dx{1}\def\dy{0}\def\nx{0}\def\ny{-1}\fi
+ \if#2l\def\a{west}\def\dx{0}\def\dy{1}\def\nx{-1}\def\ny{0}\fi
+ \ifnum#3=1 \fill ($(#1.\a)+(\nx*0.06,\ny*0.06)$) circle (1.2pt);\else
+ \fill ($(#1.\a)+(\nx*0.06+\dx*0.07,\ny*0.06+\dy*0.07)$) circle (1.2pt);
+ \fill ($(#1.\a)+(\nx*0.06-\dx*0.07,\ny*0.06-\dy*0.07)$) circle (1.2pt);\fi\fi}
+\newcommand{\ld}[5]{\tikz[baseline=-0.6ex]{\node[inner sep=1.5pt,font=\large](s){#1};\sd{s}{t}{#2}\sd{s}{r}{#3}\sd{s}{b}{#4}\sd{s}{l}{#5}}}
+\usepackage[version=4]{mhchem}
+\usepackage[T1]{fontenc}\usepackage{lmodern}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\renewcommand{\arraystretch}{1.6}
+\newif\ifkey \input{mode}
+\newcommand{\ans}[2][1]{\ifkey{\color{red!70!black}\itshape #2}\par\else\par\foreach\i in{1,...,#1}{\vspace{0.75cm}\noindent\rule{\linewidth}{0.4pt}\par}\fi}
+\newcommand{\fa}[1]{\ifkey{\color{red!70!black}\bfseries #1}\else\fi}
+\newcommand{\kv}[2]{\ifkey#1\else#2\fi}
+\newcommand{\pts}[1]{\hfill{\small[#1]}}
+\newcommand{\sect}[1]{\par\needspace{10\baselineskip}\vspace{8pt}\noindent{\large\bfseries #1}\par\vspace{-4pt}\noindent\rule{\linewidth}{0.8pt}\par}
+\newcommand{\q}[1]{\par\needspace{7\baselineskip}\vspace{6pt}\noindent\textbf{#1}\ }
+
+\pagestyle{plain}
+\begin{document}
+\ifkey{\color{red!70!black}\bfseries ANSWER KEY}\par\fi
+{\LARGE\bfseries Unit 4 Test: Periodic Trends, Bonding and Naming}\par\vspace{6pt}
+Name: \rule{6.5cm}{0.4pt}\hfill Date: \rule{3cm}{0.4pt}\par
+Use the periodic table provided. Total: 61 points.
+
+\sect{Part A: Periodic trends}
+\q{1.} Circle the larger atom in each pair. Give the reason in a few words. \pts{4}\par
+\begin{tabular}{p{2.6cm}p{11.5cm}}
+(a) Na \quad K & Reason: \kv{\fa{K has more shells, so its outer electrons are farther out.}}{\rule{9.5cm}{0.4pt}}\\
+(b) Mg \quad S & Reason: \kv{\fa{Same shell, but S has more protons pulling the electrons in, so Mg is larger.}}{\rule{9.5cm}{0.4pt}}\\
+\end{tabular}
+\ifkey\par{\color{red!70!black}\itshape (a) K. (b) Mg.}\fi
+
+\q{2.} Which is more reactive, lithium or potassium? Explain using shells. \pts{2}
+\ans[2]{Potassium. Its outer electron is in a higher shell, farther from the nucleus, so it is lost more easily.}
+
+\q{3.} Electronegativity is how strongly an atom \ifkey\fa{pulls shared electrons toward itself}\else\rule{6cm}{0.4pt}\fi\ in a bond. \pts{1}
+
+\q{4.} Circle the more electronegative atom in each pair. \pts{2}\par
+(a) F \quad I \hspace{3cm} (b) C \quad O
+\ifkey\par{\color{red!70!black}\itshape (a) F (top of the group). (b) O (farther right in the period).}\fi
+
+\sect{Part B: Why atoms bond}
+\q{5.} Why do most atoms form bonds? Why does neon not bond? \pts{2}
+\ans[2]{Atoms bond to get a full outer level (an octet). Neon's outer level is already full.}
+
+\q{6.} Draw the Lewis dot symbol for each atom. \pts{4}\par\vspace{4pt}
+\begin{tabular}{*{4}{>{\centering\arraybackslash}p{3.2cm}}}
+\kv{\ld{Ca}{1}{1}{0}{0}}{\Large Ca} & \kv{\ld{Al}{1}{1}{1}{0}}{\Large Al} & \kv{\ld{P}{2}{1}{1}{1}}{\Large P} & \kv{\ld{Br}{2}{2}{2}{1}}{\Large Br}\\[16pt]
+\end{tabular}
+
+\q{7.} How many unpaired electrons does phosphorus have? \ifkey\fa{3}\else\rule{1.5cm}{0.4pt}\fi \pts{1}
+
+\sect{Part C: Ionic compounds}
+\q{8.} Use Lewis dot symbols to show sodium and chlorine forming sodium chloride. Label the cation and the anion. \pts{3}
+\ifkey\par{\color{red!70!black}\ld{Na}{0}{1}{0}{0} + \ld{Cl}{2}{2}{2}{1} $\rightarrow$ [Na]$^{+}$ (cation) \ [\ld{Cl}{2}{2}{2}{2}]$^{-}$ (anion). Na gives its one electron to Cl.}\par\else\par\vspace{2.6cm}\fi
+
+\q{9.} Predict the charge on the ion each element forms. \pts{5}\par
+\begin{tabular}{|l|*{5}{>{\centering\arraybackslash}p{1.3cm}|}}\hline
+Element & K & Ba & N & S & F\\\hline
+Ion charge & \fa{1+} & \fa{2+} & \fa{3$-$} & \fa{2$-$} & \fa{1$-$}\\\hline
+\end{tabular}
+
+\q{10.} Write the formula of the compound each pair forms. \pts{4}\par
+\begin{tabular}{p{4.3cm}p{2.7cm}p{4.3cm}p{2.7cm}}
+(a) magnesium, chlorine & \fa{\ce{MgCl2}}\ifkey\else\rule{2.5cm}{0.4pt}\fi & (b) aluminum, oxygen & \fa{\ce{Al2O3}}\ifkey\else\rule{2.5cm}{0.4pt}\fi\\
+(c) calcium, sulfur & \fa{\ce{CaS}}\ifkey\else\rule{2.5cm}{0.4pt}\fi & (d) lithium, nitrogen & \fa{\ce{Li3N}}\ifkey\else\rule{2.5cm}{0.4pt}\fi\\
+\end{tabular}
+
+\q{11.} Name each compound. \pts{4}\par
+\begin{tabular}{p{1.9cm}p{5.1cm}p{1.9cm}p{5.1cm}}
+(a) \ce{KBr} & \fa{potassium bromide}\ifkey\else\rule{4.5cm}{0.4pt}\fi & (b) \ce{CaO} & \fa{calcium oxide}\ifkey\else\rule{4.5cm}{0.4pt}\fi\\
+(c) \ce{AlCl3} & \fa{aluminum chloride}\ifkey\else\rule{4.5cm}{0.4pt}\fi & (d) \ce{Na2S} & \fa{sodium sulfide}\ifkey\else\rule{4.5cm}{0.4pt}\fi\\
+\end{tabular}
+
+\sect{Part D: Molecular compounds}
+\q{12.} Draw the Lewis structure of each molecule. The central atom is in bold. \pts{6}\par\vspace{4pt}
+\begin{tabular}{*{3}{>{\centering\arraybackslash}p{4.6cm}}}
+\ce{H2\textbf{O}} & \ce{\textbf{N}H3} & \ce{\textbf{C}H4}\\[8pt]
+\kv{\tikz[baseline=-0.6ex]{\node(o){O};\node(a) at (-0.8,0){H};\node(b) at (0.8,0){H};\draw(a)--(o)--(b);\sd{o}{t}{2}\sd{o}{b}{2}}}{\rule{0pt}{2.4cm}} & \kv{\tikz[baseline=-0.6ex]{\node(n){N};\node(a) at (-0.8,0){H};\node(b) at (0.8,0){H};\node(c) at (0,-0.8){H};\draw(a)--(n)--(b);\draw(n)--(c);\sd{n}{t}{2}}}{\rule{0pt}{2.4cm}} & \kv{\tikz[baseline=-0.6ex]{\node(c){C};\foreach\p in {(-0.8,0),(0.8,0),(0,0.8),(0,-0.8)}{\node(h) at \p {H};\draw(c)--(h);}}}{\rule{0pt}{2.4cm}}\\
+\end{tabular}
+
+\q{13.} Here are oxygen and nitrogen: \quad \tikz[baseline=-0.6ex]{\node(a){O};\node(b) at (1,0){O};\dbl{a}{b}\sd{a}{t}{2}\sd{a}{b}{2}\sd{b}{t}{2}\sd{b}{b}{2}} \qquad \tikz[baseline=-0.6ex]{\node(a){N};\node(b) at (1,0){N};\draw(a)--(b);\draw([yshift=2.5pt]a.east)--([yshift=2.5pt]b.west);\draw([yshift=-2.5pt]a.east)--([yshift=-2.5pt]b.west);\sd{a}{l}{2}\sd{b}{r}{2}}\par
+(a) How many pairs of electrons do the two oxygen atoms share? \ifkey\fa{2 (a double bond)}\else\rule{2cm}{0.4pt}\fi\par
+(b) What kind of bond holds the two nitrogen atoms together? \ifkey\fa{a triple bond (3 shared pairs)}\else\rule{4cm}{0.4pt}\fi \pts{2}
+
+\q{14.} Name each compound. \pts{4}\par
+\begin{tabular}{p{1.9cm}p{5.1cm}p{1.9cm}p{5.1cm}}
+(a) \ce{CO2} & \fa{carbon dioxide}\ifkey\else\rule{4.5cm}{0.4pt}\fi & (b) \ce{N2O4} & \fa{dinitrogen tetroxide}\ifkey\else\rule{4.5cm}{0.4pt}\fi\\
+(c) \ce{PCl3} & \fa{phosphorus trichloride}\ifkey\else\rule{4.5cm}{0.4pt}\fi & (d) \ce{CO} & \fa{carbon monoxide}\ifkey\else\rule{4.5cm}{0.4pt}\fi\\
+\end{tabular}
+
+\q{15.} Write the formula for each compound. \pts{3}\par
+\begin{tabular}{p{4.6cm}p{2.6cm}p{4.6cm}p{2.6cm}}
+(a) sulfur dioxide & \fa{\ce{SO2}}\ifkey\else\rule{2cm}{0.4pt}\fi & (b) dinitrogen pentoxide & \fa{\ce{N2O5}}\ifkey\else\rule{2cm}{0.4pt}\fi\\
+(c) carbon tetrachloride & \fa{\ce{CCl4}}\ifkey\else\rule{2cm}{0.4pt}\fi & & \\
+\end{tabular}
+
+\sect{Part E: Types of bonds}
+\q{16.} Classify the bonding in each substance as ionic, covalent or metallic. \pts{6}\par
+\begin{tabular}{|l|*{6}{>{\centering\arraybackslash}p{1.6cm}|}}\hline
+Substance & \ce{NaCl} & \ce{H2O} & Cu & \ce{CO2} & \ce{MgO} & Fe\\\hline
+Bond type & \fa{ionic} & \fa{covalent} & \fa{metallic} & \fa{covalent} & \fa{ionic} & \fa{metallic}\\\hline
+\end{tabular}
+
+\q{17.} Copper can be bent into wire and carries electricity. Explain both using the sea of electrons. \pts{2}
+\ans[2]{The outer electrons are free to move through the whole metal. Moving electrons carry the current, and the atoms can slide past each other without breaking the bonds, so the metal bends.}
+
+\q{18.} How can you tell from a formula whether a compound is ionic or molecular? Give one example of each. \pts{2}
+\ans[2]{Metal + nonmetal: ionic (e.g., NaCl). Only nonmetals: molecular (e.g., \ce{CO2}).}
+
+\sect{Stretch}
+\q{19.} Draw the Lewis structure of carbon dioxide, \ce{CO2}, with no help. Then say whether each C--O bond is polar or nonpolar, and why. \pts{4}
+\ifkey\par{\color{red!70!black}\tikz[baseline=-0.6ex]{\node(c){C};\node(a) at (-1,0){O};\node(b) at (1,0){O};\dbl{a}{c}\dbl{c}{b}\sd{a}{t}{2}\sd{a}{b}{2}\sd{b}{t}{2}\sd{b}{b}{2}}\quad Two double bonds; each O keeps two lone pairs. Each C--O bond is polar, because oxygen is more electronegative than carbon and pulls the shared electrons toward itself.}\par\else\par\vspace{4.2cm}\fi
+\end{document}
