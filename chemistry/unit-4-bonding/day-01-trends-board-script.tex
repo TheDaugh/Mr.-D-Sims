@@ -1,83 +1,93 @@
 \documentclass[10.5pt]{article}
 \usepackage{fontspec}\defaultfontfeatures{Ligatures=TeX}
-\usepackage[letterpaper,margin=0.65in]{geometry}
-\usepackage{amsmath,xcolor,longtable,array}
+\usepackage[letterpaper,margin=0.6in]{geometry}
+\usepackage{amsmath,xcolor,longtable,array,tikz}
+\usetikzlibrary{arrows.meta}
 \setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
 \definecolor{pblue}{HTML}{1971C2}\definecolor{pred}{HTML}{E03131}\definecolor{pgreen}{HTML}{2F9E44}\definecolor{ppurple}{HTML}{7048E8}\definecolor{pgray}{HTML}{868E96}
 \newfontfamily\mono{TeX Gyre Cursor}
 \newcommand{\mtag}[2]{\colorbox{#1}{\textcolor{white}{\textsf{\fontsize{6.5}{7}\selectfont\bfseries #2}}}}
 \newcommand{\clock}[1]{{\mono\fontsize{7}{8}\selectfont #1}\ }
-\newcommand{\SAY}[1]{\par\mtag{black}{SAY}\ {\small #1}\par\vspace{2pt}}
-\newcommand{\ASK}[1]{\par\mtag{black!60}{ASK}\ {\small #1}\par\vspace{2pt}}
-% DRAW with a pen color chip: \DRAW{color}{what}
-\newcommand{\DRAW}[2]{\par\mtag{#1}{DRAW}\ {\small\color{#1}#2}\par\vspace{2pt}}
-\newcommand{\WORDS}[1]{\par\mtag{pgreen}{WORDS}\ {\small\color{pgreen}\textbf{#1}}\par\vspace{2pt}}
-\newcommand{\CHECK}[2]{\par\fcolorbox{black}{black!4}{\parbox{2.45in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries CHECK}\ {\fontsize{7.5}{9}\selectfont #1}\par{\fontsize{7.5}{9}\selectfont\textbf{Answer:} #2}\par{\fontsize{7}{8.5}\selectfont\color{pgray} 4 of 5 right: go on. Fewer: one more example, then ask again.}}}\par\vspace{3pt}}
-\newcommand{\WATCH}[1]{\par{\textsf{\fontsize{6.5}{8}\selectfont\bfseries\color{pred} WATCH FOR}\ {\small\itshape\color{pred} #1}}\par\vspace{2pt}}
+% numbered step: \step{num}{tagcolor}{TAG}{text}
+\newcommand{\step}[4]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\mtag{#2}{#3}\ {\small #4}\par\vspace{2pt}}
+\newcommand{\pic}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.42,every node/.style={font=\scriptsize}]#1\end{tikzpicture}\par\vspace{3pt}}
+\newcommand{\CHECK}[3]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\fcolorbox{black}{black!4}{\parbox{2.55in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries CHECK}\ {\fontsize{7.5}{9}\selectfont #2}\par{\fontsize{7.5}{9}\selectfont\textbf{Answer:} #3}\par{\fontsize{7}{8.5}\selectfont\color{pgray} 4 of 5 right: go on. Fewer: one more example, ask again.}}}\par\vspace{3pt}}
+\newcommand{\WATCH}[1]{\par\hspace{0.32in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries\color{pred} WATCH FOR}\ {\small\itshape\color{pred} #1}}\par}
 \newcommand{\bl}[1]{\underline{\textcolor{pgreen}{\textbf{#1}}}}
 \newcommand{\pen}[2]{\textcolor{#1}{\rule{8pt}{8pt}}\ #2}
+% mini periodic table, 8 x 5, cell 1
+\newcommand{\minitab}{\foreach \r/\n in {0/2,1/8,2/8,3/8,4/8}{\ifnum\n=2 \draw (0,-\r) rectangle (1,-\r-1); \draw (7,-\r) rectangle (8,-\r-1);\else\foreach \c in {0,...,7}{\draw[pgray!70] (\c,-\r) rectangle (\c+1,-\r-1);}\fi}\node at (6.5,-1.5){\tiny F};\node at (0.5,-2.5){\tiny Na};\node at (6.5,-2.5){\tiny Cl};}
+\newcommand{\rings}[4]{% x, y, n rings, nucleus label
+ \foreach \k in {1,...,#3}{\draw[pblue] (#1,#2) circle (0.55*\k);}\fill[pred!20] (#1,#2) circle (0.32);\node[pred] at (#1,#2){\tiny #4};}
 \pagestyle{plain}
 \begin{document}
-\begin{center}{\Large\bfseries Unit 4, Day 1 board script: Periodic Trends}\\[2pt]{\normalsize College prep \textbullet{} 50 minutes \textbullet{} Board: \texttt{chemistry/whiteboard/index.html\#lesson=trends}}\end{center}
-\noindent\textbf{How the board works.} Each frame has the slow pictures preset and empty space for you. Draw the explanation live; write each key word as a \textcolor{pgreen}{green label on your drawing}, then tick it in the green Words box. Only the check questions have covers.\par\smallskip
-\noindent\textbf{Pens (same meaning all lesson, as on frame 0).} \pen{pblue}{blue: shells and distance} \quad \pen{pred}{red: protons and the nucleus's pull} \quad \pen{pgreen}{green: new words} \quad \pen{ppurple}{purple: shared electrons} \quad \pen{black}{black: everything else}\par\smallskip
-\noindent\textbf{Moves.} \mtag{black}{SAY} the gist, briefly, in your words. \mtag{pblue}{DRAW} one thing, in the color shown. \mtag{black!60}{ASK} one question. \mtag{pgreen}{WORDS} the labels for this part. CHECK: the question at the foot of the frame.\par\smallskip
-\noindent\textbf{Not today.} No numbers, no Z$_\text{eff}$, no shielding. The reason is always ``more shells'' or ``more protons on the same shell.''\par\medskip
-\begin{longtable}{@{}>{\setlength{\parskip}{5pt}}p{3.85in}@{\hspace{0.3in}}p{2.65in}@{}}
+\begin{center}{\Large\bfseries Unit 4, Day 1 board script: Periodic Trends}\\[2pt]{\normalsize College prep \textbullet{} 50 minutes \textbullet{} \texttt{chemistry/whiteboard/index.html\#lesson=trends}}\end{center}
+\noindent\textbf{Pens.} \pen{pblue}{shells, distance} \quad \pen{pred}{protons, pull} \quad \pen{pgreen}{new words (labels)} \quad \pen{ppurple}{shared electrons} \quad \pen{black}{everything else}\par
+\noindent\textbf{Steps.} Numbered by frame: 1.1, 1.2\ldots{} are on frame 1. Each DRAW step has a small picture of what the board should look like when the step is done. Tick the green Words box as you write each label.\par
+\noindent\textbf{Not today.} No numbers, no Z$_\text{eff}$, no shielding. The reason is always ``more shells'' or ``more protons on the same shell.''\par\smallskip
+\noindent\fcolorbox{black}{black!3}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small
+\textbf{Time checkpoints.} Be starting frame 2 by \textbf{14:00}, frame 3 by \textbf{22:00}, frame 4 by \textbf{30:00}, the exit check by \textbf{38:00}. The checks are never cut; trim around them.\par
+\textbf{If you are behind,} cut in this order: (1) step 2.4, the worked K/Br example: ask it as a quick whiteboard question instead; (2) step 4.5, the ``why it matters'' line: say it in one sentence, draw nothing; (3) exit question b; (4) the summary becomes tonight's homework. If you reach 38:00 still in frame 4, finish check 4, skip to the exit check, and give the summary as homework.\par
+\textbf{If you are ahead} (the 4-of-5 checks pass quickly), use these before the exit check, one at a time on whiteboards: \emph{Rank Cs, Na, Rb by size.} (Na, Rb, Cs) \emph{Which is more reactive, iodine or fluorine? Why?} (Fluorine: fewer shells, pulls harder.) \emph{Oxygen or sulfur: which is more electronegative?} (Oxygen.) \emph{Which element on the table would you guess is the biggest atom of all?} (Bottom left: francium.)}}\par\medskip
+\begin{longtable}{@{}>{\setlength{\parskip}{5pt}}p{3.55in}@{\hspace{0.25in}}p{3.05in}@{}}
 \multicolumn{2}{@{}l}{\large\bfseries Frame 0: question and warm-up \hfill{\mono\small 0:00--7:00}}\tabularnewline*[2pt]
-\textbf{Essential question.} Why are atoms at the bottom left big and reactive, and atoms at the top right small and grabby? &
-\clock{0:00}\SAY{Warm-up is up as they walk in. Reveal the three covers at 3:00: 3 shells; group 17; K$^+$.}\clock{5:00}\SAY{Read the question. Point at the color key: ``Blue is always shells, red is always protons.''} \tabularnewline[12pt]
+\textbf{Essential question.} Why are atoms at the bottom left big and reactive, and atoms at the top right small and grabby?\par
+\textbf{Warm-up.} Shells in sodium? Chlorine's group? Potassium's ion? &
+\step{0.1}{black}{SAY}{\clock{0:00}Warm-up is up as they walk in. At 3:00 remove the covers: 3; 17; K$^+$.}
+\step{0.2}{black}{SAY}{\clock{5:00}Read the question. Point at the color key: ``Blue is always shells. Red is always protons.''} \tabularnewline[10pt]
 \multicolumn{2}{@{}l}{\large\bfseries Frame 1: two ideas behind every trend \hfill{\mono\small 7:00--14:00}}\tabularnewline*[2pt]
 A trend is a pattern that changes steadily across a \bl{period} or down a \bl{group}.\par
 \textbf{Idea 1.} Going down a group, each atom adds a new \bl{shell}, so the outer electrons are \bl{farther} from the nucleus.\par
 \textbf{Idea 2.} Going across a period, each atom adds one more \bl{proton} but keeps the same \bl{shell}, so the nucleus pulls the outer electrons \bl{harder}.\par\smallskip
 \textbf{1.} Sodium and chlorine are both in period 3. Which one has more protons pulling on its outer shell? &
-\DRAW{pgreen}{Label a row PERIOD and a column GROUP on the table.}
-\ASK{``Li has 2 shells, Na has 3. How many does K have?''}
-\DRAW{pblue}{One long arrow down the side of the table. Label it ``more SHELLS, FARTHER.''}
-\DRAW{pblue}{In the space: Na as a nucleus with 3 rings.}
-\DRAW{pred}{Next to it, Cl with 3 rings: write ``+11'' and ``+17'' in the nuclei, short arrows from nucleus to outer ring. Label ``more PROTONS, same SHELL, pulls HARDER.''}
-\WORDS{period, group, shell, farther, proton, harder}
-\CHECK{Sodium or chlorine: more protons on the outer shell?}{Chlorine, 17 to 11, same shell.}
-\WATCH{``Chlorine has more electrons, so it's bigger.'' Ask: new shell, or same shell?} \tabularnewline[12pt]
+\step{1.1}{pgreen}{DRAW}{On the table: bracket a row, write PERIOD; bracket a column, write GROUP.}
+\pic{\minitab\draw[pgreen,thick] (0,-2) -- (8,-2) -- (8,-3) -- (0,-3) -- cycle;\node[pgreen,right] at (8.1,-2.5){PERIOD};\draw[pgreen,thick] (0,0) -- (1,0) -- (1,-5) -- (0,-5) -- cycle;\node[pgreen,below] at (0.5,-5.1){GROUP};}
+\step{1.2}{black!60}{ASK}{``Li has 2 shells, Na has 3. How many does K have?''}
+\step{1.3}{pblue}{DRAW}{A long arrow down the right side of the table. Label it ``more SHELLS, FARTHER.''}
+\pic{\minitab\draw[pblue,very thick,-{Stealth}] (8.5,0) -- (8.5,-5);\node[pblue,right,align=left] at (8.6,-2.5){more \textcolor{pgreen}{SHELLS}\\\textcolor{pgreen}{FARTHER}};}
+\step{1.4}{pblue}{DRAW}{In the empty space: Na, nucleus and 3 rings. Next to it, Cl, also 3 rings.}
+\step{1.5}{pred}{DRAW}{Write +11 and +17 in the nuclei. Short arrows from each nucleus out to its outer ring, more of them on Cl. Label ``more PROTONS, same SHELL, pulls HARDER.''}
+\pic{\rings{0}{0}{3}{+11}\rings{4.2}{0}{3}{+17}\node at (0,-2){\tiny Na};\node at (4.2,-2){\tiny Cl};\draw[pred,-{Stealth}] (4.2,0.3)--(4.2,1.55);\draw[pred,-{Stealth}] (4.5,0)--(5.75,0);\draw[pred,-{Stealth}] (3.9,0)--(2.65,0);\draw[pred,-{Stealth}] (0,0.3)--(0,1.55);\node[pred,right,align=left] at (6,0){more \textcolor{pgreen}{PROTONS}\\same \textcolor{pgreen}{SHELL}\\pulls \textcolor{pgreen}{HARDER}};}
+\CHECK{1.6}{Sodium or chlorine: more protons pulling on the outer shell?}{Chlorine, 17 to 11, same shell.}
+\WATCH{``Chlorine has more electrons, so it's bigger.'' Ask: new shell, or same shell?} \tabularnewline[10pt]
 \multicolumn{2}{@{}l}{\large\bfseries Frame 2: atomic size \hfill{\mono\small 14:00--22:00}}\tabularnewline*[2pt]
 Down a group, atoms get \bl{bigger} because they have more \bl{shells}. Across a period, atoms get \bl{smaller} because more \bl{protons} pull the same shell in closer.\par
 \textbf{Example.} Potassium or bromine? Same shells (period 4); bromine has more protons pulling inward, so \bl{potassium} is larger.\par\smallskip
 \textbf{2.} A student says chlorine is bigger than sodium because it has more electrons. What is wrong with that? &
-\ASK{``Look at the circles (preset, to scale). What do you notice down? Across?'' Two answers before you write.}
-\DRAW{pblue}{Arrow down the Li--Na--K column: ``BIGGER: more SHELLS.''}
-\DRAW{pred}{Arrow along Na to Cl: ``SMALLER: more PROTONS pull in.''}
-\SAY{Worked example, think aloud: find the period, pick the idea, answer.}
-\DRAW{black}{Write ``K vs Br: same shells $\rightarrow$ more protons wins $\rightarrow$ K bigger,'' with POTASSIUM in green.}
-\WORDS{bigger, shells, smaller, protons, potassium}
-\CHECK{Chlorine bigger because more electrons: what's wrong?}{Same shell, and more protons pull it in: Cl is smaller.} \tabularnewline[12pt]
+\step{2.1}{black!60}{ASK}{``Look at the circles. What do you notice going down? Going across?'' Two answers before you draw.}
+\step{2.2}{pblue}{DRAW}{Arrow down the Li--Na--K column: ``BIGGER: more SHELLS.''}
+\step{2.3}{pred}{DRAW}{Arrow along the Na to Cl row: ``SMALLER: more PROTONS pull in.''}
+\pic{\draw[pgray] (0,0) circle (0.5);\draw[pgray] (0,-1.4) circle (0.62);\draw[pgray] (0,-3) circle (0.77);\foreach \x/\r in {1.6/0.62,2.9/0.54,4.1/0.48,5.2/0.4,6.2/0.37,7.1/0.35,8/0.33}{\draw[pgray] (\x,0) circle (\r);}\draw[pblue,very thick,-{Stealth}] (-1,0.3)--(-1,-3.6);\node[pblue,left,align=right] at (-1.1,-1.6){\textcolor{pgreen}{BIGGER}\\more\\\textcolor{pgreen}{SHELLS}};\draw[pred,very thick,-{Stealth}] (1.2,1)--(8.4,1);\node[pred,above] at (4.8,1.1){\textcolor{pgreen}{SMALLER}: more \textcolor{pgreen}{PROTONS} pull in};}
+\step{2.4}{black}{DRAW}{Next to ``Worked: potassium or bromine?'' write: same shells $\rightarrow$ more protons wins $\rightarrow$ \textcolor{pgreen}{POTASSIUM} bigger. Think aloud: find the period, pick the idea, answer.}
+\CHECK{2.5}{Chlorine bigger because more electrons: what's wrong?}{Same shell, and more protons pull it in: chlorine is smaller.} \tabularnewline[10pt]
 \multicolumn{2}{@{}l}{\large\bfseries Frame 3: reactivity \hfill{\mono\small 22:00--30:00}}\tabularnewline*[2pt]
 Metals react by \bl{losing} electrons; nonmetals by \bl{gaining}. Losing is easier when the outer electron is \bl{far from} the nucleus; gaining when it is \bl{close to} it. Most reactive metals: \bl{bottom left} (\bl{cesium}). Most reactive nonmetals: \bl{top right} (\bl{fluorine}). Noble gases: outer shell already \bl{full}.\par\smallskip
 \textbf{3.} Neon is at the top right. Why is it not the most reactive nonmetal? &
-\SAY{``Metals give electrons away; nonmetals grab them.''}
-\DRAW{pblue}{Metals column: a big atom with one electron far out, an arrow carrying it away. Write LOSING, FAR FROM in green in the grid.}
-\DRAW{pred}{Nonmetals column: a small atom pulling an electron in. Write GAINING, CLOSE TO.}
-\DRAW{pgreen}{Fill the last two rows: BOTTOM LEFT, CESIUM; TOP RIGHT, FLUORINE.}
-\ASK{``Sodium or potassium: which lets go more easily?'' (Potassium, a shell farther.)}
-\WORDS{losing, gaining, far from, close to, bottom left, top right, cesium, fluorine, full}
-\CHECK{Why isn't neon the most reactive nonmetal?}{Its outer shell is already full.} \tabularnewline[12pt]
+\step{3.1}{black}{SAY}{``Metals give electrons away; nonmetals grab them.''}
+\step{3.2}{pblue}{DRAW}{Under the Metals column: a big atom, one electron far out, an arrow carrying it away. Write LOSING and FAR FROM in the grid.}
+\step{3.3}{pred}{DRAW}{Under Nonmetals: a small atom, an electron outside, an arrow pulling it in. Write GAINING and CLOSE TO.}
+\pic{\draw[pblue] (0,0) circle (0.5);\draw[pblue] (0,0) circle (1.1);\fill[pred!20] (0,0) circle (0.25);\fill (1.1,0) circle (0.09);\draw[pblue,-{Stealth}] (1.25,0)--(2.4,0);\node[pgreen] at (0,-1.5){LOSING};\draw[pblue] (5,0) circle (0.5);\fill[pred!20] (5,0) circle (0.25);\fill (6.6,0) circle (0.09);\draw[pred,-{Stealth}] (6.45,0)--(5.6,0);\node[pgreen] at (5.6,-1.5){GAINING};}
+\step{3.4}{pgreen}{DRAW}{Fill the last two rows: BOTTOM LEFT, CESIUM; TOP RIGHT, FLUORINE. Then the noble-gas line: FULL.}
+\step{3.5}{black!60}{ASK}{``Sodium or potassium: which lets go more easily?'' (Potassium: a shell farther.)}
+\CHECK{3.6}{Why isn't neon the most reactive nonmetal?}{Its outer shell is already full.} \tabularnewline[10pt]
 \multicolumn{2}{@{}l}{\large\bfseries Frame 4: electronegativity \hfill{\mono\small 30:00--38:00}}\tabularnewline*[2pt]
 Electronegativity is how strongly an atom \bl{pulls} shared electrons in a bond. It \bl{increases} across a period and \bl{decreases} down a group. Highest: \bl{fluorine}. Noble gases are left out because they rarely \bl{bond}.\par
 Why it matters: a big difference means one atom \bl{takes} the electron (ionic); a small difference means they \bl{share} it (covalent).\par
 \textbf{Example.} Rank Cl, Na and P: \bl{Na, P, Cl}.\par\smallskip
 \textbf{4.} Which pulls harder on shared electrons, bromine or fluorine? Why? &
-\DRAW{ppurple}{In the space: two atoms, a pair of dots between them. Label ``SHARED pair.''}
-\DRAW{pred}{An arrow from one nucleus to the pair: ``PULLS.''}
-\DRAW{pred}{On the table: arrows across and up, both pointing at F. Label INCREASES (across), DECREASES (down).}
-\ASK{``Why is it the same corner as the small atoms?'' (Small atom: nucleus close to the pair.)}
-\DRAW{ppurple}{One line for tomorrow: big difference $\rightarrow$ TAKES; small $\rightarrow$ SHARE.}
-\WORDS{pulls, increases, decreases, fluorine, bond, takes, share}
-\CHECK{Bromine or fluorine: which pulls harder? Why?}{Fluorine: fewer shells, nucleus closer to the pair.} \tabularnewline[12pt]
+\step{4.1}{ppurple}{DRAW}{In the empty space: two atoms touching, a pair of dots between them. Label ``SHARED pair.''}
+\step{4.2}{pred}{DRAW}{An arrow from one nucleus toward the pair. Label PULLS.}
+\pic{\draw[pblue] (0,0) circle (1);\draw[pblue] (1.8,0) circle (1);\fill[pred!20] (0,0) circle (0.25);\fill[pred!20] (1.8,0) circle (0.25);\fill[ppurple] (0.9,0.15) circle (0.09);\fill[ppurple] (0.9,-0.15) circle (0.09);\node[ppurple] at (0.9,-1.4){SHARED pair};\draw[pred,-{Stealth}] (0.25,0)--(0.75,0);\node[pgreen] at (-1.6,0){PULLS};}
+\step{4.3}{pred}{DRAW}{On the table: an arrow along the bottom pointing right (INCREASES across) and one up the side (DECREASES down, read the other way). Both point at F.}
+\pic{\minitab\draw[pred,very thick,-{Stealth}] (0,-5.5)--(7,-5.5);\node[pgreen,below] at (3.5,-5.6){INCREASES};\draw[pred,very thick,-{Stealth}] (8.5,-5)--(8.5,-1.2);\node[pgreen,right] at (8.6,-3){\begin{tabular}{@{}l@{}}DECREASES\\going down\end{tabular}};\draw[pred,thick] (6.5,-1.5) circle (0.45);}
+\step{4.4}{black!60}{ASK}{``Why is it the same corner as the small atoms?'' (Small atom: nucleus close to the pair.)}
+\step{4.5}{ppurple}{DRAW}{One line for tomorrow: big difference $\rightarrow$ TAKES; small $\rightarrow$ SHARE. Then rank Cl, Na, P together: Na, P, Cl.}
+\CHECK{4.6}{Bromine or fluorine: which pulls harder? Why?}{Fluorine: fewer shells, nucleus closer to the pair.} \tabularnewline[10pt]
 \multicolumn{2}{@{}l}{\large\bfseries Frame 5: exit check and summary \hfill{\mono\small 38:00--50:00}}\tabularnewline*[2pt]
 \textbf{a.} Larger atom: Mg or Ba; N or Li. \textbf{b.} Least to most electronegative: O, Li, C. \textbf{c.} More reactive: calcium or magnesium? Explain.\par
 \textbf{Summary.} Answer the essential question in two or three sentences, using \emph{shell} and \emph{proton}. &
-\clock{38:00}\SAY{Alone, silent, 6 minutes. Walk the room. Reveal at 44:00: Ba, Li; Li, C, O; calcium (a shell farther out).}
-\clock{45:00}\SAY{Summary: silent writing, read two aloud. Look for ``shell'' for size and ``proton'' for pull.}
-\clock{48:00}\SAY{Up next: ``Fluorine pulls hard, sodium lets go easily. What happens when they meet?'' Stop.} \tabularnewline
+\step{5.1}{black}{SAY}{\clock{38:00}Alone, silent, 6 minutes. Walk the room. Remove the covers at 44:00: Ba, Li; Li, C, O; calcium (a shell farther out).}
+\step{5.2}{black}{SAY}{\clock{45:00}Summary: silent writing, read two aloud. Listen for ``shell'' for size and ``proton'' for pull.}
+\step{5.3}{black}{SAY}{\clock{48:00}``Fluorine pulls hard, sodium lets go easily. What happens when they meet?'' Stop there.} \tabularnewline
 \end{longtable}
 \end{document}
