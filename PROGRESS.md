@@ -2,6 +2,37 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-24: Chem Unit 4 bundle 3, Days 7 to 9, and Quiz 1 (same branch, not pushed)
+- Built: Quiz 1 (after Days 1 to 6; 28 points, key); Day 7 notes (covalent bonds), Day 8 notes (naming molecules, bond types), each with key (2 pages each), board (`#lesson=covalent`, `#lesson=naming`) and board script (3 pages each); Day 9 practice kit (sheet, Set B, slips, key, run sheet) and board `#lesson=practice9`. sw.js cache v15; e2e frame counts 6, 6, 4.
+- Standing rule recorded in the unit README: a quiz after every two notes-and-practice blocks.
+- Checks run: board bundle builds; check-lessons and unit tests (see below); notes and key pages read for Days 7 and 8; Day 9 sheet read; quiz and key read.
+- Not run: board frames not screenshotted, lesson-board e2e and smoke (no local server); Trends Lab hydrogen pairs and the dish stage not opened in a browser; the Day 7 and 8 script pages were not all read; the Day 9 key and slips pages were not read.
+- Not on the site until Ian merges.
+
+## 2026-11-24: Chem Unit 4 day 6, practice for ionic bonds, formulas and names (same branch, not pushed)
+- Built: sheet (2 pages), Set B, exit slips, key, run sheet, board `#lesson=practice6` (sw.js cache v12, e2e frame count 4).
+- Checks run: board bundle builds; sheet and key pages read; every PDF converted.
+- Not run: board frames not screenshotted, lesson-board e2e and smoke (no local server); the Trends Lab stages 2 and 3 were not opened in a browser. Not on the site until Ian merges.
+
+## 2026-11-24: Chem Unit 4 day 5, ionic formulas and names (same branch, not pushed)
+- Built: notes and key (2 pages each), board `#lesson=formulas` (sw.js cache v11, e2e frame count 6), board script (2 pages).
+- Checks run: board bundle builds; both notes PDFs are 2 pages and the key was read; script compiles and page 1 was read.
+- Not run: board frames not screenshotted, lesson-board e2e and smoke (no local server). Not on the site until Ian merges.
+
+## 2026-11-24: Chem Unit 4 day 4, ionic bonds and ion charges (same branch, not pushed)
+- Built: notes and key (2 pages each), board `#lesson=ionic` (sw.js cache v10, e2e frame count 6), board script (3 pages).
+- Checks run: board bundle builds; both notes PDFs are 2 pages and were read page by page; script compiles and pages 1 and 2 were read.
+- Not run: board frames not screenshotted, lesson-board e2e and smoke (no local server). Not on the site until Ian merges.
+
+## 2026-11-24: Chem Unit 4 day 2, why atoms bond and Lewis dot symbols (branch `chem-unit4-day2-bonding`)
+
+- Cornell notes (`day-02-bonding-notes.docx`, key, PDF; two pages): valence electrons, the octet rule, Lewis dot symbols, unpaired electrons; a check at the foot of each part; exit check and summary. Built with the Day 1 template (docx-js, matplotlib figures in `src/day-02-notes/`).
+- Lesson board `chemistry/whiteboard/index.html#lesson=bonding` (`tools/whiteboard/src/lessons/chem-bonding.js`, registered in `app.jsx`): six frames, preset only the bare table, the Ne/Na/Cl shell pictures, empty Lewis boxes and the empty unpaired-electron row; Words box per frame; covered checks. Chem board cache bumped to v9; `tests/lesson-board.e2e.js` knows the frame counts for `trends` and `bonding`.
+- Board script `chemistry/unit-4-bonding/day-02-bonding-board-script.pdf` (and .tex): SAY / DRAW with a picture / ASK / WORDS / CHECK, time checkpoints, behind and ahead plans.
+- Dot convention matches the Unit 4 test (Ca two singles; P a top pair and three singles).
+- Day 3 practice (same branch): `day-03-practice-sheet` (two pages), `-sheet-b`, `-exit-slips`, `-key` (likely error per item, exit answers, 4-of-5 decision), `-run-sheet` in `chemistry/unit-4-bonding/`; board `#lesson=practice3` (`chem-practice-3.js`, four frames: warm-up, Trends Lab prompt, whiteboard rounds, exit check). The online half is the existing Trends Lab (4.0 only); Lewis symbols and unpaired electrons are on paper. Every sheet was rendered and read; the board frames were not screenshotted.
+- Checks run: `node --test tests/unit/*.test.js` (456 pass), `node tools/check-lessons.mjs --strict` (0 errors), notes and key rendered to PDF at two pages and read page by page, board script compiled with xelatex and read page by page. Not run: the board frames were not screenshotted and `tests/lesson-board.e2e.js` (`BOARD=chem LESSON=bonding`) and `tests/smoke.js` were not run, because they need a local server on port 8123. Not on the site until Ian merges.
+
 ## 2026-11-24: Chem Unit 4 day 1 board, hybrid style (branch `chem-unit4-day1-hybrid`)
 
 - `#lesson=trends` rebuilt: preset pictures only (bare tables, atoms to scale, empty reactivity grid), empty space to draw in, a green Words box per frame to tick off, a check question with a covered answer at the foot of each part, an exit-check frame. Pen colors fixed for the lesson (legend on frame 0): blue shells/distance, red protons/pull, green new words, purple shared electrons.
@@ -445,3 +476,9 @@ Built by `docs/slot-14/build_slot14.py` (one source; every number computed from 
 - Ian asked what QA/QC practice beyond red teaming belongs in his skills, with the limit that checks must not slow builds. Chosen: one deterministic script, a failure-modes section, risk-tiered use of heavier checks (fresh-context checker, traceability) only on tests, keys and graded work.
 - Added `tools/di_verify.py` (clock sum, content budget, big-question shape, notes/script agreement, banned items on student files, exit slips at six per page, `close()` for two-way answer checks), fixtures in `tests/di-verify/`, `tests/unit/di-verify.test.js`, and `docs/DI-DAY-QA.md` with the proposed `di-day-builder` skill edits.
 - Not done: the skill edits are proposed, not saved; the script has not yet run against a real slot generator (the slot 11 and slot 10 generators were not available here). On branch `qa-di-verifier`, not merged to `main`.
+
+## 2026-11-24 — Chem Unit 4 Day 10 review and Unit 4 stickers
+- Built the Day 10 study guide (mirrors the test, Know-this box per part), key and run sheet as PDFs under `chemistry/unit-4-bonding/`. Compiled with pdflatex and the pages viewed (guide 4 pages, key 3, run sheet 1).
+- Not built: the Day 10 board. Board frames for Days 2 to 9, the lesson-board e2e and the smoke test are still unrun (the local server was refused here).
+- Added 24 stickers #121 to #144 (hand-authored SVG, 3 rare) with a one-page PDF; contact sheet viewed, no text under 40 units. Old stickers #1 to #120 were not available in this session, so duplicates of earlier jokes were not checked.
+- Nothing is committed or on the site until Ian merges.

@@ -1,0 +1,96 @@
+\documentclass[10.5pt]{article}
+\usepackage{fontspec}\defaultfontfeatures{Ligatures=TeX}
+\usepackage[letterpaper,margin=0.6in]{geometry}
+\usepackage{amsmath,xcolor,longtable,array,tikz}
+\usetikzlibrary{arrows.meta}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\definecolor{pblue}{HTML}{1971C2}\definecolor{pred}{HTML}{E03131}\definecolor{pgreen}{HTML}{2F9E44}\definecolor{ppurple}{HTML}{7048E8}\definecolor{pgray}{HTML}{868E96}
+\newfontfamily\mono{TeX Gyre Cursor}
+\newcommand{\mtag}[2]{\colorbox{#1}{\textcolor{white}{\textsf{\fontsize{6.5}{7}\selectfont\bfseries #2}}}}
+\newcommand{\clock}[1]{{\mono\fontsize{7}{8}\selectfont #1}\ }
+% numbered step: \step{num}{tagcolor}{TAG}{text}
+\newcommand{\step}[4]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\mtag{#2}{#3}\ {\small #4}\par\vspace{2pt}}
+\newcommand{\pic}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.42,every node/.style={font=\scriptsize}]#1\end{tikzpicture}\par\vspace{3pt}}
+\newcommand{\CHECK}[3]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\fcolorbox{black}{black!4}{\parbox{2.55in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries CHECK}\ {\fontsize{7.5}{9}\selectfont #2}\par{\fontsize{7.5}{9}\selectfont\textbf{Answer:} #3}\par{\fontsize{7}{8.5}\selectfont\color{pgray} 4 of 5 right: go on. Fewer: one more example, ask again.}}}\par\vspace{3pt}}
+\newcommand{\WATCH}[1]{\par\hspace{0.32in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries\color{pred} WATCH FOR}\ {\small\itshape\color{pred} #1}}\par}
+\newcommand{\bl}[1]{\underline{\textcolor{pgreen}{\textbf{#1}}}}
+\newcommand{\pen}[2]{\textcolor{#1}{\rule{8pt}{8pt}}\ #2}
+\newcommand{\picL}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.6,every node/.style={font=\footnotesize}]#1\end{tikzpicture}\par\vspace{3pt}}
+% shell picture: x, y, shells (list of electron counts is drawn by \shells), label
+\newcommand{\ring}[4]{\draw[pblue] (#1,#2) circle (#3);\foreach \k in {1,...,#4}{\pgfmathsetmacro{\ang}{90+360*\k/#4}\fill ({#1+#3*cos(\ang)},{#2+#3*sin(\ang)}) circle (0.07);}}
+\newcommand{\nuc}[3]{\fill[pred!20] (#1,#2) circle (0.3);\node[pred] at (#1,#2){\tiny #3};}
+% Lewis dots: \sd{x}{y}{n}{offset x}{offset y}{pair spread x}{pair spread y}
+\newcommand{\sd}[7]{\ifnum#3=1 \fill ({#1+#4},{#2+#5}) circle (0.07);\fi\ifnum#3=2 \fill ({#1+#4-#6},{#2+#5-#7}) circle (0.07);\fill ({#1+#4+#6},{#2+#5+#7}) circle (0.07);\fi}
+% \lw{x}{y}{symbol}{top}{right}{bottom}{left}: a box with the symbol and the dots
+\newcommand{\lw}[7]{\draw[pgray] (#1-0.65,#2-0.65) rectangle (#1+0.65,#2+0.65);\node at (#1,#2){\scriptsize #3};\sd{#1}{#2}{#4}{0}{0.45}{0.14}{0}\sd{#1}{#2}{#5}{0.45}{0}{0}{0.14}\sd{#1}{#2}{#6}{0}{-0.45}{0.14}{0}\sd{#1}{#2}{#7}{-0.45}{0}{0}{0.14}}
+\newcommand{\nb}[3]{\draw[pgray] (#1-0.65,#2-0.65) rectangle (#1+0.65,#2+0.65);\node at (#1,#2){\scriptsize #3};}
+% bracket pair with symbol and charge: \bk{x}{y}{symbol}{charge}
+\newcommand{\bk}[4]{\draw (#1-0.7,#2-0.65)--(#1-0.85,#2-0.65)--(#1-0.85,#2+0.65)--(#1-0.7,#2+0.65);\draw (#1+0.7,#2-0.65)--(#1+0.85,#2-0.65)--(#1+0.85,#2+0.65)--(#1+0.7,#2+0.65);\node at (#1,#2){\scriptsize #3};\node[pred,font=\tiny] at (#1+1.15,#2+0.8){#4};}
+\pagestyle{plain}
+\begin{document}
+\begin{center}{\Large\bfseries Unit 4, Day 4 board script: Ionic Bonds and Ion Charges}\\[2pt]{\normalsize College prep \textbullet{} 50 minutes \textbullet{} \texttt{chemistry/whiteboard/index.html\#lesson=ionic}}\end{center}
+\noindent\textbf{Pens.} \pen{pblue}{shells, distance} \quad \pen{pred}{protons, pull} \quad \pen{pgreen}{new words (labels)} \quad \pen{ppurple}{shared electrons, not today} \quad \pen{black}{everything else, including every valence dot}\par
+\noindent\textbf{Steps.} Numbered by frame. Each DRAW step has a small picture of what the board should look like when the step is done. Tick the green Words box as you write each label.\par
+\noindent\textbf{Not today.} No formulas or criss-cross (day 5), no shared pairs (day 7), no energy language, no electron configurations, no metals with more than one charge. Electrons always move from the metal to the nonmetal; do not call the result a molecule.\par\smallskip
+\noindent\fcolorbox{black}{black!3}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small
+\textbf{Time checkpoints.} Be starting frame 2 by \textbf{14:00}, frame 3 by \textbf{22:00}, frame 4 by \textbf{34:00}, the exit check by \textbf{39:00}. The checks are never cut; trim around them.\par
+\textbf{If you are behind,} cut in this order: (1) the worked Mg and O row in frame 3 (step 3.4): ask it as a whiteboard question; (2) the naming table in frame 4 down to three atoms; (3) exit question c; (4) the summary becomes tonight's homework.\par
+\textbf{If you are ahead,} one at a time on whiteboards: \emph{What ion does sulfur form?} ($\text{S}^{2-}$.) \emph{What ion does barium form?} ($\text{Ba}^{2+}$, group 2.) \emph{Name the ion Br forms.} (Bromide.) \emph{Why is there no $\text{Ne}^{-}$?} (Its outer level is already full.)}}\par\medskip
+\begin{longtable}{@{}>{\setlength{\parskip}{5pt}}p{3.55in}@{\hspace{0.25in}}p{3.05in}@{}}
+\multicolumn{2}{@{}l}{\large\bfseries Frame 0: question and warm-up \hfill{\mono\small 0:00--7:00}}\tabularnewline*[2pt]
+\textbf{Essential question.} When a metal meets a nonmetal, what happens to their electrons, and what holds the atoms together afterward?\par
+\textbf{Warm-up.} Sodium has 1 valence electron and chlorine has 7: what happens when they meet? Valence electrons in magnesium? Protons in neutral oxygen? &
+\step{0.1}{black}{SAY}{\clock{0:00}Warm-up is up as they walk in. At 3:00 remove the covers: sodium gives its electron to chlorine; 2; 8. Accept ``sodium loses one, chlorine gains one.''}
+\step{0.2}{black}{SAY}{\clock{5:00}Read the question. Point at the color key: ``Protons are red. They never change today.''} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 1: ions \hfill{\mono\small 7:00--14:00}}\tabularnewline*[2pt]
+An atom is neutral: protons equal electrons. An \bl{ion} is an atom that has gained or lost \bl{electrons}. The number of protons never changes.\par
+An atom that \bl{loses} electrons has more protons than electrons, so it is a positive \bl{cation}. An atom that \bl{gains} electrons is a negative \bl{anion}.\par\smallskip
+\textbf{1.} Sodium loses one electron. A student says it now has 10 protons. What is wrong? &
+\step{1.1}{pred}{DRAW}{In the empty space: a Mg nucleus, $+12$, with 2, 8, 2 electrons. Say: ``Twelve protons, twelve electrons: neutral.''}
+\pic{\ring{0}{0}{0.55}{2}\ring{0}{0}{1.1}{8}\ring{0}{0}{1.65}{2}\nuc{0}{0}{+12}\node at (0,-2.1){Mg atom};}
+\step{1.2}{pblue}{DRAW}{Next to it: the same nucleus, $+12$, with the outer 2 crossed out. Fill the table: Mg ion, 12 protons, 10 electrons, 2+.}
+\pic{\ring{0}{0}{0.55}{2}\ring{0}{0}{1.1}{8}\nuc{0}{0}{+12}\node at (0,-2.1){Mg ion};\node[pgreen,right] at (1.6,0){\textbf{2+}};}
+\step{1.3}{pgreen}{WORDS}{Tick \textbf{ion}, \textbf{electrons}, \textbf{loses}, \textbf{cation}. Then the O row: 8 protons, 10 electrons, 2$-$. Tick \textbf{gains}, \textbf{anion}.}
+\CHECK{1.4}{Sodium loses one electron. A student says it now has 10 protons. What is wrong?}{Protons never change. Sodium has 11 protons and 10 electrons: the ion is 1+.}
+\WATCH{``Losing an electron makes it negative.'' Ask: what is left, more protons or more electrons?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 2: ion charges \hfill{\mono\small 14:00--22:00}}\tabularnewline*[2pt]
+Atoms gain or lose electrons to reach an \bl{octet}. Metals lose their valence electrons. Nonmetals gain enough to make 8, so the charge is 8 minus the valence electrons, and it is \bl{negative}.\par
+\textbf{Example.} Magnesium is in group 2: it \bl{loses} 2 and is $\text{Mg}^{2+}$. Oxygen is in group 16: it \bl{gains} 2 and is $\text{O}^{2-}$.\par\smallskip
+\textbf{2.} A student writes the oxygen ion as $\text{O}^{2+}$. What is wrong with that? &
+\step{2.1}{black!60}{ASK}{Point at the group row. ``Which groups lose electrons, and why?'' (Groups 1, 2, 13: they have 1, 2 or 3 valence electrons to give away.)}
+\step{2.2}{pgreen}{DRAW}{Fill GAINS OR LOSES and ION CHARGE under each group: 1+, 2+, 3+, then 3$-$, 2$-$, 1$-$, none. Say each: ``Group 15: 8 minus 5 is 3, so 3 minus.''}
+\pic{\foreach \i/\n/\c in {0/1/1+,1/2/2+,2/3/3+,3/5/3-,4/6/2-,5/7/1-,6/8/0}{\nb{\i*1.4}{0}{\c}}\node[pgreen,left] at (-0.8,0){CHARGE};}
+\step{2.3}{pgreen}{WORDS}{Tick \textbf{octet}, \textbf{negative}, \textbf{loses}, \textbf{gains}, \textbf{2+}, \textbf{2$-$}.}
+\CHECK{2.4}{A student writes the oxygen ion as $\text{O}^{2+}$. What is wrong with that?}{Oxygen gains electrons, so it has more electrons than protons: the charge is negative, $\text{O}^{2-}$.}
+\WATCH{Writing a plus on every ion. Ask: did it gain or lose?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 3: the ionic bond \hfill{\mono\small 22:00--34:00}}\tabularnewline*[2pt]
+In an ionic bond, electrons move from the \bl{metal} to the \bl{nonmetal}. Each atom becomes an ion, and opposite charges \bl{attract}.\par
+The brackets show an ion. A metal ion has \bl{no} dots left. A nonmetal ion has \bl{8} dots.\par\smallskip
+\textbf{3.} A student draws the electron moving from fluorine to lithium. Which way should it move, and why? &
+\step{3.1}{black}{DRAW}{In the top row: Li with one dot on top, a plus, F with seven dots (pairs on top, right and bottom, one on the left), and an arrow. Draw a curved arrow from lithium's dot to fluorine's open side.}
+\picL{\lw{0}{0}{Li}{1}{0}{0}{0}\node at (1.3,0){+};\lw{2.6}{0}{F}{2}{2}{2}{1}\draw[->] (4,0)--(5,0);\draw[pred,-{Stealth}] (0,0.5) to[bend left=45] (2.1,0.1);}
+\step{3.2}{pgreen}{DRAW}{Right of the arrow: two bracket pairs. Li inside the first with no dots and a $+$; F inside the second with eight dots and a $-$. Label CATION and ANION. Tick \textbf{no} and \textbf{8}.}
+\picL{\bk{0}{0}{Li}{+}\bk{2.4}{0}{F}{$-$}\node[pgreen,font=\tiny] at (0,-1.1){CATION};\node[pgreen,font=\tiny] at (2.4,-1.1){ANION};}
+\step{3.3}{black!60}{ASK}{``Why do they stick together?'' (Opposite charges attract.) Write ATTRACT between the ions. Tick \textbf{metal}, \textbf{nonmetal}, \textbf{attract}.}
+\tabularnewline
+&
+\step{3.4}{black}{DRAW}{Second row, worked together: Mg with two dots (top, right), O with six dots, two curved arrows. Students tell you where each electron goes. End with $\text{Mg}^{2+}$ and $\text{O}^{2-}$ in brackets.}
+\picL{\lw{0}{0}{Mg}{1}{1}{0}{0}\node at (1.3,0){+};\lw{2.6}{0}{O}{2}{2}{1}{1}\draw[->] (4,0)--(5,0);\bk{6}{0}{Mg}{2+}\bk{8.4}{0}{O}{2$-$}}
+\CHECK{3.5}{A student draws the electron moving from fluorine to lithium. Which way should it move, and why?}{From lithium to fluorine: lithium has 1 valence electron to give, and fluorine is one electron short of an octet.}
+\WATCH{Dots left inside the metal's brackets. Ask: did the metal keep any valence electrons?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 4: naming ions \hfill{\mono\small 34:00--39:00}}\tabularnewline*[2pt]
+A cation keeps the name of its element: $\text{Mg}^{2+}$ is the \bl{magnesium} ion. An anion changes its ending to \bl{-ide}: $\text{Cl}^{-}$ is the chloride ion.\par\smallskip
+\textbf{4.} A student calls the ion made from iodine ``iodine ion.'' What is the correct name, and why? &
+\step{4.1}{pgreen}{DRAW}{Fill the Anion row: oxide, nitride, sulfide, bromide, fluoride. Underline each ending. Say: ``Drop the end, add -ide.''}
+\pic{\foreach \i/\n in {0/oxide,1/nitride,2/sulfide,3/bromide,4/fluoride}{\node[font=\tiny] at (\i*2.1,0){\n};\draw[pgreen] (\i*2.1-0.5,-0.25)--(\i*2.1+0.5,-0.25);}}
+\step{4.2}{pgreen}{WORDS}{Tick \textbf{magnesium} and \textbf{-ide}.}
+\CHECK{4.3}{A student calls the ion made from iodine ``iodine ion.'' What is the correct name, and why?}{Iodide: an anion's name ends in -ide.}
+\WATCH{Naming the anion with the element's full name. Ask: does the name end in -ide?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 5: exit check and summary \hfill{\mono\small 39:00--50:00}}\tabularnewline*[2pt]
+\textbf{a.} Give the symbol of the ion each atom forms: lithium, aluminum, chlorine. \textbf{b.} Use Lewis dot symbols to show calcium and oxygen forming ions. Label the cation and the anion. \textbf{c.} Why does aluminum form $\text{Al}^{3+}$ and not $\text{Al}^{+}$?\par
+\textbf{Summary.} Answer the essential question in two or three sentences. Use the words ``electrons'' and ``opposite.'' &
+\step{5.1}{black}{SAY}{\clock{39:00}Alone, silent, 6 minutes. Walk the room. Remove the covers at 45:00: $\text{Li}^{+}$, $\text{Al}^{3+}$, $\text{Cl}^{-}$; Ca gives both dots to O, $[\text{Ca}]^{2+}$ and $[\text{O}]^{2-}$ with 8 dots; aluminum has 3 valence electrons and loses all 3.}
+\step{5.2}{black}{SAY}{\clock{45:00}Summary: silent writing, read two aloud. Listen for ``electrons'' moving from metal to nonmetal and ``opposite'' charges attracting.}
+\step{5.3}{black}{SAY}{\clock{48:00}``Tomorrow we write the formula for what these ions make together. What do you think $\text{Mg}^{2+}$ and $\text{Cl}^{-}$ need to be in balance?'' Stop there.} \tabularnewline
+\end{longtable}
+\end{document}

@@ -9,6 +9,14 @@ import * as lesson34 from './lessons/stats-3-4.js';
 import * as lesson35 from './lessons/stats-3-5.js';
 import * as lesson36 from './lessons/stats-3-6.js';
 import * as lessonTrends from './lessons/chem-trends.js';
+import * as lessonBonding from './lessons/chem-bonding.js';
+import * as lessonPractice3 from './lessons/chem-practice-3.js';
+import * as lessonIonic from './lessons/chem-ionic.js';
+import * as lessonFormulas from './lessons/chem-formulas.js';
+import * as lessonPractice6 from './lessons/chem-practice-6.js';
+import * as lessonCovalent from './lessons/chem-covalent.js';
+import * as lessonNaming from './lessons/chem-naming.js';
+import * as lessonPractice9 from './lessons/chem-practice-9.js';
 import * as lessonZeff from './lessons/chem-zeff.js';
 
 /* One app, one bundle, several boards. The page says which one (window.MRD_BOARD). The chem keys keep their old
@@ -22,7 +30,7 @@ var BOARD = BOARDS[window.MRD_BOARD] || BOARDS.chem;
 var buildLibrary = BOARD.lib.buildLibrary, SHELVES = BOARD.lib.SHELVES;
 /* A lesson board is a board with a whole lesson pre-drawn in frames (stats.html#lesson=3.4). It saves under its own key, so the
    plain board and each lesson board never overwrite one another. */
-var LESSONS = { stats: { '3.4': lesson34, '3.5': lesson35, '3.6': lesson36 }, chem: { zeff: lessonZeff, trends: lessonTrends } };
+var LESSONS = { stats: { '3.4': lesson34, '3.5': lesson35, '3.6': lesson36 }, chem: { zeff: lessonZeff, trends: lessonTrends, bonding: lessonBonding, practice3: lessonPractice3, ionic: lessonIonic, formulas: lessonFormulas, practice6: lessonPractice6, covalent: lessonCovalent, naming: lessonNaming, practice9: lessonPractice9 } };
 var LESSON_ID = (location.hash.match(/^#lesson=([\w.]+)/) || [])[1];
 var LESSON = ((LESSONS[window.MRD_BOARD] || {})[LESSON_ID]) || null;
 var ACTIVE = LESSON ? LESSON.SHELVES.map(function (n) { return SHELVES.filter(function (s) { return s.name === n; })[0]; }).filter(Boolean) : SHELVES;   /* in the lesson's own order */

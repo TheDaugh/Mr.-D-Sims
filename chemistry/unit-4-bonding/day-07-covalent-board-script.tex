@@ -1,0 +1,89 @@
+\documentclass[10.5pt]{article}
+\usepackage{fontspec}\defaultfontfeatures{Ligatures=TeX}
+\usepackage[letterpaper,margin=0.6in]{geometry}
+\usepackage{amsmath,xcolor,longtable,array,tikz}
+\usetikzlibrary{arrows.meta}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\definecolor{pblue}{HTML}{1971C2}\definecolor{pred}{HTML}{E03131}\definecolor{pgreen}{HTML}{2F9E44}\definecolor{ppurple}{HTML}{7048E8}\definecolor{pgray}{HTML}{868E96}
+\newfontfamily\mono{TeX Gyre Cursor}
+\newcommand{\mtag}[2]{\colorbox{#1}{\textcolor{white}{\textsf{\fontsize{6.5}{7}\selectfont\bfseries #2}}}}
+\newcommand{\clock}[1]{{\mono\fontsize{7}{8}\selectfont #1}\ }
+% numbered step: \step{num}{tagcolor}{TAG}{text}
+\newcommand{\step}[4]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\mtag{#2}{#3}\ {\small #4}\par\vspace{2pt}}
+\newcommand{\pic}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.42,every node/.style={font=\scriptsize}]#1\end{tikzpicture}\par\vspace{3pt}}
+\newcommand{\CHECK}[3]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\fcolorbox{black}{black!4}{\parbox{2.55in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries CHECK}\ {\fontsize{7.5}{9}\selectfont #2}\par{\fontsize{7.5}{9}\selectfont\textbf{Answer:} #3}\par{\fontsize{7}{8.5}\selectfont\color{pgray} 4 of 5 right: go on. Fewer: one more example, ask again.}}}\par\vspace{3pt}}
+\newcommand{\WATCH}[1]{\par\hspace{0.32in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries\color{pred} WATCH FOR}\ {\small\itshape\color{pred} #1}}\par}
+\newcommand{\bl}[1]{\underline{\textcolor{pgreen}{\textbf{#1}}}}
+\newcommand{\pen}[2]{\textcolor{#1}{\rule{8pt}{8pt}}\ #2}
+\newcommand{\picL}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.6,every node/.style={font=\footnotesize}]#1\end{tikzpicture}\par\vspace{3pt}}
+% shell picture: x, y, shells (list of electron counts is drawn by \shells), label
+\newcommand{\ring}[4]{\draw[pblue] (#1,#2) circle (#3);\foreach \k in {1,...,#4}{\pgfmathsetmacro{\ang}{90+360*\k/#4}\fill ({#1+#3*cos(\ang)},{#2+#3*sin(\ang)}) circle (0.07);}}
+\newcommand{\nuc}[3]{\fill[pred!20] (#1,#2) circle (0.3);\node[pred] at (#1,#2){\tiny #3};}
+% Lewis dots: \sd{x}{y}{n}{offset x}{offset y}{pair spread x}{pair spread y}
+\newcommand{\sd}[7]{\ifnum#3=1 \fill ({#1+#4},{#2+#5}) circle (0.07);\fi\ifnum#3=2 \fill ({#1+#4-#6},{#2+#5-#7}) circle (0.07);\fill ({#1+#4+#6},{#2+#5+#7}) circle (0.07);\fi}
+% \lw{x}{y}{symbol}{top}{right}{bottom}{left}: a box with the symbol and the dots
+\newcommand{\lw}[7]{\draw[pgray] (#1-0.65,#2-0.65) rectangle (#1+0.65,#2+0.65);\node at (#1,#2){\scriptsize #3};\sd{#1}{#2}{#4}{0}{0.45}{0.14}{0}\sd{#1}{#2}{#5}{0.45}{0}{0}{0.14}\sd{#1}{#2}{#6}{0}{-0.45}{0.14}{0}\sd{#1}{#2}{#7}{-0.45}{0}{0}{0.14}}
+\newcommand{\nb}[3]{\draw[pgray] (#1-0.65,#2-0.65) rectangle (#1+0.65,#2+0.65);\node at (#1,#2){\scriptsize #3};}
+% bracket pair with symbol and charge: \bk{x}{y}{symbol}{charge}
+\newcommand{\bk}[4]{\draw (#1-0.7,#2-0.65)--(#1-0.85,#2-0.65)--(#1-0.85,#2+0.65)--(#1-0.7,#2+0.65);\draw (#1+0.7,#2-0.65)--(#1+0.85,#2-0.65)--(#1+0.85,#2+0.65)--(#1+0.7,#2+0.65);\node at (#1,#2){\scriptsize #3};\node[pred,font=\tiny] at (#1+1.15,#2+0.8){#4};}
+% purple shared pair: \spr{x}{y}{v} (v=1 pair stacked left/right, 0 stacked up/down)
+\newcommand{\spr}[3]{\ifnum#3=1\fill[ppurple] (#1-0.07,#2) circle (1.4pt);\fill[ppurple] (#1+0.07,#2) circle (1.4pt);\else\fill[ppurple] (#1,#2-0.07) circle (1.4pt);\fill[ppurple] (#1,#2+0.07) circle (1.4pt);\fi}
+\pagestyle{plain}
+\begin{document}
+\begin{center}{\Large\bfseries Unit 4, Day 7 board script: Covalent Bonds and Lewis Structures}\\[2pt]{\normalsize College prep \textbullet{} 50 minutes \textbullet{} \texttt{chemistry/whiteboard/index.html\#lesson=covalent}}\end{center}
+\noindent\textbf{Pens.} \pen{pblue}{shells, distance} \quad \pen{pred}{protons, pull} \quad \pen{pgreen}{new words (labels)} \quad \pen{ppurple}{shared electrons} \quad \pen{black}{everything else, including lone pairs}\par
+\noindent\textbf{Steps.} Numbered by frame. Each DRAW step has a small picture of the finished board. Tick the green Words box as you write each label. Every shared pair is purple.\par
+\noindent\textbf{Not today.} No formal charge, no counting total valence electrons, no shapes, no polar bonds, no names (tomorrow). Count unpaired dots, pair them with hydrogen's, and keep the rest as lone pairs.\par\smallskip
+\noindent\fcolorbox{black}{black!3}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small
+\textbf{Time checkpoints.} Frame 2 by \textbf{12:00}, frame 3 by \textbf{21:00}, frame 4 by \textbf{32:00}, exit check by \textbf{39:00}. Checks are never cut.\par
+\textbf{If you are behind,} cut in this order: (1) CH$_4$ in frame 3 becomes a whiteboard question; (2) the CO$_2$ column in frame 4; (3) exit question b; (4) the summary becomes homework.\par
+\textbf{If you are ahead,} on whiteboards: \emph{Draw HF.} (One shared pair, three lone pairs on F.) \emph{Draw $\text{Cl}_2$.} (One shared pair; each Cl keeps three lone pairs.) \emph{Draw $\text{PH}_3$ without looking.} \emph{How many bonds does fluorine make?} (One.)}}\par\medskip
+\begin{longtable}{@{}>{\setlength{\parskip}{5pt}}p{3.55in}@{\hspace{0.25in}}p{3.05in}@{}}
+\multicolumn{2}{@{}l}{\large\bfseries Frame 0: question and warm-up \hfill{\mono\small 0:00--7:00}}\tabularnewline*[2pt]
+\textbf{Essential question.} How do nonmetal atoms share electrons to complete their outer levels, and how do we draw it?\par
+\textbf{Warm-up.} Lewis dot symbol for oxygen. Unpaired electrons in nitrogen? Formula for lithium and fluorine? &
+\step{0.1}{black}{SAY}{\clock{0:00}Warm-up is up as they walk in. At 3:00 remove the covers: pairs on top and right, one dot each on bottom and left; 3; LiF.}
+\step{0.2}{black}{SAY}{\clock{5:00}Read the question. Point at purple: ``Purple is new today. Purple means shared.''} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 1: sharing \hfill{\mono\small 7:00--13:00}}\tabularnewline*[2pt]
+Two nonmetals both pull hard on electrons, so neither can take one. They \bl{share}. Each shared pair is a \bl{covalent bond}, and the atoms it joins make a \bl{molecule}.\par\smallskip
+\textbf{1.} A student says lithium and fluorine share a pair because both want one. What is wrong? &
+\step{1.1}{black}{DRAW}{Fill the table. Ionic: metal + nonmetal, electrons move, ions. Covalent: nonmetal + nonmetal, electrons are shared, molecules. Ask: ``Which is yesterday's?''}
+\pic{\node[right] at (0,0){Ionic: metal + nonmetal, \textbf{move}, ions};\node[pgreen,right] at (0,-0.9){Covalent: nonmetal + nonmetal, \textbf{shared}, molecules};}
+\step{1.2}{pgreen}{WORDS}{Tick \textbf{share}, \textbf{covalent bond}, \textbf{molecule}.}
+\CHECK{1.3}{Lithium and fluorine share a pair because both want one?}{Lithium is a metal: it gives its electron, so they form ions and an ionic bond.}
+\WATCH{Calling every bond between two atoms ``covalent.'' Ask: metal or nonmetal?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 2: the shared pair \hfill{\mono\small 13:00--21:00}}\tabularnewline*[2pt]
+Each atom puts one \bl{unpaired} dot into the shared pair. Two hydrogens share one pair and each has 2 electrons. Chlorine shares one pair with hydrogen; the other six dots stay as \bl{lone pair}s. The shared pair is a \bl{bonding pair}.\par\smallskip
+\textbf{2.} A student draws HCl with only the shared pair and no other dots on chlorine. What is missing? &
+\step{2.1}{black}{DRAW}{Top row: H with one dot, a plus, H with one dot, an arrow. Draw the two dots meeting as one purple pair between the H's. Say: ``Each H has 2 electrons now: full.''}
+\picL{\node at (0,0){H};\fill (0,0.4) circle (1.2pt);\node at (1,0){+};\node at (2,0){H};\fill (2,0.4) circle (1.2pt);\draw[->] (2.8,0)--(3.8,0);\node at (4.6,0){H};\node at (5.8,0){H};\spr{5.2}{0}{1}}
+\step{2.2}{ppurple}{DRAW}{Second row: H and Cl with its seven dots; in the box, H, a purple pair, Cl, and its three lone pairs in black. Label BONDING PAIR and LONE PAIR in green.}
+\picL{\node at (0,0){H};\node at (1.4,0){Cl};\spr{0.7}{0}{1}\fill (1.4,0.4) circle (1.2pt);\fill (1.4,-0.4) circle (1.2pt);\fill (1.8,0.07) circle (1.2pt);\fill (1.8,-0.07) circle (1.2pt);\node[pgreen,font=\tiny] at (0.7,-0.8){bonding pair};\node[pgreen,font=\tiny] at (1.9,0.9){lone pairs};}
+\step{2.3}{pgreen}{WORDS}{Tick \textbf{unpaired}, \textbf{bonding pair}, \textbf{lone pair}.}
+\CHECK{2.4}{HCl with only the shared pair and no other dots on chlorine?}{Chlorine keeps three lone pairs: 7 valence electrons, one now shared.}
+\WATCH{Drawing the dots paired away from the H. Ask: which dot is the shared one?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 3: more bonds \hfill{\mono\small 21:00--30:00}}\tabularnewline*[2pt]
+An atom makes as many bonds as it has \bl{unpaired} electrons: oxygen 2, nitrogen 3, carbon 4. Each bond is a shared pair with one hydrogen. A \bl{Lewis structure} shows every bonding pair and lone pair.\par\smallskip
+\textbf{3.} A student draws H$_2$S with sulfur bonded to two hydrogens and no other dots. How many lone pairs? &
+\step{3.1}{black}{DRAW}{Water together: O with two H, a purple pair on each side, and two black lone pairs on O (top and bottom). Say: ``Oxygen had two unpaired dots, so two bonds.''}
+\picL{\node at (0,0){O};\node at (-1.2,0){H};\node at (1.2,0){H};\spr{-0.6}{0}{1}\spr{0.6}{0}{1}\spr{0}{0.45}{1}\spr{0}{-0.45}{1}}
+\step{3.2}{black}{DRAW}{Students draw NH$_3$ and CH$_4$ on whiteboards first, then you draw them: N with three H and one lone pair on top; C with four H and no lone pairs.}
+\step{3.3}{pgreen}{WORDS}{Tick \textbf{Lewis structure} and \textbf{unpaired}.}
+\CHECK{3.4}{H$_2$S with sulfur bonded to two hydrogens and no other dots?}{Sulfur is in group 16 like oxygen: 2 bonds and 2 lone pairs.}
+\WATCH{Adding a fifth bond to carbon or a lone pair to carbon in methane. Ask: how many unpaired dots?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 4: double and triple bonds \hfill{\mono\small 30:00--38:00}}\tabularnewline*[2pt]
+An atom with 2 unpaired electrons can share two pairs with the same atom; with 3, three pairs. A \bl{double bond} is two shared pairs and a \bl{triple bond} is three. Each line stands for one shared pair.\par\smallskip
+\textbf{4.} A student says the bond in N$_2$ is a double bond. What is wrong? &
+\step{4.1}{ppurple}{DRAW}{Draw O$_2$ with a double line, each O with two lone pairs; N$_2$ with a triple line, each N with one lone pair. Say: ``Oxygen has two unpaired dots, so two shared pairs.''}
+\picL{\node at (0,0){O};\node at (1.4,0){O};\draw[ppurple] (0.25,0.05)--(1.15,0.05);\draw[ppurple] (0.25,-0.05)--(1.15,-0.05);\node at (3.2,0){N};\node at (4.6,0){N};\draw[ppurple] (3.45,0.1)--(4.35,0.1);\draw[ppurple] (3.45,0)--(4.35,0);\draw[ppurple] (3.45,-0.1)--(4.35,-0.1);}
+\step{4.2}{pgreen}{DRAW}{Fill the table: O$_2$ 2, double; N$_2$ 3, triple; CO$_2$ each C--O 2, double. Tick \textbf{double bond} and \textbf{triple bond}.}
+\CHECK{4.3}{The bond in N$_2$ is a double bond?}{Each nitrogen has 3 unpaired electrons: 3 shared pairs, a triple bond.}
+\WATCH{Counting the lines as electrons. Ask: how many electrons are in one shared pair?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 5: exit check and summary \hfill{\mono\small 38:00--50:00}}\tabularnewline*[2pt]
+\textbf{a.} Lewis structure of PH$_3$, P in the center. \textbf{b.} Lone pairs on oxygen in water and on carbon in methane. \textbf{c.} Pairs shared by two nitrogen atoms, and the name.\par
+\textbf{Summary.} Answer the essential question in two or three sentences. Use the words ``share'' and ``unpaired.'' &
+\step{5.1}{black}{SAY}{\clock{38:00}Alone, silent, 6 minutes. Remove the covers at 44:00: P with three H and one lone pair; oxygen 2, carbon 0; 3 pairs, a triple bond.}
+\step{5.2}{black}{SAY}{\clock{44:00}Summary: silent writing, read two aloud. Listen for ``share'' and ``unpaired.''}
+\step{5.3}{black}{SAY}{\clock{48:00}``Tomorrow: how do we name these molecules, and how do we tell all three kinds of bond apart?'' Stop there.} \tabularnewline
+\end{longtable}
+\end{document}
