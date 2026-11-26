@@ -16,7 +16,7 @@ function lessonList() {
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'shared/lessons.js'), 'utf8'), win);
   return win.MrD.lessons || [];
 }
-const extra = ['index.html', 'physics/index.html', 'chemistry/index.html', 'calculus/index.html', 'stats/index.html', 'stats/shared/kit-demo.html', 'teacher/index.html', 'portal/index.html',
+const extra = ['index.html', 'physics/index.html', 'chemistry/index.html', 'calculus/index.html', 'stats/index.html', 'stats/shared/kit-demo.html', 'teacher/index.html', 'teacher/boards.html', 'portal/index.html',
   'physics/lessons/teacher.html', 'chemistry/teacher.html', 'calculus/teacher.html', 'stats/teacher.html',
   'chemistry/whiteboard/index.html', 'stats/whiteboard/index.html', 'physics/whiteboard/index.html'];
 

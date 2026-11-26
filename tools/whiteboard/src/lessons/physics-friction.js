@@ -138,4 +138,4 @@ function build(convert) {
 
 export { build, FRAMES, SHELVES };
 export var ID = 'friction';
-export var TITLE = 'Physics Unit 3 · Friction';
+export var TITLE = 'Physics Unit 3 · Day 1 · Friction';

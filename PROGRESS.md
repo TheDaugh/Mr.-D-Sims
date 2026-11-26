@@ -2,6 +2,13 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-25: Teacher whiteboard page (same branch, `physics-forces-friction-day1`)
+- Built `teacher/boards.html`: one tab per class (physics, chemistry, statistics, calculus), each with the blank board, every lesson board grouped by unit in day order, a search box, and a button for every frame. Links open in one named tab per class, so the pen display reuses the same tab. Linked from `teacher/index.html` and from the physics, chem and stats teacher pages (`boards.html#<class>`).
+- Board changes (`tools/whiteboard/src/app.jsx`): `#lesson=<id>&frame=<n>` opens a lesson at frame n; a hash change reloads the board (pagehide saves first), so switching lessons in an open tab works.
+- `tools/whiteboard/build.mjs` now writes `shared/whiteboard/lessons.js` (the lesson-board index) from `app.jsx` and each lesson's ID, TITLE and FRAMES (`tools/whiteboard/lesson-index.mjs`). New boards appear on the page after a rebuild; `tests/unit/board-index.test.js` fails if the index is stale. Lesson TITLEs should read `<Course> Unit N · Day N · Topic` so the page sorts them. The friction board's title now has "Day 1".
+- Checks run: unit tests 458 pass, 0 fail; `tests/boards-page.e2e.js` all 12 pass (new); smoke all 58 pages load clean (boards.html added). Page screenshotted on the physics and chem tabs.
+- Not on the site until Ian merges.
+
 ## 2026-11-25: Physics Forces, last block: plan, test, equation sheet, Day 1 friction (branch `physics-forces-friction-day1`)
 - Plan: `physics/Unit 3 - Forces/README.md` right-sizes the UbD v3 targets F10 to F16 and F19 into standards 3.10 to 3.15 (core and stretch, cut list), a 10-day map (notes, notes, practice; quiz; cargo-ramp practice; review; test) and one real thing per practice day (Canton Avenue, Hyatt skywalks, hanging chain, cargo ramp). Practice days are online sim first, then a worksheet (no lab gear yet). The third law already had its quiz.
 - Built: test and key (39 points, `src/test/test.tex`, pdflatex with `mode.tex`); equation sheet (`src/eq-sheet/`); Day 1 Cornell notes and key (2 pages each, `src/day-01-notes/`); board script (4 pages, xelatex); the first physics lesson board, `physics/whiteboard/index.html#lesson=friction` (`tools/whiteboard/src/lessons/physics-friction.js`, registered in `app.jsx`). Shared bundle rebuilt, so all three board caches bumped (physics v2, chem v16, stats v7). `tests/lesson-board.e2e.js`: friction 6 frames; MINCOVERS is 10 for every board but stats.

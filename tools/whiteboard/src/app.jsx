@@ -34,6 +34,11 @@ var buildLibrary = BOARD.lib.buildLibrary, SHELVES = BOARD.lib.SHELVES;
 var LESSONS = { stats: { '3.4': lesson34, '3.5': lesson35, '3.6': lesson36 }, chem: { zeff: lessonZeff, trends: lessonTrends, bonding: lessonBonding, practice3: lessonPractice3, ionic: lessonIonic, formulas: lessonFormulas, practice6: lessonPractice6, covalent: lessonCovalent, naming: lessonNaming, practice9: lessonPractice9 }, physics: { friction: lessonFriction } };
 var LESSON_ID = (location.hash.match(/^#lesson=([\w.]+)/) || [])[1];
 var LESSON = ((LESSONS[window.MRD_BOARD] || {})[LESSON_ID]) || null;
+/* #lesson=<id>&frame=<n> opens the lesson at frame n (teacher/boards.html links straight to a frame). Changing the address
+   in an open board tab (a new lesson or frame from boards.html) reloads it; pagehide saves the drawing first. */
+var START_FRAME = (location.hash.match(/[&?]frame=(\d+)/) || [])[1];
+START_FRAME = START_FRAME === undefined ? null : Number(START_FRAME);
+window.addEventListener('hashchange', function () { location.reload(); });
 var ACTIVE = LESSON ? LESSON.SHELVES.map(function (n) { return SHELVES.filter(function (s) { return s.name === n; })[0]; }).filter(Boolean) : SHELVES;   /* in the lesson's own order */
 var ALL = location.hash === '#all'; /* every stencil laid out in a grid, never saved; for checking and for printing a stencil sheet */
 
@@ -95,7 +100,7 @@ function App() {
     var start = shelves.indexOf(lib.current.last) >= 0 ? lib.current.last : ACTIVE[0].name;
     setShelf(start);
     show(start);
-    if (LESSON && !saved.current) setTimeout(function () { goFrame(0); }, 250);
+    if (LESSON && (START_FRAME !== null || !saved.current)) setTimeout(function () { goFrame(START_FRAME || 0); }, 250);
   }, [show]);
 
   /* Lesson boards: jump to a frame (one screen of the lesson). */
