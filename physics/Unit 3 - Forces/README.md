@@ -52,7 +52,7 @@ Rhythm, as in chem: two notes days, then a practice day; a quiz after two blocks
 | 3 | Practice (built) | 3.11–3.12 | Friction Sandbox (`physics/sandbox/friction-push.html`, new), then the ramp sandbox for the slip angle (`physics/sandbox/ramp-pulley.html`, counterweight 0) | Canton Avenue |
 | 4 | Notes: connected systems (built) | 3.13 | | |
 | 5 | Notes: springs and Hooke's law (built) | 3.14 | | |
-| 6 | Practice | 3.13–3.14 | Two-Block Lab (`physics/lessons/sims/twoblock.html`); a spring sim (none in the repo: build a small one, or PhET Hooke's Law as a stand-in) | Hyatt skywalks; hanging chain |
+| 6 | Practice | 3.13–3.14 | Spring Sandbox (`physics/sandbox/spring-hang.html`, new) for the Hooke's law lab; Two-Block Lab (`physics/lessons/sims/twoblock.html`) | Hyatt skywalks; hanging chain |
 | 7 | Quiz (25 min) + flex | 3.11–3.14 | flex: reteach from the exit slips | |
 | 8 | Practice: everything | all | ramp-and-pulley sandbox (`physics/sandbox/ramp-pulley.html`) | the cargo ramp |
 | 9 | Review (study guide) | all | | |
@@ -124,11 +124,14 @@ Four parts (systems, a table and a hanging mass, the Atwood machine, friction on
 
 Four parts (Hooke's law, k from a graph, a hanging mass, a spring in a system), a check at the foot of each, an exit check and a summary. Part 4 puts a spring in the Day 4 carts' rope, so the spring reads the tension students already found. Numbers: 80 N/m and 0.15 m (12 N); 3 N per 0.025 m (120 N/m); 0.60 kg on it (0.049 m); a 200 N/m spring in the carts' rope (0.020 m). The exit uses 250 N/m, 80 N/m and 0.50 kg. None is a test number. The elevator spring scale (the 3.14 stretch) is only an "ahead" question in the script.
 
+## The Spring Sandbox (for Day 6)
+
+`physics/sandbox/spring-hang.html` (`#key` for the teacher key; physics in `spring-hang-model.js`, checkpoints in `spring-hang-checkpoints.js`). A spring on a lab stand beside a ruler that reads the stretch; four springs (20, 60, 150, 400 N/m, `author_set`) or your own k; 0.05 to 3 kg; four planets; an elevator speeding up or slowing down (the 3.14 stretch). Let go (it bounces about 1.4 times past where it settles, then settles) or lower gently; past 45 cm the spring snaps. Force arrows, instruments, a force-against-stretch graph built from recorded points. Predict the stretch in centimetres first (within 10% or half a centimetre counts; a snap on the bounce is graded against where it would settle). Three checkpoints: how hard does it pull, find a mystery spring's k (k and the spring force hidden), predict the stretch. No question uses the test's springs (50, 200, 400 N/m). Stands in for the Hooke's law lab until there are springs and hangers.
+
 ## Every board, one page
 
 `teacher/boards.html` lists every lesson board by class and unit, with a button for each frame. A new board shows up there after `node tools/whiteboard/build.mjs`; title it `Physics Unit 3 · Day N · Topic` so it sorts.
 
 ## Open for Ian
 
-- A small spring sim for Day 6 is the one missing sim (PhET Hooke's Law works until then).
 - The Rope Tension Profile and Elevator Scale sims (`physics/lessons/sims/`) are unused here; the elevator fits the 3.14 stretch if wanted.

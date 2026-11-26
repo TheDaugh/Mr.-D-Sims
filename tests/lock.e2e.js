@@ -31,6 +31,8 @@ const TARGETS = [
   /* the ramp-and-pulley sandbox (a standalone page, locked mode from the Begin click; physics' own period) */
   { name: 'physics ramp-pulley sandbox', url: '/physics/sandbox/ramp-pulley.html', clockAt: '2026-10-21T09:05:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
+  { name: 'physics spring sandbox', url: '/physics/sandbox/spring-hang.html', clockAt: '2026-10-21T09:05:00-04:00', student: '65J-7TGT',
+    begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
   { name: 'physics friction sandbox', url: '/physics/sandbox/friction-push.html', clockAt: '2026-10-21T09:05:00-04:00', student: '65J-7TGT',
     begin: async page => { await page.fill('#mrd-id', '65J-7TGT'); await page.fill('#mrd-period', '3'); await page.locator('#mrd-period').blur(); await page.waitForTimeout(400); await page.click('#bBegin'); } },
   /* Unit 4 Day 1 Explore: Trends Explorer, a standalone page (chem's own period; also goes black 20 minutes after the bell, see tests/trends-explorer.e2e.js) */
