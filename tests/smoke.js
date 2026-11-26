@@ -20,7 +20,8 @@ const extra = ['index.html', 'physics/index.html', 'chemistry/index.html', 'calc
   'physics/lessons/teacher.html', 'chemistry/teacher.html', 'calculus/teacher.html', 'stats/teacher.html',
   'chemistry/whiteboard/index.html', 'stats/whiteboard/index.html', 'physics/whiteboard/index.html',
   'physics/sandbox/ramp-pulley.html', 'physics/sandbox/ramp-pulley.html#key', 'physics/sandbox/friction-push.html', 'physics/sandbox/friction-push.html#key',
-  'physics/sandbox/spring-hang.html', 'physics/sandbox/spring-hang.html#key'];
+  'physics/sandbox/spring-hang.html', 'physics/sandbox/spring-hang.html#key',
+  'physics/virtual-lab/index.html?lab=06-spring-scales', 'physics/virtual-lab/index.html?lab=06-spring-scales#key'];
 
 (async () => {
   const pages = [];
@@ -28,7 +29,7 @@ const extra = ['index.html', 'physics/index.html', 'chemistry/index.html', 'calc
   extra.forEach(p => pages.push(p));
   ['arrow', 'elevator', 'friction', 'twoblock', 'rope', 'chain'].forEach(id => pages.push('physics/lessons/sims/' + id + '.html'));   // slot 4 sims
   (process.env.PAGES || '').split(',').filter(Boolean).forEach(p => pages.push(p));
-  const seen = new Set(), list = pages.filter(p => !seen.has(p) && seen.add(p) && fs.existsSync(path.join(ROOT, p.split('#')[0])));
+  const seen = new Set(), list = pages.filter(p => !seen.has(p) && seen.add(p) && fs.existsSync(path.join(ROOT, p.split(/[?#]/)[0])));
   const br = await chromium.launch({ executablePath: CHROME, args: ['--no-sandbox'] });
   let bad = 0;
   for (const p of list) {

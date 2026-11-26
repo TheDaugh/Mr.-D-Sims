@@ -67,6 +67,10 @@ const TARGETS = [
     begin: async page => { await page.waitForTimeout(900); await page.fill('#student', 'Lockie Test'); await page.click('#introGo'); },
     reopen: async page => { const b = page.locator('button:has-text("Continue where I left off")'); if (await b.count()) await b.click(); },
     gateInput: 'input[aria-label="Unlock code from Mr. D"]', gateButton: 'button:has-text("Unlock")' },
+  { name: 'virtual lab physics 06-spring-scales', url: '/physics/virtual-lab/index.html?lab=06-spring-scales', clockAt: '2026-10-21T09:05:00-04:00', student: 'Lockie Test', saveMs: 6000,
+    begin: async page => { await page.waitForTimeout(900); await page.fill('#student', 'Lockie Test'); await page.click('#introGo'); },
+    reopen: async page => { const b = page.locator('button:has-text("Continue where I left off")'); if (await b.count()) await b.click(); },
+    gateInput: 'input[aria-label="Unlock code from Mr. D"]', gateButton: 'button:has-text("Unlock")' },
 ];
 
 const STUB = () => {

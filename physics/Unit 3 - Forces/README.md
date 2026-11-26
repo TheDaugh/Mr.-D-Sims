@@ -52,7 +52,7 @@ Rhythm, as in chem: two notes days, then a practice day; a quiz after two blocks
 | 3 | Practice (built) | 3.11–3.12 | Friction Sandbox (`physics/sandbox/friction-push.html`, new), then the ramp sandbox for the slip angle (`physics/sandbox/ramp-pulley.html`, counterweight 0) | Canton Avenue |
 | 4 | Notes: connected systems (built) | 3.13 | | |
 | 5 | Notes: springs and Hooke's law (built) | 3.14 | | |
-| 6 | Practice | 3.13–3.14 | Spring Sandbox (`physics/sandbox/spring-hang.html`, new) for the Hooke's law lab; Two-Block Lab (`physics/lessons/sims/twoblock.html`) | Hyatt skywalks; hanging chain |
+| 6 | Practice (built) | 3.13–3.14 | Virtual Lab 6, the Spring Scale Bench (`physics/virtual-lab/index.html?lab=06-spring-scales`, new, 25 minutes); the Spring Sandbox stays as free play | Hyatt skywalks; hanging chain |
 | 7 | Quiz (25 min) + flex | 3.11–3.14 | flex: reteach from the exit slips | |
 | 8 | Practice: everything | all | ramp-and-pulley sandbox (`physics/sandbox/ramp-pulley.html`) | the cargo ramp |
 | 9 | Review (study guide) | all | | |
@@ -123,6 +123,24 @@ Four parts (systems, a table and a hanging mass, the Atwood machine, friction on
 | Board script | `day-05-springs-board-script.pdf` (source `.tex`, xelatex) |
 
 Four parts (Hooke's law, k from a graph, a hanging mass, a spring in a system), a check at the foot of each, an exit check and a summary. Part 4 puts a spring in the Day 4 carts' rope, so the spring reads the tension students already found. Numbers: 80 N/m and 0.15 m (12 N); 3 N per 0.025 m (120 N/m); 0.60 kg on it (0.049 m); a 200 N/m spring in the carts' rope (0.020 m). The exit uses 250 N/m, 80 N/m and 0.50 kg. None is a test number. The elevator spring scale (the 3.14 stretch) is only an "ahead" question in the script.
+
+## Day 6: practice, connected objects and springs (3.13, 3.14)
+
+Online first (25 minutes from the bell), then paper. The real things: the Hyatt Regency skywalks (Kansas City, July 17, 1981, 114 dead; as built, the nut under the upper walkway held both walkways) and a chain with mass (each link holds everything below it).
+
+| Piece | File |
+|---|---|
+| Virtual Lab 6, the Spring Scale Bench (new; modeled on the photoelectron lab) | `physics/virtual-lab/index.html?lab=06-spring-scales`, `#key` for the teacher key; `physics/virtual-lab/src/engine/scales.js`, `src/ui/scales.js`, `content/labs/06-spring-scales.json` |
+| Student sheet (2 pages: review, concepts, practice, the chain, the skywalks, a finisher) | `day-06-practice-sheet.docx`, `.pdf` |
+| Practice Set B (its own sheet, no label: friction on the table, a rope with mass, the elevator scale) | `day-06-practice-sheet-b.docx`, `.pdf` |
+| Exit slips (four to a page) | `day-06-practice-exit-slips.docx`, `.pdf` |
+| Key with the likely error for every item, the slip answers, the 4-of-5 decision and where to reteach | `day-06-practice-key.docx`, `.pdf` |
+| Teacher run sheet | `day-06-practice-run-sheet.docx`, `.pdf` |
+| Board | `physics/whiteboard/index.html#lesson=practice6` (`tools/whiteboard/src/lessons/physics-practice-6.js`): open the lab and the hook, the huddle (minute 13), whiteboard rounds, exit check |
+
+Sources in `src/day-06-practice/` (`python3 figs.py`, then `node make.js sheet|setb|slips|key|run`). No item copies a test item or uses a test number. The 40 kN walkway load and 60 kN nut limit on the sheet are labeled "suppose".
+
+**The Spring Scale Bench.** One spring scale, four rigs. A: hang 0.1 to 0.4 kg beside a ruler, record three, type k (seeded per student from 20 to 60 N/m, never 50; within 4%); after that the scale reads in newtons. B: the scale in the string of a cart (1.5, 2.0 or 4.0 kg) pulled by a hanging mass (0.25, 0.5 or 1.0 kg): held it reads mg; predict, release, and it reads Mmg/(M + m). C: two walkways on rods, people on each; the rods read the same in both designs, the circled nut doubles as built; then the real story. D: six links (seeded 0.10 to 0.25 kg) and a bucket; click a gap to move the scale; predict the top before reading it. Three checks on the shared rule (spring, string, hang), every answer typed, generated per student, hints that name the mistake (centimetres, mass for weight, the held value, the acceleration, forgetting the bucket, the whole chain). One notes huddle at the middle (five blanks, board frame 1). Locked mode, demo, `#key`.
 
 ## The Spring Sandbox (for Day 6)
 

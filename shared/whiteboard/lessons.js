@@ -222,5 +222,16 @@ window.MRD_BOARD_LESSONS = [
    "4 A spring in a system",
    "5 Exit check"
   ]
+ },
+ {
+  "board": "physics",
+  "id": "practice6",
+  "title": "Physics Unit 3 · Day 6 · Practice: strings, springs and what hangs below",
+  "frames": [
+   "0 Open the lab",
+   "1 Huddle",
+   "2 Whiteboard rounds",
+   "3 Exit check"
+  ]
  }
 ];
