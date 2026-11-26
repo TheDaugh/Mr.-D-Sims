@@ -2,6 +2,11 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-26: Physics Forces Day 7, flex and quiz (same branch, `physics-forces-day6-scales`)
+- Built: `forces-quiz.pdf` and key (8 questions, 28 points, 3 pages; source `src/quiz/quiz.tex`, the test's LaTeX setup and equation box); flex sheet and key (one page, one short set per standard); run sheet (20 minutes of flex sorted by the Day 6 exit slips, then the 25-minute quiz). README Day 7 section and day-map row.
+- Checks run: every quiz and flex answer recomputed in Python and matches the key; every page of the quiz, quiz key, flex sheet, flex key and run sheet rendered and read. No site code changed, so no tests were rerun.
+- Not on the site until Ian merges.
+
 ## 2026-11-26: Physics Forces Day 6, Virtual Lab 6 (the Spring Scale Bench) and the practice kit (branch `physics-forces-day6-scales`, from `physics-forces-day5-springs`)
 - Ian: base Day 6 on the photoelectron virtual lab (tutorial, help, application, beyond the everyday). His picks: the spring scales lab (A calibrate, B table and hanging mass, C Hyatt skywalks, D hanging chain, three checks), 25 minutes.
 - Built: `physics/virtual-lab/src/engine/scales.js` (model, generated checks, hints, huddle blanks), `src/ui/scales.js` (kind `scales`, on the PES and Pull Bench interface: one bench dialog with four SVG rigs, step card, tutorial arrows, help lock, demo of 10 captions, `#key` key rows, one notes huddle at the middle), `content/labs/06-spring-scales.json` (every student word, a term list), room `content/rooms/physics-scales.json`, `scale_rig` art and icon; registered in `src/host.js`. Hub card in `physics/sims.js`. Lock and vlab-standard e2e targets added; smoke now includes the lab and its `#key` page (and skips query strings when checking a file exists).

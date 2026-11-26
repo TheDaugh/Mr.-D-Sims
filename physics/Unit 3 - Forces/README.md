@@ -53,7 +53,7 @@ Rhythm, as in chem: two notes days, then a practice day; a quiz after two blocks
 | 4 | Notes: connected systems (built) | 3.13 | | |
 | 5 | Notes: springs and Hooke's law (built) | 3.14 | | |
 | 6 | Practice (built) | 3.13–3.14 | Virtual Lab 6, the Spring Scale Bench (`physics/virtual-lab/index.html?lab=06-spring-scales`, new, 25 minutes); the Spring Sandbox stays as free play | Hyatt skywalks; hanging chain |
-| 7 | Quiz (25 min) + flex | 3.11–3.14 | flex: reteach from the exit slips | |
+| 7 | Quiz (25 min) + flex (built) | 3.11–3.14 | flex: reteach from the exit slips | |
 | 8 | Practice: everything | all | ramp-and-pulley sandbox (`physics/sandbox/ramp-pulley.html`) | the cargo ramp |
 | 9 | Review (study guide) | all | | |
 | 10 | Test | all | | |
@@ -141,6 +141,16 @@ Online first (25 minutes from the bell), then paper. The real things: the Hyatt 
 Sources in `src/day-06-practice/` (`python3 figs.py`, then `node make.js sheet|setb|slips|key|run`). No item copies a test item or uses a test number. The 40 kN walkway load and 60 kN nut limit on the sheet are labeled "suppose".
 
 **The Spring Scale Bench.** One spring scale, four rigs. A: hang 0.1 to 0.4 kg beside a ruler, record three, type k (seeded per student from 20 to 60 N/m, never 50; within 4%); after that the scale reads in newtons. B: the scale in the string of a cart (1.5, 2.0 or 4.0 kg) pulled by a hanging mass (0.25, 0.5 or 1.0 kg): held it reads mg; predict, release, and it reads Mmg/(M + m). C: two walkways on rods, people on each; the rods read the same in both designs, the circled nut doubles as built; then the real story. D: six links (seeded 0.10 to 0.25 kg) and a bucket; click a gap to move the scale; predict the top before reading it. Three checks on the shared rule (spring, string, hang), every answer typed, generated per student, hints that name the mistake (centimetres, mass for weight, the held value, the acceleration, forgetting the bucket, the whole chain). One notes huddle at the middle (five blanks, board frame 1). Locked mode, demo, `#key`.
+
+## Day 7: flex and quiz (3.11 to 3.14)
+
+| Piece | File |
+|---|---|
+| Quiz (8 questions, 28 points, 25 minutes, 3 pages) and key | `forces-quiz.pdf`, `forces-quiz-key.pdf`; source `src/quiz/quiz.tex` (pdflatex with a `mode.tex` holding `\keytrue` or `\keyfalse`, as the test) |
+| Flex sheet (one short set per standard, 1 page) and key | `day-07-flex-sheet.docx`, `.pdf`, `day-07-flex-key.docx`, `.pdf` |
+| Run sheet (20 minutes of flex driven by the Day 6 slips, then the quiz) | `day-07-run-sheet.docx`, `.pdf` |
+
+Sources for the flex sheet and run sheet in `src/day-07-flex/` (`node make.js sheet|key|run`). Quiz numbers: an 18 kg crate with μs 0.35 and μk 0.20 (pushes of 45 N and 80 N); 8.0 kg on a frictionless 35° ramp; a 4.0 kg cart with a 1.2 kg hanging mass; an Atwood machine of 7.0 and 3.0 kg; a spring at 1.5 N per 0.020 m (75 N/m) with 0.80 kg; a 150 N/m spring scale in Q5's string. None is a test number, and none repeats a notes, practice or slip item. The third law is not on it (it had its own quiz).
 
 ## The Spring Sandbox (for Day 6)
 
