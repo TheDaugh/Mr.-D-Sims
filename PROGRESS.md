@@ -2,6 +2,12 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-25: Physics Forces Day 2, inclines (same branch, `physics-forces-friction-day1`)
+- Built: Cornell notes and key (2 pages each, `physics/Unit 3 - Forces/src/day-02-notes/`); board `physics/whiteboard/index.html#lesson=inclines` (`tools/whiteboard/src/lessons/physics-inclines.js`, a ramp drawn to its angle with a rotated block); board script (4 pages, xelatex). One 5.0 kg block on 20° all day; none are test numbers. README Day 2 section; e2e frame count 6.
+- `tests/lesson-board.e2e.js`: the covers check is now `>=` (it wanted more than 10 and the chem and physics boards have exactly 10, so it failed on every one of them).
+- Checks run: unit tests 458 pass, 0 fail; `boards-page.e2e.js` all pass (the page now lists 15 boards); smoke 58 pages clean; lesson-board e2e for physics friction and inclines, chem bonding and stats 3.4: covers now pass, 1 fail each, the Chromium "unload is not allowed" permissions message, which every board logs in this browser. All six inclines frames screenshotted and read; every page of the notes, key and script read; no missing characters in either script.
+- Not on the site until Ian merges.
+
 ## 2026-11-25: Teacher whiteboard page (same branch, `physics-forces-friction-day1`)
 - Built `teacher/boards.html`: one tab per class (physics, chemistry, statistics, calculus), each with the blank board, every lesson board grouped by unit in day order, a search box, and a button for every frame. Links open in one named tab per class, so the pen display reuses the same tab. Linked from `teacher/index.html` and from the physics, chem and stats teacher pages (`boards.html#<class>`).
 - Board changes (`tools/whiteboard/src/app.jsx`): `#lesson=<id>&frame=<n>` opens a lesson at frame n; a hash change reloads the board (pagehide saves first), so switching lessons in an open tab works.

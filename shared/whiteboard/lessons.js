@@ -172,5 +172,18 @@ window.MRD_BOARD_LESSONS = [
    "4 Solving",
    "5 Exit check"
   ]
+ },
+ {
+  "board": "physics",
+  "id": "inclines",
+  "title": "Physics Unit 3 · Day 2 · Inclines",
+  "frames": [
+   "0 Question",
+   "1 Tilted axes",
+   "2 Splitting the weight",
+   "3 N and a",
+   "4 Friction on a ramp",
+   "5 Exit check"
+  ]
  }
 ];

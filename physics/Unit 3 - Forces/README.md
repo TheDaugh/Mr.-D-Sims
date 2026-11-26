@@ -47,8 +47,8 @@ Rhythm, as in chem: two notes days, then a practice day; a quiz after two blocks
 
 | Day | Type | Standards | Sim first | Real thing |
 |---|---|---|---|---|
-| 1 | Notes: friction, static and kinetic | 3.11 | | |
-| 2 | Notes: inclines | 3.12 | | |
+| 1 | Notes: friction, static and kinetic (built) | 3.11 | | |
+| 2 | Notes: inclines (built) | 3.12 | | |
 | 3 | Practice | 3.11–3.12 | Friction Ramp (`physics/lessons/sims/friction.html`), then the ramp sandbox for the slip angle (`physics/sandbox/ramp-pulley.html`, counterweight 0) | Canton Avenue |
 | 4 | Notes: connected systems | 3.13 | | |
 | 5 | Notes: springs and Hooke's law | 3.14 | | |
@@ -75,6 +75,20 @@ Pen colors for the physics boards (proposal): blue for objects and axes, red for
 | Board script | `day-01-friction-board-script.pdf` (source `.tex`, xelatex) |
 
 Four parts (what friction is, static, kinetic, solving), a check at the foot of each, an exit check and a summary. One 12 kg crate all day: N = 118 N, μs = 0.40 (47 N), μk = 0.25 (29 N), a 55 N push (a = 2.1 m/s²). Checks use 10 kg with μs 0.60 and 20 N, and 8.0 kg with μs 0.55 and 40 N; the exit uses a 15 kg toolbox with μk 0.15 and a 50 N pull. None is a test number. Pens for every physics board: blue objects, axes and motion; red forces; green new words; purple components (from day 2).
+
+## Day 2: inclines (3.12)
+
+| Piece | File |
+|---|---|
+| Cornell notes | `day-02-inclines-notes.docx`, `day-02-inclines-notes-key.docx`, previews `.pdf`; source `src/day-02-notes/` (`python3 figs.py`, then `node make.js` and `node make.js key`) |
+| Lesson board | `physics/whiteboard/index.html#lesson=inclines` (source `tools/whiteboard/src/lessons/physics-inclines.js`) |
+| Board script | `day-02-inclines-board-script.pdf` (source `.tex`, xelatex) |
+
+Four parts (tilted axes, splitting the weight, normal force and acceleration, friction on a ramp), a check at the foot of each, an exit check and a summary. One 5.0 kg block on a 20° ramp all day: mg = 49 N, along 16.8 N, N = 46 N, a = 3.4 m/s² with no friction; μk = 0.20 gives fk = 9.2 N and a = 1.5 m/s². Exit uses 4.0 kg on 35°. Purple (components) starts today. The slip angle (tan θ = μs) is held for the Day 3 practice (Canton Avenue); it is one of the script's "ahead" questions.
+
+## Every board, one page
+
+`teacher/boards.html` lists every lesson board by class and unit, with a button for each frame. A new board shows up there after `node tools/whiteboard/build.mjs`; title it `Physics Unit 3 · Day N · Topic` so it sorts.
 
 ## Open for Ian
 

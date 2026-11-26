@@ -4,7 +4,7 @@
 const { chromium } = require(process.env.PLAYWRIGHT_DIR || 'playwright');
 const BOARD = process.env.BOARD || 'stats';
 const LESSON = process.env.LESSON || (BOARD === 'chem' ? 'zeff' : '3.4');
-const NFRAMES = { '3.4': 7, '3.5': 5, '3.6': 5, zeff: 4, trends: 6, bonding: 6, practice3: 4, ionic: 6, formulas: 6, practice6: 4, covalent: 6, naming: 6, practice9: 4, friction: 6 }[LESSON];
+const NFRAMES = { '3.4': 7, '3.5': 5, '3.6': 5, zeff: 4, trends: 6, bonding: 6, practice3: 4, ionic: 6, formulas: 6, practice6: 4, covalent: 6, naming: 6, practice9: 4, friction: 6, inclines: 6 }[LESSON];
 const MINCOVERS = BOARD === 'stats' ? 20 : 10;
 const URL = 'http://localhost:8123/' + (BOARD === 'chem' ? 'chemistry' : BOARD) + '/whiteboard/index.html#lesson=' + LESSON;
 let bad = 0;
@@ -22,7 +22,7 @@ const ok = (c, m) => { if (!c) { bad++; console.log('FAIL ' + m); } else console
   const frames = await p.evaluate(() => window.MRD_API.getSceneElements().filter(e => String(e.id).indexOf('lesson-frame-') === 0).length);
   ok(frames === NFRAMES, NFRAMES + ' lesson frames (' + frames + ')');
   const covers = await p.evaluate(() => window.MRD_API.getSceneElements().filter(e => e.backgroundColor === '#ffd8a8' && e.type === 'rectangle').length);
-  ok(covers > MINCOVERS, 'answer covers present (' + covers + ')');
+  ok(covers >= MINCOVERS, 'answer covers present (' + covers + ')');
   const x0 = await p.evaluate(() => window.MRD_API.getAppState().scrollX);
   await p.click('.frames button:nth-child(3)'); await p.waitForTimeout(900);
   const x1 = await p.evaluate(() => window.MRD_API.getAppState().scrollX);

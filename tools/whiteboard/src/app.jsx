@@ -19,6 +19,7 @@ import * as lessonNaming from './lessons/chem-naming.js';
 import * as lessonPractice9 from './lessons/chem-practice-9.js';
 import * as lessonZeff from './lessons/chem-zeff.js';
 import * as lessonFriction from './lessons/physics-friction.js';
+import * as lessonInclines from './lessons/physics-inclines.js';
 
 /* One app, one bundle, several boards. The page says which one (window.MRD_BOARD). The chem keys keep their old
    names so the boards and shelves already saved in a browser still load. */
@@ -31,7 +32,7 @@ var BOARD = BOARDS[window.MRD_BOARD] || BOARDS.chem;
 var buildLibrary = BOARD.lib.buildLibrary, SHELVES = BOARD.lib.SHELVES;
 /* A lesson board is a board with a whole lesson pre-drawn in frames (stats.html#lesson=3.4). It saves under its own key, so the
    plain board and each lesson board never overwrite one another. */
-var LESSONS = { stats: { '3.4': lesson34, '3.5': lesson35, '3.6': lesson36 }, chem: { zeff: lessonZeff, trends: lessonTrends, bonding: lessonBonding, practice3: lessonPractice3, ionic: lessonIonic, formulas: lessonFormulas, practice6: lessonPractice6, covalent: lessonCovalent, naming: lessonNaming, practice9: lessonPractice9 }, physics: { friction: lessonFriction } };
+var LESSONS = { stats: { '3.4': lesson34, '3.5': lesson35, '3.6': lesson36 }, chem: { zeff: lessonZeff, trends: lessonTrends, bonding: lessonBonding, practice3: lessonPractice3, ionic: lessonIonic, formulas: lessonFormulas, practice6: lessonPractice6, covalent: lessonCovalent, naming: lessonNaming, practice9: lessonPractice9 }, physics: { friction: lessonFriction, inclines: lessonInclines } };
 var LESSON_ID = (location.hash.match(/^#lesson=([\w.]+)/) || [])[1];
 var LESSON = ((LESSONS[window.MRD_BOARD] || {})[LESSON_ID]) || null;
 /* #lesson=<id>&frame=<n> opens the lesson at frame n (teacher/boards.html links straight to a frame). Changing the address
