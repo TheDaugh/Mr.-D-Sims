@@ -40,7 +40,7 @@ test("the room renderer draws every tile of the room with this folder's art, and
   assert.ok(fills(art) > 100);
   assert.ok(fills(art) > fills(undefined), "the track, balance and bar shelf draw more shapes than the chemistry station and shelf they replace");
   const e = createRoomRenderer({ width: 0, height: 0, getContext: () => counter().ctx }, room, art); e.draw({ x: 5, y: 4, face: "l" }, {}, false, { tile: room.legend.T, x: 5, y: 3 }, 1);
-  assert.deepEqual(Object.keys(art({ box() {}, fl() {}, poly() {}, P() {}, tileAt, room })).sort(), ["balance", "bar_shelf", "track"], "keyed by tile id");
+  assert.deepEqual(Object.keys(art({ box() {}, fl() {}, poly() {}, P() {}, tileAt, room })).sort(), ["balance", "bar_shelf", "scale_rig", "track"], "keyed by tile id (scale_rig is lab 6's bench, tested in scales-room.test.js)");
 });
 test("each new object has a picture for hover tips, the shelf screen and the carrying row", () => {
   for (const id of ["bar", "cart", "bar_shelf", "track", "stepcard", "notice"]) assert.equal(typeof icons[id], "function", id);

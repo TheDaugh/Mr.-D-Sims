@@ -1,0 +1,27 @@
+{
+  "id": "physics-scales",
+  "theme": { "wall": "#7d8b99" },
+  "noPPE": true,
+  "start": { "x": 6, "y": 8, "face": "u" },
+  "rows": [
+    "############",
+    "#C.........#",
+    "#..........#",
+    "#...SSS....#",
+    "#..........#",
+    "#..........#",
+    "####D#######",
+    "#..........#",
+    "#N.........#",
+    "#..........#",
+    "############"
+  ],
+  "legend": {
+    "#": { "type": "wall", "solid": true },
+    ".": { "type": "floor" },
+    "D": { "type": "door", "id": "door", "label": "DOOR", "name": "Lab door", "text": "The lab door. It opens when you have read the two cards." },
+    "N": { "type": "info", "solid": true, "id": "notice", "label": "NOTICE", "name": "Notice board", "text": "Today: one spring scale, four rigs. What does each string, rod and link hold?" },
+    "C": { "type": "chalkboard", "solid": true, "id": "stepcard", "label": "STEP CARD", "name": "Step card", "text": "The step card lists every step of the lab, in order." },
+    "S": { "type": "station", "solid": true, "id": "scale_rig", "label": "SCALE BENCH", "name": "Scale bench", "text": "The scale bench: a spring scale, a ruler, a cart and pulley, a walkway model and a hanging chain. Press E to use it." }
+  }
+}

@@ -51,8 +51,8 @@ Rhythm, as in chem: two notes days, then a practice day; a quiz after two blocks
 | 2 | Notes: inclines (built) | 3.12 | | |
 | 3 | Practice (built) | 3.11–3.12 | Friction Sandbox (`physics/sandbox/friction-push.html`, new), then the ramp sandbox for the slip angle (`physics/sandbox/ramp-pulley.html`, counterweight 0) | Canton Avenue |
 | 4 | Notes: connected systems (built) | 3.13 | | |
-| 5 | Notes: springs and Hooke's law | 3.14 | | |
-| 6 | Practice | 3.13–3.14 | Two-Block Lab (`physics/lessons/sims/twoblock.html`); a spring sim (none in the repo: build a small one, or PhET Hooke's Law as a stand-in) | Hyatt skywalks; hanging chain |
+| 5 | Notes: springs and Hooke's law (built) | 3.14 | | |
+| 6 | Practice (built) | 3.13–3.14 | Virtual Lab 6, the Spring Scale Bench (`physics/virtual-lab/index.html?lab=06-spring-scales`, new, 25 minutes); the Spring Sandbox stays as free play | Hyatt skywalks; hanging chain |
 | 7 | Quiz (25 min) + flex | 3.11–3.14 | flex: reteach from the exit slips | |
 | 8 | Practice: everything | all | ramp-and-pulley sandbox (`physics/sandbox/ramp-pulley.html`) | the cargo ramp |
 | 9 | Review (study guide) | all | | |
@@ -114,11 +114,42 @@ Sources in `src/day-03-practice/` (`python3 figs.py`, then `node make.js sheet|s
 
 Four parts (systems, a table and a hanging mass, the Atwood machine, friction on the table), a check at the foot of each, an exit check and a summary. System first for a, then one object for T, and every tension is checked from the other object. Numbers: 2.0 + 4.0 kg carts pulled with 12 N; a 5.0 kg cart with a 2.0 kg hanging mass (a 2.8, T 14 N); Atwood 4.0 and 6.0 kg (a 1.96, T 47 N); the cart with μk 0.20 (a 1.4, T 16.8 N). The exit uses 3.0 kg with 1.5 kg and an Atwood of 2.0 and 8.0 kg. None is a test number.
 
+## Day 5: springs (3.14)
+
+| Piece | File |
+|---|---|
+| Cornell notes | `day-05-springs-notes.docx`, `day-05-springs-notes-key.docx`, previews `.pdf`; source `src/day-05-notes/` (`python3 figs.py`, then `node make.js` and `node make.js key`) |
+| Lesson board | `physics/whiteboard/index.html#lesson=springs` (`tools/whiteboard/src/lessons/physics-springs.js`) |
+| Board script | `day-05-springs-board-script.pdf` (source `.tex`, xelatex) |
+
+Four parts (Hooke's law, k from a graph, a hanging mass, a spring in a system), a check at the foot of each, an exit check and a summary. Part 4 puts a spring in the Day 4 carts' rope, so the spring reads the tension students already found. Numbers: 80 N/m and 0.15 m (12 N); 3 N per 0.025 m (120 N/m); 0.60 kg on it (0.049 m); a 200 N/m spring in the carts' rope (0.020 m). The exit uses 250 N/m, 80 N/m and 0.50 kg. None is a test number. The elevator spring scale (the 3.14 stretch) is only an "ahead" question in the script.
+
+## Day 6: practice, connected objects and springs (3.13, 3.14)
+
+Online first (25 minutes from the bell), then paper. The real things: the Hyatt Regency skywalks (Kansas City, July 17, 1981, 114 dead; as built, the nut under the upper walkway held both walkways) and a chain with mass (each link holds everything below it).
+
+| Piece | File |
+|---|---|
+| Virtual Lab 6, the Spring Scale Bench (new; modeled on the photoelectron lab) | `physics/virtual-lab/index.html?lab=06-spring-scales`, `#key` for the teacher key; `physics/virtual-lab/src/engine/scales.js`, `src/ui/scales.js`, `content/labs/06-spring-scales.json` |
+| Student sheet (2 pages: review, concepts, practice, the chain, the skywalks, a finisher) | `day-06-practice-sheet.docx`, `.pdf` |
+| Practice Set B (its own sheet, no label: friction on the table, a rope with mass, the elevator scale) | `day-06-practice-sheet-b.docx`, `.pdf` |
+| Exit slips (four to a page) | `day-06-practice-exit-slips.docx`, `.pdf` |
+| Key with the likely error for every item, the slip answers, the 4-of-5 decision and where to reteach | `day-06-practice-key.docx`, `.pdf` |
+| Teacher run sheet | `day-06-practice-run-sheet.docx`, `.pdf` |
+| Board | `physics/whiteboard/index.html#lesson=practice6` (`tools/whiteboard/src/lessons/physics-practice-6.js`): open the lab and the hook, the huddle (minute 13), whiteboard rounds, exit check |
+
+Sources in `src/day-06-practice/` (`python3 figs.py`, then `node make.js sheet|setb|slips|key|run`). No item copies a test item or uses a test number. The 40 kN walkway load and 60 kN nut limit on the sheet are labeled "suppose".
+
+**The Spring Scale Bench.** One spring scale, four rigs. A: hang 0.1 to 0.4 kg beside a ruler, record three, type k (seeded per student from 20 to 60 N/m, never 50; within 4%); after that the scale reads in newtons. B: the scale in the string of a cart (1.5, 2.0 or 4.0 kg) pulled by a hanging mass (0.25, 0.5 or 1.0 kg): held it reads mg; predict, release, and it reads Mmg/(M + m). C: two walkways on rods, people on each; the rods read the same in both designs, the circled nut doubles as built; then the real story. D: six links (seeded 0.10 to 0.25 kg) and a bucket; click a gap to move the scale; predict the top before reading it. Three checks on the shared rule (spring, string, hang), every answer typed, generated per student, hints that name the mistake (centimetres, mass for weight, the held value, the acceleration, forgetting the bucket, the whole chain). One notes huddle at the middle (five blanks, board frame 1). Locked mode, demo, `#key`.
+
+## The Spring Sandbox (for Day 6)
+
+`physics/sandbox/spring-hang.html` (`#key` for the teacher key; physics in `spring-hang-model.js`, checkpoints in `spring-hang-checkpoints.js`). A spring on a lab stand beside a ruler that reads the stretch; four springs (20, 60, 150, 400 N/m, `author_set`) or your own k; 0.05 to 3 kg; four planets; an elevator speeding up or slowing down (the 3.14 stretch). Let go (it bounces about 1.4 times past where it settles, then settles) or lower gently; past 45 cm the spring snaps. Force arrows, instruments, a force-against-stretch graph built from recorded points. Predict the stretch in centimetres first (within 10% or half a centimetre counts; a snap on the bounce is graded against where it would settle). Three checkpoints: how hard does it pull, find a mystery spring's k (k and the spring force hidden), predict the stretch. No question uses the test's springs (50, 200, 400 N/m). Stands in for the Hooke's law lab until there are springs and hangers.
+
 ## Every board, one page
 
 `teacher/boards.html` lists every lesson board by class and unit, with a button for each frame. A new board shows up there after `node tools/whiteboard/build.mjs`; title it `Physics Unit 3 · Day N · Topic` so it sorts.
 
 ## Open for Ian
 
-- A small spring sim for Day 6 is the one missing sim (PhET Hooke's Law works until then).
 - The Rope Tension Profile and Elevator Scale sims (`physics/lessons/sims/`) are unused here; the elevator fits the 3.14 stretch if wanted.

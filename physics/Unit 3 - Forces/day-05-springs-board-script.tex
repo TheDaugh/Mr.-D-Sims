@@ -1,0 +1,106 @@
+\documentclass[10.5pt]{article}
+\usepackage{fontspec}\defaultfontfeatures{Ligatures=TeX}
+\usepackage[letterpaper,margin=0.6in]{geometry}
+\usepackage{amsmath,bm,xcolor,longtable,array,tikz,cancel}
+\usetikzlibrary{arrows.meta,patterns,decorations.pathmorphing}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\definecolor{pblue}{HTML}{1971C2}\definecolor{pred}{HTML}{E03131}\definecolor{pgreen}{HTML}{2F9E44}\definecolor{ppurple}{HTML}{7048E8}\definecolor{pgray}{HTML}{868E96}
+\newfontfamily\mono{TeX Gyre Cursor}
+\newcommand{\mtag}[2]{\colorbox{#1}{\textcolor{white}{\textsf{\fontsize{6.5}{7}\selectfont\bfseries #2}}}}
+\newcommand{\clock}[1]{{\mono\fontsize{7}{8}\selectfont #1}\ }
+\newcommand{\step}[4]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\mtag{#2}{#3}\ {\small #4}\par\vspace{2pt}}
+\newcommand{\pic}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.42,every node/.style={font=\scriptsize}]#1\end{tikzpicture}\par\vspace{3pt}}
+\newcommand{\CHECK}[3]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\fcolorbox{black}{black!4}{\parbox{2.55in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries CHECK}\ {\fontsize{7.5}{9}\selectfont #2}\par{\fontsize{7.5}{9}\selectfont\textbf{Answer:} #3}\par{\fontsize{7}{8.5}\selectfont\color{pgray} 4 of 5 right: go on. Fewer: one more example, ask again.}}}\par\vspace{3pt}}
+\newcommand{\WATCH}[1]{\par\hspace{0.32in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries\color{pred} WATCH FOR}\ {\small\itshape\color{pred} #1}}\par}
+\newcommand{\bl}[1]{\underline{\textcolor{pgreen}{\textbf{#1}}}}
+\newcommand{\pen}[2]{\textcolor{#1}{\rule{8pt}{8pt}}\ #2}
+% the floor and the crate, as preset on the board: \scene{push label}
+\newcommand{\floor}{\fill[pattern=north east lines,pattern color=pgray] (-3,-0.3) rectangle (3,0);\draw[thick] (-3,0)--(3,0);}
+\newcommand{\crate}{\draw[pblue,thick,fill=pblue!8] (-0.8,0) rectangle (0.8,1.4);\node at (0,0.7){12 kg};}
+\newcommand{\pushA}[1]{\draw[pblue,very thick,-{Stealth}] (-2.8,0.7)--(-0.85,0.7);\node[pblue,above] at (-1.8,0.7){#1};}
+\newcommand{\frc}[3]{\draw[pred,very thick,-{Stealth}] #1--#2;\node[pred] at #3;}
+% the friction graph axes (push 0-80 across, friction 0-60 up; 1 unit = 10 N) with the two dashed levels
+\newcommand{\axes}{\draw[pblue,thick,-{Stealth}] (0,0)--(8.6,0);\draw[pblue,thick,-{Stealth}] (0,0)--(0,6.6);\node[below] at (4,-1.0){push (N)};\node[rotate=90] at (-1.7,3){friction (N)};
+ \foreach \v in {2,4,6,8}{\node[below,pgray] at (\v,0){\v0};}\foreach \v in {2,4,6}{\node[left,pgray] at (0,\v){\v0};}
+ \draw[pgray,dashed] (0,4.7)--(8,4.7) node[right]{47};\draw[pgray,dashed] (0,2.94)--(8,2.94) node[right]{29};}
+% a spring (zigzag) from #1 to #2; the ceiling; the F-x axes with the three points; the carts with a spring
+\newcommand{\spr}[2]{\draw[decorate,decoration={zigzag,segment length=4pt,amplitude=3pt}] #1--#2;}
+\newcommand{\ceil}[2]{\draw[very thick] (#1,4)--(#2,4);}
+\newcommand{\fxax}{\draw[pblue,thick,-{Stealth}] (0,0)--(5.6,0) node[below left]{$x$ (m)};\draw[pblue,thick,-{Stealth}] (0,0)--(0,4.6) node[left]{$F$};
+ \foreach \v/\t in {1.25/0.025,2.5/0.050,3.75/0.075}{\node[below,pgray] at (\v,0){\tiny\t};}\foreach \v/\t in {1/3,2/6,3/9}{\node[left,pgray] at (0,\v){\t};}
+ \foreach \p in {(1.25,1),(2.5,2),(3.75,3)}{\fill[pblue] \p circle (0.09);}}
+\newcommand{\cartsS}{\draw[thick] (-0.2,0)--(7.4,0);\draw[pblue,thick,fill=pblue!8] (0,0) rectangle (1.4,1);\node at (0.7,0.5){2.0 kg};\draw[pblue,thick,fill=pblue!8] (3,0) rectangle (5,1);\node at (4,0.5){4.0 kg};
+ \spr{(1.4,0.5)}{(3,0.5)}\draw[pblue,very thick,-{Stealth}] (5,0.5)--(7,0.5) node[above left]{12 N};}
+\pagestyle{plain}
+\newcommand{\picM}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.75,every node/.style={font=\scriptsize}]#1\end{tikzpicture}\par\vspace{3pt}}
+\begin{document}
+\begin{center}{\Large\bfseries Forces, Day 5 board script: Springs}\\[2pt]{\normalsize Honors \textbullet{} 50 minutes \textbullet{} \texttt{physics/whiteboard/index.html\#lesson=springs}}\end{center}
+\noindent\textbf{Pens.} \pen{pblue}{objects, axes, motion} \quad \pen{pred}{forces} \quad \pen{pgreen}{new words (labels)} \quad \pen{ppurple}{components} \quad \pen{black}{numbers and everything else}\par
+\noindent\textbf{Steps.} Numbered by frame: 1.1, 1.2\ldots{} are on frame 1. Each DRAW step has a small picture of what the board should look like when the step is done. Tick the green Words box as you write each label.\par
+\noindent\textbf{Numbers all day.} $k = 80$ N/m stretched 0.15 m: 12 N. The graphed spring: 3 N per 0.025 m, $k = 120$ N/m. 0.60 kg on it: $mg = 5.88$ N, $x = 0.049$ m. The Day 4 carts with a 200 N/m spring in the rope, 12 N: $T = 4.0$ N, $x = 0.020$ m. None of these are test numbers; do not use 50 N/m, 1.5 kg, or 200 and 400 N/m pulled with 10 N.\par
+\noindent\textbf{Not today.} No springs in series or parallel, no elastic energy, no oscillation or period, no spring scale in an accelerating elevator (that is a stretch item for the ahead questions only), no stretching past the elastic limit beyond one sentence.\par\smallskip
+\noindent\fcolorbox{black}{black!3}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small
+\textbf{Time checkpoints.} Be starting frame 2 by \textbf{14:00}, frame 3 by \textbf{23:00}, frame 4 by \textbf{30:00}, the exit check by \textbf{38:00}. The checks are never cut; trim around them.\par
+\textbf{If you are behind,} cut in this order: (1) frame 4's worked example: say ``a spring reads the tension'' and go straight to check 4; (2) step 2.3, the data table: read the slope from the graph only; (3) exit question c; (4) the summary becomes tonight's homework.\par
+\textbf{If you are ahead} (the 4-of-5 checks pass quickly), use these before the exit check, one at a time on whiteboards: \emph{A spring scale reads 15 N under a mass at rest. The mass?} (1.5 kg.) \emph{The 0.60 kg mass on the 120 N/m spring rides in an elevator speeding up upward at 2.0 m/s$^2$. The stretch?} ($kx = m(g + a)$, 0.059 m: the scale reads more.) \emph{A spring stretches 3.0 cm under 2.0 N. How much under 5.0 N?} (7.5 cm.) \emph{Cut the 120 N/m spring in half. Is each half stiffer or softer?} (Stiffer: each half stretches half as far for the same force, so $k = 240$ N/m.)}}\par\medskip
+\begin{longtable}{@{}>{\setlength{\parskip}{5pt}}p{3.55in}@{\hspace{0.25in}}p{3.05in}@{}}
+\multicolumn{2}{@{}l}{\large\bfseries Frame 0: question and warm-up \hfill{\mono\small 0:00--7:00}}\tabularnewline*[2pt]
+\textbf{Essential question.} How does a spring tell us how big a force is?\par
+\textbf{Warm-up.} Weight of a 0.60 kg mass? Slope of a line through (0, 0) and (4, 12)? A mass hangs at rest: net force? &
+\step{0.1}{black}{SAY}{\clock{0:00}Warm-up is up as they walk in. At 3:00 remove the covers: 5.9 N; 3; zero.}
+\step{0.2}{black}{SAY}{\clock{5:00}Read the question. ``Every force scale you have ever used is a spring. Today we find out why that works.''} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 1: Hooke's law \hfill{\mono\small 7:00--14:00}}\tabularnewline*[2pt]
+A spring pulls back with a force that grows with its \bl{stretch}: $F = $ \bl{$kx$}. Double the stretch, \bl{double} the force.\par
+$x$ is measured from the \bl{natural} length, not the total length. A stiffer spring has a \bl{bigger} $k$.\par
+\textbf{Example.} $k = 80$ N/m, stretched 0.15 m: $F = 80 \times 0.15 = $ \bl{12 N}.\par\smallskip
+\textbf{1.} A spring with $k = 100$ N/m is 20 cm long. It is stretched to 26 cm. A student says $F = 100 \times 0.26 = 26$ N. What is wrong? &
+\step{1.1}{pred}{DRAW}{Between the dashed line and the bottom of the stretched spring: a double arrow, labeled $x$. Write STRETCH beside it, and NATURAL by the dashed line. Tick \textbf{stretch}, \textbf{natural}.}
+\picM{\ceil{0}{4}\spr{(1,4)}{(1,2.6)}\spr{(3,4)}{(3,1.6)}\draw[pblue,thick,fill=pblue!8] (2.6,0.9) rectangle (3.4,1.6);\draw[pgray,dashed] (0.2,2.6)--(3.8,2.6);\draw[pred,thick,{Stealth}-{Stealth}] (2.2,2.6)--(2.2,1.6) node[midway,left]{$x$};\node[pgreen] at (1,2.3){\tiny NATURAL};}
+\step{1.2}{black}{DRAW}{Write $F = kx$. Ask: ``Double $x$?'' (Double $F$.) ``Which spring is harder to stretch?'' (Bigger $k$.) Tick \textbf{kx}, \textbf{double}, \textbf{bigger}.}
+\tabularnewline
+&
+\step{1.3}{black}{DRAW}{$F = 80 \times 0.15 = 12$ N. Tick \textbf{12 N}. Say: ``N/m times m leaves N.''}
+\CHECK{1.4}{$k = 100$ N/m, 20 cm long, stretched to 26 cm: $F = 26$ N?}{No: $x$ is the stretch, 0.06 m, not the length. $F = 6$ N.}
+\WATCH{$x$ in centimeters with $k$ in N/m. Ask: what unit is in $k$?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 2: $k$ from a graph \hfill{\mono\small 14:00--23:00}}\tabularnewline*[2pt]
+Hang known forces and measure each stretch. $F$ against $x$ is a \bl{straight line} through the origin, and its \bl{slope} is $k$.\par
+\textbf{Example.} Slope = rise $\div$ run = 6 N $\div$ 0.050 m = \bl{120 N/m}.\par\smallskip
+\textbf{2.} Two springs are graphed on the same $F$ against $x$ axes. Line A is steeper than line B. Which spring is stiffer? How do you know? &
+\step{2.1}{black!60}{ASK}{``What do you notice about the three points?'' (They line up, and the line goes through 0.)}
+\step{2.2}{pred}{DRAW}{A ruler line through the origin and all three points. Write STRAIGHT LINE. Tick \textbf{straight line}.}
+\pic{\fxax\draw[pred,thick] (0,0)--(5,4);\node[pgreen] at (2.2,3.4){STRAIGHT LINE};}
+\step{2.3}{black}{DRAW}{A slope triangle from the first point to the third: run 0.050 m, rise 6 N. Slope $= 6 \div 0.050 = 120$ N/m $= k$. Tick \textbf{slope}, \textbf{120 N/m}.}
+\pic{\fxax\draw[pred,thick] (0,0)--(5,4);\draw[pred,dotted] (1.25,1)--(3.75,1)--(3.75,3);\node[pred,below] at (2.5,1){\tiny 0.050 m};\node[pred,right] at (3.75,2){\tiny 6 N};\node[pgreen] at (1.4,3.6){SLOPE $= k$};}
+\tabularnewline
+&
+\CHECK{2.4}{Line A steeper than line B: which spring is stiffer?}{A: its slope, $k$, is bigger, so it takes more force for each meter of stretch.}
+\WATCH{Slope as run over rise, or reading one point as $k = x \div F$. Ask: which axis is the force on?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 3: a hanging mass \hfill{\mono\small 23:00--30:00}}\tabularnewline*[2pt]
+A mass hanging at rest has \bl{zero} net force, so the spring force equals the weight: $kx = $ \bl{$mg$}. A \bl{spring scale} reads that force in newtons.\par
+\textbf{Example.} 0.60 kg on the 120 N/m spring: $mg = 5.88$ N, $x = 5.88 \div 120 = $ \bl{0.049 m}.\par\smallskip
+\textbf{3.} The mass on a spring is doubled. What happens to the stretch? &
+\step{3.1}{pred}{DRAW}{Two forces on the mass: $kx$ up, $mg$ down, the same length. Write ``at rest: net force ZERO, $kx = mg$''. Tick \textbf{zero}, \textbf{mg}.}
+\picM{\ceil{0}{3}\spr{(1.5,4)}{(1.5,2.2)}\draw[pblue,thick,fill=pblue!8] (1.1,1.5) rectangle (1.9,2.2);\draw[pred,very thick,-{Stealth}] (2.1,1.85)--(2.1,2.85) node[right]{$kx$};\draw[pred,very thick,-{Stealth}] (2.1,1.85)--(2.1,0.85) node[right]{$mg$};}
+\step{3.2}{black}{DRAW}{$mg = 0.60 \times 9.8 = 5.88$ N; $x = 5.88 \div 120 = 0.049$ m. Tick \textbf{0.049 m}. Say: ``A spring scale is this spring with numbers painted on.'' Tick \textbf{spring scale}.}
+\CHECK{3.3}{Double the mass: what happens to the stretch?}{It doubles: $kx = mg$, so $x$ grows in step with $m$.}
+\WATCH{$x = m \div k$ (mass, not weight). Ask: is a mass a force?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 4: a spring in a system \hfill{\mono\small 30:00--38:00}}\tabularnewline*[2pt]
+A spring in a string acts like the string: it pulls with the \bl{tension}, and its stretch shows that tension, $x = T \div k$.\par
+\textbf{Example.} The Day 4 carts with a 200 N/m spring in the rope, pulled with 12 N: $T = $ \bl{4.0 N}, so $x = 4.0 \div 200 = $ \bl{0.020 m}.\par\smallskip
+\textbf{4.} The carts are pulled with 24 N instead. How far does the spring stretch now? &
+\step{4.1}{black!60}{ASK}{``Remember Day 4: what was the rope's tension?'' (4.0 N: the rope only speeds up the back cart.) Tick \textbf{tension}, \textbf{4.0 N}.}
+\step{4.2}{pred}{DRAW}{$T$ on both carts at the spring's ends; write $x = 4.0 \div 200 = 0.020$ m. Tick \textbf{0.020 m}. Say: ``So the spring is a tension meter.''}
+\pic{\cartsS\draw[pred,very thick,-{Stealth}] (1.4,0.5)--(2,0.5);\draw[pred,very thick,-{Stealth}] (3,0.5)--(2.4,0.5);\node[pred] at (2.2,1.1){$T$};}
+\CHECK{4.3}{Pulled with 24 N: the stretch?}{$a = 4.0$ m/s$^2$, $T = 8.0$ N, $x = 0.040$ m.}
+\WATCH{$x = 12 \div 200$, using the pull. Ask: which cart does the spring speed up?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 5: exit check and summary \hfill{\mono\small 38:00--50:00}}\tabularnewline*[2pt]
+a. A spring with $k = 250$ N/m is stretched 0.040 m. How hard does it pull?\par
+b. A spring stretches 0.050 m under 4.0 N and 0.100 m under 8.0 N. Find $k$.\par
+c. A 0.50 kg mass hangs at rest on that spring. Find the stretch.\par
+\textbf{Summary.} Answer the essential question in two or three sentences. Use the words ``stretch'' and ``spring constant.'' &
+\step{5.1}{black}{SAY}{\clock{38:00}Exit check on paper, alone, 7 minutes.}
+\step{5.2}{black}{SAY}{\clock{45:00}Remove the covers: 10 N; 80 N/m; 0.061 m. 4 of 5 right on all three: Day 6 (practice) as planned. Fewer: open Day 6 with one more hanging-mass problem before the sims.}
+\step{5.3}{black}{SAY}{\clock{45:00}Summary, 3 minutes. Sample: a spring pulls with $F = kx$, so its stretch measures the force on it; once you know its spring constant from the slope of $F$ against $x$, the stretch tells you the force.}
+\step{5.4}{black}{SAY}{\clock{48:00}Up next: ``Tomorrow: a hotel walkway that fell, and a chain that holds itself up.''}
+\end{longtable}
+\end{document}

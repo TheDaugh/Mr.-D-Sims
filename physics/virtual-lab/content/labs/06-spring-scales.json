@@ -1,0 +1,430 @@
+{
+  "id": "spring-scales",
+  "checkpoints": [
+    "spring",
+    "string",
+    "hang"
+  ],
+  "kind": "scales",
+  "title": "The Spring Scale Bench: What Does Each String Hold?",
+  "badgeTitle": "Spring Scale Bench",
+  "roomFile": "physics-scales",
+  "noPPE": true,
+  "lock": true,
+  "carry": 1,
+  "lengthMin": 25,
+  "minActiveMin": 12,
+  "tutorial": {
+    "scales": true
+  },
+  "intro": "One spring scale, four rigs. You will calibrate the scale, put it in the string of a moving cart, read the rods of a walkway model, and read the tension between the links of a hanging chain.",
+  "introSteps": [
+    "Read two short cards: what a spring scale reads, and what tension is.",
+    "Walk to the scale bench and press E. Part A: hang masses, record the stretch, and find your scale's spring constant.",
+    "Part B: put the scale in the string of a cart pulled by a hanging mass. Hold it still, predict, then let go.",
+    "Halfway through, the teacher calls a huddle. Eyes up, copy the board.",
+    "Part C: read the walkway model in both designs. Part D: read a hanging chain link by link. Each part ends with a check."
+  ],
+  "keyRows": [
+    [
+      "← ↑ → ↓ or W A S D",
+      "Walk. On screen you move along the floor diagonals."
+    ],
+    [
+      "E",
+      "Use what you are facing (the scale bench)."
+    ],
+    [
+      "Esc",
+      "Close a window."
+    ],
+    [
+      "Hover",
+      "Point at anything to see its name."
+    ]
+  ],
+  "hook": {
+    "ask": "Two walkways hang one above the other from the same rods. Which nut holds the most?",
+    "note": "In 1981 a small change to a drawing like this one doubled the load on one nut. By the end of today you will see why."
+  },
+  "goal": "Goal: read the force in a string, a rod or a chain link, and say what it holds.",
+  "terms": [
+    {
+      "term": "newton",
+      "from": "Newton's Laws unit"
+    },
+    {
+      "term": "mass",
+      "from": "Newton's Laws unit"
+    },
+    {
+      "term": "weight",
+      "from": "Newton's Laws unit"
+    },
+    {
+      "term": "acceleration",
+      "from": "Newton's Laws unit"
+    },
+    {
+      "term": "free-body diagram",
+      "from": "Newton's Laws unit"
+    },
+    {
+      "term": "equilibrium",
+      "from": "Newton's Laws unit"
+    },
+    {
+      "term": "frictionless",
+      "from": "Forces Day 1"
+    },
+    {
+      "term": "tension",
+      "from": "Forces Day 4"
+    },
+    {
+      "term": "pulley",
+      "from": "Forces Day 4"
+    },
+    {
+      "term": "spring scale",
+      "from": "Forces Day 5"
+    },
+    {
+      "term": "spring constant",
+      "from": "Forces Day 5"
+    },
+    {
+      "term": "stretch",
+      "from": "Forces Day 5"
+    }
+  ],
+  "cards": [
+    {
+      "id": "scale",
+      "term": "A spring scale",
+      "body": "A spring scale is a spring in a case. Pull on it and the spring stretches: F = kx, where k is the spring constant in newtons per metre and x is the stretch in metres. Once you know k, the stretch tells you the force. Put the scale anywhere in a string and it reads the pull in the string at that spot."
+    },
+    {
+      "id": "tension",
+      "term": "Tension",
+      "body": "Tension is the pull a string, a rope, a rod or a chain link carries. A light string pulls with the same tension along its whole length. A chain with mass does not: each link holds up every link and load below it. To find a tension, draw a free-body diagram of what hangs below that spot."
+    }
+  ],
+  "steps": {
+    "calib": "Part A. Hang three masses, one at a time, and record each stretch. Then find k for your scale.",
+    "cp1": "Check 1: spring scales. Three right in a row.",
+    "string": "Part B. Record a reading held still. Then predict, release, and record on two different setups.",
+    "cp2": "Check 2: the string. Three right in a row.",
+    "hyatt": "Part C. Record the walkway model in both designs, then answer the question.",
+    "chain": "Part D. Read three gaps in the chain, predict the top, then read the top.",
+    "cp3": "Check 3: what each piece holds. Three right in a row.",
+    "done": "Done. Hand in, then take out your paper worksheet."
+  },
+  "hyatt": {
+    "story": "This is what happened at the Hyatt Regency hotel in Kansas City on July 17, 1981. The walkways were drawn with one long rod. The builder changed it to two rods, which was easier to make. The rods were fine; the nut under the fourth-floor walkway's beam now held both walkways. It pulled through the beam, both walkways fell, and 114 people died."
+  },
+  "arrows": {
+    "door": "Walk to the door and go through.",
+    "bench": "Walk to the scale bench and press E.",
+    "open": "Open the scale bench.",
+    "hang": "Click a mass to hang it on the scale.",
+    "record": "Press Record.",
+    "more": "Hang a different mass and record it too.",
+    "k": "Type your scale's spring constant here."
+  },
+  "demo": [
+    "Welcome. This tour shows every control. None of it counts toward your lab.",
+    "Walk with the arrow keys or WASD. Press E at the scale bench, the long bench with the hanging scale.",
+    "Part A: click a mass to hang it. The ruler shows the stretch. Press Record for each mass.",
+    "With three rows in the table, work out k from your own readings and type it in. Then a check: three right in a row.",
+    "Part B: the scale is in the string between the cart and the pulley. Held still, it reads the weight of the hanging mass. Before you let go, predict.",
+    "Release. Both masses speed up together, and the scale reads less than it did held. Record it, then try another setup.",
+    "Part C: the walkway model. Switch between the design on paper and the design as built, and read the rods and the circled nut.",
+    "Part D: click a gap in the chain to move the scale there. Lower gaps hold less. Predict the top before you read it.",
+    "Stuck? The help button locks your screen until the teacher comes. So do three misses in a row on a check. Your teacher types a code to open it.",
+    "That is the whole bench. Press Esc to close it. Your lab starts when the tour ends."
+  ],
+  "content": {
+    "exit": {
+      "prompt": "Do the paper worksheet next."
+    }
+  },
+  "clock": {},
+  "quests": [
+    {
+      "id": "door",
+      "text": "Walk through the lab door.",
+      "hint": "Walk to the door and keep going.",
+      "tutorial": true,
+      "state": "entered_lab"
+    },
+    {
+      "id": "bench",
+      "text": "Step up to the scale bench and press E.",
+      "hint": "The long bench with the hanging scale.",
+      "tutorial": true,
+      "event": "scales_open",
+      "count": 1
+    },
+    {
+      "id": "a_hang",
+      "text": "Hang a mass on the scale.",
+      "hint": "Click one of the mass buttons.",
+      "tutorial": true,
+      "state": "flame",
+      "rule": "a_hang"
+    },
+    {
+      "id": "a_record",
+      "text": "Record its stretch.",
+      "hint": "Press Record.",
+      "tutorial": true,
+      "state": "flame",
+      "rule": "a_record"
+    },
+    {
+      "id": "a_rows",
+      "text": "Record three different masses.",
+      "hint": "Hang another mass, then Record.",
+      "tutorial": true,
+      "state": "flame",
+      "rule": "a_rows",
+      "count": 3
+    },
+    {
+      "id": "a_k",
+      "text": "Find your scale's spring constant.",
+      "hint": "k is the force on the scale divided by the stretch in metres.",
+      "tutorial": true,
+      "state": "flame",
+      "rule": "a_k"
+    },
+    {
+      "id": "cp1",
+      "text": "Pass check 1: three right in a row.",
+      "hint": "F = kx, with x in metres.",
+      "state": "flame",
+      "rule": "cp1"
+    },
+    {
+      "id": "b_runs",
+      "text": "Record one held reading and two released readings on different setups.",
+      "hint": "Predict before each release.",
+      "state": "flame",
+      "rule": "b_runs",
+      "count": 3
+    },
+    {
+      "id": "cp2",
+      "text": "Pass check 2: three right in a row.",
+      "hint": "Held still or moving? Draw the hanging mass's free-body diagram.",
+      "state": "flame",
+      "rule": "cp2"
+    },
+    {
+      "id": "c_designs",
+      "text": "Record both walkway designs and answer the question.",
+      "hint": "Switch designs with the two buttons, and Record each.",
+      "state": "flame",
+      "rule": "c_designs"
+    },
+    {
+      "id": "d_chain",
+      "text": "Read three gaps in the chain, then predict and read the top.",
+      "hint": "Click a gap, then Record.",
+      "state": "flame",
+      "rule": "d_chain",
+      "count": 3
+    },
+    {
+      "id": "cp3",
+      "text": "Pass check 3: three right in a row.",
+      "hint": "Add up the weight of everything below that point.",
+      "state": "flame",
+      "rule": "cp3"
+    },
+    {
+      "id": "handin",
+      "text": "Hand in: download your record.",
+      "hint": "Press Hand in.",
+      "state": "flame",
+      "rule": "handed"
+    }
+  ],
+  "ui": {
+    "welcome": "A lab room with a long scale bench. Walk to the bench and press E.",
+    "enter": "You step into the lab room.",
+    "full": "Your hands are full.",
+    "putBack": "Put back.",
+    "huddle1Done": "Go to the scale bench.",
+    "huddle2Done": "",
+    "tutorialDone": "Tutorial done. The arrows are off. Work through the parts in order.",
+    "coachKey": "Teacher key (creative mode): every part is open, no huddle stop. Open Key for this student's scale, the answers and the huddle blanks.",
+    "doneInfo": "Your record is saved on this computer. Download it for your teacher, then take out your paper worksheet.",
+    "exitHead": "Next",
+    "benchBtn": "⚖ Scale bench",
+    "stepUp": "You step up to the scale bench.",
+    "closeWord": "Close",
+    "tabA": "A. Calibrate",
+    "tabB": "B. Cart and string",
+    "tabC": "C. Walkways",
+    "tabD": "D. Chain",
+    "aHead": "Part A. Calibrate the scale",
+    "aText": "Hang a mass, read the stretch on the ruler, and press Record. The table works out each weight for you.",
+    "aMore": "Masses still to record before you find k: {n}.",
+    "kAsk": "What is your scale's spring constant?",
+    "kYes": "Right: k = {k} N/m. Your scale now reads in newtons.",
+    "kSay": "The scale is calibrated. It reads in newtons now.",
+    "kHint_num": "Type a number.",
+    "kHint_cm": "Check the units of the stretch: k is in newtons per metre, so the stretch goes in metres.",
+    "kHint_mass": "The spring is stretched by a force. Use the weight column, not the mass.",
+    "kHint_flip": "You divided the wrong way. k is the force divided by the stretch.",
+    "kHint_rows": "Pick one row. Divide its weight by its stretch in metres. Do another row to check.",
+    "recordBtn": "Record",
+    "checkBtn": "Check",
+    "lockInBtn": "Lock in",
+    "recNothing": "Hang something first.",
+    "recSame": "That mass is already in the table. Try another one.",
+    "recRelease": "Release the cart first, then Record while it moves.",
+    "bHead": "Part B. The scale in the string",
+    "bText": "A cart on a frictionless table, a string over a pulley, a hanging mass. The scale sits in the string.",
+    "cartWord": "Cart:",
+    "hangWord": "Hanging:",
+    "holdBtn": "Hold the cart",
+    "releaseBtn": "Release",
+    "predAsk": "Before you let go: released, the scale will read",
+    "pred_more": "more than held",
+    "pred_same": "the same as held",
+    "pred_less": "less than held",
+    "predFirst": "Make a prediction first.",
+    "mode_held": "held",
+    "mode_released": "released",
+    "bProgress": "Held reading {held}   Released setups {rel} of 2",
+    "cHead": "Part C. The walkway model",
+    "cText": "Two walkways hang from the same rod. Read the upper rod, the lower rod and the circled nut under the upper walkway.",
+    "designOne": "Design on paper: one long rod",
+    "designTwo": "As built: two rods",
+    "designOneShort": "one rod",
+    "designTwoShort": "two rods",
+    "crowdUp": "People on the upper walkway:",
+    "crowdLow": "People on the lower walkway:",
+    "cMore": "Record both designs to go on.",
+    "hyAsk": "As built, the circled nut holds:",
+    "hy_own": "only its own walkway",
+    "hy_both": "both walkways",
+    "hy_lower": "only the lower walkway",
+    "hyYes": "Yes. As built, the lower rod hangs from the upper walkway's beam, so that nut holds both walkways.",
+    "hyNo": "Compare the circled nut's reading in your two rows with the two walkways' loads.",
+    "dHead": "Part D. A chain with mass",
+    "dText": "Six links hang from the ceiling, with a bucket on the bottom link. Link 1 is the bottom link. Move the scale to a gap and press Record.",
+    "bucketWord": "Bucket:",
+    "gapWord": "Gap above link:",
+    "topWord": "top",
+    "dMore": "Gaps still to read before you predict the top: {n}.",
+    "topAsk": "Predict: what will the scale read at the top, where the chain meets the ceiling?",
+    "topLocked": "Predict the top first.",
+    "topHeld": "You predicted {p} N. Now read the top and compare.",
+    "topMissed": "You predicted {p} N. Read the top and see what you left out.",
+    "dialHead": "The scale reads",
+    "dialStretch": "Stretch",
+    "dialNut": "The circled nut holds",
+    "tblA": "Your readings",
+    "colsA": [
+      "mass (kg)",
+      "weight (N)",
+      "stretch (cm)"
+    ],
+    "tblB": "Your runs",
+    "colsB": [
+      "setup (kg)",
+      "run",
+      "predicted",
+      "T (N)"
+    ],
+    "tblC": "Your readings",
+    "colsC": [
+      "design (people)",
+      "upper (N)",
+      "nut (N)",
+      "lower (N)"
+    ],
+    "tblD": "Your readings",
+    "colsD": [
+      "gap",
+      "bucket (kg)",
+      "scale (N)"
+    ],
+    "rigScale": "spring scale",
+    "rigHand": "held",
+    "rigMoving": "moving: a = {a} m/s²",
+    "rigCaught": "caught at the pulley",
+    "rigOne": "Design on paper: one long rod",
+    "rigTwo": "As built: two rods",
+    "rigUpper": "upper walkway",
+    "rigLower": "lower walkway",
+    "rigUpperRod": "upper rod",
+    "rigLowerRod": "lower rod",
+    "rigNut": "nut under the upper walkway",
+    "rigLink": "each link {m} kg",
+    "rigGap": "above link {j}",
+    "rigPredictFirst": "predict first",
+    "rigAAria": "A spring scale hangs from a bar beside a ruler. A mass hangs from its hook.",
+    "rigBAria": "A cart on a table. A string runs from the cart through a spring scale, over a pulley, to a hanging mass.",
+    "rigCAria": "Two walkways hang from rods. Spring scales read the upper rod and the lower rod; a circle marks the nut under the upper walkway.",
+    "rigDAria": "A chain of six links hangs from the ceiling with a bucket on the bottom link. The spring scale sits in one gap.",
+    "cpHead_spring": "Check 1: spring scales",
+    "cpHead_string": "Check 2: the string",
+    "cpHead_hang": "Check 3: what each piece holds",
+    "cpQ_findK": "A spring scale stretches {x} cm when a {m} kg mass hangs still on it. What is its spring constant?",
+    "cpQ_findF": "A spring scale with k = {k} N/m is stretched {x} cm. What does it read?",
+    "cpQ_held": "A {M} kg cart sits on a frictionless table. A string runs from the cart over a pulley to a {m} kg hanging mass, with a spring scale in the string. You hold the cart still. What does the scale read?",
+    "cpQ_released": "A {M} kg cart sits on a frictionless table. A string runs from the cart over a pulley to a {m} kg hanging mass, with a spring scale in the string. You let go and both speed up. What does the scale read while they move?",
+    "cpQ_chain": "A chain of {N} links hangs from the ceiling. Each link has a mass of {mL} kg, and a {B} kg bucket hangs from the bottom link. What is the tension just above link {j}, counting links from the bottom?",
+    "cpQ_chain0": "A chain of {N} links hangs from the ceiling. Each link has a mass of {mL} kg, and nothing hangs from the bottom link. What is the tension just above link {j}, counting links from the bottom?",
+    "cpQ_walk": "Two walkways hang one above the other from the same rods. On one rod, the upper walkway's load is {up} N and the lower walkway's is {low} N. {where} What force does it hold?",
+    "cpWhere_nut2": "As built, the lower rod hangs from the upper walkway's beam. Look at the nut under the upper walkway.",
+    "cpWhere_nut1": "As designed, one long rod runs from the ceiling to the lower walkway, and each walkway sits on its own nut. Look at the nut under the upper walkway.",
+    "cpWhere_upper": "Look at the rod between the ceiling and the upper walkway.",
+    "cpWhere_lower": "Look at the rod between the two walkways.",
+    "cpRow": "In a row: {s} of {n}.",
+    "cpRight": "Right.",
+    "cpMiss": "Not yet.",
+    "cpPass": "Passed. On to the next part.",
+    "cpNew": "Here is a new one.",
+    "cpHint_num": "Type a number.",
+    "cpHint_cm": "Check the stretch's units. k is in newtons per metre, so the stretch goes in metres.",
+    "cpHint_mass": "Turn the mass into its weight first.",
+    "cpHint_springK": "The force on the scale is the hanging weight. Divide it by the stretch in metres.",
+    "cpHint_springF": "The reading is the spring's force: k times the stretch in metres.",
+    "cpHint_held": "That is the held reading. Once released, the hanging mass speeds up, so the string pulls up on it with less than its weight.",
+    "cpHint_still": "Nothing moves here. The hanging mass is in equilibrium, so the string holds all of its weight.",
+    "cpHint_accel": "That number is the acceleration. The tension is the force that speeds up the cart.",
+    "cpHint_cart": "The table holds up the cart's weight, not the string. The string only speeds the cart up.",
+    "cpHint_string": "Draw a free-body diagram of the cart. The only sideways force on it is the string.",
+    "cpHint_whole": "That is the load at the very top. This point holds only what hangs below it.",
+    "cpHint_bucket": "Something else hangs below that point too.",
+    "cpHint_count": "Count the links below that point again. Link 1 is the bottom link.",
+    "cpHint_below": "Find everything that hangs below that point and add up its weight.",
+    "cpHint_own": "As built, the lower rod hangs from that same beam, so the nut holds more than its own walkway.",
+    "redoNote": "Your teacher unlocked your screen. Get {n} new ones right in a row.",
+    "keyLock": "Teacher key: a student's screen would lock here.",
+    "helpBtn": "I need help",
+    "helpNote": "This locks your screen until your teacher comes.",
+    "handBtn": "Hand in",
+    "handWait": "Hand in opens when the last check is passed.",
+    "handReady": "All parts done. Hand in.",
+    "lockHead": "Screen locked",
+    "lockMiss": "Three misses in a row on this check.",
+    "lockHelp": "You asked for help.",
+    "lockBody": "Raise your hand. Your teacher will come and type a code.",
+    "unlockWord": "Unlock",
+    "pinWrong": "That code is not right.",
+    "huddleTitle": "Huddle: copy the board",
+    "huddleText": "Eyes up. Copy what your teacher writes on the board into the blanks, in order. Then enter the huddle code.",
+    "codeLabel": "Huddle code",
+    "codeGo": "Go on",
+    "codeWrong": "That code is not right.",
+    "codeNote": "Outside class, the huddle is a note. Fill the blanks and go on.",
+    "keyShows": "Huddle code today: {code}"
+  }
+}
