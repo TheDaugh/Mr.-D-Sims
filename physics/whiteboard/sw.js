@@ -1,6 +1,6 @@
 /* Offline copy of the physics board. Stale-while-revalidate: a visit shows what is cached and refreshes it in the background,
    so a rebuilt board appears on the second open. Only same-origin GETs are cached; the board's code lives in shared/whiteboard/app/. */
-var CACHE = 'mrd-physics-board-v1';
+var CACHE = 'mrd-physics-board-v2';
 var CORE = ['./', 'index.html', '../../shared/whiteboard/board.css', '../../shared/whiteboard/app/app.js', '../../shared/whiteboard/app/app.css', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', function (e) {

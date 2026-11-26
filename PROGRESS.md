@@ -2,6 +2,13 @@
 
 Update this at the end of every session. Newest entry first.
 
+## 2026-11-25: Physics Forces, last block: plan, test, equation sheet, Day 1 friction (branch `physics-forces-friction-day1`)
+- Plan: `physics/Unit 3 - Forces/README.md` right-sizes the UbD v3 targets F10 to F16 and F19 into standards 3.10 to 3.15 (core and stretch, cut list), a 10-day map (notes, notes, practice; quiz; cargo-ramp practice; review; test) and one real thing per practice day (Canton Avenue, Hyatt skywalks, hanging chain, cargo ramp). Practice days are online sim first, then a worksheet (no lab gear yet). The third law already had its quiz.
+- Built: test and key (39 points, `src/test/test.tex`, pdflatex with `mode.tex`); equation sheet (`src/eq-sheet/`); Day 1 Cornell notes and key (2 pages each, `src/day-01-notes/`); board script (4 pages, xelatex); the first physics lesson board, `physics/whiteboard/index.html#lesson=friction` (`tools/whiteboard/src/lessons/physics-friction.js`, registered in `app.jsx`). Shared bundle rebuilt, so all three board caches bumped (physics v2, chem v16, stats v7). `tests/lesson-board.e2e.js`: friction 6 frames; MINCOVERS is 10 for every board but stats.
+- Checks run: `node --test tests/unit/*.test.js` 456 pass, 0 fail; `tests/smoke.js` all 57 pages load clean; `BOARD=physics LESSON=friction tests/lesson-board.e2e.js` 6 of 8 pass. The two fails also fail on `BOARD=chem LESSON=bonding` before this change: the covers check wants more than 10 and the boards have exactly 10, and Chromium logs an "unload is not allowed" permissions message. All six frames screenshotted and read; every page of the notes, key, test, key and script read.
+- Not run: check-lessons, template and lock e2e (no lesson page changed).
+- Not on the site until Ian merges.
+
 ## 2026-11-24: Chem Unit 4 bundle 3, Days 7 to 9, and Quiz 1 (same branch, not pushed)
 - Built: Quiz 1 (after Days 1 to 6; 28 points, key); Day 7 notes (covalent bonds), Day 8 notes (naming molecules, bond types), each with key (2 pages each), board (`#lesson=covalent`, `#lesson=naming`) and board script (3 pages each); Day 9 practice kit (sheet, Set B, slips, key, run sheet) and board `#lesson=practice9`. sw.js cache v15; e2e frame counts 6, 6, 4.
 - Standing rule recorded in the unit README: a quiz after every two notes-and-practice blocks.
