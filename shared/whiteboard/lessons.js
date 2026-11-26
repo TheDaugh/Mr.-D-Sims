@@ -196,5 +196,18 @@ window.MRD_BOARD_LESSONS = [
    "2 Whiteboard rounds",
    "3 Exit check"
   ]
+ },
+ {
+  "board": "physics",
+  "id": "systems",
+  "title": "Physics Unit 3 · Day 4 · Connected objects",
+  "frames": [
+   "0 Question",
+   "1 Systems",
+   "2 Table and hanging mass",
+   "3 Atwood machine",
+   "4 Friction on the table",
+   "5 Exit check"
+  ]
  }
 ];

@@ -4,7 +4,7 @@
 const { chromium } = require(process.env.PLAYWRIGHT_DIR || 'playwright');
 const BOARD = process.env.BOARD || 'stats';
 const LESSON = process.env.LESSON || (BOARD === 'chem' ? 'zeff' : '3.4');
-const NFRAMES = { '3.4': 7, '3.5': 5, '3.6': 5, zeff: 4, trends: 6, bonding: 6, practice3: 4, ionic: 6, formulas: 6, practice6: 4, covalent: 6, naming: 6, practice9: 4, friction: 6, inclines: 6 }[LESSON];
+const NFRAMES = { '3.4': 7, '3.5': 5, '3.6': 5, zeff: 4, trends: 6, bonding: 6, practice3: 4, ionic: 6, formulas: 6, practice6: 4, covalent: 6, naming: 6, practice9: 4, friction: 6, inclines: 6, systems: 6 }[LESSON];
 const MINCOVERS = BOARD === 'stats' ? 20 : 10;
 const URL = 'http://localhost:8123/' + (BOARD === 'chem' ? 'chemistry' : BOARD) + '/whiteboard/index.html#lesson=' + LESSON;
 let bad = 0;

@@ -50,7 +50,7 @@ Rhythm, as in chem: two notes days, then a practice day; a quiz after two blocks
 | 1 | Notes: friction, static and kinetic (built) | 3.11 | | |
 | 2 | Notes: inclines (built) | 3.12 | | |
 | 3 | Practice (built) | 3.11–3.12 | Friction Sandbox (`physics/sandbox/friction-push.html`, new), then the ramp sandbox for the slip angle (`physics/sandbox/ramp-pulley.html`, counterweight 0) | Canton Avenue |
-| 4 | Notes: connected systems | 3.13 | | |
+| 4 | Notes: connected systems (built) | 3.13 | | |
 | 5 | Notes: springs and Hooke's law | 3.14 | | |
 | 6 | Practice | 3.13–3.14 | Two-Block Lab (`physics/lessons/sims/twoblock.html`); a spring sim (none in the repo: build a small one, or PhET Hooke's Law as a stand-in) | Hyatt skywalks; hanging chain |
 | 7 | Quiz (25 min) + flex | 3.11–3.14 | flex: reteach from the exit slips | |
@@ -103,6 +103,16 @@ Online first, then paper. The real thing: Canton Avenue, Pittsburgh (37% grade, 
 Sources in `src/day-03-practice/` (`python3 figs.py`, then `node make.js sheet|setb|slips|key|run`). No item copies a test item or uses a test number.
 
 **The Friction Sandbox.** A crate on a warehouse floor with a push machine behind it. Surfaces (wood, rubber, steel, carpet, ice, or your own μs and μk), mass, planet; a steady push or "Grow the push" (10 N per second). Linked views: force arrows, instruments with a speed graph, and the friction-against-push graph (it climbs to μs N, drops to μk N, and stays flat). Predict, then push (logged and tallied); Record table with copy and CSV. Three checkpoints with the shared rule (3 right in a row, 3 misses lock, today's unlock code): how big is friction, read μ from a mystery crate's graph, find the acceleration. Every answer is typed. The old `physics/lessons/sims/friction.html` stays inside the slot 4 FBD lesson, unchanged.
+
+## Day 4: connected objects (3.13)
+
+| Piece | File |
+|---|---|
+| Cornell notes | `day-04-systems-notes.docx`, `day-04-systems-notes-key.docx`, previews `.pdf`; source `src/day-04-notes/` (`python3 figs.py`, then `node make.js` and `node make.js key`) |
+| Lesson board | `physics/whiteboard/index.html#lesson=systems` (`tools/whiteboard/src/lessons/physics-systems.js`) |
+| Board script | `day-04-systems-board-script.pdf` (source `.tex`, xelatex) |
+
+Four parts (systems, a table and a hanging mass, the Atwood machine, friction on the table), a check at the foot of each, an exit check and a summary. System first for a, then one object for T, and every tension is checked from the other object. Numbers: 2.0 + 4.0 kg carts pulled with 12 N; a 5.0 kg cart with a 2.0 kg hanging mass (a 2.8, T 14 N); Atwood 4.0 and 6.0 kg (a 1.96, T 47 N); the cart with μk 0.20 (a 1.4, T 16.8 N). The exit uses 3.0 kg with 1.5 kg and an Atwood of 2.0 and 8.0 kg. None is a test number.
 
 ## Every board, one page
 

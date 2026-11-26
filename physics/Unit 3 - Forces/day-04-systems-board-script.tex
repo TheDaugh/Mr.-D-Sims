@@ -1,0 +1,114 @@
+\documentclass[10.5pt]{article}
+\usepackage{fontspec}\defaultfontfeatures{Ligatures=TeX}
+\usepackage[letterpaper,margin=0.6in]{geometry}
+\usepackage{amsmath,bm,xcolor,longtable,array,tikz,cancel}
+\usetikzlibrary{arrows.meta,patterns}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\definecolor{pblue}{HTML}{1971C2}\definecolor{pred}{HTML}{E03131}\definecolor{pgreen}{HTML}{2F9E44}\definecolor{ppurple}{HTML}{7048E8}\definecolor{pgray}{HTML}{868E96}
+\newfontfamily\mono{TeX Gyre Cursor}
+\newcommand{\mtag}[2]{\colorbox{#1}{\textcolor{white}{\textsf{\fontsize{6.5}{7}\selectfont\bfseries #2}}}}
+\newcommand{\clock}[1]{{\mono\fontsize{7}{8}\selectfont #1}\ }
+\newcommand{\step}[4]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\mtag{#2}{#3}\ {\small #4}\par\vspace{2pt}}
+\newcommand{\pic}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.42,every node/.style={font=\scriptsize}]#1\end{tikzpicture}\par\vspace{3pt}}
+\newcommand{\CHECK}[3]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\fcolorbox{black}{black!4}{\parbox{2.55in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries CHECK}\ {\fontsize{7.5}{9}\selectfont #2}\par{\fontsize{7.5}{9}\selectfont\textbf{Answer:} #3}\par{\fontsize{7}{8.5}\selectfont\color{pgray} 4 of 5 right: go on. Fewer: one more example, ask again.}}}\par\vspace{3pt}}
+\newcommand{\WATCH}[1]{\par\hspace{0.32in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries\color{pred} WATCH FOR}\ {\small\itshape\color{pred} #1}}\par}
+\newcommand{\bl}[1]{\underline{\textcolor{pgreen}{\textbf{#1}}}}
+\newcommand{\pen}[2]{\textcolor{#1}{\rule{8pt}{8pt}}\ #2}
+% the floor and the crate, as preset on the board: \scene{push label}
+\newcommand{\floor}{\fill[pattern=north east lines,pattern color=pgray] (-3,-0.3) rectangle (3,0);\draw[thick] (-3,0)--(3,0);}
+\newcommand{\crate}{\draw[pblue,thick,fill=pblue!8] (-0.8,0) rectangle (0.8,1.4);\node at (0,0.7){12 kg};}
+\newcommand{\pushA}[1]{\draw[pblue,very thick,-{Stealth}] (-2.8,0.7)--(-0.85,0.7);\node[pblue,above] at (-1.8,0.7){#1};}
+\newcommand{\frc}[3]{\draw[pred,very thick,-{Stealth}] #1--#2;\node[pred] at #3;}
+% the friction graph axes (push 0-80 across, friction 0-60 up; 1 unit = 10 N) with the two dashed levels
+\newcommand{\axes}{\draw[pblue,thick,-{Stealth}] (0,0)--(8.6,0);\draw[pblue,thick,-{Stealth}] (0,0)--(0,6.6);\node[below] at (4,-1.0){push (N)};\node[rotate=90] at (-1.7,3){friction (N)};
+ \foreach \v in {2,4,6,8}{\node[below,pgray] at (\v,0){\v0};}\foreach \v in {2,4,6}{\node[left,pgray] at (0,\v){\v0};}
+ \draw[pgray,dashed] (0,4.7)--(8,4.7) node[right]{47};\draw[pgray,dashed] (0,2.94)--(8,2.94) node[right]{29};}
+% the two carts and rope; the table rig; the Atwood machine (as preset on the board)
+\newcommand{\carts}{\fill[pattern=north east lines,pattern color=pgray] (-0.2,-0.25) rectangle (7.4,0);\draw[thick] (-0.2,0)--(7.4,0);
+ \draw[pblue,thick,fill=pblue!8] (0,0) rectangle (1.4,1);\node at (0.7,0.5){2.0 kg};\draw[pblue,thick,fill=pblue!8] (3,0) rectangle (5,1);\node at (4,0.5){4.0 kg};
+ \draw[brown,thick] (1.4,0.5)--(3,0.5);\draw[pblue,very thick,-{Stealth}] (5,0.5)--(7,0.5) node[above left]{12 N};}
+\newcommand{\tbl}{\draw[thick] (0,2)--(5,2)--(5,-0.6);\draw[fill=black!20] (5.25,2.2) circle (0.22);
+ \draw[pblue,thick,fill=pblue!8] (1,2) rectangle (2.8,2.9);\node at (1.9,2.45){5.0 kg};\draw[brown,thick] (2.8,2.42)--(5.25,2.42);\draw[brown,thick] (5.47,2.2)--(5.47,1);
+ \draw[pblue,thick,fill=pblue!8] (5.07,0.2) rectangle (5.87,1);\node[right] at (5.9,0.6){2.0 kg};}
+\newcommand{\atw}{\draw[thick] (0.4,4)--(3.6,4);\draw (2,4)--(2,3.6);\draw[fill=black!20] (2,3.1) circle (0.55);\draw[brown,thick] (1.45,3.1)--(1.45,1.7);\draw[brown,thick] (2.55,3.1)--(2.55,1.1);
+ \draw[pblue,thick,fill=pblue!8] (1.05,1) rectangle (1.85,1.7);\node at (1.45,1.35){4.0};\draw[pblue,thick,fill=pblue!8] (2.15,0.2) rectangle (2.95,1.1);\node at (2.55,0.65){6.0};}
+\pagestyle{plain}
+\begin{document}
+\begin{center}{\Large\bfseries Forces, Day 4 board script: Connected Objects}\\[2pt]{\normalsize Honors \textbullet{} 50 minutes \textbullet{} \texttt{physics/whiteboard/index.html\#lesson=systems}}\end{center}
+\noindent\textbf{Pens.} \pen{pblue}{objects, axes, motion} \quad \pen{pred}{forces} \quad \pen{pgreen}{new words (labels)} \quad \pen{ppurple}{components} \quad \pen{black}{numbers and everything else}\par
+\noindent\textbf{Steps.} Numbered by frame: 1.1, 1.2\ldots{} are on frame 1. Each DRAW step has a small picture of what the board should look like when the step is done. Tick the green Words box as you write each label.\par
+\noindent\textbf{Numbers all day.} Two carts, 2.0 and 4.0 kg, pulled with 12 N: $a = 2.0$ m/s$^2$, $T = 4.0$ N. A 5.0 kg cart and a 2.0 kg hanging mass: $a = 2.8$ m/s$^2$, $T = 14$ N. Atwood, 4.0 and 6.0 kg: $a = 1.96$ m/s$^2$, $T = 47$ N. The cart with $\mu_k = 0.20$: $f_k = 9.8$ N, $a = 1.4$ m/s$^2$, $T = 16.8$ N. Every tension checks from both objects. None of these are test numbers; do not use 3.0 kg with 1.0 kg, or 5.0 kg with 3.0 kg.\par
+\noindent\textbf{Not today.} No pulleys with mass, no more than one pulley, no ramps with a counterweight (that is the Day 8 cargo ramp), no tension in a rope that has mass (Day 6 practice).\par\smallskip
+\noindent\fcolorbox{black}{black!3}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small
+\textbf{Time checkpoints.} Be starting frame 2 by \textbf{14:00}, frame 3 by \textbf{24:00}, frame 4 by \textbf{31:00}, the exit check by \textbf{38:00}. The checks are never cut; trim around them.\par
+\textbf{If you are behind,} cut in this order: (1) step 2.4, the check from the hanging mass: say it in one sentence; (2) step 3.4, the tension from the 6.0 kg side; (3) frame 4's worked tension (keep $a$, drop $T$); (4) exit question b; (5) the summary becomes tonight's homework.\par
+\textbf{If you are ahead} (the 4-of-5 checks pass quickly), use these before the exit check, one at a time on whiteboards: \emph{Three carts, 1.0, 2.0 and 3.0 kg, pulled from the front with 18 N. Tension between the back two?} (a = 3.0, T = 3.0 N.) \emph{What hanging mass makes the 5.0 kg cart speed up at 4.9 m/s$^2$?} (5.0 kg: half of g when the masses are equal.) \emph{In the Atwood machine, what happens to T if both masses double?} (It doubles to 94 N; a stays 1.96.) \emph{With $\mu_k = 0.40$, does the 5.0 kg cart move at all?} (Static friction would decide; with $\mu_s \ge 0.40$, 19.6 N cannot beat 19.6 N, so no.)}}\par\medskip
+\begin{longtable}{@{}>{\setlength{\parskip}{5pt}}p{3.55in}@{\hspace{0.25in}}p{3.05in}@{}}
+\multicolumn{2}{@{}l}{\large\bfseries Frame 0: question and warm-up \hfill{\mono\small 0:00--7:00}}\tabularnewline*[2pt]
+\textbf{Essential question.} When objects are tied together, how do we find how fast they speed up and how hard the string pulls?\par
+\textbf{Warm-up.} 12 N of net force on 3.0 kg: acceleration? Weight of a 2.0 kg mass? A rope pulls a box: its third-law partner? &
+\step{0.1}{black}{SAY}{\clock{0:00}Warm-up is up as they walk in. At 3:00 remove the covers: 4.0 m/s$^2$; 19.6 N; the box pulls back on the rope.}
+\step{0.2}{black}{SAY}{\clock{5:00}Read the question. ``Today, two objects and one string. The trick is choosing what to look at.''} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 1: systems \hfill{\mono\small 7:00--14:00}}\tabularnewline*[2pt]
+Treat the tied objects as one \bl{system}. The string pulls the two objects with equal and \bl{opposite} forces, so tension is \bl{internal} and cancels. Only \bl{external} forces change how the system moves.\par
+System: $a$ = (net external force) $\div$ (total mass). Then look at \bl{one} object to find the tension.\par
+\textbf{Example.} 2.0 and 4.0 kg carts, 12 N: $a = 12 \div 6.0 = $ \bl{2.0 m/s$^2$}. The back cart: $T = 2.0 \times 2.0 = $ \bl{4.0 N}.\par\smallskip
+\textbf{1.} A student says the rope between the two carts pulls with 12 N, because that is the pull. What is wrong? &
+\step{1.1}{pred}{DRAW}{Tension on both carts: the rope pulls the back cart forward and the front cart back. Same length. Say: ``Third-law pair, through the rope.'' Tick \textbf{opposite}.}
+\pic{\carts\draw[pred,very thick,-{Stealth}] (1.4,0.5)--(2.1,0.5);\draw[pred,very thick,-{Stealth}] (3,0.5)--(2.3,0.5);\node[pred] at (2.2,1){T};}
+\step{1.2}{pblue}{DRAW}{A dashed box around both carts and the rope. Write SYSTEM, 6.0 kg. Say: ``Inside the box, the two T arrows cancel. INTERNAL. The 12 N comes from outside: EXTERNAL.'' Tick \textbf{system}, \textbf{internal}, \textbf{external}.}
+\pic{\carts\draw[pblue,dashed] (-0.15,-0.1) rectangle (5.15,1.15);\node[pgreen] at (2.5,1.5){SYSTEM: 6.0 kg};}
+\tabularnewline
+&
+\step{1.3}{black}{DRAW}{Under the picture: $a = 12 \div 6.0 = 2.0$ m/s$^2$. Tick \textbf{2.0 m/s$^2$}, then circle the 2.0 kg cart: ``Now ONE object. What pulls it forward?'' (Only T.) $T = 2.0 \times 2.0 = 4.0$ N. Tick \textbf{one}, \textbf{4.0 N}.}
+\pic{\node[right] at (0,0){$a = 12 \div 6.0 = \textcolor{pgreen}{\mathbf{2.0\ m/s^2}}$};\node[right] at (0,-1){back cart: $T = 2.0 \times 2.0 = \textcolor{pgreen}{\mathbf{4.0\ N}}$};}
+\CHECK{1.4}{The rope between the carts pulls with 12 N?}{No: it only speeds up the 2.0 kg cart, $T = 4.0$ N. The 12 N speeds up both.}
+\WATCH{Dividing 12 N by one cart's mass. Ask: which objects does the 12 N have to move?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 2: a table and a hanging mass \hfill{\mono\small 14:00--24:00}}\tabularnewline*[2pt]
+The only external force along the string is the hanging mass's \bl{weight}. It has to speed up \bl{both} masses.\par
+\textbf{Example.} 5.0 kg cart, frictionless table, 2.0 kg hanging. System: $a = 19.6 \div 7.0 = $ \bl{2.8 m/s$^2$}. Cart alone: $T = 5.0 \times 2.8 = $ \bl{14 N}. Check: $19.6 - T = 2.0 \times 2.8$, so $T = 14$ N. $T$ is \bl{less} than its weight.\par\smallskip
+\textbf{2.} A student says the hanging mass falls with $a = g = 9.8$ m/s$^2$. What is wrong? &
+\step{2.1}{black!60}{ASK}{``Let go. What makes this move?'' (The hanging weight.) ``What has to speed up?'' (Both.) Tick \textbf{weight}, \textbf{both}.}
+\step{2.2}{pred}{DRAW}{$W = 19.6$ N down on the hanging mass; $T$ along the string on both. Say: ``The string bends over the pulley, so we follow the string as if it were straight.''}
+\pic{\tbl\draw[pred,very thick,-{Stealth}] (5.47,0.2)--(5.47,-0.7) node[right]{19.6 N};\draw[pred,very thick,-{Stealth}] (2.8,2.42)--(3.8,2.42) node[above]{T};\draw[pred,very thick,-{Stealth}] (5.47,1)--(5.47,1.7);}
+\tabularnewline
+&
+\step{2.3}{black}{DRAW}{In ``Work it here'': $a = 19.6 \div 7.0 = 2.8$ m/s$^2$; cart alone: $T = 5.0 \times 2.8 = 14$ N. Tick \textbf{2.8 m/s$^2$}, \textbf{14 N}.}
+\pic{\node[right] at (0,0){$a = 19.6 \div 7.0 = \textcolor{pgreen}{\mathbf{2.8\ m/s^2}}$};\node[right] at (0,-1){cart: $T = 5.0 \times 2.8 = \textcolor{pgreen}{\mathbf{14\ N}}$};}
+\step{2.4}{black!60}{ASK}{``Check from the hanging mass.'' ($19.6 - T = 2.0 \times 2.8$, $T = 14$ N.) ``Why is 14 less than 19.6?'' (It speeds up downward, so the net force is down.) Tick \textbf{less}.}
+\CHECK{2.5}{The hanging mass falls with $a = g$?}{No: its weight must speed up the cart too, so $a$ is less than $g$: 2.8 m/s$^2$.}
+\WATCH{$T = 19.6$ N, ``the string holds the weight.'' Ask: is the hanging mass at rest?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 3: the Atwood machine \hfill{\mono\small 24:00--31:00}}\tabularnewline*[2pt]
+The \bl{heavier} side goes down. The net external force is the \bl{difference} of the two weights, and it speeds up the \bl{total} mass.\par
+\textbf{Example.} 4.0 and 6.0 kg: $a = (58.8 - 39.2) \div 10 = $ \bl{1.96 m/s$^2$}. The 4.0 kg mass goes up: $T - 39.2 = 4.0 \times 1.96$, so $T = $ \bl{47 N}.\par\smallskip
+\textbf{3.} Two 3.0 kg masses hang over a pulley. Find $a$ and $T$. &
+\step{3.1}{black!60}{ASK}{``Which way?'' (6.0 kg down.) Draw blue $a$ arrows: down on 6.0, up on 4.0. Tick \textbf{heavier}.}
+\step{3.2}{pred}{DRAW}{Weights 58.8 N and 39.2 N down; $T$ up on both, the same $T$. Say: ``One string, one tension.''}
+\pic{\atw\draw[pred,very thick,-{Stealth}] (1.25,1)--(1.25,0.2) node[left]{39.2};\draw[pred,very thick,-{Stealth}] (2.75,0.2)--(2.75,-0.6) node[right]{58.8};\draw[pred,very thick,-{Stealth}] (1.25,1.7)--(1.25,2.3) node[left]{T};\draw[pred,very thick,-{Stealth}] (2.75,1.1)--(2.75,1.7) node[right]{T};}
+\tabularnewline
+&
+\step{3.3}{black}{DRAW}{$a = (58.8 - 39.2) \div 10 = 1.96$ m/s$^2$. Tick \textbf{difference}, \textbf{total}, \textbf{1.96 m/s$^2$}.}
+\step{3.4}{black}{DRAW}{The 4.0 kg mass alone, up positive: $T - 39.2 = 4.0 \times 1.96$, $T = 47$ N. Check from the 6.0 kg side: $58.8 - T = 6.0 \times 1.96$, $T = 47$ N. Tick \textbf{47 N}.}
+\pic{\node[right] at (0,0){$a = (58.8 - 39.2) \div 10 = \textcolor{pgreen}{\mathbf{1.96}}$};\node[right] at (0,-1){$T - 39.2 = 4.0 \times 1.96$, $T = \textcolor{pgreen}{\mathbf{47\ N}}$};}
+\CHECK{3.5}{Two 3.0 kg masses over a pulley: $a$ and $T$?}{Equal weights: $a = 0$, $T = 29.4$ N.}
+\WATCH{$T = 58.8 - 39.2 = 19.6$ N. Ask: then could the 4.0 kg mass rise?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 4: friction on the table \hfill{\mono\small 31:00--38:00}}\tabularnewline*[2pt]
+Friction is one more external force, pointing \bl{against} the motion. It acts only on the table mass, so use \bl{that mass's} $N$.\par
+\textbf{Example.} The 5.0 kg cart with $\mu_k = 0.20$: $f_k = 0.20 \times 49 = $ \bl{9.8 N}. $a = (19.6 - 9.8) \div 7.0 = $ \bl{1.4 m/s$^2$}. Cart: $T - 9.8 = 5.0 \times 1.4$, so $T = $ \bl{16.8 N}.\par\smallskip
+\textbf{4.} A student finds the friction with $N = (5.0 + 2.0) \times 9.8$. What is wrong? &
+\step{4.1}{pred}{DRAW}{Friction on the cart, pointing left, at its bottom face. Tick \textbf{against}. Ask: ``Which mass presses on the table?'' (The cart only.) Tick \textbf{that mass's N}.}
+\pic{\tbl\draw[pred,very thick,-{Stealth}] (2.2,2.03)--(1.1,2.03) node[above left]{$f_k$};}
+\step{4.2}{black}{DRAW}{$f_k = 0.20 \times 49 = 9.8$ N; $a = (19.6 - 9.8) \div 7.0 = 1.4$ m/s$^2$; cart: $T - 9.8 = 5.0 \times 1.4$, $T = 16.8$ N. Tick \textbf{9.8 N}, \textbf{1.4 m/s$^2$}, \textbf{16.8 N}.}
+\CHECK{4.3}{Friction with $N = (5.0 + 2.0) \times 9.8$?}{No: only the cart presses on the table, $N = 49$ N.}
+\WATCH{$T$ goes down with friction. Ask: does the string now pull harder or softer on the cart? (Harder: 16.8 N, it fights friction too.)} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 5: exit check and summary \hfill{\mono\small 38:00--50:00}}\tabularnewline*[2pt]
+a. A 3.0 kg block on a frictionless table is tied over a pulley to a 1.5 kg hanging mass. Find the acceleration.\par
+b. Find the tension in the string.\par
+c. An Atwood machine holds 2.0 kg and 8.0 kg. Which side goes down, and how fast does it speed up?\par
+\textbf{Summary.} Answer the essential question in two or three sentences. Use the words ``system'' and ``tension.'' &
+\step{5.1}{black}{SAY}{\clock{38:00}Exit check on paper, alone, 7 minutes.}
+\step{5.2}{black}{SAY}{\clock{45:00}Remove the covers: 3.3 m/s$^2$; 9.8 N; the 8.0 kg side, 5.9 m/s$^2$. 4 of 5 right on a and b: Day 5 (springs) as planned. Fewer: open Day 5 with one more table-and-hanging problem.}
+\step{5.3}{black}{SAY}{\clock{45:00}Summary, 3 minutes. Sample: treat the tied objects as one system, where tension is internal and cancels, so $a$ = net external force $\div$ total mass; then look at one object alone to find the tension.}
+\step{5.4}{black}{SAY}{\clock{48:00}Up next: ``Tomorrow: springs. A force you can see by how far something stretches.''}
+\end{longtable}
+\end{document}
