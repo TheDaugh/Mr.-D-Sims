@@ -209,5 +209,18 @@ window.MRD_BOARD_LESSONS = [
    "4 Friction on the table",
    "5 Exit check"
   ]
+ },
+ {
+  "board": "physics",
+  "id": "springs",
+  "title": "Physics Unit 3 · Day 5 · Springs",
+  "frames": [
+   "0 Question",
+   "1 Hooke’s law",
+   "2 k from a graph",
+   "3 A hanging mass",
+   "4 A spring in a system",
+   "5 Exit check"
+  ]
  }
 ];

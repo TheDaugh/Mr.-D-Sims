@@ -51,7 +51,7 @@ Rhythm, as in chem: two notes days, then a practice day; a quiz after two blocks
 | 2 | Notes: inclines (built) | 3.12 | | |
 | 3 | Practice (built) | 3.11–3.12 | Friction Sandbox (`physics/sandbox/friction-push.html`, new), then the ramp sandbox for the slip angle (`physics/sandbox/ramp-pulley.html`, counterweight 0) | Canton Avenue |
 | 4 | Notes: connected systems (built) | 3.13 | | |
-| 5 | Notes: springs and Hooke's law | 3.14 | | |
+| 5 | Notes: springs and Hooke's law (built) | 3.14 | | |
 | 6 | Practice | 3.13–3.14 | Two-Block Lab (`physics/lessons/sims/twoblock.html`); a spring sim (none in the repo: build a small one, or PhET Hooke's Law as a stand-in) | Hyatt skywalks; hanging chain |
 | 7 | Quiz (25 min) + flex | 3.11–3.14 | flex: reteach from the exit slips | |
 | 8 | Practice: everything | all | ramp-and-pulley sandbox (`physics/sandbox/ramp-pulley.html`) | the cargo ramp |
@@ -113,6 +113,16 @@ Sources in `src/day-03-practice/` (`python3 figs.py`, then `node make.js sheet|s
 | Board script | `day-04-systems-board-script.pdf` (source `.tex`, xelatex) |
 
 Four parts (systems, a table and a hanging mass, the Atwood machine, friction on the table), a check at the foot of each, an exit check and a summary. System first for a, then one object for T, and every tension is checked from the other object. Numbers: 2.0 + 4.0 kg carts pulled with 12 N; a 5.0 kg cart with a 2.0 kg hanging mass (a 2.8, T 14 N); Atwood 4.0 and 6.0 kg (a 1.96, T 47 N); the cart with μk 0.20 (a 1.4, T 16.8 N). The exit uses 3.0 kg with 1.5 kg and an Atwood of 2.0 and 8.0 kg. None is a test number.
+
+## Day 5: springs (3.14)
+
+| Piece | File |
+|---|---|
+| Cornell notes | `day-05-springs-notes.docx`, `day-05-springs-notes-key.docx`, previews `.pdf`; source `src/day-05-notes/` (`python3 figs.py`, then `node make.js` and `node make.js key`) |
+| Lesson board | `physics/whiteboard/index.html#lesson=springs` (`tools/whiteboard/src/lessons/physics-springs.js`) |
+| Board script | `day-05-springs-board-script.pdf` (source `.tex`, xelatex) |
+
+Four parts (Hooke's law, k from a graph, a hanging mass, a spring in a system), a check at the foot of each, an exit check and a summary. Part 4 puts a spring in the Day 4 carts' rope, so the spring reads the tension students already found. Numbers: 80 N/m and 0.15 m (12 N); 3 N per 0.025 m (120 N/m); 0.60 kg on it (0.049 m); a 200 N/m spring in the carts' rope (0.020 m). The exit uses 250 N/m, 80 N/m and 0.50 kg. None is a test number. The elevator spring scale (the 3.14 stretch) is only an "ahead" question in the script.
 
 ## Every board, one page
 
