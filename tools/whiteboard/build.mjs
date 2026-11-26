@@ -5,6 +5,8 @@ import { build } from 'esbuild';
 import { cpSync, mkdirSync, rmSync, existsSync, statSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { writeFileSync } from 'node:fs';
+import { lessonIndex, lessonIndexScript } from './lesson-index.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../../shared/whiteboard');
@@ -42,3 +44,8 @@ for (const dir of keep) {
 
 const size = (p) => (existsSync(p) ? (statSync(p).size / 1e6).toFixed(2) + ' MB' : 'missing');
 console.log('app.js', size(path.join(out, 'app.js')), ' app.css', size(path.join(out, 'app.css')), ' fonts', readdirSync(path.join(out, 'fonts')).join(', '));
+
+// The lesson-board index for teacher/boards.html (outside app/, so it survives the rmSync above on the next build too).
+const index = lessonIndex(here);
+writeFileSync(path.join(root, 'lessons.js'), lessonIndexScript(index));
+console.log('lessons.js', index.length, 'lesson boards');

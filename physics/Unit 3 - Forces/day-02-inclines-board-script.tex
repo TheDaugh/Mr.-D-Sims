@@ -1,0 +1,116 @@
+\documentclass[10.5pt]{article}
+\usepackage{fontspec}\defaultfontfeatures{Ligatures=TeX}
+\usepackage[letterpaper,margin=0.6in]{geometry}
+\usepackage{amsmath,bm,xcolor,longtable,array,tikz,cancel}
+\usetikzlibrary{arrows.meta,patterns}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\definecolor{pblue}{HTML}{1971C2}\definecolor{pred}{HTML}{E03131}\definecolor{pgreen}{HTML}{2F9E44}\definecolor{ppurple}{HTML}{7048E8}\definecolor{pgray}{HTML}{868E96}
+\newfontfamily\mono{TeX Gyre Cursor}
+\newcommand{\mtag}[2]{\colorbox{#1}{\textcolor{white}{\textsf{\fontsize{6.5}{7}\selectfont\bfseries #2}}}}
+\newcommand{\clock}[1]{{\mono\fontsize{7}{8}\selectfont #1}\ }
+\newcommand{\step}[4]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\mtag{#2}{#3}\ {\small #4}\par\vspace{2pt}}
+\newcommand{\pic}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.42,every node/.style={font=\scriptsize}]#1\end{tikzpicture}\par\vspace{3pt}}
+\newcommand{\CHECK}[3]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\fcolorbox{black}{black!4}{\parbox{2.55in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries CHECK}\ {\fontsize{7.5}{9}\selectfont #2}\par{\fontsize{7.5}{9}\selectfont\textbf{Answer:} #3}\par{\fontsize{7}{8.5}\selectfont\color{pgray} 4 of 5 right: go on. Fewer: one more example, ask again.}}}\par\vspace{3pt}}
+\newcommand{\WATCH}[1]{\par\hspace{0.32in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries\color{pred} WATCH FOR}\ {\small\itshape\color{pred} #1}}\par}
+\newcommand{\bl}[1]{\underline{\textcolor{pgreen}{\textbf{#1}}}}
+\newcommand{\pen}[2]{\textcolor{#1}{\rule{8pt}{8pt}}\ #2}
+% the floor and the crate, as preset on the board: \scene{push label}
+\newcommand{\floor}{\fill[pattern=north east lines,pattern color=pgray] (-3,-0.3) rectangle (3,0);\draw[thick] (-3,0)--(3,0);}
+\newcommand{\crate}{\draw[pblue,thick,fill=pblue!8] (-0.8,0) rectangle (0.8,1.4);\node at (0,0.7){12 kg};}
+\newcommand{\pushA}[1]{\draw[pblue,very thick,-{Stealth}] (-2.8,0.7)--(-0.85,0.7);\node[pblue,above] at (-1.8,0.7){#1};}
+\newcommand{\frc}[3]{\draw[pred,very thick,-{Stealth}] #1--#2;\node[pred] at #3;}
+% the friction graph axes (push 0-80 across, friction 0-60 up; 1 unit = 10 N) with the two dashed levels
+\newcommand{\axes}{\draw[pblue,thick,-{Stealth}] (0,0)--(8.6,0);\draw[pblue,thick,-{Stealth}] (0,0)--(0,6.6);\node[below] at (4,-1.0){push (N)};\node[rotate=90] at (-1.7,3){friction (N)};
+ \foreach \v in {2,4,6,8}{\node[below,pgray] at (\v,0){\v0};}\foreach \v in {2,4,6}{\node[left,pgray] at (0,\v){\v0};}
+ \draw[pgray,dashed] (0,4.7)--(8,4.7) node[right]{47};\draw[pgray,dashed] (0,2.94)--(8,2.94) node[right]{29};}
+% a 20 degree ramp (length 6) with the block 2.6 along it; \bc is the block's center
+\newcommand{\rampB}{\fill[black!6] (0,0)--(6,0)--(6,2.184)--cycle;\draw[thick] (0,0)--(6,0)--(6,2.184)--cycle;\node at (1.1,0.22){20\textdegree};
+ \begin{scope}[shift={(2.6,0.946)},rotate=20]\draw[pblue,thick,fill=pblue!8] (0,0) rectangle (1.4,0.9);\node[rotate=0] at (0.7,0.45){5.0 kg};\end{scope}}
+\newcommand{\BC}{(3.104,1.608)}
+\newcommand{\BT}{(3.146,1.661)}
+\pagestyle{plain}
+\begin{document}
+\begin{center}{\Large\bfseries Forces, Day 2 board script: Inclines}\\[2pt]{\normalsize Honors \textbullet{} 50 minutes \textbullet{} \texttt{physics/whiteboard/index.html\#lesson=inclines}}\end{center}
+\noindent\textbf{Pens.} \pen{pblue}{objects, axes, motion} \quad \pen{pred}{forces} \quad \pen{pgreen}{new words (labels)} \quad \pen{ppurple}{components (new today)} \quad \pen{black}{numbers and everything else}\par
+\noindent\textbf{Steps.} Numbered by frame: 1.1, 1.2\ldots{} are on frame 1. Each DRAW step has a small picture of what the board should look like when the step is done. Tick the green Words box as you write each label.\par
+\noindent\textbf{Numbers all day.} The 5.0 kg block on a 20\textdegree{} ramp: $mg = 49$ N, along $= 49\sin 20^\circ = 16.8$ N, into $= 49\cos 20^\circ = 46$ N, so $N = 46$ N; no friction, $a = 9.8 \sin 20^\circ = 3.4$ m/s$^2$; with $\mu_k = 0.20$, $f_k = 9.2$ N and $a = 1.5$ m/s$^2$. Calculators in degree mode. None of these are test numbers; do not use 10 kg, 30\textdegree{} or 40\textdegree.\par
+\noindent\textbf{Not today.} No pulleys or counterweights (day 4), no slip-angle formula ($\tan\theta = \mu_s$ is day 3's practice), no pushing at an angle, no deriving why the angle at the weight is $\theta$ beyond ``tip the ramp flat and the angle goes to zero with it.''\par\smallskip
+\noindent\fcolorbox{black}{black!3}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small
+\textbf{Time checkpoints.} Be starting frame 2 by \textbf{13:00}, frame 3 by \textbf{23:00}, frame 4 by \textbf{31:00}, the exit check by \textbf{38:00}. Frame 2 is the long one. The checks are never cut; trim around them.\par
+\textbf{If you are behind,} cut in this order: (1) step 2.5, the 0\textdegree{} and 90\textdegree{} rows: say them in one sentence; (2) step 4.4, the sliding example with $\mu_k$: leave it for day 3; (3) step 1.4, the tilted axes as a separate drawing: draw them inside step 2.1 instead; (4) exit question c; (5) the summary becomes tonight's homework.\par
+\textbf{If you are ahead} (the 4-of-5 checks pass quickly), use these before the exit check, one at a time on whiteboards: \emph{The 5.0 kg block on a 50\textdegree{} ramp, no friction: $a$?} (7.5 m/s$^2$.) \emph{Which ramp angle gives $a = g/2$?} (30\textdegree.) \emph{The block stays put with $\mu_s = 0.40$. Largest angle before it slips?} ($\mu_s mg\cos\theta = mg\sin\theta$, so $\tan\theta = 0.40$, $\theta = 22^\circ$; a preview of day 3.) \emph{On a 20\textdegree{} ramp, is $N$ bigger or smaller if the block is 10 kg?} (Bigger, 92 N, but still $mg\cos\theta$.)}}\par\medskip
+\begin{longtable}{@{}>{\setlength{\parskip}{5pt}}p{3.55in}@{\hspace{0.25in}}p{3.05in}@{}}
+\multicolumn{2}{@{}l}{\large\bfseries Frame 0: question and warm-up \hfill{\mono\small 0:00--7:00}}\tabularnewline*[2pt]
+\textbf{Essential question.} What part of an object's weight pulls it down a ramp, and how hard does the ramp push back?\par
+\textbf{Warm-up.} 10 kg box sliding with $\mu_k = 0.20$: kinetic friction? $\sin 30^\circ$ on your calculator? A box slides left: which way is friction? &
+\step{0.1}{black}{SAY}{\clock{0:00}Warm-up is up as they walk in. At 3:00 remove the covers: 20 N; 0.50 (if they get $-0.99$, the calculator is in radians); to the right.}
+\step{0.2}{black}{SAY}{\clock{5:00}Read the question. Point at purple: ``New color today. Purple is a piece of a force, never a new force.''} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 1: tilted axes \hfill{\mono\small 7:00--13:00}}\tabularnewline*[2pt]
+On a ramp, the normal force points \bl{perpendicular} to the surface, not straight up. Weight still points straight \bl{down}.\par
+Tilt the axes: one \bl{along} the ramp, the way the object can move, and one into the ramp.\par\smallskip
+\textbf{1.} A student draws the normal force on a block on a ramp pointing straight up. What is wrong? &
+\step{1.1}{black!60}{ASK}{Point at the block. ``Two forces if there is no friction. Who exerts them?'' (Earth: weight. Ramp: normal force.)}
+\step{1.2}{pred}{DRAW}{Weight straight down from the center. Label W (Earth). Say: ``Gravity does not care about the ramp.'' Tick \textbf{down}.}
+\pic{\rampB\draw[pred,very thick,-{Stealth}] \BC--++(0,-2.2) node[right]{W};}
+\step{1.3}{pred}{DRAW}{The normal force from the top face, square to the ramp. Draw the little right-angle box at its foot. Label N (ramp), and write PERPENDICULAR beside it. Tick \textbf{perpendicular}.}
+\pic{\rampB\draw[pred,very thick,-{Stealth}] \BC--++(0,-2.2) node[right]{W};\draw[pred,very thick,-{Stealth}] (2.950,2.031)--++(110:1.8) node[left]{N};\node[pgreen,right] at (3.2,3.6){PERPENDICULAR};}
+\tabularnewline
+&
+\step{1.4}{pblue}{DRAW}{Dashed axes through the block: one along the slope (write ALONG), one square to it. Say: ``It can only move along the ramp, so that is our $x$.'' Tick \textbf{along}.}
+\pic{\rampB\draw[pblue,dashed] \BC++(200:2.4)--++(20:4.8) node[right]{\textcolor{pgreen}{ALONG}};\draw[pblue,dashed] \BC++(290:1.4)--++(110:2.8);}
+\CHECK{1.5}{N on a ramp block drawn straight up?}{Wrong: the ramp pushes perpendicular to its own surface, so N tilts with the ramp.}
+\WATCH{N drawn equal and opposite to W, as on a floor. Ask: is the ramp's surface level?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 2: splitting the weight \hfill{\mono\small 13:00--23:00}}\tabularnewline*[2pt]
+Split the weight $mg$ into two \bl{components}. The angle between the weight and the into-the-ramp part is the ramp angle $\theta$.\par
+Table: along the ramp \bl{$mg\sin\theta$}, into the ramp \bl{$mg\cos\theta$}; at 0\textdegree{} 0 and $mg$; at 90\textdegree{} $mg$ and 0.\par
+\textbf{Example.} 5.0 kg on a 20\textdegree{} ramp: $mg = 49$ N. Along: $49\sin 20^\circ = $ \bl{16.8 N}. Into: $49\cos 20^\circ = $ \bl{46 N}.\par\smallskip
+\textbf{2.} On a 10\textdegree{} ramp, which part of the weight is bigger: along or into the ramp? How can you tell without a calculator? &
+\step{2.1}{pred}{DRAW}{Weight $mg$ straight down from the block's center, long.}
+\step{2.2}{ppurple}{DRAW}{From the same point: one purple arrow down the slope, one purple arrow into the ramp. Dotted lines from both tips to the tip of $mg$, making a box. Say: ``Two pieces that add back up to the weight.'' Tick \textbf{components}.}
+\pic{\rampB\draw[pred,very thick,-{Stealth}] \BC--++(0,-2.4) node[right]{$mg$};\draw[ppurple,very thick,-{Stealth}] \BC--++(200:0.82);\draw[ppurple,very thick,-{Stealth}] \BC--++(290:2.255);\draw[ppurple,dotted] \BC++(200:0.82)--++(290:2.255);\draw[ppurple,dotted] \BC++(290:2.255)--++(200:0.82);}
+\tabularnewline
+&
+\step{2.3}{ppurple}{DRAW}{Mark $\theta$ between $mg$ and the into-the-ramp arrow. Say: ``Tip the ramp flat: this angle goes to zero with it. So it is the ramp's angle.''}
+\step{2.4}{pgreen}{WORDS}{Label the arrows $mg\sin\theta$ (along) and $mg\cos\theta$ (into). Fill the first row of the table. Tick \textbf{$\bm{mg\sin\theta}$}, \textbf{$\bm{mg\cos\theta}$}.}
+\pic{\rampB\draw[pred,very thick,-{Stealth}] \BC--++(0,-2.4) node[right]{$mg$};\draw[ppurple,very thick,-{Stealth}] \BC--++(200:0.82) node[left]{\textcolor{pgreen}{$mg\sin\theta$}};\draw[ppurple,very thick,-{Stealth}] \BC--++(290:2.255) node[right]{\textcolor{pgreen}{$mg\cos\theta$}};\draw[ppurple] \BC++(270:0.8) arc (270:290:0.8);\node[ppurple] at (3.42,0.62){$\theta$};}
+\step{2.5}{black!60}{ASK}{``Flat floor, $\theta = 0$: how much pulls along?'' (0; all of it, $mg$, is into.) ``A wall, 90\textdegree?'' ($mg$ along; 0 into.) Fill the rows. Tick \textbf{0 and mg}.}
+\step{2.6}{black}{DRAW}{Under the table: along $= 49\sin 20^\circ = 16.8$ N; into $= 49\cos 20^\circ = 46$ N. Tick \textbf{16.8 N}, \textbf{46 N}.}
+\CHECK{2.7}{10\textdegree{} ramp: along or into, which is bigger?}{Into: 10\textdegree{} is almost flat, and on a flat floor all the weight is into the floor.}
+\WATCH{sin and cos swapped. Ask: as the ramp goes flat, which part should go to zero?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 3: normal force and acceleration \hfill{\mono\small 23:00--31:00}}\tabularnewline*[2pt]
+The block does not sink into the ramp, so $N$ balances the into-the-ramp part: $N = $ \bl{$mg\cos\theta$}. On a ramp, $N$ is \bl{less} than $mg$.\par
+With no friction, the only force along the ramp is $mg\sin\theta$, so $a = $ \bl{$g\sin\theta$}. The mass \bl{cancels}.\par
+\textbf{Example.} The 5.0 kg block: $N = $ \bl{46 N}. With no friction, $a = 9.8\sin 20^\circ = $ \bl{3.4 m/s$^2$} down the ramp.\par\smallskip
+\textbf{3.} A student says a heavy crate slides down a frictionless ramp faster than a light one. What is wrong? &
+\step{3.1}{black!60}{ASK}{``Does the block sink into the ramp? Then what is the net force into the ramp?'' (Zero.)}
+\step{3.2}{pred}{DRAW}{N up from the block, the same length as the purple $mg\cos\theta$. Write $N = mg\cos\theta = 46$ N and ``LESS than $mg$''. Tick \textbf{$\bm{mg\cos\theta}$}, \textbf{less}, \textbf{46 N}.}
+\pic{\rampB\draw[ppurple,very thick,-{Stealth}] \BC--++(290:2.0);\draw[pred,very thick,-{Stealth}] (2.950,2.031)--++(110:2.0) node[left]{$N$};\node[right] at (4.2,3.4){$N = mg\cos\theta$};}
+\step{3.3}{black}{DRAW}{In ``Work it here'': $\Sigma F = mg\sin\theta = ma$, cross out $m$ on both sides, $a = g\sin\theta = 9.8\sin 20^\circ = 3.4$ m/s$^2$. Tick \textbf{$\bm{g\sin\theta}$}, \textbf{cancels}, \textbf{3.4 m/s$^2$}.}
+\pic{\node[right] at (0,0){$\Sigma F = \cancel{m}g\sin\theta = \cancel{m}a$};\node[right] at (0,-1){$a = g\sin\theta = \textcolor{pgreen}{\mathbf{3.4\ m/s^2}}$};}
+\CHECK{3.4}{A heavy crate slides down a frictionless ramp faster than a light one?}{No: $a = g\sin\theta$. The mass cancels, so both have the same acceleration.}
+\WATCH{$N = mg$ on a ramp. Ask: which purple arrow does $N$ cancel?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 4: friction on a ramp \hfill{\mono\small 31:00--38:00}}\tabularnewline*[2pt]
+A block at rest on a ramp would slide \bl{down}, so static friction points \bl{up} the ramp and matches $mg\sin\theta$. Use the ramp's $N$ in the friction rules: $f_k = \mu_k\, mg\cos\theta$.\par
+\textbf{Example.} The block at rest: friction $=$ \bl{16.8 N} up the ramp. If it slides down with $\mu_k = 0.20$: $f_k = 0.20 \times 46 = $ \bl{9.2 N}, $\Sigma F = 16.8 - 9.2 = 7.6$ N, $a = $ \bl{1.5 m/s$^2$}.\par\smallskip
+\textbf{4.} A box sits still on a 15\textdegree{} ramp. Which way does friction point, and how big is it compared with $mg\sin 15^\circ$? &
+\step{4.1}{black!60}{ASK}{``The block is not sliding. Which way would it go without friction?'' (Down.) ``So friction points?'' (Up the ramp.) Tick \textbf{down}, \textbf{up}.}
+\step{4.2}{pred}{DRAW}{Friction up the slope along the block's bottom face, the same length as the purple $mg\sin\theta$. Write ``at rest: $f_s = mg\sin\theta = 16.8$ N''. Tick \textbf{16.8 N}.}
+\pic{\rampB\draw[ppurple,very thick,-{Stealth}] \BC--++(200:1.0);\draw[pred,very thick,-{Stealth}] (2.882,1.049)--++(20:1.0) node[above]{$f_s$};}
+\tabularnewline
+&
+\step{4.3}{black}{SAY}{``Now it slides down, $\mu_k = 0.20$. Kinetic friction uses the ramp's $N$, 46 N, not 49.''}
+\step{4.4}{black}{DRAW}{Under ``Sliding'': $f_k = 0.20 \times 46 = 9.2$ N; $\Sigma F = 16.8 - 9.2 = 7.6$ N; $a = 7.6 \div 5.0 = 1.5$ m/s$^2$. Tick \textbf{9.2 N}, \textbf{1.5 m/s$^2$}.}
+\pic{\node[right] at (0,0){$f_k = 0.20 \times 46 = 9.2$ N};\node[right] at (0,-1){$\Sigma F = 16.8 - 9.2 = 7.6$ N};\node[right] at (0,-2){$a = 7.6 \div 5.0 = \textcolor{pgreen}{\mathbf{1.5\ m/s^2}}$};}
+\CHECK{4.5}{A box sits still on a 15\textdegree{} ramp. Friction: which way, how big?}{Up the ramp, the same size as $mg\sin 15^\circ$.}
+\WATCH{$f_k = \mu_k mg$ (the floor's $N$). Ask: what is $N$ on a ramp?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 5: exit check and summary \hfill{\mono\small 38:00--50:00}}\tabularnewline*[2pt]
+a. A 4.0 kg block sits on a frictionless 35\textdegree{} ramp. Find the part of its weight along the ramp, and the normal force.\par
+b. Find the block's acceleration.\par
+c. Why does the acceleration not depend on the block's mass?\par
+\textbf{Summary.} Answer the essential question in two or three sentences. Use the words ``$mg\sin\theta$'' and ``$mg\cos\theta$.'' &
+\step{5.1}{black}{SAY}{\clock{38:00}Exit check on paper, alone, 7 minutes.}
+\step{5.2}{black}{SAY}{\clock{45:00}Remove the covers: along 22 N, $N = 32$ N; 5.6 m/s$^2$; $mg\sin\theta$ grows with $m$, so $a = g\sin\theta$. 4 of 5 right on a and b: day 3 (practice) as planned. Fewer: open day 3 with one ramp worked on the board before the sim.}
+\step{5.3}{black}{SAY}{\clock{45:00}Summary, 3 minutes. Sample: the part of the weight along the ramp is $mg\sin\theta$, and it pulls the object down; the ramp pushes back with $N = mg\cos\theta$, which is less than $mg$.}
+\step{5.4}{black}{SAY}{\clock{48:00}Up next: ``Tomorrow: Pittsburgh's steepest street, and why cars slide down it in winter.''}
+\end{longtable}
+\end{document}

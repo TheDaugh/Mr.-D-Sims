@@ -1,0 +1,41 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.6in]{geometry}
+\usepackage{amsmath,array,tikz}
+\usepackage[T1]{fontenc}\usepackage{lmodern}
+\setlength{\parindent}{0pt}\pagestyle{empty}
+\renewcommand{\arraystretch}{1.9}
+\newcommand{\sheet}{%
+\begin{minipage}[t][4.55in][t]{\linewidth}
+{\Large\bfseries Forces: Equation Sheet}\par\vspace{8pt}
+\begin{minipage}[t]{0.6\linewidth}
+\begin{tabular}{>{\raggedright\arraybackslash}p{4.2cm} >{\centering\arraybackslash}p{2.8cm}}
+Newton's second law & $\Sigma F = ma$\\
+Weight & $W = mg$\\
+Kinetic friction & $f_k = \mu_k N$\\
+Static friction & $f_s \le \mu_s N$\\
+Spring force & $F = kx$\\
+\end{tabular}
+\par\vspace{6pt}
+$g = 9.8\ \text{m/s}^2$ \qquad $1\ \text{N} = 1\ \text{kg}\cdot\text{m/s}^2$
+\end{minipage}\hfill
+\begin{minipage}[t]{0.36\linewidth}
+\vspace{4pt}
+\begin{tikzpicture}[scale=1.1]
+\draw[thick] (0,0)--(3,0)--(3,1.8)--cycle;
+\draw (2.75,0)--(2.75,0.25)--(3,0.25);
+\draw (0.6,0) arc (0:31:0.6); \node at (0.85,0.2) {$\theta$};
+\node[below] at (1.5,0) {adjacent};
+\node[right] at (3,0.9) {opposite};
+\node[above left] at (1.5,0.95) {hypotenuse};
+\end{tikzpicture}
+\par\vspace{4pt}
+$\sin\theta = \dfrac{\text{opposite}}{\text{hypotenuse}}$\par\vspace{4pt}
+$\cos\theta = \dfrac{\text{adjacent}}{\text{hypotenuse}}$\par\vspace{4pt}
+$\tan\theta = \dfrac{\text{opposite}}{\text{adjacent}}$
+\end{minipage}
+\end{minipage}}
+\begin{document}
+\sheet\par\vspace{0.15in}
+\noindent\rule{\linewidth}{0.3pt}\par\vspace{0.25in}
+\sheet
+\end{document}

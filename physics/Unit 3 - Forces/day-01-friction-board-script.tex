@@ -1,0 +1,117 @@
+\documentclass[10.5pt]{article}
+\usepackage{fontspec}\defaultfontfeatures{Ligatures=TeX}
+\usepackage[letterpaper,margin=0.6in]{geometry}
+\usepackage{amsmath,xcolor,longtable,array,tikz}
+\usetikzlibrary{arrows.meta,patterns}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\definecolor{pblue}{HTML}{1971C2}\definecolor{pred}{HTML}{E03131}\definecolor{pgreen}{HTML}{2F9E44}\definecolor{ppurple}{HTML}{7048E8}\definecolor{pgray}{HTML}{868E96}
+\newfontfamily\mono{TeX Gyre Cursor}
+\newcommand{\mtag}[2]{\colorbox{#1}{\textcolor{white}{\textsf{\fontsize{6.5}{7}\selectfont\bfseries #2}}}}
+\newcommand{\clock}[1]{{\mono\fontsize{7}{8}\selectfont #1}\ }
+\newcommand{\step}[4]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\mtag{#2}{#3}\ {\small #4}\par\vspace{2pt}}
+\newcommand{\pic}[1]{\par\hspace{0.32in}\begin{tikzpicture}[scale=0.42,every node/.style={font=\scriptsize}]#1\end{tikzpicture}\par\vspace{3pt}}
+\newcommand{\CHECK}[3]{\par\noindent\makebox[0.32in][l]{\textbf{\small #1}}\fcolorbox{black}{black!4}{\parbox{2.55in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries CHECK}\ {\fontsize{7.5}{9}\selectfont #2}\par{\fontsize{7.5}{9}\selectfont\textbf{Answer:} #3}\par{\fontsize{7}{8.5}\selectfont\color{pgray} 4 of 5 right: go on. Fewer: one more example, ask again.}}}\par\vspace{3pt}}
+\newcommand{\WATCH}[1]{\par\hspace{0.32in}{\textsf{\fontsize{6.5}{8}\selectfont\bfseries\color{pred} WATCH FOR}\ {\small\itshape\color{pred} #1}}\par}
+\newcommand{\bl}[1]{\underline{\textcolor{pgreen}{\textbf{#1}}}}
+\newcommand{\pen}[2]{\textcolor{#1}{\rule{8pt}{8pt}}\ #2}
+% the floor and the crate, as preset on the board: \scene{push label}
+\newcommand{\floor}{\fill[pattern=north east lines,pattern color=pgray] (-3,-0.3) rectangle (3,0);\draw[thick] (-3,0)--(3,0);}
+\newcommand{\crate}{\draw[pblue,thick,fill=pblue!8] (-0.8,0) rectangle (0.8,1.4);\node at (0,0.7){12 kg};}
+\newcommand{\pushA}[1]{\draw[pblue,very thick,-{Stealth}] (-2.8,0.7)--(-0.85,0.7);\node[pblue,above] at (-1.8,0.7){#1};}
+\newcommand{\frc}[3]{\draw[pred,very thick,-{Stealth}] #1--#2;\node[pred] at #3;}
+% the friction graph axes (push 0-80 across, friction 0-60 up; 1 unit = 10 N) with the two dashed levels
+\newcommand{\axes}{\draw[pblue,thick,-{Stealth}] (0,0)--(8.6,0);\draw[pblue,thick,-{Stealth}] (0,0)--(0,6.6);\node[below] at (4,-1.0){push (N)};\node[rotate=90] at (-1.7,3){friction (N)};
+ \foreach \v in {2,4,6,8}{\node[below,pgray] at (\v,0){\v0};}\foreach \v in {2,4,6}{\node[left,pgray] at (0,\v){\v0};}
+ \draw[pgray,dashed] (0,4.7)--(8,4.7) node[right]{47};\draw[pgray,dashed] (0,2.94)--(8,2.94) node[right]{29};}
+\pagestyle{plain}
+\begin{document}
+\begin{center}{\Large\bfseries Forces, Day 1 board script: Friction}\\[2pt]{\normalsize Honors \textbullet{} 50 minutes \textbullet{} \texttt{physics/whiteboard/index.html\#lesson=friction}}\end{center}
+\noindent\textbf{Pens.} \pen{pblue}{objects, axes, motion} \quad \pen{pred}{forces} \quad \pen{pgreen}{new words (labels)} \quad \pen{ppurple}{components (from day 2)} \quad \pen{black}{numbers and everything else}\par
+\noindent\textbf{Steps.} Numbered by frame: 1.1, 1.2\ldots{} are on frame 1. Each DRAW step has a small picture of what the board should look like when the step is done. Tick the green Words box as you write each label.\par
+\noindent\textbf{Numbers all day.} The 12 kg crate: $N = 118$ N, $\mu_s = 0.40$ so $\mu_s N = 47$ N, $\mu_k = 0.25$ so $f_k = 29$ N, then a 55 N push. Use $g = 9.8$ m/s$^2$. None of these are test numbers; do not swap in 20 kg, 0.50, 0.30, 60 N or 120 N.\par
+\noindent\textbf{Not today.} No ramps (day 2), no surfaces at an angle, no pulling at an angle, no rolling friction or drag, no microscopic ``bumps and welds'' story beyond one sentence. Every crate today is on a flat floor, so $N = mg$.\par\smallskip
+\noindent\fcolorbox{black}{black!3}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small
+\textbf{Time checkpoints.} Be starting frame 2 by \textbf{14:00}, frame 3 by \textbf{22:00}, frame 4 by \textbf{31:00}, the exit check by \textbf{38:00}. The checks are never cut; trim around them.\par
+\textbf{If you are behind,} cut in this order: (1) step 3.3, the static/kinetic table: say the two rows aloud, students fill it from the key words; (2) step 2.3, the 10 N column: skip straight to 30 N; (3) step 4.4, the worked 55 N push: ask it as a whiteboard question instead; (4) exit question c; (5) the summary becomes tonight's homework. If you reach 38:00 still in frame 4, finish check 4 and go to the exit check.\par
+\textbf{If you are ahead} (the 4-of-5 checks pass quickly), use these before the exit check, one at a time on whiteboards: \emph{The 12 kg crate is pushed with 45 N. Does it move? Friction?} (No; 45 N.) \emph{A 30 kg desk slides with $\mu_k = 0.20$. What push keeps it moving at constant speed?} (59 N: net force zero, so the push equals $f_k$.) \emph{The crate's mass doubles. What happens to $\mu_s N$?} (Doubles to 94 N; $\mu_s$ stays 0.40.) \emph{Why do the coefficients have no units?} (They are force divided by force.)}}\par\medskip
+\begin{longtable}{@{}>{\setlength{\parskip}{5pt}}p{3.55in}@{\hspace{0.25in}}p{3.05in}@{}}
+\multicolumn{2}{@{}l}{\large\bfseries Frame 0: question and warm-up \hfill{\mono\small 0:00--7:00}}\tabularnewline*[2pt]
+\textbf{Essential question.} How big is the friction force, and why is starting a slide harder than keeping it going?\par
+\textbf{Warm-up.} A 6.0 kg bag rests on a table: normal force? A net force of 12 N on 4.0 kg: acceleration? The floor pushes up on a crate: its third-law partner? &
+\step{0.1}{black}{SAY}{\clock{0:00}Warm-up is up as they walk in. At 3:00 remove the covers: 59 N; 3.0 m/s$^2$; the crate pushes down on the floor.}
+\step{0.2}{black}{SAY}{\clock{5:00}Read the question. Point at the color key: ``Red is always a force. Blue is the object and how it moves. Green is a word you write down.''} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 1: what friction is \hfill{\mono\small 7:00--14:00}}\tabularnewline*[2pt]
+Friction is a \bl{contact} force. The surface exerts it \bl{along} the surface, and it points against the \bl{sliding}, or against the way the object would slide.\par
+On a flat floor, with the push sideways, the floor holds the crate up: $N = $ \bl{mg}.\par
+\textbf{Example.} The 12 kg crate: $N = 12 \times 9.8 = $ \bl{118 N}.\par\smallskip
+\textbf{1.} A box is pushed to the right but does not move. Which way does friction point? Why? &
+\step{1.1}{black!60}{ASK}{Point at the crate. ``The push is to the right. Name every other force on the crate, and who exerts it.'' (Earth: weight. Floor: normal force. Floor: friction.)}
+\step{1.2}{pred}{DRAW}{Weight down from the center (W, Earth) and the normal force up from the top (N, floor), the same length.}
+\pic{\floor\crate\pushA{push}\frc{(0,0.7)}{(0,-1.4)}{(0.9,-1.1){W (Earth)}}\frc{(0,1.4)}{(0,3.5)}{(0.9,3.2){N (floor)}}}
+\step{1.3}{pred}{DRAW}{Friction along the floor, from the bottom of the crate, pointing left. Label it ``f (floor)''.}
+\pic{\floor\crate\pushA{push}\frc{(0,0.7)}{(0,-1.4)}{(0.9,-1.1){W}}\frc{(0,1.4)}{(0,3.5)}{(0.6,3.2){N}}\frc{(0.3,0.08)}{(-1.6,0.08)}{(-1.6,-0.6){f (floor)}}}
+\tabularnewline
+&
+\step{1.4}{pgreen}{WORDS}{Write CONTACT, ALONG and SLIDING beside the friction arrow. Tick \textbf{contact}, \textbf{along}, \textbf{sliding}. Say: ``It points against the slide, or against the slide that would happen.''}
+\pic{\floor\crate\frc{(0.3,0.08)}{(-1.6,0.08)}{(-1.6,-0.6){f}}\node[pgreen,right] at (1,1.8){CONTACT};\node[pgreen,right] at (1,1.2){ALONG the floor};\node[pgreen,right] at (1,0.6){against SLIDING};}
+\step{1.5}{black}{DRAW}{Under the picture: ``Flat floor: $N = mg$'', then $N = 12 \times 9.8 = 118$ N. Tick \textbf{mg} and \textbf{118 N}.}
+\pic{\node[right] at (0,0){Flat floor: $N = \textcolor{pgreen}{\mathbf{mg}}$};\node[right] at (0,-1){$N = 12 \times 9.8 = \textcolor{pgreen}{\mathbf{118\ N}}$};}
+\CHECK{1.6}{A box pushed right does not move. Which way does friction point?}{Left: without friction the box would slide right.}
+\WATCH{``It isn't moving, so there is no friction.'' Ask: then what cancels the push?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 2: static friction \hfill{\mono\small 14:00--22:00}}\tabularnewline*[2pt]
+When the object is not sliding, friction \bl{matches} the push, so the net force is \bl{zero}.\par
+Static friction has a limit: $f_s \le \mu_s N$. Past $\mu_s N$, the object starts to \bl{slide}.\par
+\textbf{Example.} The crate has $\mu_s = 0.40$, so the largest static friction is $0.40 \times 118 = $ \bl{47 N}.\par
+Table: push 0, 10, 30, 50 N; friction \bl{0}, \bl{10}, \bl{30}, \bl{slides}.\par\smallskip
+\textbf{2.} A 10 kg box has $\mu_s = 0.60$. It is pushed with 20 N and does not move. A student says friction is 58.8 N. What is wrong? &
+\step{2.1}{black!60}{ASK}{``I push this crate with 10 N and it does not move. How big is friction?'' Wait for 10 N. ``How do you know?'' (At rest, so the net force is zero.)}
+\step{2.2}{pgreen}{WORDS}{Beside the crate: ``At rest: friction MATCHES the push. Net force ZERO.'' Tick \textbf{matches}, \textbf{zero}.}
+\pic{\floor\crate\pushA{10 N}\frc{(0.3,0.08)}{(-1.2,0.08)}{(-1.2,-0.6){10 N}}\node[pgreen,right] at (1.1,1){MATCHES};\node[pgreen,right] at (1.1,0.3){net ZERO};}
+\step{2.3}{black}{DRAW}{Fill the table one column at a time, asking each: 0, 10, 30. Leave 50 empty for now.}
+\tabularnewline
+&
+\step{2.4}{black}{DRAW}{Next to ``Largest static friction'': $\mu_s N = 0.40 \times 118 = 47$ N. Say: ``The floor can give up to 47 N, and no more.'' Tick \textbf{47 N}.}
+\pic{\node[right] at (0,0){$f_s \le \mu_s N$};\node[right] at (0,-1){$0.40 \times 118 = \textcolor{pgreen}{\mathbf{47\ N}}$};}
+\step{2.5}{black!60}{ASK}{``50 N push. What happens?'' (50 is more than 47: it slides.) Write SLIDES in the last box. Tick \textbf{slide}.}
+\pic{\draw (0,0) rectangle (8,1.6);\foreach \x in {2,4,6}{\draw (\x,0)--(\x,1.6);}\draw (0,0.8)--(8,0.8);\foreach \x/\t in {1/0,3/10,5/30,7/50}{\node at (\x,1.2){\t};}\foreach \x/\t in {1/0,3/10,5/30}{\node at (\x,0.4){\t};}\node[pgreen] at (7,0.4){\textbf{SLIDES}};}
+\CHECK{2.6}{10 kg, $\mu_s = 0.60$, pushed with 20 N, at rest. Friction is 58.8 N?}{No: 58.8 N is only the limit. Static friction matches the push: 20 N.}
+\WATCH{Writing $f = \mu_s N$ for every case. Ask: is the box sliding, or about to?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 3: kinetic friction \hfill{\mono\small 22:00--31:00}}\tabularnewline*[2pt]
+Once the object slides, $f_k = \mu_k N$. It stays the \bl{same} however hard you push and however fast it goes.\par
+$\mu_k$ is usually \bl{smaller} than $\mu_s$, so friction \bl{drops} when the slide starts. That is why starting is harder than keeping it going.\par
+Graph: friction against push. Table: static is ``not sliding'', ``matches the push, up to $\mu_s N$''; kinetic is ``sliding'', ``$\mu_k N$, constant''.\par
+\textbf{Example.} The crate has $\mu_k = 0.25$, so once it slides, $f_k = 0.25 \times 118 = $ \bl{29 N}.\par\smallskip
+\textbf{3.} A student says pushing a sliding box harder makes kinetic friction bigger. What is wrong? &
+\step{3.1}{black}{DRAW}{Beside $\mu_k = 0.25$: $f_k = 0.25 \times 118 = 29$ N. Tick \textbf{29 N}. Say: ``Once it slides, this number does not change.''}
+\step{3.2}{pred}{DRAW}{On the axes: a line from 0 rising with the push (friction = push) up to the 47 level; drop straight down to 29; then flat to 80. Write STATIC on the rising part and KINETIC on the flat part.}
+\pic{\axes\draw[pred,very thick] (0,0)--(4.7,4.7);\draw[pred,dotted] (4.7,4.7)--(4.7,2.94);\draw[pred,very thick] (4.7,2.94)--(8,2.94);\node[pgreen] at (3.0,1.2){STATIC};\node[pgreen] at (6.6,2.2){KINETIC};}
+\tabularnewline
+&
+\step{3.3}{pgreen}{WORDS}{Point at the drop. ``Friction DROPS when the slide starts, because $\mu_k$ is SMALLER. After that it stays the SAME.'' Write the three words on the graph. Fill the static/kinetic table. Tick \textbf{same}, \textbf{smaller}, \textbf{drops}.}
+\pic{\axes\draw[pred,very thick] (0,0)--(4.7,4.7);\draw[pred,dotted] (4.7,4.7)--(4.7,2.94);\draw[pred,very thick] (4.7,2.94)--(8,2.94);\node[pgreen,right] at (4.8,3.9){DROPS};\node[pgreen] at (6.6,2.2){SAME};}
+\step{3.4}{black!60}{ASK}{``Sliding crate. I push with 40 N, then 70 N. Friction each time?'' (29 N both times.)}
+\CHECK{3.5}{Pushing a sliding box harder makes kinetic friction bigger?}{No: $f_k = \mu_k N$ depends only on the surfaces and $N$, not the push or the speed.}
+\WATCH{Friction drawn bigger than the push on a box that speeds up. Ask: then which way would it go?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 4: solving friction problems \hfill{\mono\small 31:00--38:00}}\tabularnewline*[2pt]
+Step 1. Find $N$. Step 2. Compare the push with $\mu_s N$. Smaller: it stays put, friction = push, $a = $ \bl{0}. Bigger: it \bl{slides}. Step 3. If it slides, use $f_k = \mu_k N$ and \bl{$\Sigma F = ma$}.\par
+\textbf{Example.} The 12 kg crate is pushed with 55 N. 55 N is more than 47 N, so it \bl{slides}. $\Sigma F = 55 - 29 = $ \bl{26 N}, so $a = 26 \div 12 = $ \bl{2.1 m/s$^2$}.\par\smallskip
+\textbf{4.} An 8.0 kg box has $\mu_s = 0.55$. It is pushed with 40 N. Does it move? Show how you know. &
+\step{4.1}{black}{SAY}{Read the three steps. ``Step 2 is the one people skip.'' Tick \textbf{0} as you read ``it stays put, $a = 0$''.}
+\step{4.2}{black!60}{ASK}{``55 N push. Step 1?'' (118 N.) ``Step 2?'' (55 is more than 47: it slides.) Tick \textbf{slides}.}
+\step{4.3}{pred}{DRAW}{On the crate: the 55 N push and a 29 N friction arrow, shorter. Write ``slides, so $f_k$''.}
+\pic{\floor\crate\pushA{55 N}\frc{(0.3,0.08)}{(-1.2,0.08)}{(-1.4,-0.6){29 N}}\node[right] at (1.1,0.7){slides, so $f_k$};}
+\step{4.4}{black}{DRAW}{In ``Work it here'': $\Sigma F = 55 - 29 = 26$ N; $a = 26 \div 12 = 2.1$ m/s$^2$. Tick \textbf{$\Sigma F = ma$}, \textbf{26 N}, \textbf{2.1 m/s$^2$}.}
+\pic{\node[right] at (0,0){$\Sigma F = 55 - 29 = \textcolor{pgreen}{\mathbf{26\ N}}$};\node[right] at (0,-1){$a = 26 \div 12 = \textcolor{pgreen}{\mathbf{2.1\ m/s^2}}$};}
+\CHECK{4.5}{8.0 kg, $\mu_s = 0.55$, pushed with 40 N. Does it move?}{$\mu_s N = 0.55 \times 78.4 = 43$ N. 40 N is less: it stays put, friction 40 N, $a = 0$.}
+\WATCH{Subtracting $\mu_s N$ from the push and getting a negative acceleration. Ask: did you do step 2?} \tabularnewline[10pt]
+\multicolumn{2}{@{}l}{\large\bfseries Frame 5: exit check and summary \hfill{\mono\small 38:00--50:00}}\tabularnewline*[2pt]
+a. A 15 kg toolbox slides across a floor with $\mu_k = 0.15$. Find the kinetic friction.\par
+b. The toolbox is pulled sideways with 50 N while it slides. Find its acceleration.\par
+c. A hockey puck slides to the left. Which way does friction point?\par
+\textbf{Summary.} Answer the essential question in two or three sentences. Use the words ``static'' and ``kinetic.'' &
+\step{5.1}{black}{SAY}{\clock{38:00}Exit check on paper, alone, 7 minutes.}
+\step{5.2}{black}{SAY}{\clock{45:00}Remove the covers: 22 N; 1.9 m/s$^2$ ($\Sigma F = 50 - 22 = 28$ N); to the right. 4 of 5 right on a and b: day 2 (inclines) as planned. Fewer: open day 2 with one more flat-floor problem.}
+\step{5.3}{black}{SAY}{\clock{45:00}Summary, 3 minutes. Sample: static friction matches the push up to $\mu_s N$; once it slides, kinetic friction is $\mu_k N$, which is smaller, so keeping it going takes less force than starting it.}
+\step{5.4}{black}{SAY}{\clock{48:00}Up next: ``Tomorrow the floor tilts. Same friction, but $N$ is no longer $mg$.''}
+\end{longtable}
+\end{document}

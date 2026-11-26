@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Whiteboards · Teacher · Mr. D's Sims</title>
+<style>
+:root{--bg:#f5f3ee;--panel:#fff;--ink:#1c2530;--muted:#566170;--line:#d8d3c6;--accent:#17607c;--chip:#eef4f7;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#12181f;--panel:#1b232c;--ink:#e8edf2;--muted:#9aa7b5;--line:#2f3a46;--accent:#4fb0d3;--chip:#22303b}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+.wrap{padding:16px clamp(12px,3vw,40px) 48px;max-width:1200px}
+h1{margin:6px 0 0}h2{margin:0 0 8px;font-size:1.15rem}h3{margin:14px 0 6px;font-size:1rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+a{color:var(--accent)}.sub{color:var(--muted);margin:4px 0 14px}.hint{color:var(--muted);font-size:.88rem}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+.tabs button{font:inherit;font-weight:700;padding:8px 18px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.top{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+a.btn{display:inline-block;text-decoration:none;font-weight:700;padding:8px 16px;border-radius:8px;background:var(--accent);color:#fff}
+a.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.lesson{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:6px 14px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.lesson:first-of-type{border-top:0}
+.lesson .name{font-weight:700}.lesson .meta{color:var(--muted);font-size:.85rem}
+.frames{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+.frames a{font-size:.85rem;text-decoration:none;color:var(--ink);background:var(--chip);border:1px solid var(--line);border-radius:6px;padding:3px 9px}
+.frames a:hover,.frames a:focus{border-color:var(--accent);color:var(--accent)}
+input[type=search]{font:inherit;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);min-width:240px}
+.empty{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html">← Teacher</a>
+  <h1>Whiteboards</h1>
+  <p class="sub">Pick a class, then open a lesson board at any frame. Every link opens in one board tab per class, so the next click reuses the same tab on the pen display.</p>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="top" style="margin-bottom:12px"><input type="search" id="q" placeholder="Find a lesson (e.g. friction, day 5)" aria-label="Find a lesson"></div>
+  <div id="body"></div>
+  <p class="hint">A lesson board keeps what you write in this browser, separately for each lesson. To wipe one and get the preset back, use <b>Start over</b> on that board. The plain board (no lesson) is separate again and never overwritten by a lesson.</p>
+</div>
+<script src="../shared/whiteboard/lessons.js"></script>
+<script>
+(function () {
+  var CLASSES = [
+    { key: 'physics', name: 'Physics', board: 'physics', path: '../physics/whiteboard/index.html', all: true },
+    { key: 'chem', name: 'Chemistry', board: 'chem', path: '../chemistry/whiteboard/index.html' },
+    { key: 'stats', name: 'Statistics', board: 'stats', path: '../stats/whiteboard/index.html' },
+    { key: 'calc', name: 'Calculus', board: null }
+  ];
+  var LESSONS = window.MRD_BOARD_LESSONS || [];
+  var $ = function (id) { return document.getElementById(id); };
+  var el = function (tag, attrs, kids) {
+    var e = document.createElement(tag);
+    for (var k in attrs || {}) { if (k === 'text') e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); }
+    (kids || []).forEach(function (c) { if (c) e.appendChild(c); });
+    return e;
+  };
+  /* "Chem Unit 4 · Day 2 · Why atoms bond" -> unit "Unit 4", label "Day 2 · Why atoms bond", order 2.
+     "Stats 3.4 · Using the Empirical Rule" -> unit "Unit 3", label "3.4 · Using the Empirical Rule". */
+  function parse(L) {
+    var parts = L.title.split(' · '), head = parts[0], rest = parts.slice(1).join(' · '), m;
+    if ((m = head.match(/Unit (\d+)/))) {
+      var d = rest.match(/Day (\d+)/);
+      return { unit: Number(m[1]), label: rest, order: d ? Number(d[1]) : 0 };
+    }
+    if ((m = head.match(/(\d+)\.(\d+)/))) return { unit: Number(m[1]), label: m[0] + ' · ' + rest, order: Number(m[2]) };
+    if ((m = head.match(/slot (\d+)/i))) return { unit: 0, label: 'Slot ' + m[1] + ' · ' + rest, order: Number(m[1]) };
+    return { unit: 0, label: L.title, order: 0 };
+  }
+  function link(c, id, frame) { return c.path + '#lesson=' + encodeURIComponent(id) + (frame === undefined ? '' : '&frame=' + frame); }
+  var current = null;
+  function show(key) {
+    var c = CLASSES.filter(function (x) { return x.key === key; })[0] || CLASSES[0];
+    current = c;
+    try { localStorage.setItem('mrd-teacher-boards-class', c.key); } catch (e) { /* private mode */ }
+    if (location.hash !== '#' + c.key) history.replaceState(null, '', '#' + c.key);
+    [].forEach.call($('tabs').children, function (b) { b.setAttribute('aria-selected', b.dataset.key === c.key ? 'true' : 'false'); });
+    render();
+  }
+  function render() {
+    var c = current, body = $('body'), q = $('q').value.trim().toLowerCase();
+    body.innerHTML = '';
+    if (!c.board) { body.appendChild(el('div', { class: 'card' }, [el('p', { class: 'empty', text: 'No ' + c.name.toLowerCase() + ' board yet.' })])); return; }
+    var target = 'mrd-board-' + c.key;
+    var top = el('div', { class: 'card' }, [el('h2', { text: c.name + ' board' }), el('div', { class: 'top' }, [
+      el('a', { class: 'btn', href: c.path, target: target, text: 'Blank board' }),
+      c.all ? el('a', { class: 'btn ghost', href: c.path + '#all', target: target, text: 'Every stencil' }) : null])]);
+    body.appendChild(top);
+    var list = LESSONS.filter(function (L) { return L.board === c.board; }).map(function (L) { var p = parse(L); p.L = L; return p; })
+      .filter(function (p) { return !q || (p.label + ' ' + p.L.title + ' ' + p.L.id).toLowerCase().indexOf(q) >= 0; });
+    if (!list.length) { body.appendChild(el('div', { class: 'card' }, [el('p', { class: 'empty', text: q ? 'No lesson board matches.' : 'No lesson boards yet.' })])); return; }
+    var units = {};
+    list.forEach(function (p) { (units[p.unit] = units[p.unit] || []).push(p); });
+    Object.keys(units).map(Number).sort(function (a, b) { return b - a; }).forEach(function (u) {
+      var card = el('div', { class: 'card' }, [el('h2', { text: u ? 'Unit ' + u : 'Earlier lessons' })]);
+      units[u].sort(function (a, b) { return a.order - b.order; }).forEach(function (p) {
+        var frames = el('div', { class: 'frames' }, p.L.frames.map(function (f, i) { return el('a', { href: link(c, p.L.id, i), target: target, text: f }); }));
+        card.appendChild(el('div', { class: 'lesson' }, [
+          el('div', {}, [el('div', { class: 'name', text: p.label }), el('div', { class: 'meta', text: p.L.frames.length + ' frames · #lesson=' + p.L.id })]),
+          el('a', { class: 'btn', href: link(c, p.L.id), target: target, text: 'Open' }),
+          frames]));
+      });
+      body.appendChild(card);
+    });
+  }
+  CLASSES.forEach(function (c) {
+    var b = el('button', { type: 'button', role: 'tab', text: c.name }); b.dataset.key = c.key;
+    b.addEventListener('click', function () { show(c.key); });
+    $('tabs').appendChild(b);
+  });
+  $('q').addEventListener('input', render);
+  window.addEventListener('hashchange', function () { var k = location.hash.slice(1); if (!current || k !== current.key) show(k); });
+  var saved = null; try { saved = localStorage.getItem('mrd-teacher-boards-class'); } catch (e) { /* private mode */ }
+  show(location.hash.slice(1) || saved || 'physics');
+})();
+</script>
+</body>
+</html>
