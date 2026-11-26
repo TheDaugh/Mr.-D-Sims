@@ -49,7 +49,7 @@ Rhythm, as in chem: two notes days, then a practice day; a quiz after two blocks
 |---|---|---|---|---|
 | 1 | Notes: friction, static and kinetic (built) | 3.11 | | |
 | 2 | Notes: inclines (built) | 3.12 | | |
-| 3 | Practice | 3.11–3.12 | Friction Ramp (`physics/lessons/sims/friction.html`), then the ramp sandbox for the slip angle (`physics/sandbox/ramp-pulley.html`, counterweight 0) | Canton Avenue |
+| 3 | Practice (built) | 3.11–3.12 | Friction Sandbox (`physics/sandbox/friction-push.html`, new), then the ramp sandbox for the slip angle (`physics/sandbox/ramp-pulley.html`, counterweight 0) | Canton Avenue |
 | 4 | Notes: connected systems | 3.13 | | |
 | 5 | Notes: springs and Hooke's law | 3.14 | | |
 | 6 | Practice | 3.13–3.14 | Two-Block Lab (`physics/lessons/sims/twoblock.html`); a spring sim (none in the repo: build a small one, or PhET Hooke's Law as a stand-in) | Hyatt skywalks; hanging chain |
@@ -85,6 +85,24 @@ Four parts (what friction is, static, kinetic, solving), a check at the foot of 
 | Board script | `day-02-inclines-board-script.pdf` (source `.tex`, xelatex) |
 
 Four parts (tilted axes, splitting the weight, normal force and acceleration, friction on a ramp), a check at the foot of each, an exit check and a summary. One 5.0 kg block on a 20° ramp all day: mg = 49 N, along 16.8 N, N = 46 N, a = 3.4 m/s² with no friction; μk = 0.20 gives fk = 9.2 N and a = 1.5 m/s². Exit uses 4.0 kg on 35°. Purple (components) starts today. The slip angle (tan θ = μs) is held for the Day 3 practice (Canton Avenue); it is one of the script's "ahead" questions.
+
+## Day 3: practice, friction and inclines (3.11, 3.12)
+
+Online first, then paper. The real thing: Canton Avenue, Pittsburgh (37% grade, θ = 20.3°; a parked 1500 kg car needs 5,100 N of static friction; dry μs 0.70 holds, icy μs 0.10 does not; mass cancels, so it holds only if μs ≥ tan θ).
+
+| Piece | File |
+|---|---|
+| Friction Sandbox (new, replaces the old Friction Ramp sim) | `physics/sandbox/friction-push.html`, `#key` for the teacher key; physics in `friction-push-model.js`, checkpoints in `friction-push-checkpoints.js` |
+| Student sheet (2 pages: review, concepts, practice, Canton Avenue, a finisher) | `day-03-practice-sheet.docx`, `.pdf` |
+| Practice Set B (its own sheet, no label) | `day-03-practice-sheet-b.docx`, `.pdf` |
+| Exit slips (four to a page) | `day-03-practice-exit-slips.docx`, `.pdf` |
+| Key with the likely error for every item, the slip answers, the 4-of-5 decision and where to reteach | `day-03-practice-key.docx`, `.pdf` |
+| Teacher run sheet | `day-03-practice-run-sheet.docx`, `.pdf` |
+| Board | `physics/whiteboard/index.html#lesson=practice3` (`tools/whiteboard/src/lessons/physics-practice-3.js`): warm-up, the two sandboxes and Canton Avenue, whiteboard rounds, exit check |
+
+Sources in `src/day-03-practice/` (`python3 figs.py`, then `node make.js sheet|setb|slips|key|run`). No item copies a test item or uses a test number.
+
+**The Friction Sandbox.** A crate on a warehouse floor with a push machine behind it. Surfaces (wood, rubber, steel, carpet, ice, or your own μs and μk), mass, planet; a steady push or "Grow the push" (10 N per second). Linked views: force arrows, instruments with a speed graph, and the friction-against-push graph (it climbs to μs N, drops to μk N, and stays flat). Predict, then push (logged and tallied); Record table with copy and CSV. Three checkpoints with the shared rule (3 right in a row, 3 misses lock, today's unlock code): how big is friction, read μ from a mystery crate's graph, find the acceleration. Every answer is typed. The old `physics/lessons/sims/friction.html` stays inside the slot 4 FBD lesson, unchanged.
 
 ## Every board, one page
 

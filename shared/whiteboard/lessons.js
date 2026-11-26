@@ -185,5 +185,16 @@ window.MRD_BOARD_LESSONS = [
    "4 Friction on a ramp",
    "5 Exit check"
   ]
+ },
+ {
+  "board": "physics",
+  "id": "practice3",
+  "title": "Physics Unit 3 · Day 3 · Practice: friction and inclines",
+  "frames": [
+   "0 Warm-up",
+   "1 Sandboxes",
+   "2 Whiteboard rounds",
+   "3 Exit check"
+  ]
  }
 ];

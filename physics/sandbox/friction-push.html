@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Friction Sandbox · Mr. D's Sims</title>
+<meta name="description" content="Push a crate across a warehouse floor. Change the surface, the mass and the push, watch static and kinetic friction on a live graph, predict, then test.">
+<style>
+:root{--bg:#0f1720;--panel:#17222e;--panel2:#1d2b39;--ink:#eaf0f6;--muted:#9fb0c1;--line:#2c3e50;--go:#2fae6b;--warn:#e0613f;--accent:#4f8cff;--gold:#f2b84b;--bad:#ff8a73;--ok:#59d596}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100%}
+button,select,input{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none}
+header h1{font-size:1.05rem;margin:0;letter-spacing:.2px}
+header .back{color:var(--muted);text-decoration:none;font-size:1.2rem;padding:2px 6px}
+.chip{font-size:.85rem;padding:3px 10px;border-radius:99px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.chip b{color:var(--ink)}
+.sp{flex:1}
+.hbtn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:5px 12px;cursor:pointer}
+.hbtn[aria-pressed=true]{background:var(--accent);border-color:var(--accent)}
+#main{flex:1;display:flex;min-height:0}
+#stagewrap{position:relative;flex:1;min-width:0}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#side{width:292px;flex:none;background:var(--panel);border-left:1px solid var(--line);padding:10px 14px;overflow:auto}
+#side h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:10px 0 4px}
+#side h2:first-child{margin-top:2px}
+.row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 8px;margin:3px 0}
+.row label{color:var(--ink)}
+.row output{font-variant-numeric:tabular-nums;color:var(--gold);min-width:4.2em;text-align:right}
+.row input[type=range]{grid-column:1/3;width:100%;accent-color:var(--accent);height:22px;margin:2px 0}
+.tog{display:flex;align-items:center;gap:9px;margin:4px 0;cursor:pointer}
+.tog input{width:20px;height:20px;accent-color:var(--accent)}
+select{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:100%}
+#side[data-locked=true] .lockable{opacity:.45;pointer-events:none}
+#bar{display:flex;gap:8px;padding:9px 12px;background:var(--panel);border-top:1px solid var(--line);flex:none;flex-wrap:wrap;justify-content:center}
+.big{min-height:46px;min-width:112px;padding:6px 16px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-weight:600}
+.big:hover{border-color:var(--accent)}
+.big.go{background:var(--go);border-color:var(--go);color:#06220f}
+.big.pred{background:var(--gold);border-color:var(--gold);color:#2b1c00}
+.big[aria-pressed=true]{background:var(--accent);border-color:var(--accent)}
+.big:disabled{opacity:.4;cursor:not-allowed}
+.float{position:absolute;background:rgba(18,28,38,.94);border:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+#predictBar{left:50%;bottom:14px;transform:translateX(-50%);text-align:center;max-width:94%}
+#predictBar p{margin:0 0 8px;font-weight:600}
+#predictBar .opts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#inst{left:12px;top:12px;width:232px}
+#inst dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:0 0 6px;font-variant-numeric:tabular-nums}
+#inst dt{color:var(--muted)} #inst dd{margin:0;text-align:right}
+#graphs{width:208px;height:150px;display:block;margin-top:4px;border-radius:6px;background:#101a24}
+#tablePanel{right:12px;bottom:12px;width:min(540px,calc(100% - 24px));max-height:46%;overflow:auto}
+#tablePanel table{border-collapse:collapse;width:100%;font-size:.86rem;font-variant-numeric:tabular-nums}
+#tablePanel th,#tablePanel td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;white-space:nowrap}
+#tablePanel th{color:var(--muted);font-weight:600}
+#tablePanel .tools{display:flex;gap:8px;margin:8px 0 0;flex-wrap:wrap}
+td.ok{color:var(--ok)} td.no{color:var(--bad)}
+#keyPanel{left:50%;top:50%;transform:translate(-50%,-50%);width:min(540px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;font-size:.9rem;z-index:5}
+#keyPanel .kx{float:right}
+#keyPanel h3{margin:0 0 6px;font-size:1rem} #keyPanel table{width:100%;border-collapse:collapse}
+#keyPanel td{padding:2px 4px;border-bottom:1px solid var(--line)} #keyPanel td:last-child{text-align:right;color:var(--gold);font-variant-numeric:tabular-nums}
+#keyPanel p{margin:6px 0 0;color:var(--muted)}
+#cpCard{left:12px;bottom:12px;width:min(410px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;z-index:4}
+#cpCard h3{margin:0 0 6px;font-size:1rem;display:flex;align-items:center;gap:8px}
+#cpCard h3 .sp{flex:1}
+.cptabs{display:flex;gap:6px;margin:0 0 8px;flex-wrap:wrap}
+.cptab{flex:1;min-width:110px;text-align:left;padding:5px 8px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-size:.85rem}
+.cptab[aria-pressed=true]{border-color:var(--accent)}
+.cptab .dots{display:block;letter-spacing:3px;color:var(--gold)}
+.cptab.done{border-color:var(--ok)} .cptab.done .dots{color:var(--ok)}
+#cpBody p{margin:6px 0}
+#cpBody fieldset{border:1px solid var(--line);border-radius:10px;margin:8px 0;padding:6px 10px}
+#cpBody legend{color:var(--muted);font-size:.82rem;padding:0 4px}
+#cpBody label.opt{display:flex;gap:8px;align-items:flex-start;margin:4px 0;cursor:pointer;font-size:.92rem}
+#cpBody label.opt input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex:none}
+#cpBody input[type=number]{width:7em;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+#cpBody .fb{padding:8px 10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
+#cpBody .fb.ok{border-color:var(--ok)} #cpBody .fb.no{border-color:var(--bad)}
+#cpBody .keyline{color:var(--gold);font-size:.82rem}
+.primary{background:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:6px 14px;cursor:pointer;font-weight:600}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:4px 0}
+.pin{width:6em;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin:0 6px}
+.pesMsg.no{color:var(--bad)}
+.card .row{display:flex;align-items:center;gap:6px;margin:10px 0}
+#keyPage{align-items:flex-start;overflow:auto;background:rgba(10,15,21,.97)}
+#keyPage .kp{max-width:880px;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 26px 28px;margin:0 auto}
+#keyPage h1{font-size:1.35rem;margin:0 0 2px} #keyPage h2{font-size:1.05rem;margin:22px 0 6px;color:var(--gold)} #keyPage h3{font-size:.95rem;margin:14px 0 4px}
+#keyPage p,#keyPage li{margin:5px 0;color:#d2dce6} #keyPage ul{padding-left:20px;margin:4px 0}
+#keyPage table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums;margin:6px 0}
+#keyPage th,#keyPage td{border-bottom:1px solid var(--line);padding:4px 7px;text-align:left} #keyPage th{color:var(--muted);font-weight:600}
+#keyPage .bar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+#keyPage .code{font-size:1.5rem;font-weight:700;color:var(--gold);letter-spacing:.12em}
+#keyPage .mini{padding:2px 10px;font-size:.82rem}
+@media print{body{overflow:visible;background:#fff;color:#000}#app,#start,#lockres,#cpLock,.float{display:none!important}#keyPage{position:static;background:#fff;display:block!important}#keyPage .kp{border:0;background:#fff;max-width:none;padding:0}#keyPage *{color:#000!important}#keyPage .bar,#keyPage .mini{display:none!important}#keyPage h2{color:#000!important}}
+#toast{left:50%;top:14px;transform:translateX(-50%);max-width:min(620px,92%);text-align:center;pointer-events:none;opacity:0;transition:opacity .25s}
+#toast.on{opacity:1}
+#toast.ok{border-color:var(--ok)} #toast.no{border-color:var(--bad)}
+#hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);color:var(--muted);background:rgba(15,23,32,.7);padding:4px 12px;border-radius:99px;pointer-events:none;font-size:.9rem}
+.overlay{position:fixed;inset:0;background:rgba(10,15,21,.94);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.overlay[hidden]{display:none}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 26px;max-width:520px;width:100%}
+.card h2{margin:0 0 8px}
+.card p{margin:8px 0;color:var(--muted)}
+.card input[type=text]{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:4px 6px 4px 4px}
+.hint{color:var(--muted);font-size:.9rem;margin:4px 0}
+.hint.ok{color:var(--ok)} .hint.bad{color:var(--bad)}
+.mrd-idask{margin:10px 0}
+.small{font-size:.86rem;color:var(--muted)}
+@media (max-width:820px){#main{flex-direction:column}#side{width:auto;max-height:42%;border-left:0;border-top:1px solid var(--line)}}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+#fgraphBox{right:12px;top:12px;width:330px}
+#fgraphBox h3{margin:0 0 4px;font-size:.9rem;color:var(--muted);font-weight:600;display:flex;gap:8px;align-items:center}
+#fgraphBox h3 .sp{flex:1}
+#fgraph{width:306px;height:210px;display:block;border-radius:6px;background:#101a24}
+.mystery output{color:var(--muted)!important}
+.mystery #rMus,.mystery #rMuk,.mystery #sSurf{visibility:hidden}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <a class="back" href="../index.html" title="Back to the physics hub" aria-label="Back to the physics hub">←</a>
+  <h1>Friction Sandbox</h1>
+  <span class="chip" id="chipWorld">Wood on wood · Earth</span>
+  <span class="chip" id="chipTally" hidden>Predictions <b id="tallyTxt">0 of 0</b></span>
+  <span class="sp"></span>
+  <button class="hbtn" id="btnKeyPage" hidden title="Open the teacher key">🔑 Teacher key</button>
+  <button class="hbtn" id="btnKey" aria-pressed="false" hidden title="Live numbers for the settings on screen">📐 Live numbers</button>
+  <button class="hbtn" id="btnCp" aria-pressed="false" title="Checkpoints (C)">✔ Checkpoints <b id="cpCount">0 of 3</b></button>
+  <button class="hbtn" id="btnTable" aria-pressed="false" title="Record table (T)">📋 Table</button>
+  <button class="hbtn" id="btnFs" title="Full screen">⛶</button>
+</header>
+<div id="main">
+  <div id="stagewrap">
+    <canvas id="cv" aria-label="A crate on a warehouse floor with a push machine behind it"></canvas>
+    <div id="hint">Set a push and press Push, or press Grow the push. Then change anything you like.</div>
+    <div class="float" id="toast" role="status" aria-live="polite"></div>
+    <div class="float" id="predictBar" hidden>
+      <p>With a steady <span id="predF">0 N</span> push, the crate…</p>
+      <div class="opts">
+        <button class="big" data-pred="rest">stays put</button>
+        <button class="big" data-pred="slides">slides</button>
+        <button class="big" id="predCancel">Cancel</button>
+      </div>
+    </div>
+    <div class="float" id="inst" hidden>
+      <dl>
+        <dt>Speed</dt><dd id="iV">—</dd>
+        <dt>Acceleration</dt><dd id="iA">—</dd>
+        <dt>Push</dt><dd id="iP">—</dd>
+        <dt>Friction</dt><dd id="iF">—</dd>
+        <dt>Normal force</dt><dd id="iN">—</dd>
+        <dt>μs, μk</dt><dd id="iMu">—</dd>
+      </dl>
+      <canvas id="graphs" width="208" height="80" aria-label="Speed against time, last eight seconds" style="height:80px"></canvas>
+    </div>
+    <div class="float" id="fgraphBox" hidden>
+      <h3>Friction against push <span class="sp"></span><button class="linkbtn" id="fgClear">Clear</button></h3>
+      <canvas id="fgraph" width="306" height="210" aria-label="Friction force against push force"></canvas>
+    </div>
+    <div class="float" id="tablePanel" hidden>
+      <table aria-label="Record table"><thead><tr><th>#</th><th>Mass kg</th><th>Surface</th><th>μs</th><th>μk</th><th>World</th><th>Push N</th><th>You said</th><th>Crate</th><th>Friction N</th><th>a m/s²</th><th></th></tr></thead><tbody id="rows"></tbody></table>
+      <p class="small">A run you did not predict shows a dash in “You said”. Friction is its size.</p>
+      <div class="tools"><button class="hbtn" id="btnCopy">Copy for a spreadsheet</button><button class="hbtn" id="btnCsv">Download CSV</button><button class="hbtn" id="btnClear">Clear table</button></div>
+    </div>
+    <div class="float" id="cpCard" hidden role="region" aria-label="Checkpoints">
+      <h3>Checkpoints <span class="sp"></span><button class="linkbtn" id="cpHide">Hide</button></h3>
+      <div class="cptabs" id="cpTabs"></div>
+      <div id="cpBody"></div>
+    </div>
+    <div class="float" id="keyPanel" hidden></div>
+  </div>
+  <aside id="side" aria-label="Controls" data-locked="false">
+    <h2>The crate</h2>
+    <div class="lockable" id="crateBox">
+      <div class="row"><label for="rM">Crate mass</label><output id="oM">12 kg</output><input id="rM" type="range" min="1" max="40" step="1" value="12"></div>
+      <label class="small" for="sSurf">Surface</label>
+      <select id="sSurf"></select>
+      <div class="row"><label for="rMus">Static friction μs</label><output id="oMus">0.50</output><input id="rMus" type="range" min="0.05" max="1" step="0.05" value="0.5"></div>
+      <div class="row"><label for="rMuk">Sliding friction μk</label><output id="oMuk">0.30</output><input id="rMuk" type="range" min="0.05" max="1" step="0.05" value="0.3"></div>
+      <label class="small" for="sPlanet">Where is this?</label>
+      <select id="sPlanet"><option value="earth">Earth</option><option value="moon">The Moon</option><option value="mars">Mars</option><option value="jupiter">Jupiter</option></select>
+    </div>
+    <h2>The push</h2>
+    <div class="row"><label for="rF">Steady push</label><output id="oF">30 N</output><input id="rF" type="range" min="0" max="500" step="1" value="30"></div>
+    <p class="small">You can change the push while it runs.</p>
+    <h2>Show me</h2>
+    <label class="tog"><input type="checkbox" id="tArrows"> Force arrows</label>
+    <label class="tog"><input type="checkbox" id="tGraph"> Friction graph</label>
+    <label class="tog"><input type="checkbox" id="tInst"> Instruments</label>
+    <p class="small">Numbers stay hidden until you turn the instruments on.</p>
+  </aside>
+</div>
+<nav id="bar" aria-label="Sandbox controls">
+  <button class="big go" id="bGo" title="Push with the steady push (Space)">▶ Push</button>
+  <button class="big go" id="bGrow" title="The push starts at zero and grows by 10 N every second (G)">📈 Grow the push</button>
+  <button class="big pred" id="bPred" title="Predict first (P)">🎯 Predict, then push</button>
+  <button class="big" id="bPause" aria-pressed="false" title="Pause (Space)">⏸ Pause</button>
+  <button class="big" id="bSlow" aria-pressed="false" title="Slow motion">🐢 Slow-mo</button>
+  <button class="big" id="bReset" title="Stop the push and put the crate back (R)">↺ Reset</button>
+  <button class="big" id="bRec" title="Add what is happening now to the table">⏺ Record</button>
+</nav>
+</div>
+
+<div class="overlay" id="start" hidden>
+  <div class="card">
+    <h2>Friction Sandbox</h2>
+    <p>Play first. Push the crate, change the surface and the mass, and watch what friction does. Then press <b>Predict, then push</b> and see whether you can call it before it moves.</p>
+    <div id="idHost"></div>
+    <p class="small" id="lockNote" hidden>During class this opens in full screen. Leaving it is counted, and Mr. D has to see you to unlock it.</p>
+    <p class="hint bad" id="startMsg"></p>
+    <button class="big go" id="bBegin" disabled>Begin</button>
+  </div>
+</div>
+<div class="overlay" id="keyPage" hidden role="dialog" aria-label="Teacher key"><div class="kp" id="kpBody"></div></div>
+<div class="overlay" id="cpLock" hidden><div class="card" id="cpLockBody"></div></div>
+<div class="overlay" id="lockres" hidden>
+  <div class="card">
+    <h2>🔒 Locked. Hand up, eyes forward.</h2>
+    <p id="lockresTxt"></p>
+    <p><input type="text" id="lockCode" inputmode="numeric" maxlength="4" aria-label="Unlock code from Mr. D" style="width:6em"> <button class="big" id="bUnlock">Unlock</button></p>
+    <p class="hint bad" id="lockMsg"></p>
+  </div>
+</div>
+
+<script src="../../shared/bell.js"></script>
+<script src="../../shared/codes.js"></script>
+<script src="../../shared/lock.js"></script>
+<script src="../../shared/profile.js"></script>
+<script src="../../shared/ids.js"></script>
+<script src="friction-push-model.js"></script>
+<script src="friction-push-checkpoints.js"></script>
+<script>
+(function () {
+  "use strict";
+  var M = window.FrictionModel, CK = window.FrictionCheckpoints, MrD = window.MrD, $ = function (id) { return document.getElementById(id); };
+  var KEY = /key/.test(location.hash), NOLOCK = (/nolock=(\d+)/.exec(location.hash) || [])[1], LESSON_ID = "friction-sandbox";
+  var DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  var PLANET_NAME = { earth: "Earth", moon: "the Moon", mars: "Mars", jupiter: "Jupiter" };
+  var SKY = { earth: ["#cfd6dc", "#eef1f3"], moon: ["#05070b", "#10151d"], mars: ["#b5683d", "#e9b789"], jupiter: ["#c98d54", "#f1d2a4"] };
+  var FLOOR = { wood: ["#b98a55", "#8a6438"], rubber: ["#3b3f44", "#2a2d31"], steel: ["#9aa4ad", "#6f7a84"], carpet: ["#7a4250", "#5e2f3b"], ice: ["#cdeefa", "#9fd6ec"], custom: ["#8d969e", "#6d767e"], mystery: ["#6b6f75", "#55595e"] };
+  var WORD = { rest: "stays put", slides: "slides" };
+  var P = { m: 12, surf: "wood", mus: 0.5, muk: 0.3, g: 9.8, planet: "earth" }, mystery = null;
+  var st = M.fresh(), mode = "held", grow = false, paused = false, slow = false, started = false, predictOpen = false, run = null;
+  var rows = [], items = [], rights = 0, shake = 0, dust = [], hist = [], histT = 0, acc = 0, last = 0, fpts = [], broke = false;
+  var S = { id: "", period: "" }, lockArmed = false;
+
+  /* ---------- the surface list ---------- */
+  Object.keys(M.SURFACES).forEach(function (k) { var o = document.createElement("option"); o.value = k; o.textContent = M.SURFACES[k].name; $("sSurf").appendChild(o); });
+  (function () { var o = document.createElement("option"); o.value = "custom"; o.textContent = "My own (use the sliders)"; $("sSurf").appendChild(o); })();
+
+  /* ---------- physics loop ---------- */
+  var H = 1 / 240;
+  function pushNow() { return grow ? Math.min(M.F_MAX, M.RATE * st.t) : +$("rF").value; }
+  function stepSim() {
+    var wasMoving = st.moving;
+    M.step(P, st, H, pushNow());
+    if (!wasMoving && st.moving && !broke) { broke = true; bang(); var lim = M.forces(P).fmax; fpts.push([lim, lim]); fpts.push([st.F, Math.abs(st.f)]); }
+    if (!st.moving) broke = false;
+    histT += H;
+    if (histT >= 1 / 30) { histT = 0; hist.push([st.t, st.v]); if (hist.length > 240) hist.shift(); fpts.push([st.F, Math.abs(st.f)]); if (fpts.length > 4000) fpts.shift(); }
+    if (grow) $("oF").textContent = Math.round(st.F) + " N (growing)";
+    if (run && !run.decided) { if (st.moving) decide("slides"); else if (st.t - run.t0 >= 2.0) decide("rest"); }
+  }
+  function bang() { shake = 0.35; for (var i = 0; i < 16; i++) dust.push({ x: st.x + 0.7 + (Math.random() - 0.5) * 0.4, y: 0.05, vx: -Math.random() * 2.5, vy: Math.random() * 1.8, life: 1 }); }
+
+  /* ---------- reading the controls ---------- */
+  function readControls(fromSurface) {
+    if (mystery) { P.m = mystery.m; P.mus = mystery.mus; P.muk = mystery.muk; }
+    else {
+      P.m = +$("rM").value; P.surf = $("sSurf").value;
+      if (fromSurface && P.surf !== "custom") { $("rMus").value = M.SURFACES[P.surf].mus; $("rMuk").value = M.SURFACES[P.surf].muk; }
+      if (+$("rMuk").value > +$("rMus").value) $("rMuk").value = $("rMus").value;
+      P.mus = +$("rMus").value; P.muk = +$("rMuk").value;
+      if (!fromSurface && P.surf !== "custom" && (P.mus !== M.SURFACES[P.surf].mus || P.muk !== M.SURFACES[P.surf].muk)) { P.surf = "custom"; $("sSurf").value = "custom"; }
+    }
+    P.planet = $("sPlanet").value; P.g = M.PLANETS[P.planet];
+    $("oM").textContent = P.m + " kg"; $("oMus").textContent = mystery ? "?" : P.mus.toFixed(2); $("oMuk").textContent = mystery ? "?" : P.muk.toFixed(2);
+    if (!grow) $("oF").textContent = $("rF").value + " N";
+    $("crateBox").classList.toggle("mystery", !!mystery);
+    $("chipWorld").textContent = surfName() + " · " + PLANET_NAME[P.planet].replace(/^t/, "T");
+    renderKey();
+  }
+  function surfName() { return mystery ? "Mystery crate" : P.surf === "custom" ? "My own surface" : M.SURFACES[P.surf].name.split(" on ")[0] + " on " + M.SURFACES[P.surf].name.split(" on ").slice(1).join(" on "); }
+  ["rM", "rMus", "rMuk", "sPlanet", "rF"].forEach(function (id) { $(id).addEventListener("input", function () { readControls(false); }); });
+  $("sSurf").addEventListener("change", function () { readControls(true); this.blur(); });
+  $("sPlanet").addEventListener("change", function () { this.blur(); });
+  function lockControls(on) { $("side").dataset.locked = on ? "true" : "false"; $("rF").disabled = on; }
+  function loadMystery(mq) { reset(); mystery = mq; $("rM").value = mq.m; $("rM").disabled = $("rMus").disabled = $("rMuk").disabled = $("sSurf").disabled = true; $("sPlanet").value = "earth"; fpts = []; readControls(false); toast("Mystery crate loaded: " + mq.m + " kg. Turn on the friction graph and grow the push.", "ok"); }
+  function clearMystery() { if (!mystery) return; mystery = null; $("rM").disabled = $("rMus").disabled = $("rMuk").disabled = $("sSurf").disabled = false; readControls(true); }
+
+  /* ---------- the buttons ---------- */
+  function begin(isGrow) {
+    if (!started) return;
+    if (mode !== "held") { toast("Press Reset first.", ""); return; }
+    mode = "run"; grow = isGrow; paused = false; $("bPause").setAttribute("aria-pressed", "false"); $("hint").hidden = true; st.v = 0;
+    if (isGrow) { fpts = []; $("rF").disabled = true; }
+  }
+  function reset() {
+    st = M.fresh(); mode = "held"; grow = false; run = null; paused = false; predictOpen = false; hist = []; dust = []; broke = false;
+    $("predictBar").hidden = true; $("bPause").setAttribute("aria-pressed", "false"); lockControls(false); $("rF").disabled = false; $("hint").hidden = false; toast(""); readControls(false);
+  }
+  function openPredict() {
+    if (!started) return;
+    if (mode !== "held") { toast("Press Reset first. A prediction is made before the push starts.", ""); return; }
+    predictOpen = true; $("predF").textContent = $("rF").value + " N"; $("predictBar").hidden = false; $("hint").hidden = true;
+  }
+  function choose(p) {
+    predictOpen = false; $("predictBar").hidden = true;
+    run = { pred: p, snap: snap(), t0: 0, decided: false };
+    lockControls(true); begin(false);
+  }
+  function snap() { return { m: P.m, surf: mystery ? "mystery" : P.surf, mus: P.mus, muk: P.muk, planet: P.planet, F: +$("rF").value }; }
+  function decide(res) {
+    run.decided = true; lockControls(false);
+    var ok = res === run.pred, s = run.snap, q = M.forces(P);
+    addRow(s, run.pred, res, res === "rest" ? s.F : q.fk, res === "rest" ? 0 : M.accel(P, s.F), ok);
+    items.push({ skill: "friction.predict", title: s.m + " kg, μs " + s.mus.toFixed(2) + ", push " + s.F + " N", band: null, firstTry: true, ok: ok });
+    if (ok) rights++;
+    $("chipTally").hidden = false; $("tallyTxt").textContent = rights + " of " + items.length;
+    saveProfile();
+    toast(ok ? "✓ You called it: the crate " + WORD[res] + "."
+             : "✗ You said it " + WORD[run.pred] + "; the crate " + WORD[res] + ". Your settings: " + s.m + " kg, push " + s.F + " N" + (mystery ? "" : ", μs " + s.mus.toFixed(2)) + ". Turn on the force arrows: how big can the friction arrow get before the crate breaks loose?", ok ? "ok" : "no");
+  }
+  function record() {
+    if (mode !== "run") { toast("Start a push first, then record what you see.", ""); return; }
+    var s = snap(); s.F = Math.round(st.F);
+    addRow(s, null, st.moving ? "slides" : "rest", Math.abs(st.f), st.moving ? st.a : 0, null);
+    toast("Recorded.", "ok");
+  }
+  function worldText(s) { return PLANET_NAME[s.planet].replace(/^the /, ""); }
+  function surfText(s) { return s.surf === "mystery" ? "mystery" : s.surf === "custom" ? "own" : s.surf; }
+  function addRow(s, pred, res, f, a, ok) { rows.push({ n: rows.length + 1, s: s, pred: pred, res: res, f: Math.round(f * 10) / 10, a: Math.round(a * 100) / 100, ok: ok }); renderTable(); }
+  function muText(s, k) { return s.surf === "mystery" ? "?" : s[k].toFixed(2); }
+  function renderTable() {
+    var tb = $("rows"); tb.textContent = "";
+    rows.forEach(function (r) {
+      var tr = document.createElement("tr"), c = [r.n, r.s.m, surfText(r.s), muText(r.s, "mus"), muText(r.s, "muk"), worldText(r.s), r.s.F, r.pred ? WORD[r.pred] : "—", r.res === "rest" ? "holding" : "sliding", r.f.toFixed(1), r.a.toFixed(2), r.ok == null ? "" : (r.ok ? "✓" : "✗")];
+      c.forEach(function (v, i) { var td = document.createElement("td"); td.textContent = v; if (i === 11) td.className = r.ok ? "ok" : "no"; tr.appendChild(td); });
+      tb.appendChild(tr);
+    });
+  }
+  function tsv(sep) {
+    var h = ["#", "mass_kg", "surface", "mu_s", "mu_k", "world", "push_N", "predicted", "crate", "friction_N", "a_m_s2", "correct"], out = [h.join(sep)];
+    rows.forEach(function (r) { out.push([r.n, r.s.m, surfText(r.s), muText(r.s, "mus"), muText(r.s, "muk"), worldText(r.s), r.s.F, r.pred ? WORD[r.pred] : "", r.res === "rest" ? "holding" : "sliding", r.f, r.a, r.ok == null ? "" : (r.ok ? "yes" : "no")].join(sep)); });
+    return out.join("\n");
+  }
+  function copy() {
+    var t = tsv("\t");
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { toast("Copied. Paste into a spreadsheet.", "ok"); }, function () { toast("Copy was blocked. Use Download CSV.", "no"); });
+    else toast("Copy is not available here. Use Download CSV.", "no");
+  }
+  function csv() {
+    var b = new Blob([tsv(",")], { type: "text/csv" }), a = document.createElement("a");
+    a.href = URL.createObjectURL(b); a.download = "friction-record.csv"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 500);
+  }
+  function saveProfile() {
+    if (!S.id || !MrD.profile) return;
+    var all = items.concat(cpItems);
+    MrD.profile.record({ course: "physics", lesson: LESSON_ID, title: "Friction Sandbox", first: S.id, period: S.period, day: MrD.bell.dayKey(), reached: all.filter(function (x) { return x.ok; }).length, of: all.length, items: all, source: "sandbox" });
+  }
+  var toastT = 0;
+  function toast(msg, kind) { var t = $("toast"); clearTimeout(toastT); if (!msg) { t.className = "float"; return; } t.textContent = msg; t.className = "float on " + (kind || ""); toastT = setTimeout(function () { t.className = "float"; }, kind === "no" ? 11000 : 5000); }
+
+  function toggle(btn, fn) { btn.addEventListener("click", function () { fn(); btn.blur(); }); }
+  toggle($("bGo"), function () { begin(false); }); toggle($("bGrow"), function () { begin(true); $("tGraph").checked = true; $("fgraphBox").hidden = false; });
+  toggle($("bPred"), openPredict); toggle($("bReset"), reset); toggle($("bRec"), record);
+  toggle($("bPause"), function () { if (mode === "run") { paused = !paused; $("bPause").setAttribute("aria-pressed", String(paused)); } });
+  toggle($("bSlow"), function () { slow = !slow; $("bSlow").setAttribute("aria-pressed", String(slow)); });
+  toggle($("predCancel"), function () { predictOpen = false; $("predictBar").hidden = true; $("hint").hidden = mode !== "held"; });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-pred]"), function (b) { toggle(b, function () { choose(b.dataset.pred); }); });
+  toggle($("btnTable"), function () { var on = $("tablePanel").hidden; $("tablePanel").hidden = !on; $("btnTable").setAttribute("aria-pressed", String(on)); });
+  toggle($("btnKey"), function () { var on = $("keyPanel").hidden; $("keyPanel").hidden = !on; $("btnKey").setAttribute("aria-pressed", String(on)); renderKey(); });
+  toggle($("btnCopy"), copy); toggle($("btnCsv"), csv); toggle($("btnClear"), function () { rows = []; renderTable(); }); toggle($("fgClear"), function () { fpts = []; });
+  toggle($("btnFs"), function () { if (document.fullscreenElement) document.exitFullscreen(); else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); });
+  $("tInst").addEventListener("change", function () { $("inst").hidden = !this.checked; });
+  $("tGraph").addEventListener("change", function () { $("fgraphBox").hidden = !this.checked; });
+  document.addEventListener("keydown", function (e) {
+    var tg = e.target && e.target.tagName; if (tg === "INPUT" || tg === "SELECT" || tg === "TEXTAREA" || e.ctrlKey || e.metaKey || e.altKey || !started) return;
+    if (e.key === " ") { e.preventDefault(); if (mode === "held") begin(false); else $("bPause").click(); }
+    else if (e.key === "r" || e.key === "R") reset();
+    else if (e.key === "g" || e.key === "G") $("bGrow").click();
+    else if (e.key === "p" || e.key === "P") openPredict();
+    else if (e.key === "t" || e.key === "T") $("btnTable").click();
+    else if (e.key === "c" || e.key === "C") $("btnCp").click();
+    else if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && !$("rF").disabled) { var r = $("rF"); r.value = +r.value + (e.key === "ArrowRight" ? 5 : -5); readControls(false); }
+  });
+
+  /* ---------- the live numbers (teacher, #key) ---------- */
+  function f1(x) { return (Math.round(x * 10) / 10).toFixed(1); }
+  function renderKey() {
+    if (!KEY || $("keyPanel").hidden) return;
+    var F = +$("rF").value, a = M.analyze(P, F);
+    var h = "<button class=\"hbtn kx\" id=\"keyX\">Close ✕</button><h3>Live numbers for the settings on screen</h3><table>" +
+      "<tr><td>g</td><td>" + a.g.toFixed(2) + " m/s²</td></tr>" +
+      "<tr><td>μs, μk" + (mystery ? " (mystery crate)" : "") + "</td><td>" + a.mus.toFixed(2) + ", " + a.muk.toFixed(2) + "</td></tr>" +
+      "<tr><td>Normal force N = m g</td><td>" + f1(a.N) + " N</td></tr>" +
+      "<tr><td>Most static friction can give, μs N</td><td>" + f1(a.fmax) + " N</td></tr>" +
+      "<tr><td>Sliding friction, μk N</td><td>" + f1(a.fk) + " N</td></tr>" +
+      "<tr><td>The drop when it breaks loose</td><td>" + f1(a.drop) + " N</td></tr>" +
+      "<tr><td><b>A steady " + F + " N push from rest</b></td><td><b>" + WORD[a.verdict] + "</b></td></tr>" +
+      "<tr><td>Friction then</td><td>" + f1(a.friction) + " N</td></tr>" +
+      "<tr><td>Acceleration then</td><td>" + a.a.toFixed(2) + " m/s²</td></tr>" +
+      "<tr><td>Push that keeps it sliding at constant speed</td><td>" + f1(a.keepGoing) + " N</td></tr></table>" +
+      "<p>Teaching traps: friction at rest is the push, not μs N; μs N is only the most it can give. Sliding friction does not grow with the push or the speed. A crate that slides keeps sliding at a push between μk N and μs N: start it with a big push, then drop to " + f1((a.fk + a.fmax) / 2) + " N.</p>" +
+      "<p>Today's unlock code: " + (MrD.codes && MrD.codes.override ? MrD.codes.override() : "see the teacher page") + ".</p>";
+    $("keyPanel").innerHTML = h; $("keyX").onclick = function () { $("btnKey").click(); };
+  }
+
+  /* ---------- drawing ---------- */
+  var cv = $("cv"), ctx = cv.getContext("2d"), gv = $("graphs"), gx = gv.getContext("2d"), fg = $("fgraph"), fx = fg.getContext("2d"), camX = 0;
+  function resize() { var w = cv.clientWidth, h = cv.clientHeight; if (cv.width !== Math.round(w * DPR) || cv.height !== Math.round(h * DPR)) { cv.width = Math.round(w * DPR); cv.height = Math.round(h * DPR); } return [w, h]; }
+  function frame(ts) {
+    var dt = Math.min(0.05, (ts - (last || ts)) / 1000); last = ts;
+    if (mode === "run" && !paused) { acc += dt * (slow ? 0.25 : 1); var n = 0; while (acc >= H && n < 40) { stepSim(); acc -= H; n++; } if (n >= 40) acc = 0; }
+    shake *= Math.pow(0.02, dt);
+    dust.forEach(function (d) { d.x += d.vx * dt; d.y += d.vy * dt; d.vy -= 6 * dt; d.life -= dt * 1.3; }); dust = dust.filter(function (d) { return d.life > 0; });
+    draw(); if ($("tInst").checked) drawInst(); if ($("tGraph").checked) drawFGraph();
+    requestAnimationFrame(frame);
+  }
+  function arrow(x, y, dx, dy, col) {
+    var len = Math.hypot(dx, dy); if (len < 0.04) return; var ux = dx / len, uy = dy / len, hd = Math.min(0.3, len * 0.5);
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 0.09; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + dx - ux * hd * 0.6, y + dy - uy * hd * 0.6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + dx, y + dy); ctx.lineTo(x + dx - ux * hd - uy * hd * 0.5, y + dy - uy * hd + ux * hd * 0.5); ctx.lineTo(x + dx - ux * hd + uy * hd * 0.5, y + dy - uy * hd - ux * hd * 0.5); ctx.closePath(); ctx.fill();
+  }
+  function draw() {
+    var wh = resize(), w = wh[0], h = wh[1], sc = Math.min(w / 12, h / 6.5);
+    camX += (st.x - camX) * 0.08; if (Math.abs(st.x - camX) > 6) camX = st.x - Math.sign(st.x - camX) * 6;
+    var sx = w * 0.56 - camX * sc + (Math.random() - 0.5) * shake * 14, sy = h * 0.68 + (Math.random() - 0.5) * shake * 10;
+    var X = function (x) { return sx + x * sc; }, Y = function (y) { return sy - y * sc; };
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var sk = SKY[P.planet], g = ctx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, sk[0]); g.addColorStop(1, sk[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    if (P.planet === "earth") {                                                                          // the warehouse wall: shelving that scrolls slower than the floor
+      var px = -(camX * sc * 0.4) % 180; ctx.fillStyle = "rgba(90,100,110,.18)";
+      for (var k = -1; k < w / 180 + 2; k++) { var bx = px + k * 180; ctx.fillRect(bx, h * 0.12, 8, h * 0.5); ctx.fillRect(bx + 120, h * 0.12, 8, h * 0.5); for (var s2 = 0; s2 < 4; s2++) ctx.fillRect(bx, h * 0.12 + s2 * h * 0.13, 128, 5); }
+    } else if (P.planet === "moon") { ctx.fillStyle = "#cfd8e3"; for (var i = 0; i < 40; i++) ctx.fillRect((i * 97.3) % w, (i * 53.7) % (h * 0.6), 1.5, 1.5); }
+    ctx.setTransform(DPR * sc, 0, 0, -DPR * sc, DPR * sx, DPR * sy);
+    var key = mystery ? "mystery" : P.surf, fc = FLOOR[key], x0 = camX - 14, x1 = camX + 14;
+    ctx.fillStyle = fc[1]; ctx.fillRect(x0, -4, x1 - x0, 4); ctx.fillStyle = fc[0]; ctx.fillRect(x0, -0.25, x1 - x0, 0.25);
+    ctx.strokeStyle = "rgba(0,0,0,.25)"; ctx.lineWidth = 0.03;
+    for (var t = Math.floor(x0); t <= x1; t++) { ctx.beginPath(); ctx.moveTo(t, 0); ctx.lineTo(t, key === "wood" ? -0.25 : -0.12); ctx.stroke(); }
+    if (key === "ice") { ctx.fillStyle = "rgba(255,255,255,.55)"; for (var t2 = Math.floor(x0); t2 <= x1; t2 += 2) ctx.fillRect(t2 + 0.3, -0.06, 0.8, 0.03); }
+    var cx = st.x, CW = 1.4, CH = 1.1;
+    var machX = cx - 0.7;                                                                                 // the push machine rides behind the crate
+    ctx.fillStyle = "#e0b43a"; ctx.strokeStyle = "#5c4a12"; ctx.lineWidth = 0.05; ctx.fillRect(machX - 2.3, 0.18, 1.6, 0.9); ctx.strokeRect(machX - 2.3, 0.18, 1.6, 0.9);
+    ctx.fillStyle = "#2b2f33"; [machX - 2.0, machX - 1.0].forEach(function (wx) { ctx.beginPath(); ctx.arc(wx, 0.18, 0.18, 0, 6.3); ctx.fill(); });
+    ctx.fillStyle = "#9aa4ad"; ctx.fillRect(machX - 0.7, 0.5, 0.7, 0.16);                                // the ram
+    ctx.fillStyle = "#c9d1d8"; ctx.fillRect(machX - 0.05, 0.35, 0.08, 0.46);
+    ctx.fillStyle = "#c58b4e"; ctx.strokeStyle = "#6e4a22"; ctx.lineWidth = 0.06; ctx.fillRect(cx - CW / 2, 0, CW, CH); ctx.strokeRect(cx - CW / 2, 0, CW, CH);
+    ctx.lineWidth = 0.035; ctx.beginPath(); ctx.moveTo(cx - CW / 2, 0); ctx.lineTo(cx + CW / 2, CH); ctx.moveTo(cx + CW / 2, 0); ctx.lineTo(cx - CW / 2, CH); ctx.stroke();
+    if (st.v > 0.6) { ctx.strokeStyle = "rgba(60,60,60,.35)"; ctx.lineWidth = 0.04; for (var j = 0; j < 4; j++) { var ly = 0.2 + j * 0.25, ln = Math.min(2.5, st.v * 0.4); ctx.beginPath(); ctx.moveTo(machX - 2.5 - j * 0.15, ly); ctx.lineTo(machX - 2.5 - ln - j * 0.15, ly); ctx.stroke(); } }
+    dust.forEach(function (d) { ctx.fillStyle = "rgba(235,225,205," + Math.max(0, d.life * 0.7) + ")"; ctx.beginPath(); ctx.arc(d.x, d.y, 0.06 + 0.1 * (1 - d.life), 0, 6.3); ctx.fill(); });
+    var showF = $("tArrows").checked && !predictOpen, q = M.forces(P), Fn = mode === "run" ? st.F : 0, fr = mode === "run" ? Math.abs(st.f) : 0;
+    if (showF) {
+      var mx = Math.max(q.N, Fn, fr, 1), kk = 2.6 / mx;
+      arrow(cx, CH / 2, 0, -q.N * kk, "#4f8cff"); arrow(cx, CH, 0, q.N * kk, "#2fae6b"); arrow(cx - CW / 2 - 0.05 - Fn * kk, CH / 2 + 0.25, Fn * kk, 0, "#e0613f"); if (fr > 0.01) arrow(cx + 0.2, 0.02, -fr * kk, 0, "#d68a00");
+    }
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "600 14px system-ui,sans-serif";
+    var lab = function (txt, x, y, col) { ctx.lineWidth = 3; ctx.strokeStyle = "rgba(10,16,22,.75)"; ctx.fillStyle = col || "#fff"; ctx.strokeText(txt, x, y); ctx.fillText(txt, x, y); };
+    lab(P.m + " kg", X(cx), Y(CH / 2));
+    for (var d5 = Math.ceil(x0 / 5) * 5; d5 <= x1; d5 += 5) { ctx.font = "12px system-ui"; lab(d5 + " m", X(d5), Y(-0.5), "#dfe6ec"); }
+    if (mystery) lab("? surface", X(cx) + 110, Y(-0.5), "#ffe08a");
+    if (showF) {
+      var mx2 = Math.max(q.N, Fn, fr, 1), k2 = 2.6 / mx2; ctx.font = "600 12px system-ui,sans-serif";
+      lab("weight", X(cx) + 30, Y(CH / 2 - q.N * k2) + 6, "#9cc2ff"); lab("normal", X(cx) + 30, Y(CH + q.N * k2) - 6, "#8be8b4");
+      if (Fn > 0.5) lab("push", X(cx - CW / 2 - 0.05 - Fn * k2 * 0.5), Y(CH / 2 + 0.25) - 14, "#ff9d8d"); if (fr > 0.5) lab("friction", X(cx - fr * k2 * 0.5), Y(0) + 14, "#ffcb85");
+    }
+  }
+  function drawInst() {
+    var q = M.forces(P), run2 = mode === "run";
+    $("iV").textContent = run2 ? st.v.toFixed(2) + " m/s" : "—";
+    $("iA").textContent = run2 ? (Math.abs(st.a) < 0.005 ? "0" : st.a.toFixed(2)) + " m/s²" : "—";
+    $("iP").textContent = run2 ? st.F.toFixed(1) + " N" : "—";
+    $("iF").textContent = run2 ? Math.abs(st.f).toFixed(1) + " N" + (st.moving ? " (sliding)" : " (holding)") : "—";
+    $("iN").textContent = q.N.toFixed(1) + " N";
+    $("iMu").textContent = mystery && !KEY ? "?" : q.mus.toFixed(2) + ", " + q.muk.toFixed(2);
+    gx.clearRect(0, 0, 208, 80); gx.fillStyle = "#101a24"; gx.fillRect(0, 0, 208, 80); gx.strokeStyle = "#2c3e50"; gx.strokeRect(24.5, 4.5, 178, 71);
+    gx.fillStyle = "#59d596"; gx.font = "11px system-ui"; gx.fillText("v", 6, 16);
+    if (hist.length < 2) return; var mv = 0.5; hist.forEach(function (p) { mv = Math.max(mv, p[1]); });
+    var t1 = hist[hist.length - 1][0], t0 = Math.max(0, t1 - 8); gx.strokeStyle = "#59d596"; gx.lineWidth = 1.6; gx.beginPath();
+    hist.forEach(function (p, i) { var x = 25 + (p[0] - t0) / Math.max(8, t1 - t0) * 176, y = 74 - p[1] / mv * 66; if (i) gx.lineTo(x, y); else gx.moveTo(x, y); }); gx.stroke();
+  }
+  function niceMax(v) { var c = [10, 20, 25, 50, 75, 100, 150, 200, 300, 400, 500]; for (var i = 0; i < c.length; i++) if (c[i] >= v) return c[i]; return 500; }
+  function drawFGraph() {
+    var W = 306, Hh = 210, L = 40, R = 10, T = 10, B = 30, q = M.forces(P), xm = niceMax(Math.max(q.fmax * 1.6, 10)), ym = xm;
+    fx.clearRect(0, 0, W, Hh); fx.fillStyle = "#101a24"; fx.fillRect(0, 0, W, Hh);
+    var X = function (v) { return L + v / xm * (W - L - R); }, Y = function (v) { return Hh - B - v / ym * (Hh - T - B); };
+    fx.strokeStyle = "#2c3e50"; fx.lineWidth = 1; fx.font = "11px system-ui"; fx.fillStyle = "#9fb0c1"; fx.textAlign = "center";
+    for (var i = 0; i <= 5; i++) { var v = xm * i / 5, x = X(v), y = Y(v); fx.beginPath(); fx.moveTo(x, T); fx.lineTo(x, Hh - B); fx.moveTo(L, y); fx.lineTo(W - R, y); fx.stroke(); fx.fillText(String(Math.round(v)), x, Hh - B + 13); fx.textAlign = "right"; fx.fillText(String(Math.round(v)), L - 4, y + 4); fx.textAlign = "center"; }
+    fx.fillText("push (N)", (L + W - R) / 2, Hh - 4); fx.save(); fx.translate(11, (T + Hh - B) / 2); fx.rotate(-Math.PI / 2); fx.fillText("friction (N)", 0, 0); fx.restore();
+    if (fpts.length > 1) { fx.strokeStyle = "#f2b84b"; fx.lineWidth = 2.2; fx.beginPath(); fpts.forEach(function (p, j) { var x = X(Math.min(p[0], xm)), y = Y(Math.min(p[1], ym)); if (j) fx.lineTo(x, y); else fx.moveTo(x, y); }); fx.stroke(); }
+    if (mode === "run") { fx.fillStyle = "#e0613f"; fx.beginPath(); fx.arc(X(Math.min(st.F, xm)), Y(Math.min(Math.abs(st.f), ym)), 4, 0, 6.3); fx.fill(); }
+  }
+
+  /* ---------- the teacher key page (#key) ---------- */
+  var DEMOS = [
+    ["Day 1 crate, small push", { m: 12, surf: "custom", mus: 0.4, muk: 0.25, F: 30 }, "Holds: friction is 30 N, not 47 N. Ask what friction is before anyone touches a number."],
+    ["Day 1 crate, big push", { m: 12, surf: "custom", mus: 0.4, muk: 0.25, F: 55 }, "Slides: friction drops to 29 N, a = (55 − 29.4)/12 = 2.1 m/s²."],
+    ["Grow the push on wood", { m: 12, surf: "wood", mus: 0.5, muk: 0.3, F: 0, grow: true }, "Climbs to μs N = 59 N, drops to μk N = 35 N. Read both and divide by N = 118 N."],
+    ["Ice", { m: 12, surf: "ice", mus: 0.1, muk: 0.05, F: 15 }, "Breaks loose at 12 N; slides with only 5.9 N of friction."],
+    ["Rubber mat", { m: 12, surf: "rubber", mus: 0.9, muk: 0.7, F: 100 }, "Holds at 100 N: the limit is 106 N."],
+    ["Same crate on the Moon", { m: 12, surf: "wood", mus: 0.5, muk: 0.3, F: 30, planet: "moon" }, "N is only 19 N, so the limit is 9.7 N and a 30 N push slides it. Friction depends on N, and N depends on g."],
+    ["Keeps going on a small push", { m: 12, surf: "wood", mus: 0.5, muk: 0.3, F: 70 }, "Push, then drag the push down to 45 N while it slides: it keeps going (45 is above μk N = 35 N) but would never have started at 45."]
+  ];
+  function el2(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function tableOf(head, rowsArr) { return "<table><thead><tr>" + head.map(function (x) { return "<th>" + x + "</th>"; }).join("") + "</tr></thead><tbody>" + rowsArr.map(function (r) { return "<tr>" + r.map(function (x) { return "<td>" + x + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table>"; }
+  function loadSettings(o) {
+    clearMystery(); reset();
+    $("sPlanet").value = o.planet || "earth"; $("rM").value = o.m; $("sSurf").value = o.surf; $("rMus").value = o.mus; $("rMuk").value = o.muk; $("rF").value = o.F;
+    readControls(false); if (o.surf !== "custom") { $("sSurf").value = o.surf; P.surf = o.surf; readControls(true); }
+    closeKeyPage(); if (o.grow) { $("tGraph").checked = true; $("fgraphBox").hidden = false; }
+  }
+  function renderKeyPage() {
+    var b = $("kpBody"); b.textContent = "";
+    var code = MrD.codes && MrD.codes.override ? MrD.codes.override() : "see the teacher page";
+    var d = new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+    var top = el2("div", "bar", ""); b.appendChild(top);
+    var close = el2("button", "big go", "Open the sandbox"); close.id = "keyPageClose"; close.onclick = closeKeyPage; var pr = el2("button", "big", "Print this key"); pr.onclick = function () { window.print(); };
+    top.appendChild(close); top.appendChild(pr);
+    b.appendChild(el2("h1", "", "Friction Sandbox: teacher key"));
+    b.appendChild(el2("p", "small", "Forces, last block, Day 3 practice (friction and inclines), first half. Replaces the old Friction Ramp sim. " + d + "."));
+    b.appendChild(el2("h2", "", "1. Today's unlock code"));
+    b.appendChild(el2("p", "", "A student whose checkpoint is locked (three misses in a row, or “I need Mr. D”) stays locked until you type today's code, the same one as “Unlock any locked student” on the teacher page: <span class=\"code\" id=\"kpCode\">" + code + "</span>"));
+    b.appendChild(el2("p", "", "After an unlock only that checkpoint resets, and the student needs two right in a row on fresh questions. The same code frees a student from the full-screen lock."));
+    b.appendChild(el2("h2", "", "2. How the first half of Day 3 can run"));
+    b.appendChild(el2("ul", "", "<li><b>Free play, about 5 minutes.</b> Push crates, change surfaces, try the Moon. Say nothing about formulas.</li><li><b>Grow the push.</b> Everyone turns on the friction graph and grows the push on one surface. Ask what the climb, the top and the drop are.</li><li><b>Predict, then push.</b> Each prediction is logged with the settings and counted. A miss points at the force arrows, never at the answer.</li><li><b>Checkpoints (✔ button).</b> Three, each needs three right in a row; every answer is typed, so none can be guessed. Then the worksheet.</li>"));
+    b.appendChild(el2("h2", "", "3. Setups worth showing (press Load)"));
+    var dr = DEMOS.map(function (x, i) { var p = { m: x[1].m, mus: x[1].mus, muk: x[1].muk, g: M.PLANETS[x[1].planet || "earth"] }, a = M.analyze(p, x[1].F);
+      return ["<button class=\"hbtn mini\" data-demo=\"" + i + "\">Load</button>", x[0], x[1].m + " kg, μs " + x[1].mus + ", μk " + x[1].muk + (x[1].grow ? ", grow" : ", push " + x[1].F + " N") + (x[1].planet ? ", " + x[1].planet : ""), f1(a.fmax) + " N", f1(a.fk) + " N", x[1].grow ? "—" : WORD[a.verdict], x[2]]; });
+    var tw = el2("div", "", tableOf(["", "Setup", "Settings", "μs N", "μk N", "Crate", "What to say"], dr)); b.appendChild(tw);
+    Array.prototype.forEach.call(tw.querySelectorAll("[data-demo]"), function (btn) { btn.onclick = function () { loadSettings(DEMOS[+btn.dataset.demo][1]); }; });
+    b.appendChild(el2("h2", "", "4. Checkpoint 1: How big is friction?"));
+    b.appendChild(el2("p", "", "<b>Right answer.</b> N = m g. If the push is no more than μs N, the crate holds and <b>friction equals the push</b>. If the push is bigger, it slides and <b>friction is μk N</b>. Half the questions hold and half slide; every push is at least 20% from the limit, and a holding push is never close to μk N, so a wrong method cannot land on the right number. Accepts ±3%."));
+    b.appendChild(el2("p", "", "<b>Wrong answers to expect</b> (each gets its own hint): μs N for a crate that holds; μk N for a crate that holds; the push for a crate that slides; μs N for a crate that slides."));
+    b.appendChild(el2("h2", "", "5. Checkpoint 2: Read the graph"));
+    b.appendChild(el2("p", "", "<b>Right answer.</b> The student loads a mystery crate (mass shown, μs and μk hidden, different for every student and question), grows the push, and reads the friction graph: <b>μs = top of the climb ÷ m g</b>, <b>μk = flat level after the drop ÷ m g</b>. Questions alternate between μs and μk. Accepts ±0.03. With the instruments on, the friction readout at the break and after it gives the same two numbers."));
+    b.appendChild(el2("p", "", "<b>Wrong answers to expect:</b> typing the force in newtons instead of the coefficient; swapping the two levels; dividing by the mass instead of m g."));
+    b.appendChild(el2("h2", "", "6. Checkpoint 3: Find the acceleration"));
+    b.appendChild(el2("p", "", "<b>Right answer.</b> Compare the push with μs N. If it holds, <b>a = 0</b> (one question in three). If it slides, <b>a = (push − μk N) ÷ m</b>. Accepts ±3%."));
+    b.appendChild(el2("p", "", "<b>Wrong answers to expect:</b> push ÷ m with no friction; using μs N instead of μk N once it slides; a nonzero answer for a crate that holds."));
+    b.appendChild(el2("h2", "", "7. Surfaces"));
+    b.appendChild(el2("div", "", tableOf(["Surface", "μs", "μk"], Object.keys(M.SURFACES).map(function (k) { var s = M.SURFACES[k]; return [s.name, s.mus.toFixed(2), s.muk.toFixed(2)]; }))));
+    b.appendChild(el2("p", "small", "Typical textbook values, my choice from the usual ranges, not measured (<code>author_set</code>). Change them in <code>friction-push-model.js</code>."));
+    b.appendChild(el2("h2", "", "8. What the model assumes"));
+    b.appendChild(el2("ul", "", "<li>A flat floor and a sideways push, so N = m g. The machine pushes and never pulls, up to " + M.F_MAX + " N, and rides along behind the crate.</li><li>At rest, static friction matches the push up to μs N. Sliding, friction is μk N, whatever the speed or the push. μk cannot be set above μs.</li><li>If the push drops below μk N the crate slows; when friction stops it, it stops dead and static friction decides again. It never slides backwards.</li><li>Grow the push adds " + M.RATE + " N every second. g: Earth 9.8, Moon 1.62, Mars 3.71, Jupiter 24.8 m/s².</li>"));
+    b.appendChild(el2("h2", "", "9. Reading what students did"));
+    b.appendChild(el2("p", "", "Each student's table can be copied or downloaded from their own screen. Their saved record holds the prediction tally and which checkpoints they passed, and whether each was passed with no misses, on their own device under their ID (the review portal reads it)."));
+  }
+  function openKeyPage() { if (!KEY) return; renderKeyPage(); $("keyPage").hidden = false; $("keyPage").scrollTop = 0; }
+  function closeKeyPage() { $("keyPage").hidden = true; }
+  toggle($("btnKeyPage"), openKeyPage);
+
+  /* ---------- checkpoints: 3 right in a row, a lock after 3 misses, today's code (shared/virtual-lab/checkpoint.js) ---------- */
+  var CPM = null, CPS = null, cpActive = "cp1", cpFb = null, cpItems = [];
+  var CPLOCK_TEXT = { head: "🔒 Locked. Hand up, eyes forward.", miss: "You missed three in a row on a checkpoint.", help: "You asked for Mr. D.", body: "Mr. D will come to you and type a code. After that you need two right in a row.", word: "Unlock code", wrong: "Not the code. Hand up and wait for Mr. D.", go: "Unlock" };
+  function cpWho() { return S.id || "key"; }
+  function cpStorage() { return "fp.cp.v1:" + cpWho() + ":" + MrD.bell.dayKey(); }
+  function cpLoad() {
+    var s2 = { cp1: CPM.track(), cp2: CPM.track(), cp3: CPM.track(), lock: null, items: [] }, saved = null;
+    try { saved = JSON.parse(localStorage.getItem(cpStorage())); } catch (e) { }
+    if (saved) { CK.TYPES.forEach(function (t) { if (saved[t]) s2[t] = saved[t]; }); s2.lock = saved.lock || null; s2.items = saved.items || []; }
+    CK.TYPES.forEach(function (t) { s2[t].atCp = true; });
+    return s2;
+  }
+  function cpSave() { try { localStorage.setItem(cpStorage(), JSON.stringify(CPS)); } catch (e) { } }
+  function cpPassed() { return CK.TYPES.filter(function (t) { return CPS[t].passed; }).length; }
+  function cpStart() {
+    if (!CPM || !started || CPS) return;
+    CPS = cpLoad(); cpItems = CPS.items;
+    $("cpCount").textContent = cpPassed() + " of 3"; cpRender();
+    var m = CPM.mirrorGet(LESSON_ID);
+    if (!CPS.lock && m && m.student === cpWho()) CPS.lock = CPM.lockInfo(m.type, m.reason, "Checkpoints");
+    if (CPS.lock) cpShowLock();
+  }
+  function cpQ(type) { return CK.gen(type, cpWho(), CPS[type].n); }
+  function mk(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function cpRender() {
+    if (!CPS) return;
+    var tabs = $("cpTabs"), body = $("cpBody"); tabs.textContent = ""; body.textContent = "";
+    CK.TYPES.forEach(function (t, i) {
+      var tr = CPS[t], b = mk("button", "cptab" + (tr.passed ? " done" : ""));
+      b.type = "button"; b.setAttribute("aria-pressed", String(t === cpActive)); b.appendChild(document.createTextNode((i + 1) + " " + CK.NAMES[t]));
+      b.appendChild(mk("span", "dots", tr.passed ? "✓ passed" : "●".repeat(tr.streak) + "○".repeat(Math.max(0, tr.need - tr.streak))));
+      b.onclick = function () { cpActive = t; cpFb = null; cpRender(); b.blur(); }; tabs.appendChild(b);
+    });
+    var t = cpActive, tr = CPS[t], q = cpQ(t);
+    if (tr.passed) { body.appendChild(mk("p", "fb ok", "✓ You passed “" + CK.NAMES[t] + "”. " + (cpPassed() === 3 ? "All three checkpoints are done." : "Pick another checkpoint above."))); return; }
+    if (cpFb) {
+      body.appendChild(mk("p", "fb " + (cpFb.ok ? "ok" : "no"), cpFb.text));
+      var nx = mk("button", "primary", cpFb.ok ? "Next question" : "Try a new question"); nx.type = "button"; nx.onclick = function () { cpFb = null; cpRender(); };
+      body.appendChild(nx); body.appendChild(mk("p", "small", "Question " + (tr.n + 1) + " will be a new one."));
+      return;
+    }
+    body.appendChild(mk("p", "", q.prompt));
+    if (q.mystery) { var lm = mk("button", "hbtn", "Load the mystery crate"); lm.type = "button"; lm.id = "cpLoad"; lm.onclick = function () { loadMystery(q.mystery); }; body.appendChild(lm); }
+    var f = document.createElement("form"); f.setAttribute("novalidate", ""); f.onsubmit = function (e) { e.preventDefault(); cpSubmit(t, q, f); };
+    var row = mk("p"), inp = document.createElement("input"); inp.type = "number"; inp.id = "cpNum"; inp.step = "any"; inp.setAttribute("aria-label", q.label);
+    row.appendChild(inp); if (q.unit) row.appendChild(document.createTextNode(" " + q.unit)); f.appendChild(row);
+    var msg = mk("p", "hint bad"); msg.id = "cpInline"; f.appendChild(msg);
+    var go = mk("button", "primary", "Check"); go.type = "submit"; go.id = "cpCheck"; f.appendChild(go);
+    var help = mk("button", "linkbtn", "I need Mr. D"); help.type = "button"; help.id = "cpHelp"; help.onclick = function () { tr.helps++; cpLockOn(t, "help"); }; f.appendChild(document.createTextNode(" ")); f.appendChild(help);
+    body.appendChild(f);
+    body.appendChild(mk("p", "small", "In a row: " + tr.streak + " of " + tr.need + ". Three misses in a row lock the screen."));
+    if (KEY) body.appendChild(mk("p", "keyline", "Key: " + (q.type === "cp2" ? q.label + " = " + q.answer.toFixed(2) + " (μs " + q.mystery.mus.toFixed(2) + ", μk " + q.mystery.muk.toFixed(2) + ")" : q.answer.toFixed(2) + " " + q.unit)));
+  }
+  function cpSubmit(t, q, f) {
+    var tr = CPS[t], v = f.querySelector("#cpNum").value;
+    if (v === "") { $("cpInline").textContent = "Type a number first."; return; }
+    var g = CK.grade(q, v);
+    tr.att.push({ n: tr.n, ok: g.ok, code: g.code, hint: g.hint ? g.hint.slice(0, 60) : "", at: new Date().toISOString() });
+    var res = CPM.grade(tr, g.ok);
+    if (t === "cp2") clearMystery();
+    if (res === "pass") {
+      cpItems.push({ skill: "friction." + t, title: CK.NAMES[t], band: null, firstTry: tr.att.every(function (a) { return a.ok; }), ok: true });
+      $("cpCount").textContent = cpPassed() + " of 3"; cpFb = { ok: true, text: "✓ Right. That is the checkpoint passed." }; toast("Checkpoint passed: " + CK.NAMES[t] + (cpPassed() === 3 ? ". All three are done." : "."), "ok"); saveProfile();
+    } else if (res === "right") cpFb = { ok: true, text: "✓ Right. " + tr.streak + " of " + tr.need + " in a row." };
+    else if (res === "miss") cpFb = { ok: false, text: g.hint + " (Misses in a row: " + tr.miss + " of 3.)" };
+    else { cpFb = null; cpSave(); cpLockOn(t, "miss"); return; }
+    cpSave(); cpRender();
+  }
+  function cpLockOn(type, reason) { var L = CPM.lockInfo(type, reason, "Checkpoints"); CPS.lock = L; CPM.mirrorSet(LESSON_ID, L, cpWho()); cpSave(); cpShowLock(); }
+  function cpShowLock() {
+    var L = CPS.lock, host = $("cpLockBody"); host.textContent = "";
+    CPM.lockScreen(L, CPLOCK_TEXT, { pin: "cpPin", go: "cpGo", msg: "cpMsg" }, function () {
+      CPM.unlockTrack(CPS[L.type]); CPS.lock = null; CPM.mirrorClear(LESSON_ID); cpFb = null; cpSave(); $("cpLock").hidden = true; cpActive = L.type; cpRender();
+    }).forEach(function (n) { host.appendChild(n); });
+    $("cpLock").hidden = false; var pin = $("cpPin"); if (pin) pin.focus();
+  }
+  toggle($("btnCp"), function () { var on = $("cpCard").hidden; $("cpCard").hidden = !on; $("btnCp").setAttribute("aria-pressed", String(on)); if (on) cpStart(); });
+  toggle($("cpHide"), function () { $("cpCard").hidden = true; $("btnCp").setAttribute("aria-pressed", "false"); });
+  import("../../shared/virtual-lab/checkpoint.js").then(function (m) { CPM = m; cpStart(); }, function () { $("btnCp").hidden = true; });
+
+  /* ---------- starting, and locked mode (shared/lock.js) ---------- */
+  function clk() { return MrD.bell.clock("physics"); }
+  function lockWanted() { return !KEY && !!S.id && NOLOCK !== LessonLock.offCode() && !!clk().lockOn; }
+  function go() { started = true; $("start").hidden = true; $("lockres").hidden = true; cpStart(); }
+  function beginLesson() {
+    var info = askH.get(); if (!info.valid) return; S.id = info.id; S.period = info.period; MrD.ids.setMe(S.id, S.period);
+    if (!lockWanted()) { go(); return; }
+    LessonLock.enter(S.id).then(function (ok) {
+      if (!ok) { $("startMsg").textContent = "Full screen did not start. This needs Chrome on your Chromebook. Tell Mr. D."; return; }
+      lockArmed = true; go();
+    });
+  }
+  function lockResumeCard() {
+    $("start").hidden = true; $("lockres").hidden = false;
+    $("lockresTxt").textContent = "You closed the sandbox. That is lock number " + LessonLock.lockNo() + ". Mr. D needs to see you and give you a code.";
+    var inp = $("lockCode"); inp.focus();
+    var tryIt = function () { LessonLock.resume(inp.value).then(function (r) { if (r === "ok") { lockArmed = true; $("lockMsg").textContent = ""; $("lockres").hidden = true; go(); } else $("lockMsg").textContent = r === "nofs" ? "Full screen did not start. Click again." : "Not the code. Hand up and wait for Mr. D."; }); };
+    $("bUnlock").onclick = tryIt; inp.onkeydown = function (e) { if (e.key === "Enter") tryIt(); };
+  }
+  var askH = null;
+  function boot() {
+    $("sSurf").value = "wood"; readControls(true); reset();
+    if (KEY) { $("btnKey").hidden = false; $("btnKeyPage").hidden = false; $("start").hidden = true; started = true; cpStart(); openKeyPage(); return; }
+    LessonLock.init({ id: LESSON_ID, root: $("app"), onChange: function () { } });
+    var me = MrD.ids.me(); if (me) { S.id = me.id; S.period = me.period; }
+    if (NOLOCK !== LessonLock.offCode() && clk().lockOn && LessonLock.pending()) { lockResumeCard(); return; }
+    $("start").hidden = false; $("lockNote").hidden = !(clk().lockOn && NOLOCK !== LessonLock.offCode());
+    askH = MrD.ids.ask($("idHost"), { onChange: function (i) { $("bBegin").disabled = !i.valid; $("startMsg").textContent = ""; } });
+    $("bBegin").addEventListener("click", beginLesson);
+    setInterval(function () { if (lockArmed && !clk().lockOn) { lockArmed = false; LessonLock.finish(); } }, 5000);
+  }
+  /* A hook for the tests; it only reads and drives the same functions the buttons use. */
+  window.__fp = { P: P, st: function () { return st; }, mode: function () { return mode; }, rows: function () { return rows; }, items: function () { return items; }, rights: function () { return rights; }, fpts: function () { return fpts; },
+    set: function (k, v) { var map = { m: "rM", mus: "rMus", muk: "rMuk", F: "rF" }; if (map[k]) $(map[k]).value = v; else if (k === "planet") $("sPlanet").value = v; else if (k === "surf") { $("sSurf").value = v; readControls(true); return; } readControls(false); },
+    push: function () { begin(false); }, grow: function () { begin(true); }, reset: reset, choose: choose, openPredict: openPredict, record: record, step: function (n) { for (var i = 0; i < n; i++) stepSim(); }, started: function () { return started; },
+    mystery: function () { return mystery; }, cp: { ready: function () { return !!CPS; }, state: function () { return CPS; }, q: function (t) { return CPS ? cpQ(t) : null; } }, force: function () { started = true; $("start").hidden = true; } };
+  boot();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -18,7 +18,8 @@ function lessonList() {
 }
 const extra = ['index.html', 'physics/index.html', 'chemistry/index.html', 'calculus/index.html', 'stats/index.html', 'stats/shared/kit-demo.html', 'teacher/index.html', 'teacher/boards.html', 'portal/index.html',
   'physics/lessons/teacher.html', 'chemistry/teacher.html', 'calculus/teacher.html', 'stats/teacher.html',
-  'chemistry/whiteboard/index.html', 'stats/whiteboard/index.html', 'physics/whiteboard/index.html'];
+  'chemistry/whiteboard/index.html', 'stats/whiteboard/index.html', 'physics/whiteboard/index.html',
+  'physics/sandbox/ramp-pulley.html', 'physics/sandbox/ramp-pulley.html#key', 'physics/sandbox/friction-push.html', 'physics/sandbox/friction-push.html#key'];
 
 (async () => {
   const pages = [];
